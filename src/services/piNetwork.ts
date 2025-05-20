@@ -91,8 +91,9 @@ export const createPiPayment = async (
       return null;
     }
 
-    const paymentData = {
+    const paymentData: PiPayment = {
       amount,
+      identifier: `payment-${Date.now()}`, // Generate a unique identifier
       memo,
       metadata,
     };

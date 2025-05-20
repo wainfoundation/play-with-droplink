@@ -7,7 +7,7 @@ const CTA = () => {
       <div className="container mx-auto text-center relative z-20">
         <h2 className="text-3xl md:text-4xl font-bold mb-6">Join Our Community Today</h2>
         <p className="text-xl mb-8 max-w-2xl mx-auto">
-          Be part of a thriving ecosystem of creators building the future of Pi Network together.
+          Be part of a thriving ecosystem of creators building and connecting with the Pi community.
         </p>
         <Link 
           to="/signup" 
@@ -15,7 +15,7 @@ const CTA = () => {
         >
           Get Started for Free
         </Link>
-        <p className="mt-4 text-sm opacity-80">No credit card required. Community-powered.</p>
+        <p className="mt-4 text-sm opacity-80">No credit card required. Community-powered with Pi payments.</p>
       </div>
     </section>
   );
