@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Mail, HelpCircle, FileText, Users, Shield, Cookie, Link as LinkIcon } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -42,19 +42,33 @@ const Footer = () => {
         <div className="space-y-4">
           <h3 className="font-poppins font-semibold text-lg">Resources</h3>
           <ul className="space-y-2">
-            <li><Link to="/help" className="text-sm hover:text-primary transition-colors">Help Center</Link></li>
-            <li><Link to="/templates" className="text-sm hover:text-primary transition-colors">Templates</Link></li>
-            <li><Link to="/creators" className="text-sm hover:text-primary transition-colors">Creator Directory</Link></li>
-            <li><Link to="/developers" className="text-sm hover:text-primary transition-colors">Developers</Link></li>
+            <li><Link to="/help" className="text-sm hover:text-primary transition-colors flex items-center gap-2">
+              <HelpCircle size={16} /> Help Center
+            </Link></li>
+            <li><Link to="/templates" className="text-sm hover:text-primary transition-colors flex items-center gap-2">
+              <FileText size={16} /> Templates
+            </Link></li>
+            <li><Link to="/creators" className="text-sm hover:text-primary transition-colors flex items-center gap-2">
+              <Users size={16} /> Creator Directory
+            </Link></li>
+            <li><Link to="/developers" className="text-sm hover:text-primary transition-colors flex items-center gap-2">
+              <LinkIcon size={16} /> Developers
+            </Link></li>
           </ul>
         </div>
 
         <div className="space-y-4">
           <h3 className="font-poppins font-semibold text-lg">Legal</h3>
           <ul className="space-y-2">
-            <li><Link to="/terms" className="text-sm hover:text-primary transition-colors">Terms of Service</Link></li>
-            <li><Link to="/privacy" className="text-sm hover:text-primary transition-colors">Privacy Policy</Link></li>
-            <li><Link to="/cookies" className="text-sm hover:text-primary transition-colors">Cookie Policy</Link></li>
+            <li><Link to="/terms" className="text-sm hover:text-primary transition-colors flex items-center gap-2">
+              <FileText size={16} /> Terms of Service
+            </Link></li>
+            <li><Link to="/privacy" className="text-sm hover:text-primary transition-colors flex items-center gap-2">
+              <Shield size={16} /> Privacy Policy
+            </Link></li>
+            <li><Link to="/cookies" className="text-sm hover:text-primary transition-colors flex items-center gap-2">
+              <Cookie size={16} /> Cookie Policy
+            </Link></li>
           </ul>
 
           <div className="mt-8 pt-4 border-t border-gray-200">
@@ -67,9 +81,9 @@ const Footer = () => {
               />
               <button 
                 type="submit" 
-                className="px-4 py-2 bg-primary text-white font-semibold rounded-md hover:bg-secondary transition-colors"
+                className="px-4 py-2 bg-primary text-white font-semibold rounded-md hover:bg-secondary transition-colors flex items-center justify-center gap-2"
               >
-                Subscribe
+                <Mail size={16} /> Subscribe
               </button>
             </form>
           </div>
