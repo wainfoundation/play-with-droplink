@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -63,6 +64,10 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
+			fontFamily: {
+				sans: ['Inter', 'sans-serif'],
+				poppins: ['Poppins', 'sans-serif'],
+			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
@@ -84,11 +89,34 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				float: {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-30px)' }
+				},
+				wave: {
+					'0%': { backgroundPosition: '0 0' },
+					'50%': { backgroundPosition: '1000px 1000px' },
+					'100%': { backgroundPosition: '0 0' }
+				},
+				pulse: {
+					'0%, 100%': { transform: 'scale(1)' },
+					'50%': { transform: 'scale(1.05)' }
+				},
+				fadeIn: {
+					to: { opacity: '1', transform: 'translateY(0)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'float': 'float 6s ease-in-out infinite',
+				'wave': 'wave 10s ease-in-out infinite',
+				'pulse': 'pulse 2s infinite ease-in-out',
+				'fade-in': 'fadeIn 1s ease-out forwards'
+			},
+			backgroundImage: {
+				'gradient-hero': 'linear-gradient(45deg, #00aaff, #00d4ff)',
 			}
 		}
 	},
