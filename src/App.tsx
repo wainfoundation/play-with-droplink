@@ -13,6 +13,7 @@ import Pricing from "./pages/Pricing";
 import Features from "./pages/Features";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import AdminPortal from "./pages/AdminPortal";
 
 // Company Pages
 import About from "./pages/About";
@@ -53,6 +54,7 @@ const App = () => {
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/features" element={<Features />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/admin" element={<AdminPortal />} />
             
             {/* Company Pages */}
             <Route path="/about" element={<About />} />
