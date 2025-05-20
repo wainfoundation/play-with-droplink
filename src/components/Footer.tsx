@@ -78,7 +78,7 @@ const Footer = () => {
 
       <div className="container mx-auto mt-12 pt-6 border-t border-gray-200 text-center text-sm">
         <p>© {new Date().getFullYear()} Droplink. All rights reserved.</p>
-        <p className="mt-2 text-xs text-gray-500">Powered by Pi Network. Pi is not affiliated with Droplink.</p>
+        <p className="mt-2 text-xs text-gray-500">Built by the community, for the community. Droplink is committed to helping creators thrive on Pi Network.</p>
       </div>
     </footer>
   );

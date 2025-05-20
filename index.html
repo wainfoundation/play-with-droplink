@@ -19,6 +19,17 @@
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    
+    <!-- Pi Network SDK -->
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <script>
+      // Initialize Pi SDK in sandbox mode (remove sandbox flag for production)
+      document.addEventListener('DOMContentLoaded', function() {
+        if (window.Pi) {
+          window.Pi.init({ version: "2.0", sandbox: true });
+        }
+      });
+    </script>
   </head>
 
   <body>

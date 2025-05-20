@@ -52,7 +52,8 @@ const Pricing = () => {
     "Connect All Social Profiles",
     "Sell Products with Pi Payments",
     "Basic Analytics",
-    "Email Support"
+    "Email Support",
+    "Community Forums Access"
   ];
   
   const proFeatures = [
@@ -67,7 +68,8 @@ const Pricing = () => {
     "Custom Themes",
     "Location Analytics",
     "Email/Phone Collection",
-    "SEO & Pi Integrations"
+    "SEO & Pi Integrations",
+    "Community Rewards"
   ];
   
   const premiumFeatures = [
@@ -77,7 +79,8 @@ const Pricing = () => {
     "Historical Insights",
     "Data Export",
     "Whitelabel Option",
-    "Advanced Pi Payments"
+    "Advanced Pi Payments",
+    "Community Contributor Status"
   ];
   
   return (
@@ -88,7 +91,7 @@ const Pricing = () => {
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold mb-4 text-primary">Pricing Plans</h1>
             <p className="text-xl max-w-2xl mx-auto text-gray-600">
-              Choose a plan to amplify your Pi-powered presence.
+              Choose a plan to amplify your presence and join our community-driven ecosystem.
             </p>
             
             <div className="mt-6 inline-flex items-center p-1 bg-muted rounded-lg">
@@ -114,13 +117,13 @@ const Pricing = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <PricingCard
               title="Starter"
-              price={annual ? "3π" : "4π"}
+              price={annual ? "6π" : "8π"}
               features={starterFeatures}
             />
             
             <PricingCard
               title="Pro"
-              price={annual ? "6π" : "8π"}
+              price={annual ? "10π" : "12π"}
               features={proFeatures}
               isPopular={true}
               ctaText="Try Free for 7 Days"
@@ -128,7 +131,7 @@ const Pricing = () => {
             
             <PricingCard
               title="Premium"
-              price={annual ? "9π" : "12π"}
+              price={annual ? "15π" : "18π"}
               features={premiumFeatures}
             />
           </div>
@@ -155,6 +158,13 @@ const Pricing = () => {
                 <h3 className="font-bold text-lg">What happens after my Pro trial ends?</h3>
                 <p className="text-gray-600 mt-2">
                   After your 7-day trial, you'll be automatically subscribed to the Pro plan unless you downgrade to Starter.
+                </p>
+              </div>
+              
+              <div>
+                <h3 className="font-bold text-lg">How does Droplink support the Pi community?</h3>
+                <p className="text-gray-600 mt-2">
+                  Droplink is built by and for the Pi community. We contribute back through community rewards, special events, and by creating tools that help creators thrive.
                 </p>
               </div>
             </div>

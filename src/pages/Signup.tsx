@@ -1,12 +1,14 @@
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { toast } from "@/hooks/use-toast";
+import { authenticateWithPi, initPiNetwork } from "@/services/piNetwork";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -15,6 +17,13 @@ const Signup = () => {
     password: "",
     agreeTerms: false
   });
+  const [piAuthenticating, setPiAuthenticating] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Initialize Pi Network SDK
+    initPiNetwork(true); // Use sandbox mode for development
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -35,6 +44,51 @@ const Signup = () => {
     e.preventDefault();
     // In a real app, we would handle signup logic here
     console.log("Signup attempt with:", formData);
+    toast({
+      title: "Account Created!",
+      description: "Welcome to Droplink. This is a demo - in a real app, you would be registered now."
+    });
+  };
+
+  const handlePiSignup = async () => {
+    try {
+      setPiAuthenticating(true);
+      const authResult = await authenticateWithPi(["username"]);
+      
+      if (authResult?.user) {
+        console.log("Pi authentication successful:", authResult);
+        toast({
+          title: "Pi Authentication Successful",
+          description: `Welcome, ${authResult.user.username || "Pioneer"}! Complete your profile to continue.`,
+        });
+        
+        // Pre-fill username if available
+        if (authResult.user.username) {
+          setFormData(prev => ({
+            ...prev,
+            username: authResult.user.username || ""
+          }));
+        }
+        
+        // In a real app, you would handle the successful authentication here
+        // For this demo, we're just pre-filling the username
+      } else {
+        toast({
+          title: "Authentication Failed",
+          description: "Could not authenticate with Pi Network",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Pi signup error:", error);
+      toast({
+        title: "Authentication Error",
+        description: "An error occurred during Pi authentication",
+        variant: "destructive",
+      });
+    } finally {
+      setPiAuthenticating(false);
+    }
   };
 
   return (
@@ -44,10 +98,31 @@ const Signup = () => {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-primary">Create Your Droplink</h1>
-            <p className="text-gray-600 mt-2">Get started with your Pi Network link page</p>
+            <p className="text-gray-600 mt-2">Join our community on Pi Network</p>
           </div>
           
           <div className="bg-white rounded-xl shadow-lg p-8">
+            <Button 
+              type="button" 
+              onClick={handlePiSignup}
+              className="w-full bg-gradient-hero hover:bg-secondary flex items-center justify-center gap-2 mb-6"
+              disabled={piAuthenticating}
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/>
+              </svg>
+              {piAuthenticating ? "Authenticating..." : "Sign up with Pi Network"}
+            </Button>
+            
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or complete your profile</span>
+              </div>
+            </div>
+            
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="username">Username</Label>

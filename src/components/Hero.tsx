@@ -43,9 +43,13 @@ const Hero = () => {
     
     setTimeout(type, 500);
     
+    // Fix: Added a proper cleanup function
     return () => {
-      // Cleanup (not strictly necessary, but good practice)
-      clearTimeout();
+      // Clear any pending timeouts
+      const highestId = window.setTimeout(() => {}, 0);
+      for (let i = 0; i < highestId; i++) {
+        clearTimeout(i);
+      }
     };
   }, []);
   
