@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -82,7 +81,7 @@ const Developers = () => {
                             <code>curl -X POST "https://api.droplink.io/v1/profiles" \
 -H "Authorization: Bearer YOUR_API_KEY" \
 -H "Content-Type: application/json" \
--d '{"username": "myusername", "title": "My Profile"}'</code>
+-d {"{"}"username": "myusername", "title": "My Profile"{"}"}</code>
                           </pre>
                         </div>
                       </div>
@@ -115,7 +114,7 @@ const Developers = () => {
                             <code>curl -X POST "https://api.droplink.io/v1/links" \
 -H "Authorization: Bearer YOUR_API_KEY" \
 -H "Content-Type: application/json" \
--d '{"profile_id": "123", "title": "My Link", "url": "https://example.com"}'</code>
+-d {"{"}"profile_id": "123", "title": "My Link", "url": "https://example.com"{"}"}</code>
                           </pre>
                         </div>
                       </div>
@@ -129,7 +128,7 @@ const Developers = () => {
                         <div>
                           <h3 className="text-lg font-semibold flex items-center">
                             <span className="bg-primary text-white px-2 py-0.5 text-xs font-bold rounded mr-2">GET</span>
-                            /analytics/profiles/{'{profile_id}'}
+                            /analytics/profiles/{"{"}"profile_id"{"}"}
                           </h3>
                           <p className="my-2 text-muted-foreground">Get analytics for a specific profile</p>
                           <pre className="bg-muted p-3 rounded-md overflow-x-auto text-sm">
@@ -141,7 +140,7 @@ const Developers = () => {
                         <div>
                           <h3 className="text-lg font-semibold flex items-center">
                             <span className="bg-primary text-white px-2 py-0.5 text-xs font-bold rounded mr-2">GET</span>
-                            /analytics/links/{'{link_id}'}
+                            /analytics/links/{"{"}"link_id"{"}"}
                           </h3>
                           <p className="my-2 text-muted-foreground">Get analytics for a specific link</p>
                           <pre className="bg-muted p-3 rounded-md overflow-x-auto text-sm">
