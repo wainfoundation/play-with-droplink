@@ -31,7 +31,7 @@ const Dashboard = () => {
     cancelSubscription
   } = useUser();
   
-  const [isYearly, setIsYearly] = useState(true);
+  const [billingCycle, setBillingCycle] = useState('annual'); // 'annual' or 'monthly'
   const [processingPayment, setProcessingPayment] = useState(false);
   const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
   
@@ -94,24 +94,42 @@ const Dashboard = () => {
     setProcessingPayment(true);
     
     try {
+      // Plan pricing based on tier and billing cycle
+      const planPrices = {
+        starter: { monthly: 10, annual: 8 },
+        pro: { monthly: 15, annual: 12 },
+        premium: { monthly: 22, annual: 18 }
+      };
+      
       // Calculate amount based on plan and billing cycle
+      const planName = plan.toLowerCase();
       let amount = 0;
-      if (plan === "Starter") {
-        amount = isYearly ? 6 : 8;
-      } else if (plan === "Pro") {
-        amount = isYearly ? 10 : 12;
-      } else if (plan === "Premium") {
-        amount = isYearly ? 15 : 18;
+      
+      if (planName === "starter") {
+        amount = billingCycle === 'annual' ? planPrices.starter.annual * 12 : planPrices.starter.monthly;
+      } else if (planName === "pro") {
+        amount = billingCycle === 'annual' ? planPrices.pro.annual * 12 : planPrices.pro.monthly;
+      } else if (planName === "premium") {
+        amount = billingCycle === 'annual' ? planPrices.premium.annual * 12 : planPrices.premium.monthly;
+      }
+      
+      // Calculate expiration date
+      const expireDate = new Date();
+      if (billingCycle === 'annual') {
+        expireDate.setFullYear(expireDate.getFullYear() + 1);
+      } else {
+        expireDate.setMonth(expireDate.getMonth() + 1);
       }
       
       // Create payment through Pi Network
       const paymentData = {
         amount,
-        memo: `${plan} Plan Subscription (${isYearly ? 'Annual' : 'Monthly'})`,
+        memo: `${plan} Plan Subscription (${billingCycle === 'annual' ? 'Annual' : 'Monthly'})`,
         metadata: {
           isSubscription: true,
-          plan: plan.toLowerCase(),
-          duration: isYearly ? 'annual' : 'monthly'
+          plan: planName,
+          duration: billingCycle,
+          expiresAt: expireDate.toISOString()
         }
       };
       

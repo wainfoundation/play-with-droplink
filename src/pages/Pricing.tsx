@@ -13,6 +13,8 @@ import { useToast } from "@/hooks/use-toast";
 const PricingCard = ({ 
   title, 
   price, 
+  annualPrice,
+  billingCycle,
   features, 
   isPopular = false,
   ctaText = "Get Started",
@@ -20,9 +22,15 @@ const PricingCard = ({
   currentPlan = false,
   processingPayment = false
 }) => {
+  // Calculate display price based on billing cycle
+  const displayPrice = billingCycle === 'annual' ? annualPrice : price;
+  
+  // Calculate savings percentage for annual billing
+  const savingsPercent = price > 0 ? Math.round(((price - annualPrice) / price) * 100) : 0;
+  
   return (
     <div className={`bg-white rounded-xl shadow-lg p-8 border ${currentPlan ? 'border-green-500' : isPopular ? 'border-primary' : 'border-gray-200'} relative`}>
-      {isPopular && (
+      {isPopular && !currentPlan && (
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm font-medium">
           Most Popular
         </div>
@@ -33,11 +41,20 @@ const PricingCard = ({
         </div>
       )}
       <h3 className="text-xl font-bold mb-2 text-primary">{title}</h3>
-      <div className="mb-4">
-        <span className="text-3xl font-bold">{price}</span>
+      <div className="mb-1">
+        <span className="text-3xl font-bold">{displayPrice}π</span>
         <span className="text-gray-500">/month</span>
       </div>
-      <p className="text-gray-600 mb-6">Billed annually</p>
+      <p className="text-gray-600 mb-6 text-sm">
+        {billingCycle === 'annual' ? (
+          <>Billed annually ({annualPrice * 12}π/year)</>
+        ) : (
+          <>Billed monthly</>
+        )}
+        {billingCycle === 'annual' && savingsPercent > 0 && (
+          <span className="ml-1 text-green-600 font-medium">Save {savingsPercent}%</span>
+        )}
+      </p>
       
       <ul className="space-y-3 mb-8">
         {features.map((feature, index) => (
@@ -60,7 +77,7 @@ const PricingCard = ({
 };
 
 const Pricing = () => {
-  const [annual, setAnnual] = useState(true);
+  const [billingCycle, setBillingCycle] = useState('annual'); // 'annual' or 'monthly'
   const [processingPayment, setProcessingPayment] = useState(false);
   
   const { isLoggedIn, user, subscription, showAds } = useUser();
@@ -103,6 +120,12 @@ const Pricing = () => {
     "Community Contributor Status"
   ];
   
+  const planPrices = {
+    starter: { monthly: 10, annual: 8 },
+    pro: { monthly: 15, annual: 12 },
+    premium: { monthly: 22, annual: 18 }
+  };
+  
   const handleSubscribe = async (plan: string) => {
     if (!isLoggedIn) {
       navigate('/login');
@@ -112,24 +135,35 @@ const Pricing = () => {
     setProcessingPayment(true);
     
     try {
-      // Calculate amount based on plan and billing cycle
+      // Get price based on plan and billing cycle
+      const planName = plan.toLowerCase();
       let amount = 0;
-      if (plan === "Starter") {
-        amount = annual ? 6 : 8;
-      } else if (plan === "Pro") {
-        amount = annual ? 10 : 12;
-      } else if (plan === "Premium") {
-        amount = annual ? 15 : 18;
+      
+      if (planName === "starter") {
+        amount = billingCycle === 'annual' ? planPrices.starter.annual * 12 : planPrices.starter.monthly;
+      } else if (planName === "pro") {
+        amount = billingCycle === 'annual' ? planPrices.pro.annual * 12 : planPrices.pro.monthly;
+      } else if (planName === "premium") {
+        amount = billingCycle === 'annual' ? planPrices.premium.annual * 12 : planPrices.premium.monthly;
+      }
+      
+      // Calculate expiration date
+      const expireDate = new Date();
+      if (billingCycle === 'annual') {
+        expireDate.setFullYear(expireDate.getFullYear() + 1);
+      } else {
+        expireDate.setMonth(expireDate.getMonth() + 1);
       }
       
       // Create payment through Pi Network
       const paymentData = {
         amount,
-        memo: `${plan} Plan Subscription (${annual ? 'Annual' : 'Monthly'})`,
+        memo: `${plan} Plan Subscription (${billingCycle === 'annual' ? 'Annual' : 'Monthly'})`,
         metadata: {
           isSubscription: true,
-          plan: plan.toLowerCase(),
-          duration: annual ? 'annual' : 'monthly'
+          plan: planName,
+          duration: billingCycle,
+          expiresAt: expireDate.toISOString()
         }
       };
       
@@ -157,6 +191,19 @@ const Pricing = () => {
     return subscription.plan.toLowerCase() === plan.toLowerCase();
   };
   
+  const getCurrentBillingCycle = (): string => {
+    if (!subscription) return 'monthly';
+    
+    // Determine billing cycle by checking if expires_at is more than 6 months away
+    const expiresAt = new Date(subscription.expires_at);
+    const sixMonthsFromNow = new Date();
+    sixMonthsFromNow.setMonth(sixMonthsFromNow.getMonth() + 6);
+    
+    return expiresAt > sixMonthsFromNow ? 'annual' : 'monthly';
+  };
+  
+  const userBillingCycle = getCurrentBillingCycle();
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -177,17 +224,17 @@ const Pricing = () => {
             
             <div className="mt-6 inline-flex items-center p-1 bg-muted rounded-lg">
               <button
-                onClick={() => setAnnual(true)}
+                onClick={() => setBillingCycle('annual')}
                 className={`px-4 py-2 text-sm font-medium rounded-md ${
-                  annual ? 'bg-white shadow-sm' : 'text-gray-500'
+                  billingCycle === 'annual' ? 'bg-white shadow-sm' : 'text-gray-500'
                 }`}
               >
                 Annual (Save 20%)
               </button>
               <button
-                onClick={() => setAnnual(false)}
+                onClick={() => setBillingCycle('monthly')}
                 className={`px-4 py-2 text-sm font-medium rounded-md ${
-                  !annual ? 'bg-white shadow-sm' : 'text-gray-500'
+                  billingCycle === 'monthly' ? 'bg-white shadow-sm' : 'text-gray-500'
                 }`}
               >
                 Monthly
@@ -198,7 +245,7 @@ const Pricing = () => {
               <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg inline-block">
                 <p className="text-sm text-blue-800">
                   You're currently on the <span className="font-bold">
-                    {subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1)}
+                    {subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1)} ({userBillingCycle})
                   </span> plan
                 </p>
               </div>
@@ -208,32 +255,38 @@ const Pricing = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <PricingCard
               title="Starter"
-              price={annual ? "6π" : "8π"}
+              price={planPrices.starter.monthly}
+              annualPrice={planPrices.starter.annual}
+              billingCycle={billingCycle}
               features={starterFeatures}
               ctaText={isLoggedIn ? "Subscribe Now" : "Sign Up & Subscribe"}
               ctaAction={() => handleSubscribe("Starter")}
-              currentPlan={isPlanActive("starter")}
+              currentPlan={isPlanActive("starter") && userBillingCycle === billingCycle}
               processingPayment={processingPayment}
             />
             
             <PricingCard
               title="Pro"
-              price={annual ? "10π" : "12π"}
+              price={planPrices.pro.monthly}
+              annualPrice={planPrices.pro.annual}
+              billingCycle={billingCycle}
               features={proFeatures}
               isPopular={true}
               ctaText={isLoggedIn ? "Subscribe Now" : "Sign Up & Subscribe"}
               ctaAction={() => handleSubscribe("Pro")}
-              currentPlan={isPlanActive("pro")}
+              currentPlan={isPlanActive("pro") && userBillingCycle === billingCycle}
               processingPayment={processingPayment}
             />
             
             <PricingCard
               title="Premium"
-              price={annual ? "15π" : "18π"}
+              price={planPrices.premium.monthly}
+              annualPrice={planPrices.premium.annual}
+              billingCycle={billingCycle}
               features={premiumFeatures}
               ctaText={isLoggedIn ? "Subscribe Now" : "Sign Up & Subscribe"}
               ctaAction={() => handleSubscribe("Premium")}
-              currentPlan={isPlanActive("premium")}
+              currentPlan={isPlanActive("premium") && userBillingCycle === billingCycle}
               processingPayment={processingPayment}
             />
           </div>
@@ -257,9 +310,16 @@ const Pricing = () => {
               </div>
               
               <div>
-                <h3 className="font-bold text-lg">Can I switch between plans?</h3>
+                <h3 className="font-bold text-lg">What's the difference between monthly and annual billing?</h3>
                 <p className="text-gray-600 mt-2">
-                  Yes, you can upgrade or downgrade your plan at any time. When upgrading, you'll get immediate access to new features.
+                  Annual billing offers a 20% discount compared to monthly billing. You'll be charged once per year instead of monthly, and your subscription will last for 12 months.
+                </p>
+              </div>
+              
+              <div>
+                <h3 className="font-bold text-lg">Can I switch between plans or billing cycles?</h3>
+                <p className="text-gray-600 mt-2">
+                  Yes, you can upgrade, downgrade, or change your billing cycle at any time. When upgrading or changing to monthly billing, the changes take effect immediately. When downgrading or switching to annual billing, changes will apply at the end of your current billing period.
                 </p>
               </div>
               
@@ -267,13 +327,6 @@ const Pricing = () => {
                 <h3 className="font-bold text-lg">What happens when I cancel my subscription?</h3>
                 <p className="text-gray-600 mt-2">
                   If you cancel your subscription, you'll keep premium access until the end of your current billing period. After that, your account will revert to the free tier features. Please note there are no refunds for canceled subscriptions.
-                </p>
-              </div>
-              
-              <div>
-                <h3 className="font-bold text-lg">How does Droplink support the Pi community?</h3>
-                <p className="text-gray-600 mt-2">
-                  Droplink is built by and for the Pi community. We contribute back through community rewards, special events, and by creating tools that help creators thrive.
                 </p>
               </div>
             </div>

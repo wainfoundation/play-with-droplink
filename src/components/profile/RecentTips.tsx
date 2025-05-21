@@ -52,16 +52,16 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
         if (totalError) {
           console.error("Failed to fetch total tips:", totalError);
         } else if (totalData) {
-          // Calculate total using a more explicit type handling
-          const total = totalData.reduce((sum: number, payment) => {
-            // Safely convert string or number to number type
-            if (typeof payment.amount === 'string') {
-              return sum + parseFloat(payment.amount || '0');
+          // Calculate total with proper type handling to avoid recursive type instantiation
+          let total = 0;
+          
+          totalData.forEach(payment => {
+            if (typeof payment.amount === 'string' && payment.amount) {
+              total += parseFloat(payment.amount);
             } else if (typeof payment.amount === 'number') {
-              return sum + payment.amount;
+              total += payment.amount;
             }
-            return sum;
-          }, 0);
+          });
           
           setTotalReceived(total);
         }
@@ -135,10 +135,11 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
       <div className="space-y-2">
         {tips.map(tip => {
           // Pre-process the amount to avoid type issues in JSX
-          let displayAmount: string;
-          if (typeof tip.amount === 'string') {
-            displayAmount = parseFloat(tip.amount || '0').toFixed(2);
-          } else {
+          let displayAmount = "0.00";
+          
+          if (typeof tip.amount === 'string' && tip.amount) {
+            displayAmount = parseFloat(tip.amount).toFixed(2);
+          } else if (typeof tip.amount === 'number') {
             displayAmount = tip.amount.toFixed(2);
           }
           

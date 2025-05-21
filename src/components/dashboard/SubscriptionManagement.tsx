@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CheckIcon, CalendarCheck } from "lucide-react";
 
 interface SubscriptionManagementProps {
@@ -18,7 +18,7 @@ const SubscriptionManagement = ({
   processingPayment,
   setConfirmCancelOpen 
 }: SubscriptionManagementProps) => {
-  const [isYearly, setIsYearly] = useState(true);
+  const [billingCycle, setBillingCycle] = useState('annual'); // 'annual' or 'monthly'
   
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -27,6 +27,24 @@ const SubscriptionManagement = ({
       month: 'long', 
       day: 'numeric' 
     });
+  };
+  
+  const planPrices = {
+    starter: { monthly: 10, annual: 8 },
+    pro: { monthly: 15, annual: 12 },
+    premium: { monthly: 22, annual: 18 }
+  };
+
+  // Determine if current subscription is annual or monthly
+  const getCurrentBillingCycle = (): string => {
+    if (!subscription) return 'monthly';
+    
+    // Determine billing cycle by checking if expires_at is more than 6 months away from created_at
+    const createdAt = new Date(subscription.created_at || Date.now());
+    const expiresAt = new Date(subscription.expires_at);
+    const diffMonths = (expiresAt.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24 * 30);
+    
+    return diffMonths > 6 ? 'annual' : 'monthly';
   };
 
   return (
@@ -45,7 +63,7 @@ const SubscriptionManagement = ({
               <div>
                 <span className="font-bold text-primary">
                   {subscription 
-                    ? subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1) 
+                    ? `${subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1)} (${getCurrentBillingCycle()})` 
                     : "Free"}
                 </span>
                 {subscription && (
@@ -74,17 +92,17 @@ const SubscriptionManagement = ({
               <div className="flex justify-center mb-6">
                 <div className="inline-flex items-center p-1 bg-muted rounded-lg">
                   <button
-                    onClick={() => setIsYearly(true)}
+                    onClick={() => setBillingCycle('annual')}
                     className={`px-4 py-2 text-sm font-medium rounded-md ${
-                      isYearly ? 'bg-white shadow-sm' : 'text-gray-500'
+                      billingCycle === 'annual' ? 'bg-white shadow-sm' : 'text-gray-500'
                     }`}
                   >
                     Annual (Save 20%)
                   </button>
                   <button
-                    onClick={() => setIsYearly(false)}
+                    onClick={() => setBillingCycle('monthly')}
                     className={`px-4 py-2 text-sm font-medium rounded-md ${
-                      !isYearly ? 'bg-white shadow-sm' : 'text-gray-500'
+                      billingCycle === 'monthly' ? 'bg-white shadow-sm' : 'text-gray-500'
                     }`}
                   >
                     Monthly
@@ -95,8 +113,10 @@ const SubscriptionManagement = ({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <SubscriptionPlanCard 
                   title="Starter"
-                  price={isYearly ? "6π" : "8π"}
-                  billingPeriod={isYearly ? "Billed annually (72π)" : "Billed monthly (8π)"}
+                  price={billingCycle === 'annual' ? planPrices.starter.annual : planPrices.starter.monthly}
+                  billingPeriod={billingCycle === 'annual' 
+                    ? `Billed annually (${planPrices.starter.annual * 12}π)` 
+                    : "Billed monthly"}
                   features={[
                     "Unlimited Links",
                     "Pi Payments",
@@ -109,8 +129,10 @@ const SubscriptionManagement = ({
                 
                 <SubscriptionPlanCard 
                   title="Pro"
-                  price={isYearly ? "10π" : "12π"}
-                  billingPeriod={isYearly ? "Billed annually (120π)" : "Billed monthly (12π)"}
+                  price={billingCycle === 'annual' ? planPrices.pro.annual : planPrices.pro.monthly}
+                  billingPeriod={billingCycle === 'annual' 
+                    ? `Billed annually (${planPrices.pro.annual * 12}π)` 
+                    : "Billed monthly"}
                   features={[
                     "Everything in Starter",
                     "Custom Themes",
@@ -123,8 +145,10 @@ const SubscriptionManagement = ({
                 
                 <SubscriptionPlanCard 
                   title="Premium"
-                  price={isYearly ? "15π" : "18π"}
-                  billingPeriod={isYearly ? "Billed annually (180π)" : "Billed monthly (18π)"}
+                  price={billingCycle === 'annual' ? planPrices.premium.annual : planPrices.premium.monthly}
+                  billingPeriod={billingCycle === 'annual' 
+                    ? `Billed annually (${planPrices.premium.annual * 12}π)` 
+                    : "Billed monthly"}
                   features={[
                     "Everything in Pro",
                     "Priority Support (4-Hour)",
@@ -166,7 +190,7 @@ const SubscriptionManagement = ({
 
 interface SubscriptionPlanCardProps {
   title: string;
-  price: string;
+  price: number;
   billingPeriod: string;
   features: string[];
   isPopular: boolean;
@@ -192,7 +216,7 @@ const SubscriptionPlanCard = ({
       )}
       <h4 className="font-bold text-primary text-xl mb-2">{title}</h4>
       <div className="text-3xl font-bold mb-1">
-        {price}<span className="text-sm font-normal text-gray-500">/month</span>
+        {price}π<span className="text-sm font-normal text-gray-500">/month</span>
       </div>
       <p className="text-gray-500 text-sm mb-4">
         {billingPeriod}
