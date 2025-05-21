@@ -30,42 +30,50 @@ const RecentTips = ({ profileId }: Props) => {
       try {
         setLoading(true);
         
-        // Explicitly type the query response to avoid deep inference
-        const { data: payments, error } = await supabase
+        // Use explicit typing to avoid deep type inference
+        type PaymentData = {
+          id: string;
+          amount: number;
+          user_id: string;
+          created_at: string;
+        };
+        
+        // Explicitly avoid complex type parameters
+        const paymentsResult = await supabase
           .from('payments')
           .select('id, amount, user_id, created_at')
           .eq('receiver_id', profileId)
           .order('created_at', { ascending: false })
           .limit(5);
           
-        if (error) {
-          console.error('Error fetching tips:', error);
+        if (paymentsResult.error) {
+          console.error('Error fetching tips:', paymentsResult.error);
           return;
         }
 
+        const payments = paymentsResult.data as PaymentData[];
         const tipsData: TipWithSender[] = [];
         
         // Process each payment and fetch user data separately
-        if (payments) {
-          for (const item of payments) {
-            const { data: userData, error: userError } = await supabase
-              .from('user_profiles')
-              .select('username')
-              .eq('id', item.user_id)
-              .single();
+        for (const item of payments || []) {
+          // Type for user data response
+          type UserData = { username: string };
+          
+          const userResult = await supabase
+            .from('user_profiles')
+            .select('username')
+            .eq('id', item.user_id)
+            .single();
+            
+          const userData = userResult.error ? undefined : (userResult.data as UserData | null);
               
-            if (userError && userError.code !== 'PGRST116') {
-              console.error('Error fetching user data:', userError);
-            }
-              
-            tipsData.push({
-              id: item.id,
-              amount: item.amount,
-              sender_id: item.user_id,
-              created_at: item.created_at,
-              sender: userData ? { username: userData.username } : undefined
-            });
-          }
+          tipsData.push({
+            id: item.id,
+            amount: item.amount,
+            sender_id: item.user_id,
+            created_at: item.created_at,
+            sender: userData ? { username: userData.username } : undefined
+          });
         }
         
         setTips(tipsData);
