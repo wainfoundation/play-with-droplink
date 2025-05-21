@@ -1,55 +1,30 @@
 
-import { useState, useEffect } from 'react';
+import { useUser } from '@/context/UserContext';
 
 export type SubscriptionPlan = 'starter' | 'pro' | 'premium' | null;
 
 export const useUserPlan = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [plan, setPlan] = useState<SubscriptionPlan>(null);
-  const [username, setUsername] = useState<string | null>(null);
-  const [subscriptionEnd, setSubscriptionEnd] = useState<Date | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { 
+    isLoggedIn, 
+    subscription, 
+    isLoading, 
+    profile, 
+    showAds
+  } = useUser();
 
-  useEffect(() => {
-    // Check authentication status
-    const token = localStorage.getItem('userToken');
-    const storedPlan = localStorage.getItem('userPlan') as SubscriptionPlan;
-    const storedUsername = localStorage.getItem('piUsername') || localStorage.getItem('username');
-    const storedExpiration = localStorage.getItem('subscriptionEnd');
-    
-    setIsLoggedIn(!!token);
-    
-    if (storedPlan) {
-      setPlan(storedPlan);
-    } else if (token) {
-      // If logged in but no plan, default to starter
-      setPlan('starter');
-      localStorage.setItem('userPlan', 'starter');
-    }
-    
-    if (storedUsername) {
-      setUsername(storedUsername);
-    }
-    
-    if (storedExpiration) {
-      setSubscriptionEnd(new Date(storedExpiration));
-    }
-    
-    setIsLoading(false);
-  }, []);
+  // Map from the subscription data if available
+  const plan = subscription?.plan as SubscriptionPlan || 'starter';
+  const subscriptionEnd = subscription?.expires_at ? new Date(subscription.expires_at) : null;
+  const username = profile?.username || null;
 
-  const updatePlan = (newPlan: SubscriptionPlan) => {
-    setPlan(newPlan);
-    if (newPlan) {
-      localStorage.setItem('userPlan', newPlan);
-    } else {
-      localStorage.removeItem('userPlan');
-    }
+  const updatePlan = () => {
+    // This is now handled by the UserContext and Supabase
+    console.warn('updatePlan is deprecated. Plans are managed through Pi payments.');
   };
 
-  const setSubscriptionEndDate = (date: Date) => {
-    setSubscriptionEnd(date);
-    localStorage.setItem('subscriptionEnd', date.toISOString());
+  const setSubscriptionEndDate = () => {
+    // This is now handled by the UserContext and Supabase
+    console.warn('setSubscriptionEndDate is deprecated. Subscription dates are managed through Pi payments.');
   };
 
   return {
@@ -60,7 +35,7 @@ export const useUserPlan = () => {
     isLoading,
     updatePlan,
     setSubscriptionEndDate,
-    showAds: plan === 'starter' && isLoggedIn,
+    showAds,
   };
 };
 

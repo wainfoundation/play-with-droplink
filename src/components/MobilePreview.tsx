@@ -1,17 +1,17 @@
 
 import { useNavigate } from 'react-router-dom';
-import { useUserPlan } from '@/hooks/use-user-plan';
+import { useUser } from '@/context/UserContext';
 
 const MobilePreview = () => {
   const navigate = useNavigate();
-  const { username } = useUserPlan();
+  const { profile, isLoggedIn } = useUser();
   
-  // Demo username if not logged in
-  const demoUsername = username || "username";
+  // Username from profile or demo username if not logged in
+  const displayUsername = profile?.username || "username";
   
   const handleProfileClick = () => {
-    if (username) {
-      navigate(`/u/${username}`);
+    if (isLoggedIn && profile) {
+      navigate(`/u/${profile.username}`);
     } else {
       navigate('/signup');
     }
@@ -30,13 +30,15 @@ const MobilePreview = () => {
             <div className="p-6 flex flex-col items-center">
               <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border-2 border-primary">
                 <img 
-                  src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${demoUsername}`}
+                  src={profile?.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${displayUsername}`}
                   alt="Profile" 
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h3 className="text-lg font-bold mb-1">@{demoUsername}</h3>
-              <p className="text-sm text-gray-500 mb-6">Digital creator & Pi pioneer</p>
+              <h3 className="text-lg font-bold mb-1">@{displayUsername}</h3>
+              <p className="text-sm text-gray-500 mb-6">
+                {profile?.bio || "Digital creator & Pi pioneer"}
+              </p>
               
               <div className="w-full space-y-3">
                 <button 
@@ -44,7 +46,7 @@ const MobilePreview = () => {
                   className="block w-full bg-primary text-white font-medium py-3 px-4 rounded-lg transition-all hover:bg-secondary hover:scale-[1.02] shadow-md"
                 >
                   <span className="flex items-center justify-center gap-2">
-                    <span>👤</span> {username ? "View Your Profile" : "Create Your Profile"}
+                    <span>👤</span> {isLoggedIn ? "View Your Profile" : "Create Your Profile"}
                   </span>
                 </button>
                 <a href="#" className="block w-full bg-primary text-white font-medium py-3 px-4 rounded-lg transition-all hover:bg-secondary hover:scale-[1.02] shadow-md">

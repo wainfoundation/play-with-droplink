@@ -1,11 +1,14 @@
+
 import { useState } from "react";
 import { CheckIcon } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PiAdsNetwork from "@/components/PiAdsNetwork";
-import useUserPlan from "@/hooks/use-user-plan";
+import { useUser } from "@/context/UserContext";
+import { createPiPayment } from "@/services/piPaymentService";
+import { useToast } from "@/hooks/use-toast";
 
 const PricingCard = ({ 
   title, 
@@ -13,13 +16,20 @@ const PricingCard = ({
   features, 
   isPopular = false,
   ctaText = "Get Started",
-  ctaLink = "/signup"
+  ctaAction,
+  currentPlan = false,
+  processingPayment = false
 }) => {
   return (
-    <div className={`bg-white rounded-xl shadow-lg p-8 border ${isPopular ? 'border-primary' : 'border-gray-200'} relative`}>
+    <div className={`bg-white rounded-xl shadow-lg p-8 border ${currentPlan ? 'border-green-500' : isPopular ? 'border-primary' : 'border-gray-200'} relative`}>
       {isPopular && (
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm font-medium">
           Most Popular
+        </div>
+      )}
+      {currentPlan && (
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+          Your Plan
         </div>
       )}
       <h3 className="text-xl font-bold mb-2 text-primary">{title}</h3>
@@ -38,8 +48,12 @@ const PricingCard = ({
         ))}
       </ul>
       
-      <Button asChild className={`w-full ${isPopular ? 'bg-gradient-hero hover:bg-secondary' : 'bg-white border border-primary text-primary hover:bg-muted'}`}>
-        <Link to={ctaLink}>{ctaText}</Link>
+      <Button 
+        onClick={ctaAction}
+        className={`w-full ${currentPlan ? 'bg-green-500 hover:bg-green-600 cursor-not-allowed' : isPopular ? 'bg-gradient-hero hover:bg-secondary' : 'bg-white border border-primary text-primary hover:bg-muted'}`}
+        disabled={currentPlan || processingPayment}
+      >
+        {processingPayment ? "Processing..." : currentPlan ? "Current Plan" : ctaText}
       </Button>
     </div>
   );
@@ -47,7 +61,11 @@ const PricingCard = ({
 
 const Pricing = () => {
   const [annual, setAnnual] = useState(true);
-  const { isLoggedIn, plan, username, showAds } = useUserPlan();
+  const [processingPayment, setProcessingPayment] = useState(false);
+  
+  const { isLoggedIn, user, subscription, showAds } = useUser();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   
   const starterFeatures = [
     "Unlimited Links",
@@ -84,6 +102,60 @@ const Pricing = () => {
     "Advanced Pi Payments",
     "Community Contributor Status"
   ];
+  
+  const handleSubscribe = async (plan: string) => {
+    if (!isLoggedIn) {
+      navigate('/login');
+      return;
+    }
+    
+    setProcessingPayment(true);
+    
+    try {
+      // Calculate amount based on plan and billing cycle
+      let amount = 0;
+      if (plan === "Starter") {
+        amount = annual ? 6 : 8;
+      } else if (plan === "Pro") {
+        amount = annual ? 10 : 12;
+      } else if (plan === "Premium") {
+        amount = annual ? 15 : 18;
+      }
+      
+      // Create payment through Pi Network
+      const paymentData = {
+        amount,
+        memo: `${plan} Plan Subscription (${annual ? 'Annual' : 'Monthly'})`,
+        metadata: {
+          isSubscription: true,
+          plan: plan.toLowerCase(),
+          duration: annual ? 'annual' : 'monthly'
+        }
+      };
+      
+      await createPiPayment(paymentData, user);
+      
+      // The payment flow will be handled by callbacks in piPaymentService
+      toast({
+        title: "Payment Processing",
+        description: "Follow the Pi payment flow to complete your subscription",
+      });
+    } catch (error) {
+      console.error("Subscription error:", error);
+      toast({
+        title: "Subscription failed",
+        description: "There was an error processing your subscription",
+        variant: "destructive",
+      });
+    } finally {
+      setProcessingPayment(false);
+    }
+  };
+  
+  const isPlanActive = (plan: string): boolean => {
+    if (!subscription) return false;
+    return subscription.plan.toLowerCase() === plan.toLowerCase();
+  };
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -122,10 +194,12 @@ const Pricing = () => {
               </button>
             </div>
             
-            {isLoggedIn && username && plan && (
+            {isLoggedIn && subscription && (
               <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg inline-block">
                 <p className="text-sm text-blue-800">
-                  You're currently on the <span className="font-bold">{plan.charAt(0).toUpperCase() + plan.slice(1)}</span> plan
+                  You're currently on the <span className="font-bold">
+                    {subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1)}
+                  </span> plan
                 </p>
               </div>
             )}
@@ -136,6 +210,10 @@ const Pricing = () => {
               title="Starter"
               price={annual ? "6π" : "8π"}
               features={starterFeatures}
+              ctaText={isLoggedIn ? "Subscribe Now" : "Sign Up & Subscribe"}
+              ctaAction={() => handleSubscribe("Starter")}
+              currentPlan={isPlanActive("starter")}
+              processingPayment={processingPayment}
             />
             
             <PricingCard
@@ -143,13 +221,20 @@ const Pricing = () => {
               price={annual ? "10π" : "12π"}
               features={proFeatures}
               isPopular={true}
-              ctaText="Try Free for 7 Days"
+              ctaText={isLoggedIn ? "Subscribe Now" : "Sign Up & Subscribe"}
+              ctaAction={() => handleSubscribe("Pro")}
+              currentPlan={isPlanActive("pro")}
+              processingPayment={processingPayment}
             />
             
             <PricingCard
               title="Premium"
               price={annual ? "15π" : "18π"}
               features={premiumFeatures}
+              ctaText={isLoggedIn ? "Subscribe Now" : "Sign Up & Subscribe"}
+              ctaAction={() => handleSubscribe("Premium")}
+              currentPlan={isPlanActive("premium")}
+              processingPayment={processingPayment}
             />
           </div>
           
@@ -179,9 +264,9 @@ const Pricing = () => {
               </div>
               
               <div>
-                <h3 className="font-bold text-lg">What happens after my Pro trial ends?</h3>
+                <h3 className="font-bold text-lg">What happens when I cancel my subscription?</h3>
                 <p className="text-gray-600 mt-2">
-                  After your 7-day trial, you'll be automatically subscribed to the Pro plan unless you downgrade to Starter.
+                  If you cancel your subscription, you'll keep premium access until the end of your current billing period. After that, your account will revert to the free tier features. Please note there are no refunds for canceled subscriptions.
                 </p>
               </div>
               

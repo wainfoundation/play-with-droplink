@@ -1,10 +1,13 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { initPiNetwork } from "@/services/piNetwork";
+import { useEffect } from "react";
+import { UserProvider } from "@/context/UserContext";
+import { initPiNetwork } from "@/services/piPaymentService";
+
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -42,24 +45,19 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-  const [piInitialized, setPiInitialized] = useState(false);
-
   useEffect(() => {
     // Initialize Pi Network SDK
-    const initialized = initPiNetwork();
-    setPiInitialized(initialized);
+    initPiNetwork();
     
     // Log environment info (remove in production)
     console.log("Environment:", {
-      sandbox: import.meta.env.VITE_PI_SANDBOX,
-      hasApiKey: !!import.meta.env.VITE_PI_API_KEY,
+      isDevMode: import.meta.env.DEV,
     });
   }, []);
 
   // Authentication-protected route wrapper
   const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-    // For now, we'll use a simple check. In a real app, this would verify JWT tokens
-    const isAuthenticated = localStorage.getItem('userToken');
+    const isAuthenticated = localStorage.getItem('userToken') || !!supabase?.auth?.session?.user;
     
     if (!isAuthenticated) {
       return <Navigate to="/login" replace />;
@@ -70,52 +68,54 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Main Pages */}
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/features" element={<Features />} />
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route path="/admin" element={<AdminPortal />} />
-            
-            {/* Company Pages */}
-            <Route path="/about" element={<About />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/careers" element={<Careers />} />
-            <Route path="/contact" element={<Contact />} />
-            
-            {/* Resources Pages */}
-            <Route path="/help" element={<Help />} />
-            <Route path="/templates" element={<Templates />} />
-            <Route path="/creators" element={<CreatorDirectory />} />
-            <Route path="/developers" element={<Developers />} />
-            
-            {/* Legal Pages */}
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/cookies" element={<Cookies />} />
-            
-            {/* User profile page - update to use new ProfilePage component */}
-            <Route path="/u/:username" element={<ProfilePage />} />
-            
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <UserProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* Main Pages */}
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/features" element={<Features />} />
+              <Route 
+                path="/dashboard" 
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route path="/admin" element={<AdminPortal />} />
+              
+              {/* Company Pages */}
+              <Route path="/about" element={<About />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/careers" element={<Careers />} />
+              <Route path="/contact" element={<Contact />} />
+              
+              {/* Resources Pages */}
+              <Route path="/help" element={<Help />} />
+              <Route path="/templates" element={<Templates />} />
+              <Route path="/creators" element={<CreatorDirectory />} />
+              <Route path="/developers" element={<Developers />} />
+              
+              {/* Legal Pages */}
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/cookies" element={<Cookies />} />
+              
+              {/* User profile page */}
+              <Route path="/u/:username" element={<ProfilePage />} />
+              
+              {/* Catch-all route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </UserProvider>
     </QueryClientProvider>
   );
 };

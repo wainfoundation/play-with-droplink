@@ -1,8 +1,8 @@
 
 import { useEffect, useState } from 'react';
+import { useUser } from '@/context/UserContext';
 
 // Define the Pi Ads Network interface
-// This is a placeholder - you'll need to replace with actual Pi Ads Network SDK types
 interface PiAdsNetwork {
   init: (config: { apiKey: string; placementId: string }) => void;
   showAd: () => void;
@@ -22,8 +22,12 @@ interface PiAdsProps {
 const PiAdsNetwork = ({ placementId = 'default-placement' }: PiAdsProps) => {
   const [adLoaded, setAdLoaded] = useState(false);
   const [adError, setAdError] = useState<string | null>(null);
+  const { showAds } = useUser();
 
   useEffect(() => {
+    // Don't load ads if the user shouldn't see them
+    if (!showAds) return;
+    
     // Load Pi Ads Network SDK
     const loadPiAdsSDK = async () => {
       try {
@@ -50,8 +54,8 @@ const PiAdsNetwork = ({ placementId = 'default-placement' }: PiAdsProps) => {
     const initializeAds = () => {
       try {
         if (window.PiAdsNetwork) {
-          // Initialize with your Pi Ads Network API key
-          const apiKey = import.meta.env.VITE_PI_API_KEY;
+          // Initialize with Pi Ads Network API key
+          const apiKey = "ldtwy98n3q6f8uvxvoxvnidgiklu21ndbfn5ltqpnfxcftbocc9ujxrcfiwcwkj6";
           window.PiAdsNetwork.init({ 
             apiKey,
             placementId
@@ -68,13 +72,18 @@ const PiAdsNetwork = ({ placementId = 'default-placement' }: PiAdsProps) => {
       }
     };
 
-    loadPiAdsSDK();
+    if (showAds) {
+      loadPiAdsSDK();
+    }
 
     // Cleanup function
     return () => {
       // Add any cleanup needed for the ads
     };
-  }, [placementId]);
+  }, [placementId, showAds]);
+
+  // If user shouldn't see ads, return nothing
+  if (!showAds) return null;
 
   // Placeholder for ad container
   return (

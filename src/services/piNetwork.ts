@@ -40,8 +40,8 @@ declare global {
 }
 
 // Get environment variables
-const PI_API_KEY = import.meta.env.VITE_PI_API_KEY || '';
-const PI_SANDBOX = import.meta.env.VITE_PI_SANDBOX === 'true';
+const PI_API_KEY = "ldtwy98n3q6f8uvxvoxvnidgiklu21ndbfn5ltqpnfxcftbocc9ujxrcfiwcwkj6";
+const PI_SANDBOX = true;
 
 // Initialize Pi SDK
 export const initPiNetwork = (): boolean => {

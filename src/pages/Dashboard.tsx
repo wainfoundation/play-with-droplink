@@ -8,18 +8,27 @@ import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { authenticateWithPi, createPiPayment } from "@/services/piNetwork";
+import { authenticateWithPi, createPiPayment } from "@/services/piPaymentService";
 import { CheckIcon, XIcon, Calendar, CalendarCheck } from "lucide-react";
+import { useUser } from "@/context/UserContext";
+import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 const Dashboard = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState<string | null>(null);
-  const [userPlan, setUserPlan] = useState<string | null>(null);
-  const [subscriptionEnd, setSubscriptionEnd] = useState<Date | null>(null);
+  const { 
+    user, 
+    profile, 
+    subscription, 
+    isLoading, 
+    isLoggedIn,
+    refreshUserData,
+    cancelSubscription
+  } = useUser();
+  
   const [isYearly, setIsYearly] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
+  const [processingPayment, setProcessingPayment] = useState(false);
+  const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
   
   // Analytics data (simulated)
   const [pageViews, setPageViews] = useState(0);
@@ -28,14 +37,13 @@ const Dashboard = () => {
   
   useEffect(() => {
     // Check if user is logged in
-    const storedUsername = localStorage.getItem("username");
-    const storedPlan = localStorage.getItem("userPlan");
-    const storedExpiration = localStorage.getItem("subscriptionEnd");
+    if (!isLoading && !isLoggedIn) {
+      // Redirect to login if not logged in
+      navigate("/login");
+      return;
+    }
     
-    if (storedUsername) {
-      setIsLoggedIn(true);
-      setUsername(storedUsername);
-      
+    if (isLoggedIn && profile) {
       // Simulate analytics data
       const randomViews = Math.floor(Math.random() * 1000) + 100;
       const randomClicks = Math.floor(randomViews * (Math.random() * 0.7 + 0.1));
@@ -44,33 +52,18 @@ const Dashboard = () => {
       setPageViews(randomViews);
       setLinkClicks(randomClicks);
       setConversionRate(randomRate);
-    } else {
-      // Redirect to login if not logged in
-      navigate("/login");
     }
-    
-    if (storedPlan) {
-      setUserPlan(storedPlan);
-    }
-    
-    if (storedExpiration) {
-      setSubscriptionEnd(new Date(storedExpiration));
-    }
-  }, [navigate]);
+  }, [isLoading, isLoggedIn, profile, navigate]);
   
   const handlePiLogin = async () => {
     try {
-      const auth = await authenticateWithPi(["username"]);
-      if (auth && auth.user.username) {
-        setIsLoggedIn(true);
-        setUsername(auth.user.username);
-        
-        // Store in localStorage
-        localStorage.setItem("username", auth.user.username);
+      const auth = await authenticateWithPi(["username", "payments"]);
+      if (auth) {
+        refreshUserData();
         
         toast({
           title: "Logged in successfully",
-          description: `Welcome, ${auth.user.username}!`,
+          description: `Welcome, ${auth.user.username || "User"}!`,
         });
       }
     } catch (error) {
@@ -84,14 +77,18 @@ const Dashboard = () => {
   };
   
   const handleSubscribe = async (plan: string) => {
-    setIsLoading(true);
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to subscribe",
+        variant: "destructive", 
+      });
+      return;
+    }
+    
+    setProcessingPayment(true);
     
     try {
-      // Make sure user is authenticated first
-      if (!isLoggedIn) {
-        await handlePiLogin();
-      }
-      
       // Calculate amount based on plan and billing cycle
       let amount = 0;
       if (plan === "Starter") {
@@ -102,66 +99,50 @@ const Dashboard = () => {
         amount = isYearly ? 15 : 18;
       }
       
-      // Calculate subscription end date
-      const endDate = new Date();
-      if (isYearly) {
-        endDate.setFullYear(endDate.getFullYear() + 1);
-      } else {
-        endDate.setMonth(endDate.getMonth() + 1);
-      }
-      
       // Create payment through Pi Network
-      const payment = await createPiPayment(
+      const paymentData = {
         amount,
-        `${plan} Plan Subscription (${isYearly ? 'Annual' : 'Monthly'})`,
-        { plan, billingCycle: isYearly ? 'annual' : 'monthly' }
-      );
+        memo: `${plan} Plan Subscription (${isYearly ? 'Annual' : 'Monthly'})`,
+        metadata: {
+          isSubscription: true,
+          plan: plan.toLowerCase(),
+          duration: isYearly ? 'annual' : 'monthly'
+        }
+      };
       
-      if (payment) {
-        // In a real app, you'd verify the payment on your backend
-        // For now, we'll simulate a successful payment
-        setUserPlan(plan);
-        setSubscriptionEnd(endDate);
-        
-        // Store in localStorage
-        localStorage.setItem("userPlan", plan);
-        localStorage.setItem("subscriptionEnd", endDate.toString());
-        
-        toast({
-          title: "Subscription successful!",
-          description: `You've successfully subscribed to the ${plan} plan.`,
-        });
-      }
+      await createPiPayment(paymentData, user);
+      
+      // The payment flow will be handled by callbacks in piPaymentService
+      toast({
+        title: "Payment Processing",
+        description: "Follow the Pi payment flow to complete your subscription",
+      });
+      
+      // After a successful payment, refresh user data to get updated subscription
+      setTimeout(() => {
+        refreshUserData();
+      }, 5000);
     } catch (error) {
       console.error("Subscription error:", error);
       toast({
         title: "Subscription failed",
-        description: "There was an error processing your subscription.",
+        description: "There was an error processing your subscription",
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setProcessingPayment(false);
     }
   };
   
-  const handleCancelSubscription = () => {
-    // In a real app, you would call your backend to cancel the subscription
-    
-    // Simulate cancellation
-    setUserPlan(null);
-    setSubscriptionEnd(null);
-    
-    // Remove from localStorage
-    localStorage.removeItem("userPlan");
-    localStorage.removeItem("subscriptionEnd");
-    
-    toast({
-      title: "Subscription cancelled",
-      description: "Your subscription has been cancelled successfully.",
-    });
+  const handleCancelSubscriptionConfirm = async () => {
+    const success = await cancelSubscription();
+    if (success) {
+      setConfirmCancelOpen(false);
+    }
   };
   
-  const formatDate = (date: Date) => {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 
       year: 'numeric', 
       month: 'long', 
@@ -169,28 +150,45 @@ const Dashboard = () => {
     });
   };
   
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <h2 className="text-xl font-medium text-primary">Loading dashboard...</h2>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-grow py-12 px-6">
         <div className="container mx-auto max-w-6xl">
-          {isLoggedIn && username ? (
+          {isLoggedIn && profile ? (
             <>
               <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8">
                 <div>
                   <h1 className="text-3xl font-bold text-primary">Dashboard</h1>
-                  <p className="text-gray-600">Welcome back, @{username}</p>
+                  <p className="text-gray-600">Welcome back, @{profile.username || "user"}</p>
                 </div>
                 
-                {userPlan && (
+                {subscription && (
                   <div className="mt-4 md:mt-0 p-3 bg-blue-50 rounded-lg">
                     <div className="flex items-center">
-                      <Badge className="mr-2 bg-primary">{userPlan}</Badge>
+                      <Badge className="mr-2 bg-primary">
+                        {subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1)}
+                      </Badge>
                       <span className="text-sm text-gray-600">
-                        {subscriptionEnd && (
+                        {subscription.expires_at && (
                           <span className="flex items-center">
                             <Calendar className="h-4 w-4 mr-1" />
-                            Renews {formatDate(subscriptionEnd)}
+                            Renews {formatDate(subscription.expires_at)}
                           </span>
                         )}
                       </span>
@@ -252,7 +250,7 @@ const Dashboard = () => {
                         <Button variant="outline">
                           Edit Profile
                         </Button>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={() => navigate(`/u/${profile.username}`)}>
                           View My Page
                         </Button>
                       </CardContent>
@@ -260,18 +258,17 @@ const Dashboard = () => {
                     
                     <Card>
                       <CardHeader>
-                        <CardTitle>Current Plan: {userPlan || "Free"}</CardTitle>
+                        <CardTitle>Current Plan: {subscription ? subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1) : "Free"}</CardTitle>
                         <CardDescription>
-                          {userPlan ? (
-                            subscriptionEnd && 
-                            <span>Your subscription renews on {formatDate(subscriptionEnd)}</span>
+                          {subscription ? (
+                            <span>Your subscription renews on {formatDate(subscription.expires_at)}</span>
                           ) : (
                             "You are currently using the free version."
                           )}
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
-                        {!userPlan && (
+                        {!subscription && (
                           <div className="text-sm mb-4">
                             <p>Upgrade to access premium features like:</p>
                             <ul className="list-disc pl-5 mt-2 space-y-1">
@@ -283,8 +280,12 @@ const Dashboard = () => {
                         )}
                       </CardContent>
                       <CardFooter>
-                        {userPlan ? (
-                          <Button variant="outline" className="w-full" onClick={handleCancelSubscription}>
+                        {subscription ? (
+                          <Button 
+                            variant="outline" 
+                            className="w-full" 
+                            onClick={() => setConfirmCancelOpen(true)}
+                          >
                             Manage Subscription
                           </Button>
                         ) : (
@@ -324,13 +325,13 @@ const Dashboard = () => {
                     <CardHeader>
                       <CardTitle>Analytics & Insights</CardTitle>
                       <CardDescription>
-                        {userPlan === "Pro" || userPlan === "Premium" 
+                        {subscription && (subscription.plan === "pro" || subscription.plan === "premium")
                           ? "Track detailed performance metrics of your page and links" 
                           : "Upgrade to Pro or Premium to access detailed analytics"}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      {userPlan === "Pro" || userPlan === "Premium" ? (
+                      {subscription && (subscription.plan === "pro" || subscription.plan === "premium") ? (
                         <div className="space-y-4">
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="bg-blue-50 p-4 rounded-lg">
@@ -397,19 +398,23 @@ const Dashboard = () => {
                           <h3 className="text-lg font-medium mb-2">Current Plan</h3>
                           <div className="bg-blue-50 p-4 rounded-lg flex flex-col md:flex-row md:justify-between md:items-center">
                             <div>
-                              <span className="font-bold text-primary">{userPlan || "Free"}</span>
-                              {subscriptionEnd && (
+                              <span className="font-bold text-primary">
+                                {subscription 
+                                  ? subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1) 
+                                  : "Free"}
+                              </span>
+                              {subscription && (
                                 <p className="text-sm text-gray-600 flex items-center mt-1">
                                   <CalendarCheck className="h-4 w-4 mr-1" />
-                                  Renews on {formatDate(subscriptionEnd)}
+                                  Renews on {formatDate(subscription.expires_at)}
                                 </p>
                               )}
                             </div>
-                            {userPlan && (
+                            {subscription && (
                               <Button 
                                 variant="outline" 
                                 className="mt-3 md:mt-0"
-                                onClick={handleCancelSubscription}
+                                onClick={() => setConfirmCancelOpen(true)}
                               >
                                 Cancel Subscription
                               </Button>
@@ -417,7 +422,7 @@ const Dashboard = () => {
                           </div>
                         </div>
                         
-                        {!userPlan && (
+                        {!subscription && (
                           <div>
                             <h3 className="text-lg font-medium mb-4">Choose a Plan</h3>
                             
@@ -454,9 +459,9 @@ const Dashboard = () => {
                                 <Button 
                                   className="w-full mb-4 bg-primary hover:bg-primary/90"
                                   onClick={() => handleSubscribe("Starter")}
-                                  disabled={isLoading}
+                                  disabled={processingPayment}
                                 >
-                                  {isLoading ? "Processing..." : "Subscribe"}
+                                  {processingPayment ? "Processing..." : "Subscribe"}
                                 </Button>
                                 <ul className="text-left text-sm">
                                   <li className="flex items-start mb-2">
@@ -488,9 +493,9 @@ const Dashboard = () => {
                                 <Button 
                                   className="w-full mb-4 bg-gradient-hero hover:bg-secondary"
                                   onClick={() => handleSubscribe("Pro")}
-                                  disabled={isLoading}
+                                  disabled={processingPayment}
                                 >
-                                  {isLoading ? "Processing..." : "Subscribe"}
+                                  {processingPayment ? "Processing..." : "Subscribe"}
                                 </Button>
                                 <ul className="text-left text-sm">
                                   <li className="flex items-start mb-2">
@@ -519,9 +524,9 @@ const Dashboard = () => {
                                 <Button 
                                   className="w-full mb-4 bg-primary hover:bg-primary/90"
                                   onClick={() => handleSubscribe("Premium")}
-                                  disabled={isLoading}
+                                  disabled={processingPayment}
                                 >
-                                  {isLoading ? "Processing..." : "Subscribe"}
+                                  {processingPayment ? "Processing..." : "Subscribe"}
                                 </Button>
                                 <ul className="text-left text-sm">
                                   <li className="flex items-start mb-2">
@@ -544,21 +549,15 @@ const Dashboard = () => {
                         
                         <div>
                           <h3 className="text-lg font-medium mb-2">Payment History</h3>
-                          {userPlan ? (
+                          {subscription ? (
                             <div className="bg-blue-50 p-4 rounded-lg">
                               <div className="flex justify-between border-b pb-2 mb-2">
                                 <span>Last payment</span>
-                                <span>
-                                  {isYearly 
-                                    ? userPlan === "Starter" ? "72π" : userPlan === "Pro" ? "120π" : "180π"
-                                    : userPlan === "Starter" ? "8π" : userPlan === "Pro" ? "12π" : "18π"}
-                                </span>
+                                <span>{subscription.amount} π</span>
                               </div>
                               <div className="text-sm text-gray-600">
-                                {subscriptionEnd && (
-                                  <p>
-                                    Next payment will be on {formatDate(subscriptionEnd)}
-                                  </p>
+                                {subscription.expires_at && (
+                                  <p>Next payment will be on {formatDate(subscription.expires_at)}</p>
                                 )}
                               </div>
                             </div>
@@ -588,6 +587,18 @@ const Dashboard = () => {
         </div>
       </main>
       <Footer />
+      
+      {/* Confirmation Dialog for Subscription Cancellation */}
+      <ConfirmationDialog
+        open={confirmCancelOpen}
+        onOpenChange={setConfirmCancelOpen}
+        title="Cancel Subscription?"
+        description="Are you sure you want to cancel your subscription? You won't be refunded for the current billing period and will need to subscribe again to regain premium access in the future."
+        confirmText="Yes, Cancel Subscription"
+        cancelText="No, Keep Subscription"
+        onConfirm={handleCancelSubscriptionConfirm}
+        variant="destructive"
+      />
     </div>
   );
 };

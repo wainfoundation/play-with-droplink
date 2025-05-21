@@ -8,7 +8,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { toast } from "@/hooks/use-toast";
-import { authenticateWithPi, initPiNetwork } from "@/services/piNetwork";
+import { authenticateWithPi } from "@/services/piPaymentService";
+import { supabase } from "@/integrations/supabase/client";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -23,14 +24,11 @@ const Signup = () => {
 
   useEffect(() => {
     // Check if user is already logged in
-    const token = localStorage.getItem('userToken');
-    if (token) {
-      navigate('/dashboard');
-      return;
-    }
-    
-    // Initialize Pi Network SDK
-    initPiNetwork();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        navigate('/dashboard');
+      }
+    });
   }, [navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,16 +80,20 @@ const Signup = () => {
         return;
       }
       
-      // In a real app, we would make an API call to create the account
-      // For now, we'll simulate a successful registration
-      console.log("Registration attempt with:", formData);
+      // Use Supabase Auth to create a new user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            username: formData.username,
+          }
+        }
+      });
       
-      // Create a user token and store authentication data
-      const mockToken = btoa(`${formData.email}:${Date.now()}`);
-      localStorage.setItem('userToken', mockToken);
-      localStorage.setItem('username', formData.username);
-      localStorage.setItem('userEmail', formData.email);
-      localStorage.setItem('userPlan', 'starter'); // Default plan
+      if (authError) {
+        throw new Error(authError.message);
+      }
       
       toast({
         title: "Account Created!",
@@ -105,7 +107,7 @@ const Signup = () => {
       console.error("Registration error:", error);
       toast({
         title: "Registration Failed",
-        description: "An error occurred during account creation",
+        description: error instanceof Error ? error.message : "An error occurred during account creation",
         variant: "destructive",
       });
     } finally {
@@ -121,33 +123,49 @@ const Signup = () => {
       if (authResult?.user) {
         console.log("Pi authentication successful:", authResult);
         
-        // Store authentication data
-        localStorage.setItem('userToken', authResult.accessToken);
-        localStorage.setItem('piUserId', authResult.user.uid);
-        
-        if (authResult.user.username) {
-          localStorage.setItem('piUsername', authResult.user.username);
-          localStorage.setItem('username', authResult.user.username);
+        // Check if user already exists
+        const { data: existingUser } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('username', authResult.user.username)
+          .maybeSingle();
           
-          // Pre-fill username if available
-          setFormData(prev => ({
-            ...prev,
-            username: authResult.user.username || ""
-          }));
+        if (existingUser) {
+          // User already exists, sign them in instead
+          toast({
+            title: "Account Already Exists",
+            description: "Signing you in with your existing account",
+          });
+          navigate('/dashboard');
+          return;
         }
         
-        // Set default plan
-        localStorage.setItem('userPlan', 'starter');
+        // Create a random password for the Pi user
+        const randomPassword = Math.random().toString(36).slice(2) + Math.random().toString(36).toUpperCase().slice(2);
+        
+        // Use Supabase Auth to create a new user
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: `pi_${authResult.user.uid}@pinetwork.user`, // Create a placeholder email
+          password: randomPassword,
+          options: {
+            data: {
+              username: authResult.user.username,
+              pi_uid: authResult.user.uid
+            }
+          }
+        });
+        
+        if (authError) {
+          throw new Error(authError.message);
+        }
         
         toast({
           title: "Pi Authentication Successful",
           description: `Welcome, @${authResult.user.username || "Pioneer"}! You're now registered with Pi Network.`,
         });
         
-        // If we already have the username, we can proceed to dashboard
-        if (authResult.user.username) {
-          navigate('/dashboard');
-        }
+        // Redirect to dashboard
+        navigate('/dashboard');
       } else {
         toast({
           title: "Authentication Failed",
@@ -195,7 +213,7 @@ const Signup = () => {
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or complete your profile</span>
+                <span className="px-2 bg-white text-gray-500">Or sign up with email</span>
               </div>
             </div>
             
@@ -271,8 +289,8 @@ const Signup = () => {
                 </div>
               </div>
               
-              <Button type="submit" className="w-full bg-gradient-hero hover:bg-secondary">
-                Create Account
+              <Button type="submit" className="w-full bg-gradient-hero hover:bg-secondary" disabled={isSubmitting}>
+                {isSubmitting ? "Creating Account..." : "Create Account"}
               </Button>
             </form>
             
