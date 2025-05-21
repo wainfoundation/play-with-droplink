@@ -41,7 +41,10 @@ export function usePiAuth() {
     // Check if Pi Network SDK is available in the window object
     if (window.Pi) {
       // Use a Promise pattern correctly with proper error handling
-      Promise.resolve(window.Pi.init({ version: "2.0", sandbox: true }))
+      Promise.resolve()
+        .then(() => {
+          return window.Pi.init({ version: "2.0", sandbox: true });
+        })
         .then(() => {
           console.log("Pi Network SDK initialized");
           setLoading(false);

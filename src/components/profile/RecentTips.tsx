@@ -22,16 +22,6 @@ interface Tip {
   from_user?: TipUser;
 }
 
-// Define interface for the payment data returned from Supabase
-interface PaymentData {
-  id: string;
-  amount: number;
-  created_at: string;
-  user_id: string;
-  recipient_id: string;
-  from_user: TipUser;
-}
-
 const RecentTips = ({ userId }: { userId: string }) => {
   const [tips, setTips] = useState<Tip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,15 +31,14 @@ const RecentTips = ({ userId }: { userId: string }) => {
       try {
         setLoading(true);
         
-        // Use payments table with correctly named columns
+        // Check payments table schema and use correct field names
         const { data, error } = await supabase
           .from("payments")
           .select(`
             id, 
             amount, 
             created_at, 
-            user_id, 
-            recipient_id,
+            user_id,
             from_user:user_profiles!user_id(id, username, avatar_url)
           `)
           .eq("recipient_id", userId)
@@ -58,23 +47,26 @@ const RecentTips = ({ userId }: { userId: string }) => {
           
         if (error) {
           console.error("Error fetching tips:", error);
+          setTips([]);
+          setLoading(false);
           return;
         }
         
         // Handle case where data might be null
         if (!data || !Array.isArray(data)) {
           setTips([]);
+          setLoading(false);
           return;
         }
         
-        // Type checking to ensure we're working with the expected data structure
-        const formattedTips = data.map((payment): Tip => {
+        // Safely transform the data to match our Tip interface
+        const formattedTips: Tip[] = data.map((payment: any) => {
           return {
             id: payment.id,
             amount: payment.amount,
             created_at: payment.created_at,
             from_user_id: payment.user_id,
-            to_user_id: payment.recipient_id,
+            to_user_id: userId, // Since we're querying where recipient_id = userId
             from_user: payment.from_user
           };
         });
@@ -82,6 +74,7 @@ const RecentTips = ({ userId }: { userId: string }) => {
         setTips(formattedTips);
       } catch (err) {
         console.error("Error in fetchTips:", err);
+        setTips([]);
       } finally {
         setLoading(false);
       }
