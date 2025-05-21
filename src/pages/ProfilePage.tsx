@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate as useReactRouterNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PiAdsNetwork from "@/components/PiAdsNetwork";
@@ -46,7 +46,7 @@ const ProfilePage = () => {
   const [showTipModal, setShowTipModal] = useState(false);
   
   const { user, showAds } = useUser();
-  const navigate = useReactRouterNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -255,11 +255,6 @@ const ProfilePage = () => {
         description: "Profile URL copied to clipboard",
       });
     }
-  };
-
-  // Helper function for navigation
-  const navigate = (path: string) => {
-    window.location.href = path;
   };
 
   if (loading) {

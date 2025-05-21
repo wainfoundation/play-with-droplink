@@ -35,7 +35,7 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
           .eq('status', 'completed')
           .eq('recipient_id', userId)
           .order('created_at', { ascending: false })
-          .limit(limit || 3);
+          .limit(limit);
         
         if (tipsError) {
           console.error("Failed to fetch tips:", tipsError);
@@ -52,8 +52,12 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
         if (totalError) {
           console.error("Failed to fetch total tips:", totalError);
         } else if (totalData) {
-          const total = totalData.reduce((sum, payment) => 
-            sum + parseFloat(typeof payment.amount === 'string' ? payment.amount : payment.amount.toString()), 0);
+          const total = totalData.reduce((sum, payment) => {
+            const amountValue = typeof payment.amount === 'string' 
+              ? parseFloat(payment.amount) 
+              : payment.amount;
+            return sum + amountValue;
+          }, 0);
           setTotalReceived(total);
         }
         
@@ -64,7 +68,9 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
         }
         
         // Get usernames for the tippers
-        const userIds = tipsData.filter(tip => tip.user_id).map(tip => tip.user_id as string);
+        const userIds = tipsData
+          .filter(tip => tip.user_id)
+          .map(tip => tip.user_id as string);
         
         if (userIds.length > 0) {
           const { data: usersData, error: usersError } = await supabase
@@ -83,7 +89,7 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
             
             const tipsWithUsernames = tipsData.map(tip => ({
               ...tip,
-              from_username: tip.user_id && usernameMap[tip.user_id] || 'Anonymous'
+              from_username: tip.user_id && usernameMap[tip.user_id] ? usernameMap[tip.user_id] : 'Anonymous'
             }));
             
             setTips(tipsWithUsernames);
@@ -128,7 +134,7 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
               <div>
                 <p className="font-medium">
                   {tip.from_username || 'Anonymous'} tipped <span className="text-primary">
-                    {parseFloat(typeof tip.amount === 'string' ? tip.amount : tip.amount.toString()).toFixed(2)} Pi
+                    {parseFloat(tip.amount.toString()).toFixed(2)} Pi
                   </span>
                 </p>
                 {tip.memo && <p className="text-gray-600 mt-1">{tip.memo}</p>}
