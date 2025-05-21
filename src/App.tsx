@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect } from "react";
 import { UserProvider } from "@/context/UserContext";
-import { initPiNetwork } from "@/services/piPaymentService";
+import { initPiNetwork } from "@/services/piNetwork";
 
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -89,6 +89,9 @@ const App = () => {
                 } 
               />
               <Route path="/admin" element={<AdminPortal />} />
+              
+              {/* Handle /demo route - redirect to home for now */}
+              <Route path="/demo" element={<Navigate to="/" replace />} />
               
               {/* Company Pages */}
               <Route path="/about" element={<About />} />
