@@ -45,7 +45,8 @@ export const useUserPlan = () => {
     hasFileUploads: plan === 'premium',
     hasWhitelabel: plan === 'premium',
     hasDataExport: plan === 'premium',
-    hasPrioritySupport: plan === 'premium'
+    hasPrioritySupport: plan === 'premium',
+    canUsePiAdNetwork: plan === 'free' || plan === 'starter'
   };
 
   return {

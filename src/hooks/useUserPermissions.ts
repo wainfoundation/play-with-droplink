@@ -50,7 +50,7 @@ export const useUserPermissions = () => {
     hasWhitelabel: plan === 'premium',
     hasDataExport: plan === 'premium',
     hasPrioritySupport: plan === 'premium',
-    canUsePiAdNetwork: plan !== 'free',
+    canUsePiAdNetwork: plan === 'free' || plan === 'starter',
     canSellWithPiPayments: plan === 'premium',
     // New additional permissions for monitoring in admin
     hasFullAdminAccess: isAdmin

@@ -30,8 +30,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   // Overall loading state
   const isLoading = authLoading || profileLoading || subscriptionLoading;
   
-  // Only show ads if user is logged in, not an admin, and either doesn't have a subscription or has a starter plan
-  const showAds = isLoggedIn && !isAdmin && (!subscription || subscription?.plan === "starter");
+  // Only show ads for free plan users or starter plan users
+  const showAds = isLoggedIn && !isAdmin && 
+    (!subscription || subscription?.plan === "free" || subscription?.plan === "starter");
 
   const refreshUserData = useCallback(async () => {
     await Promise.all([
