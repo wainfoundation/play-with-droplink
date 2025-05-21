@@ -20,17 +20,6 @@ interface TipWithSender extends Tip {
   sender?: SenderInfo;
 }
 
-interface PaymentData {
-  id: string;
-  amount: number;
-  user_id: string;
-  created_at: string;
-}
-
-interface UserData {
-  username?: string;
-}
-
 interface Props {
   profileId: string;
 }
@@ -44,7 +33,7 @@ const RecentTips = ({ profileId }: Props) => {
       try {
         setLoading(true);
         
-        // Avoid complex typings by using a simpler approach with type assertion
+        // Explicitly type the response without using generics
         const { data, error } = await supabase
           .from('payments')
           .select('id, amount, user_id, created_at')
@@ -62,34 +51,29 @@ const RecentTips = ({ profileId }: Props) => {
         
         if (data) {
           for (const payment of data) {
-            // Explicitly type the payment object
-            const paymentItem = {
+            // Explicitly create a typed payment object
+            const tipItem: Tip = {
               id: payment.id,
               amount: payment.amount,
-              user_id: payment.user_id,
+              sender_id: payment.user_id,
               created_at: payment.created_at
             };
             
-            // Get user data with simplification
+            // Get user data with explicit typing
             const { data: userData, error: userError } = await supabase
               .from('user_profiles')
               .select('username')
-              .eq('id', paymentItem.user_id)
-              .limit(1);
+              .eq('id', tipItem.sender_id)
+              .single();
               
-            if (userError) {
+            if (userError && userError.code !== 'PGRST116') { // Not found is not a critical error
               console.error('Error fetching sender data:', userError);
             }
             
             // Add tip with sender information
             tipsData.push({
-              id: paymentItem.id,
-              amount: paymentItem.amount,
-              sender_id: paymentItem.user_id,
-              created_at: paymentItem.created_at,
-              sender: userData && userData.length > 0 
-                ? { username: userData[0].username } 
-                : undefined
+              ...tipItem,
+              sender: userData || undefined
             });
           }
         }
