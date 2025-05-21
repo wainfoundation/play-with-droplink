@@ -6,10 +6,11 @@ import { Pi } from "lucide-react";
 
 interface Tip {
   id: string;
-  amount: number;
+  amount: number | string;
   created_at: string;
   memo: string;
   from_username?: string;
+  user_id?: string; // Adding this to avoid recursive type instantiation
 }
 
 interface RecentTipsProps {
@@ -51,12 +52,12 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
         if (totalError) {
           console.error("Failed to fetch total tips:", totalError);
         } else {
-          const total = totalData.reduce((sum, payment) => sum + parseFloat(payment.amount), 0);
+          const total = totalData.reduce((sum, payment) => sum + parseFloat(payment.amount.toString()), 0);
           setTotalReceived(total);
         }
         
         // Get usernames for the tippers if needed
-        const userIds = tipsData.map(tip => tip.user_id);
+        const userIds = tipsData?.map(tip => tip.user_id) || [];
         
         if (userIds.length > 0) {
           const { data: usersData, error: usersError } = await supabase
@@ -65,18 +66,22 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
             .in('id', userIds);
           
           if (!usersError && usersData) {
-            const usernameMap = Object.fromEntries(
-              usersData.map(user => [user.id, user.username])
-            );
+            const usernameMap: Record<string, string> = {};
+            
+            usersData.forEach(user => {
+              if (user.id) {
+                usernameMap[user.id] = user.username;
+              }
+            });
             
             const tipsWithUsernames = tipsData.map(tip => ({
               ...tip,
-              from_username: usernameMap[tip.user_id] || 'Anonymous'
+              from_username: tip.user_id && usernameMap[tip.user_id] || 'Anonymous'
             }));
             
             setTips(tipsWithUsernames);
           } else {
-            setTips(tipsData);
+            setTips(tipsData || []);
           }
         } else {
           setTips(tipsData || []);
