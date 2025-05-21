@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,16 +22,6 @@ interface Tip {
   from_user: TipUser | null;
 }
 
-// Use a specific type for the raw database response to avoid deep instantiation
-type PaymentRecord = {
-  id: string;
-  amount: number;
-  created_at: string;
-  user_id: string;
-  recipient_id: string;
-  from_user: TipUser | null;
-};
-
 const RecentTips = ({ userId }: { userId: string }) => {
   const [tips, setTips] = useState<Tip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,7 +31,7 @@ const RecentTips = ({ userId }: { userId: string }) => {
       try {
         setLoading(true);
         
-        // Use explicit type definition to avoid deep instantiation
+        // Fetch payments data without complex type definitions
         const { data, error } = await supabase
           .from("payments")
           .select("id, amount, created_at, user_id, recipient_id, from_user:user_profiles!user_id(id, username, avatar_url)")
@@ -59,15 +50,20 @@ const RecentTips = ({ userId }: { userId: string }) => {
           return;
         }
         
-        // Use a simpler approach with type assertion to avoid deep type instantiation
-        const formattedTips = (data as any[]).map((payment): Tip => ({
-          id: payment.id,
-          amount: payment.amount,
-          created_at: payment.created_at,
-          from_user_id: payment.user_id,
-          to_user_id: payment.recipient_id,
-          from_user: payment.from_user
-        }));
+        // Simplify by using type assertion and manual mapping
+        // This avoids TypeScript's deep type instantiation issues
+        const formattedTips: Tip[] = [];
+        
+        for (const item of data) {
+          formattedTips.push({
+            id: item.id,
+            amount: item.amount,
+            created_at: item.created_at,
+            from_user_id: item.user_id,
+            to_user_id: item.recipient_id,
+            from_user: item.from_user
+          });
+        }
         
         setTips(formattedTips);
       } catch (err) {
