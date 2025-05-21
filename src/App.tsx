@@ -27,6 +27,8 @@ import Cookies from "./pages/Cookies";
 import GDPR from "./pages/GDPR";
 import Demo from "./pages/Demo";
 import Help from "./pages/Help";
+import AllFaqs from "./pages/AllFaqs";
+import Community from "./pages/Community";
 import CreatorDirectory from "./pages/CreatorDirectory";
 import Developers from "./pages/Developers";
 
@@ -67,6 +69,8 @@ function App() {
               <Route path="/gdpr" element={<GDPR />} />
               <Route path="/demo" element={<Demo />} />
               <Route path="/help" element={<Help />} />
+              <Route path="/help/all-faqs" element={<AllFaqs />} />
+              <Route path="/community" element={<Community />} />
               <Route path="/creators" element={<CreatorDirectory />} />
               <Route path="/developers" element={<Developers />} />
               <Route path="*" element={<NotFound />} />

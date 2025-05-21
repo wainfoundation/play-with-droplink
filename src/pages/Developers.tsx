@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
@@ -10,9 +10,27 @@ import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
 import { Helmet } from "react-helmet-async";
 import { Code, FileJson, ArrowRight, Book, Database, Lock } from "lucide-react";
+import { useUser } from "@/context/UserContext";
+import { useUserPermissions } from "@/hooks/useUserPermissions";
 
 const Developers = () => {
   const [activeTab, setActiveTab] = useState("api");
+  const { isLoading } = useUser();
+  const { permissions } = useUserPermissions();
+  
+  // Check if user has admin access to view developer portal
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+  
+  // If not an admin, redirect to home page
+  if (!permissions.hasFullAdminAccess) {
+    return <Navigate to="/" replace />;
+  }
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -22,6 +40,11 @@ const Developers = () => {
       </Helmet>
       <Navbar />
       <main className="flex-grow">
+        {/* Admin Notice Banner */}
+        <div className="bg-yellow-100 text-yellow-800 px-4 py-3 text-center">
+          <p className="font-medium">Admin Only View - Developer Documentation Portal</p>
+        </div>
+      
         {/* Hero Section */}
         <section className="bg-muted py-16 px-4">
           <div className="container mx-auto max-w-4xl text-center">

@@ -7,6 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
+import { Helmet } from "react-helmet-async";
 
 const Help = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -136,6 +137,10 @@ const Help = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>Help Center - Droplink</title>
+        <meta name="description" content="Get help with using Droplink, the Pi Network link-in-bio platform. Find tutorials, FAQs, and guides." />
+      </Helmet>
       <Navbar />
       <main className="flex-grow">
         {/* Hero Section */}
