@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
@@ -62,8 +61,8 @@ const RecentTips = ({ userId }: { userId: string }) => {
           return;
         }
         
-        // Use the explicitly defined type to handle the data
-        const rawData = data as unknown as RawPaymentData[];
+        // Handle the data with explicit type casting to avoid deep instantiation
+        const rawData = data as any[];
         
         const formattedTips: Tip[] = rawData.map(payment => ({
           id: payment.id,

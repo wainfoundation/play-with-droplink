@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
@@ -26,8 +25,7 @@ const LinksSection = () => {
 
   useEffect(() => {
     if (profile?.username) {
-      const baseUrl = window.location.origin;
-      setProfileUrl(`${baseUrl}/@${profile.username}`);
+      setProfileUrl(`https://droplink.space/@${profile.username}`);
     }
   }, [profile]);
 

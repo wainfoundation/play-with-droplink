@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -265,7 +266,7 @@ const ProfilePage = () => {
     return <ErrorState username={username} />;
   }
 
-  const profileUrl = `https://${window.location.host}/@${profileData.username}`;
+  const profileUrl = `https://droplink.space/@${profileData.username}`;
   
   return (
     <div className="min-h-screen flex flex-col">

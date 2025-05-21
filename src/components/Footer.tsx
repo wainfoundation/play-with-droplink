@@ -17,13 +17,13 @@ const Footer = () => {
             Unify your links, sell products, and earn Pi on Pi Network with one elegant page.
           </p>
           <div className="flex gap-4">
-            <a href="https://instagram.com" aria-label="Instagram" className="text-primary hover:text-secondary transition-colors">
+            <a href="https://instagram.com/droplink.space" aria-label="Instagram" className="text-primary hover:text-secondary transition-colors">
               <Instagram size={24} />
             </a>
-            <a href="https://twitter.com" aria-label="Twitter" className="text-primary hover:text-secondary transition-colors">
+            <a href="https://twitter.com/droplink_space" aria-label="Twitter" className="text-primary hover:text-secondary transition-colors">
               <Twitter size={24} />
             </a>
-            <a href="https://facebook.com" aria-label="Facebook" className="text-primary hover:text-secondary transition-colors">
+            <a href="https://facebook.com/droplink.space" aria-label="Facebook" className="text-primary hover:text-secondary transition-colors">
               <Facebook size={24} />
             </a>
           </div>
@@ -91,7 +91,7 @@ const Footer = () => {
       </div>
 
       <div className="container mx-auto mt-12 pt-6 border-t border-gray-200 text-center text-sm">
-        <p>© {new Date().getFullYear()} Droplink. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} Droplink.space. All rights reserved.</p>
         <p className="mt-2 text-xs text-gray-500">Built by the community, for the community. Droplink is committed to helping creators thrive on Pi Network.</p>
       </div>
     </footer>
