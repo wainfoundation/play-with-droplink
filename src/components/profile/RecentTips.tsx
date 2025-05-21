@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -30,7 +29,7 @@ const RecentTips = ({ profileId }: Props) => {
       try {
         setLoading(true);
         
-        // Get tips from the payments table, not "tips" table
+        // Using the payments table with explicit column selections and aliases
         const { data, error } = await supabase
           .from('payments')
           .select(`
@@ -49,8 +48,9 @@ const RecentTips = ({ profileId }: Props) => {
           return;
         }
 
-        // Type assertion to help TypeScript recognize the data structure
-        setTips((data || []) as TipWithSender[]);
+        // Use type assertion to tell TypeScript about the structure
+        const typedData = (data || []) as unknown as TipWithSender[];
+        setTips(typedData);
       } catch (err) {
         console.error('Failed to fetch recent tips:', err);
       } finally {

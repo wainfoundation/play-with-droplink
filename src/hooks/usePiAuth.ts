@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,12 +32,22 @@ export function usePiAuth() {
         // After successful Pi authentication, try to find or create a user in Supabase
         let existingUser = null;
         
-        // Use explicit type for the query response
+        // Explicitly type the query response
+        interface UserProfileRow {
+          id: string;
+          username: string;
+          display_name: string | null;
+          bio: string | null;
+          avatar_url: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        }
+        
         const { data, error: userError } = await supabase
           .from('user_profiles')
           .select('*')
           .eq('pi_user_id', authResult.user.uid)
-          .maybeSingle();
+          .maybeSingle<UserProfileRow>();
         
         existingUser = data;
         
