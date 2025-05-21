@@ -21,10 +21,20 @@ export interface PiPaymentData {
 // Check if running in Pi Browser
 export const isRunningInPiBrowser = (): boolean => {
   try {
-    // Check if Pi SDK is available
-    if (typeof window !== 'undefined' && window.Pi) {
-      return true;
+    // Enhanced detection for Pi Browser environment
+    if (typeof window !== 'undefined') {
+      // Check for Pi SDK availability
+      if (window.Pi) {
+        return true;
+      }
+      
+      // Check for Pi Browser specific user agent strings
+      const userAgent = navigator.userAgent.toLowerCase();
+      if (userAgent.includes('pibrowser') || userAgent.includes('pi network') || userAgent.includes('pi-browser')) {
+        return true;
+      }
     }
+    console.log("Not running in Pi Browser");
     return false;
   } catch (error) {
     console.error("Error checking Pi Browser environment:", error);

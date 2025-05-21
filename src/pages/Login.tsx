@@ -13,7 +13,10 @@ import { isRunningInPiBrowser } from "@/utils/pi-sdk";
 const Login = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useUser();
+  // Perform check directly for debugging
   const isPiBrowser = isRunningInPiBrowser();
+  
+  console.log("Login page - isPiBrowser:", isPiBrowser, "isLoggedIn:", isLoggedIn);
 
   useEffect(() => {
     // Initialize Pi Network SDK
@@ -54,9 +57,10 @@ const Login = () => {
       </main>
       <Footer />
       
-      {/* Pi Browser Dialog - will only show if not in Pi Browser */}
+      {/* Always render the dialog, it will only show if not in Pi Browser */}
       <PiBrowserDialog 
         redirectUrl="https://pinet.com/@droplink"
+        showOnMount={true}
       />
     </div>
   );

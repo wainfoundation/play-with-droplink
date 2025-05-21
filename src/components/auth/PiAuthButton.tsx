@@ -14,6 +14,8 @@ export function PiAuthButton() {
   const { refreshUserData } = useUser();
   const isPiBrowser = isRunningInPiBrowser();
 
+  console.log("PiAuthButton - isPiBrowser:", isPiBrowser);
+
   // Initialize Pi SDK when component mounts
   useEffect(() => {
     initPiNetwork();
@@ -22,11 +24,15 @@ export function PiAuthButton() {
   const handlePiAuth = async () => {
     // If not in Pi Browser, show a toast and return
     if (!isPiBrowser) {
+      console.log("Not in Pi Browser, showing toast");
       toast({
         title: "Pi Browser Required",
         description: "Please open this app in Pi Browser for the best experience",
         variant: "destructive",
       });
+      
+      // Try to open the dialog by dispatching a custom event
+      window.dispatchEvent(new CustomEvent('open-pi-browser-dialog'));
       return;
     }
     

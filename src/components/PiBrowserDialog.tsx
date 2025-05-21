@@ -28,16 +28,21 @@ const PiBrowserDialog = ({
   onClose
 }: PiBrowserDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  
+  // Directly check Pi Browser status on each render to ensure it's current
   const isPiBrowser = isRunningInPiBrowser();
 
   useEffect(() => {
+    console.log("PiBrowserDialog - isPiBrowser:", isPiBrowser, "showOnMount:", showOnMount);
     // Only show dialog if not in Pi Browser and showOnMount is true
     if (!isPiBrowser && showOnMount) {
+      console.log("Opening Pi Browser dialog");
       setIsOpen(true);
     }
   }, [isPiBrowser, showOnMount]);
 
   const handleClose = () => {
+    console.log("Closing Pi Browser dialog");
     setIsOpen(false);
     if (onClose) {
       onClose();
@@ -45,8 +50,12 @@ const PiBrowserDialog = ({
   };
 
   const redirectToPiBrowser = () => {
+    console.log("Redirecting to:", redirectUrl);
     window.location.href = redirectUrl;
   };
+
+  // Debug check
+  console.log("PiBrowserDialog rendering - isPiBrowser:", isPiBrowser, "isOpen:", isOpen);
 
   // Don't render anything if in Pi Browser
   if (isPiBrowser) {
