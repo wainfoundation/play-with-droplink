@@ -53,15 +53,14 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
           console.error("Failed to fetch total tips:", totalError);
         } else if (totalData) {
           // Calculate total using a more explicit type handling
-          const total = totalData.reduce((sum, payment) => {
+          const total = totalData.reduce((sum: number, payment) => {
             // Safely convert string or number to number type
-            let amountNum = 0;
             if (typeof payment.amount === 'string') {
-              amountNum = parseFloat(payment.amount);
+              return sum + parseFloat(payment.amount || '0');
             } else if (typeof payment.amount === 'number') {
-              amountNum = payment.amount;
+              return sum + payment.amount;
             }
-            return sum + amountNum;
+            return sum;
           }, 0);
           
           setTotalReceived(total);
@@ -134,25 +133,33 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
       </div>
       
       <div className="space-y-2">
-        {tips.map(tip => (
-          <div key={tip.id} className="bg-gray-50 p-3 rounded-lg text-sm">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="font-medium">
-                  {tip.from_username || 'Anonymous'} tipped <span className="text-primary">
-                    {typeof tip.amount === 'string' 
-                      ? parseFloat(tip.amount).toFixed(2) 
-                      : tip.amount.toFixed(2)} Pi
-                  </span>
-                </p>
-                {tip.memo && <p className="text-gray-600 mt-1">{tip.memo}</p>}
+        {tips.map(tip => {
+          // Pre-process the amount to avoid type issues in JSX
+          let displayAmount: string;
+          if (typeof tip.amount === 'string') {
+            displayAmount = parseFloat(tip.amount || '0').toFixed(2);
+          } else {
+            displayAmount = tip.amount.toFixed(2);
+          }
+          
+          return (
+            <div key={tip.id} className="bg-gray-50 p-3 rounded-lg text-sm">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-medium">
+                    {tip.from_username || 'Anonymous'} tipped <span className="text-primary">
+                      {displayAmount} Pi
+                    </span>
+                  </p>
+                  {tip.memo && <p className="text-gray-600 mt-1">{tip.memo}</p>}
+                </div>
+                <span className="text-xs text-gray-500">
+                  {new Date(tip.created_at).toLocaleDateString()}
+                </span>
               </div>
-              <span className="text-xs text-gray-500">
-                {new Date(tip.created_at).toLocaleDateString()}
-              </span>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
