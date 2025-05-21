@@ -13,13 +13,14 @@ interface TipUser {
   avatar_url: string | null;
 }
 
+// Simplified Tip interface that doesn't rely on nested types
 interface Tip {
   id: string;
   amount: number;
   created_at: string;
   from_user_id: string;
   to_user_id: string;
-  from_user?: TipUser;
+  from_user: TipUser | null;
 }
 
 const RecentTips = ({ userId }: { userId: string }) => {
@@ -53,18 +54,19 @@ const RecentTips = ({ userId }: { userId: string }) => {
           return;
         }
         
-        // Directly map to the Tip interface without relying on type inference
-        const formattedTips = data.map((payment: any) => {
-          const tip: Tip = {
+        // Handle the data without complex type inference
+        const formattedTips: Tip[] = [];
+        
+        for (const payment of data) {
+          formattedTips.push({
             id: payment.id,
             amount: payment.amount,
             created_at: payment.created_at,
             from_user_id: payment.user_id,
             to_user_id: userId,
             from_user: payment.from_user
-          };
-          return tip;
-        });
+          });
+        }
         
         setTips(formattedTips);
       } catch (err) {
