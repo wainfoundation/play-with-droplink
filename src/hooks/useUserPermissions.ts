@@ -11,26 +11,25 @@ export const useUserPermissions = () => {
     profile
   } = useUser();
 
-  // Enhanced security: Strict check for admin status
-  // Admin users get premium privileges only if properly authenticated
+  // Enhanced security: Strict check for admin status with additional validation
   let plan: SubscriptionPlan = 'free'; // Default to free
   
-  if (isLoggedIn && isAdmin) {
+  if (isLoggedIn && isAdmin && profile?.id) {
     plan = 'premium'; // Admin users get premium plan by default
     console.log("Admin privileges granted to authenticated admin user");
   } else if (isLoggedIn && subscription?.plan) {
     plan = subscription.plan as SubscriptionPlan;
   }
   
-  // Improved security: Strict check for subscription validity
+  // Improved security: More strict check for subscription validity
   const subscriptionEnd = subscription?.expires_at ? new Date(subscription.expires_at) : null;
   const isSubscriptionActive = isLoggedIn && subscription?.is_active && 
     subscriptionEnd && new Date() < subscriptionEnd;
   
-  // If subscription is expired but still marked as active, treat as free plan
-  if (!isSubscriptionActive && plan !== 'free' && !(isLoggedIn && isAdmin)) {
+  // Double check for subscription validity
+  if (!isSubscriptionActive && plan !== 'free' && !(isLoggedIn && isAdmin && profile?.id)) {
     plan = 'free';
-    console.log('Subscription expired but still marked as active. Treating as free plan.');
+    console.log('Subscription invalid or expired. Treating as free plan.');
   }
   
   const username = profile?.username || null;
@@ -53,8 +52,8 @@ export const useUserPermissions = () => {
     hasPrioritySupport: plan === 'premium',
     canUsePiAdNetwork: plan === 'free' || plan === 'starter',
     canSellWithPiPayments: plan === 'premium',
-    // Enhanced security: Require both login and admin status for full admin access
-    hasFullAdminAccess: isLoggedIn && isAdmin
+    // Enhanced security: Require profile ID validation for full admin access
+    hasFullAdminAccess: isLoggedIn && isAdmin && !!profile?.id
   };
 
   return {

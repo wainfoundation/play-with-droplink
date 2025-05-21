@@ -13,24 +13,33 @@ export const useAuth = () => {
   const ADMIN_EMAILS = ["admin@pidrop.dev"];
   
   useEffect(() => {
-    // Security improvement: Add authorization header validation
+    // Security improvement: Add authorization header and token validation
     const checkAuthHeaders = async () => {
       // Check if auth state includes valid tokens
       const { data } = await supabase.auth.getSession();
+      
       if (data.session?.access_token) {
+        // Validate token expiry
+        if (new Date(data.session.expires_at * 1000) < new Date()) {
+          console.warn("Access token has expired");
+          await signOut(); // Force sign out if token expired
+          return false;
+        }
         console.log("Valid access token present");
+        return true;
       }
+      return false;
     };
     
     // Set up auth state change listener with improved security
     const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         console.log("Auth state change:", event, session?.user?.id);
         const currentUser = session?.user ?? null;
         setUser(currentUser);
         
-        // Security enhancement: Strict admin validation
-        if (currentUser && currentUser.email) {
+        // Security enhancement: Strict admin validation with email verification
+        if (currentUser && currentUser.email && currentUser.email_confirmed_at) {
           const userIsAdmin = ADMIN_EMAILS.includes(currentUser.email);
           setIsAdmin(userIsAdmin);
           
@@ -46,25 +55,35 @@ export const useAuth = () => {
     );
 
     // Check current session with improved security
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Current session:", session?.user?.id);
-      const currentUser = session?.user ?? null;
-      setUser(currentUser);
-      
-      // Security enhancement: Strict admin validation
-      if (currentUser && currentUser.email) {
-        const userIsAdmin = ADMIN_EMAILS.includes(currentUser.email);
-        setIsAdmin(userIsAdmin);
+    const initAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log("Current session:", session?.user?.id);
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
         
-        if (userIsAdmin) {
-          console.log("User has admin privileges");
+        // Security enhancement: Strict admin validation with email verification
+        if (currentUser && currentUser.email && currentUser.email_confirmed_at) {
+          const userIsAdmin = ADMIN_EMAILS.includes(currentUser.email);
+          setIsAdmin(userIsAdmin);
+          
+          if (userIsAdmin) {
+            console.log("User has admin privileges");
+          }
         }
+        
+        // Run security check
+        await checkAuthHeaders();
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error initializing auth:", error);
+        setUser(null);
+        setIsAdmin(false);
+        setIsLoading(false);
       }
-      
-      // Run security check
-      checkAuthHeaders();
-      setIsLoading(false);
-    });
+    };
+
+    initAuth();
 
     return () => {
       authSubscription.unsubscribe();
@@ -89,12 +108,20 @@ export const useAuth = () => {
       // Clear Supabase storage items
       localStorage.removeItem('supabase.auth.token');
       
+      // Clear any session cookies
+      document.cookie.split(';').forEach(c => {
+        document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
+      });
+      
       console.log("User signed out successfully");
       
       toast({
         title: "Signed Out",
         description: "You have been successfully signed out",
       });
+      
+      // Force page reload to clear any in-memory state
+      window.location.href = '/';
     } catch (error) {
       console.error("Error signing out:", error);
       toast({
