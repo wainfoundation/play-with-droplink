@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,19 +20,6 @@ interface Tip {
   from_user_id: string;
   to_user_id: string;
   from_user: TipUser | null;
-}
-
-interface RawPaymentData {
-  id: string;
-  amount: number;
-  created_at: string;
-  user_id: string;
-  recipient_id: string;
-  from_user: {
-    id: string;
-    username: string;
-    avatar_url: string | null;
-  } | null;
 }
 
 const RecentTips = ({ userId }: { userId: string }) => {
@@ -61,10 +49,8 @@ const RecentTips = ({ userId }: { userId: string }) => {
           return;
         }
         
-        // Handle the data with explicit type casting to avoid deep instantiation
-        const rawData = data as any[];
-        
-        const formattedTips: Tip[] = rawData.map(payment => ({
+        // Map the data directly to our Tip interface
+        const formattedTips: Tip[] = data.map((payment: any) => ({
           id: payment.id,
           amount: payment.amount,
           created_at: payment.created_at,
