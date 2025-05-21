@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { isRunningInPiBrowser, initPiNetwork } from "@/utils/pi-sdk";
 
 export interface PaymentData {
   amount: number;
@@ -14,34 +15,18 @@ export interface PaymentCallbacks {
   onError: (error: Error, payment?: any) => void;
 }
 
-// Initialize Pi SDK with environment detection
-export const initPiNetwork = (): boolean => {
-  try {
-    if (window.Pi) {
-      // Check if we're in development or production
-      const isSandbox = import.meta.env.DEV || 
-                         window.location.hostname.includes('localhost') || 
-                         window.location.hostname.includes('lovableproject.com');
-      
-      window.Pi.init({ version: "2.0", sandbox: isSandbox });
-      console.log("Pi SDK initialized with sandbox mode:", isSandbox);
-      return true;
-    }
-    console.error("Pi SDK not found. Make sure to include the Pi SDK script.");
-    return false;
-  } catch (error) {
-    console.error("Failed to initialize Pi SDK:", error);
-    return false;
-  }
+// Initialize Pi SDK using our utility
+export const initializeNetwork = () => {
+  return initPiNetwork();
 };
 
 // Authenticate user with Pi Network
 export const authenticateWithPi = async (
-  scopes: string[] = ["username", "payments"]
+  scopes: string[] = ["username", "payments", "wallet_address"]
 ): Promise<any> => {
   try {
-    if (!window.Pi) {
-      console.error("Pi SDK not initialized");
+    if (!isRunningInPiBrowser()) {
+      console.error("Pi SDK not initialized or not available");
       return null;
     }
 
@@ -81,8 +66,8 @@ export const createPiPayment = async (
   user: any
 ): Promise<any> => {
   try {
-    if (!window.Pi) {
-      console.error("Pi SDK not initialized");
+    if (!isRunningInPiBrowser()) {
+      console.error("Pi SDK not initialized or not available");
       return null;
     }
 
@@ -116,12 +101,18 @@ export const createPiPayment = async (
       onReadyForServerCompletion: async (paymentId: string, txid: string) => {
         console.log("Payment ready for completion:", paymentId, "Transaction ID:", txid);
         
+        // Get current environment (sandbox vs production)
+        const isSandbox = import.meta.env.DEV || 
+                          window.location.hostname.includes('localhost') || 
+                          window.location.hostname.includes('lovableproject.com');
+        
         // Complete the payment in our database
         await supabase.functions.invoke('complete-payment', {
           body: { 
             paymentId,
             transactionId: txid,
-            status: 'completed'
+            status: 'completed',
+            sandbox: isSandbox
           }
         });
       },
@@ -160,8 +151,23 @@ export const createPiPayment = async (
   }
 };
 
+// Create a reusable function for Pi browser detection with guidance
+export const getPiBrowserStatus = () => {
+  const isPiBrowser = isRunningInPiBrowser();
+  
+  return {
+    isPiBrowser,
+    message: isPiBrowser 
+      ? "Running in Pi Browser" 
+      : "For the best experience with Pi payments, please open this app in Pi Browser.",
+    downloadUrl: "https://minepi.com/download"
+  };
+};
+
 export default {
-  initPiNetwork,
+  initializeNetwork,
   authenticateWithPi,
   createPiPayment,
+  getPiBrowserStatus,
+  isRunningInPiBrowser
 };
