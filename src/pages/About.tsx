@@ -65,27 +65,17 @@ const About = () => {
               </div>
               
               <h2 className="text-2xl font-bold mt-10 mb-4">Meet The Team</h2>
-              <div className="grid md:grid-cols-3 gap-6 my-8">
+              <div className="flex justify-center my-8">
                 <div className="text-center">
-                  <div className="w-32 h-32 rounded-full bg-gradient-hero mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-white text-3xl font-bold">JD</span>
+                  <div className="w-40 h-40 rounded-full bg-gradient-hero mx-auto mb-4 flex items-center justify-center">
+                    <img 
+                      src="/lovable-uploads/6ccb1c20-f7fc-4341-98bf-3920b4dfdb29.png" 
+                      alt="Mrwain" 
+                      className="w-36 h-36 rounded-full object-cover"
+                    />
                   </div>
-                  <h3 className="text-xl font-semibold">Mrwain</h3>
+                  <h3 className="text-2xl font-semibold">Mrwain</h3>
                   <p className="text-muted-foreground">Founder & CEO</p>
-                </div>
-                <div className="text-center">
-                  <div className="w-32 h-32 rounded-full bg-gradient-hero mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-white text-3xl font-bold">JS</span>
-                  </div>
-                  <h3 className="text-xl font-semibold">John Smith</h3>
-                  <p className="text-muted-foreground">CTO</p>
-                </div>
-                <div className="text-center">
-                  <div className="w-32 h-32 rounded-full bg-gradient-hero mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-white text-3xl font-bold">AT</span>
-                  </div>
-                  <h3 className="text-xl font-semibold">Anna Taylor</h3>
-                  <p className="text-muted-foreground">Head of Community</p>
                 </div>
               </div>
               
