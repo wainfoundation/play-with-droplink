@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import { toast } from "@/hooks/use-toast";
 import { authenticateWithPi } from "@/services/piPaymentService";
 import { supabase } from "@/integrations/supabase/client";
+import { isPasswordCompromised } from "@/utils/passwordSecurity";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +21,7 @@ const Signup = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [piAuthenticating, setPiAuthenticating] = useState(false);
+  const [isCheckingPassword, setIsCheckingPassword] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -75,6 +77,20 @@ const Signup = () => {
         toast({
           title: "Terms Required",
           description: "Please agree to the terms and conditions",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // New feature: Check if password has been compromised
+      setIsCheckingPassword(true);
+      const compromised = await isPasswordCompromised(formData.password);
+      setIsCheckingPassword(false);
+      
+      if (compromised) {
+        toast({
+          title: "Insecure Password",
+          description: "This password has appeared in data breaches. Please choose a different password for your security.",
           variant: "destructive",
         });
         return;
@@ -262,7 +278,8 @@ const Signup = () => {
                   required
                 />
                 <p className="text-xs text-gray-500">
-                  Must be at least 8 characters with letters and numbers
+                  Must be at least 8 characters with letters and numbers. <br/>
+                  For your security, we check if passwords have been exposed in data breaches.
                 </p>
               </div>
               
@@ -289,8 +306,13 @@ const Signup = () => {
                 </div>
               </div>
               
-              <Button type="submit" className="w-full bg-gradient-hero hover:bg-secondary" disabled={isSubmitting}>
-                {isSubmitting ? "Creating Account..." : "Create Account"}
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-hero hover:bg-secondary" 
+                disabled={isSubmitting || isCheckingPassword}
+              >
+                {isSubmitting ? "Creating Account..." : 
+                 isCheckingPassword ? "Checking Password Security..." : "Create Account"}
               </Button>
             </form>
             

@@ -1,19 +1,91 @@
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
-import { useEmailAuth } from "@/hooks/useEmailAuth";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "@/context/UserContext";
+import { isPasswordCompromised } from "@/utils/passwordSecurity";
 
 export function EmailLoginForm() {
-  const {
-    email,
-    setEmail,
-    password,
-    setPassword,
-    isSubmitting,
-    handleSubmit
-  } = useEmailAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCheckingPassword, setIsCheckingPassword] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const { refreshUserData } = useUser();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      setIsSubmitting(true);
+      
+      // Validate inputs
+      if (!email || !password) {
+        toast({
+          title: "Login Failed",
+          description: "Please enter both email and password",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Check if password has been compromised
+      setIsCheckingPassword(true);
+      const compromised = await isPasswordCompromised(password);
+      setIsCheckingPassword(false);
+      
+      if (compromised) {
+        // Allow login but warn the user
+        toast({
+          title: "Security Warning",
+          description: "Your password appears in known data breaches. Please change it after logging in.",
+          variant: "warning",
+        });
+        // Continue with login despite the warning
+      }
+      
+      // Use Supabase auth to login with email and password
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      
+      if (error) {
+        console.error("Supabase login error:", error);
+        toast({
+          title: "Login Failed",
+          description: error.message || "Invalid email or password",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Refresh user data after successful login
+      await refreshUserData();
+      
+      toast({
+        title: "Login Successful",
+        description: "Welcome back to Droplink!",
+      });
+      
+      navigate('/dashboard');
+    } catch (error) {
+      console.error("Login error:", error);
+      toast({
+        title: "Login Failed",
+        description: "An error occurred during login",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -46,8 +118,13 @@ export function EmailLoginForm() {
         />
       </div>
       
-      <Button type="submit" className="w-full bg-gradient-hero hover:bg-secondary" disabled={isSubmitting}>
-        {isSubmitting ? "Signing in..." : "Sign in"}
+      <Button 
+        type="submit" 
+        className="w-full bg-gradient-hero hover:bg-secondary" 
+        disabled={isSubmitting || isCheckingPassword}
+      >
+        {isSubmitting ? "Signing in..." : 
+         isCheckingPassword ? "Verifying security..." : "Sign in"}
       </Button>
     </form>
   );
