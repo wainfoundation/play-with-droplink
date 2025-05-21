@@ -44,16 +44,22 @@ export function usePiAuth() {
         // After successful Pi authentication, try to find or create a user in Supabase
         let existingUser: UserProfile | null = null;
         
+        // Use explicit typing for the query response
+        type UserQueryResult = UserProfile[];
+        
         // Use simple object for query response without relying on deep types
         const { data, error } = await supabase
           .from('user_profiles')
           .select('*')
-          .eq('pi_user_id', piAuthData.user.uid);
+          .eq('pi_user_id', piAuthData.user.uid) as {
+            data: UserQueryResult | null;
+            error: any;
+          };
         
         if (error) {
           console.error("Error checking for existing Pi user:", error);
         } else if (data && data.length > 0) {
-          existingUser = data[0] as UserProfile;
+          existingUser = data[0];
         }
         
         // If no existing user, create one
