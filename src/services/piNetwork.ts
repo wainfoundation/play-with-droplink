@@ -40,7 +40,7 @@ declare global {
 }
 
 // Get environment variables
-const PI_API_KEY = "ldtwy98n3q6f8uvxvoxvnidgiklu21ndbfn5ltqpnfxcftbocc9ujxrcfiwcwkj6";
+const PI_API_KEY = "ckta3qej1mjqit2rlqt6nutpw089uynyotj3g9spwqlhrvvggqv7hoe6cn3plgb5";
 const PI_SANDBOX = true;
 
 // Initialize Pi SDK

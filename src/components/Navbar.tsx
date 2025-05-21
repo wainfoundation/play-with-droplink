@@ -1,14 +1,22 @@
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Facebook, Instagram, Menu, Twitter, X } from "lucide-react";
+import { Facebook, Instagram, Menu, Twitter, X, LogOut, UserRound } from "lucide-react";
+import { useUser } from "@/context/UserContext";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isLoggedIn, signOut, profile } = useUser();
+  const navigate = useNavigate();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/login');
   };
 
   return (
@@ -24,10 +32,35 @@ const Navbar = () => {
         <Link to="/features" className="nav-link">Features</Link>
         <Link to="/pricing" className="nav-link">Pricing</Link>
         <Link to="/templates" className="nav-link">Templates</Link>
-        <Link to="/login" className="nav-link">Log In</Link>
-        <Button asChild className="bg-gradient-hero hover:bg-secondary">
-          <Link to="/signup">Start Free</Link>
-        </Button>
+        
+        {isLoggedIn ? (
+          <>
+            <Link to="/dashboard" className="nav-link">Dashboard</Link>
+            <Button 
+              variant="ghost" 
+              className="flex items-center gap-2 text-primary" 
+              onClick={handleLogout}
+            >
+              <LogOut size={18} />
+              Log Out
+            </Button>
+            {profile && (
+              <Button asChild variant="outline" className="flex items-center gap-2">
+                <Link to="/dashboard">
+                  <UserRound size={18} />
+                  {profile.username || 'Account'}
+                </Link>
+              </Button>
+            )}
+          </>
+        ) : (
+          <>
+            <Link to="/login" className="nav-link">Log In</Link>
+            <Button asChild className="bg-gradient-hero hover:bg-secondary">
+              <Link to="/signup">Start Free</Link>
+            </Button>
+          </>
+        )}
       </nav>
 
       <div className="hidden md:flex items-center gap-4">
@@ -76,10 +109,27 @@ const Navbar = () => {
             <Link to="/features" className="p-3 hover:bg-muted rounded-md transition-colors">Features</Link>
             <Link to="/pricing" className="p-3 hover:bg-muted rounded-md transition-colors">Pricing</Link>
             <Link to="/templates" className="p-3 hover:bg-muted rounded-md transition-colors">Templates</Link>
-            <Link to="/login" className="p-3 hover:bg-muted rounded-md transition-colors">Log In</Link>
-            <Button asChild className="mt-2 bg-gradient-hero hover:bg-secondary">
-              <Link to="/signup">Start Free</Link>
-            </Button>
+            
+            {isLoggedIn ? (
+              <>
+                <Link to="/dashboard" className="p-3 hover:bg-muted rounded-md transition-colors">Dashboard</Link>
+                <Button 
+                  variant="ghost" 
+                  className="flex items-center justify-start gap-2 p-3 hover:bg-muted rounded-md transition-colors"
+                  onClick={handleLogout}
+                >
+                  <LogOut size={18} />
+                  Log Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="p-3 hover:bg-muted rounded-md transition-colors">Log In</Link>
+                <Button asChild className="mt-2 bg-gradient-hero hover:bg-secondary">
+                  <Link to="/signup">Start Free</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           <div className="mt-auto flex justify-center gap-8 py-6">

@@ -57,10 +57,11 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
           
           if (Array.isArray(totalData)) {
             for (const payment of totalData) {
-              if (typeof payment.amount === 'string' && payment.amount) {
-                total += parseFloat(payment.amount);
-              } else if (typeof payment.amount === 'number') {
-                total += payment.amount;
+              const amount = payment.amount;
+              if (typeof amount === 'string' && amount) {
+                total += parseFloat(amount);
+              } else if (typeof amount === 'number') {
+                total += amount;
               }
             }
           }

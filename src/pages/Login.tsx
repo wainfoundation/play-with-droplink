@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { toast } from "@/hooks/use-toast";
-import { authenticateWithPi, initPiNetwork } from "@/services/piNetwork";
+import { useToast } from "@/components/ui/use-toast";
+import { authenticateWithPi } from "@/services/piPaymentService";
+import { useUser } from "@/context/UserContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -15,17 +16,15 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [piAuthenticating, setPiAuthenticating] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const { isLoggedIn, refreshUserData } = useUser();
 
   useEffect(() => {
     // Check if user is already logged in
-    const token = localStorage.getItem('userToken');
-    if (token) {
+    if (isLoggedIn) {
       navigate('/dashboard');
     }
-
-    // Initialize Pi Network SDK
-    initPiNetwork();
-  }, [navigate]);
+  }, [isLoggedIn, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,6 +59,8 @@ const Login = () => {
       if (!localStorage.getItem('userPlan')) {
         localStorage.setItem('userPlan', 'starter');
       }
+      
+      await refreshUserData();
       
       toast({
         title: "Login Successful",
@@ -100,6 +101,8 @@ const Login = () => {
         if (!localStorage.getItem('userPlan')) {
           localStorage.setItem('userPlan', 'starter');
         }
+        
+        await refreshUserData();
         
         toast({
           title: "Pi Authentication Successful",
@@ -189,8 +192,8 @@ const Login = () => {
                 />
               </div>
               
-              <Button type="submit" className="w-full bg-gradient-hero hover:bg-secondary">
-                Sign in
+              <Button type="submit" className="w-full bg-gradient-hero hover:bg-secondary" disabled={isSubmitting}>
+                {isSubmitting ? "Signing in..." : "Sign in"}
               </Button>
             </form>
             
