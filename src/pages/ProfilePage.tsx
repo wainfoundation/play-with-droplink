@@ -311,9 +311,9 @@ const ProfilePage = () => {
               onTipClick={handleTipClick}
             />
             
-            {/* Display recent tips if available */}
+            {/* Display recent tips if available - fix the prop name to match the component */}
             {profileData.id && (
-              <RecentTips profileId={profileData.id} />
+              <RecentTips userId={profileData.id} />
             )}
           </div>
         </div>

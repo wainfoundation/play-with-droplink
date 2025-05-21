@@ -22,9 +22,11 @@ interface UserData {
   plan?: string;
 }
 
-interface AuthResult {
-  user: UserData | null;
-  piUser: PiUser | null;
+interface PiAuthResult {
+  user: {
+    uid: string;
+    username: string;
+  }
 }
 
 // Export as a named function so it can be imported as: import { usePiAuth } from "@/hooks/usePiAuth"
@@ -54,6 +56,12 @@ export function usePiAuth() {
     }
   }, []);
 
+  const onIncompletePaymentFound = (payment: any) => {
+    console.log("Incomplete payment found:", payment);
+    // Handle incomplete payment
+    return null;
+  };
+
   const handlePiLogin = async () => {
     try {
       setPiAuthenticating(true);
@@ -66,7 +74,7 @@ export function usePiAuth() {
       const authResult = await window.Pi.authenticate(
         ["username", "payments", "wallet_address"],
         onIncompletePaymentFound
-      );
+      ) as PiAuthResult;
 
       if (authResult) {
         console.log("Pi Auth Result:", authResult);
@@ -82,7 +90,7 @@ export function usePiAuth() {
         const { data: existingUser, error: fetchError } = await supabase
           .from('user_profiles')
           .select()
-          .eq("uid", authResult.user.uid)
+          .eq("id", authResult.user.uid)
           .maybeSingle();
           
         if (fetchError && fetchError.code !== "PGRST116") {
@@ -97,9 +105,9 @@ export function usePiAuth() {
           const { data: newUser, error: createError } = await supabase
             .from('user_profiles')
             .insert({
+              id: authResult.user.uid,
               username: authResult.user.username,
-              uid: authResult.user.uid,
-              auth_method: "pi_network",
+              auth_method: "pi_network"
             })
             .select()
             .maybeSingle();
@@ -137,12 +145,6 @@ export function usePiAuth() {
     } finally {
       setPiAuthenticating(false);
     }
-  };
-
-  const onIncompletePaymentFound = (payment: any) => {
-    console.log("Incomplete payment found:", payment);
-    // Handle incomplete payment
-    return null;
   };
 
   return {

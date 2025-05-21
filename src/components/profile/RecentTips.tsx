@@ -22,6 +22,16 @@ interface Tip {
   from_user?: TipUser;
 }
 
+// Define interface for the payment data returned from Supabase
+interface PaymentData {
+  id: string;
+  amount: number;
+  created_at: string;
+  user_id: string;
+  recipient_id: string;
+  from_user: TipUser;
+}
+
 const RecentTips = ({ userId }: { userId: string }) => {
   const [tips, setTips] = useState<Tip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,15 +41,15 @@ const RecentTips = ({ userId }: { userId: string }) => {
       try {
         setLoading(true);
         
-        // Use payments table with proper join rather than non-existent tips table
+        // Use payments table with proper join 
         const { data, error } = await supabase
           .from("payments")
           .select(`
             id, 
             amount, 
             created_at, 
-            user_id as from_user_id, 
-            recipient_id:user_id as to_user_id,
+            user_id, 
+            recipient_id,
             from_user:user_profiles!user_id(id, username, avatar_url)
           `)
           .eq("recipient_id", userId)
@@ -52,12 +62,12 @@ const RecentTips = ({ userId }: { userId: string }) => {
         }
         
         // Proper type casting to match Tip interface
-        const formattedTips = (data || []).map((payment): Tip => ({
+        const formattedTips = (data || []).map((payment: PaymentData): Tip => ({
           id: payment.id,
           amount: payment.amount,
           created_at: payment.created_at,
-          from_user_id: payment.from_user_id,
-          to_user_id: payment.to_user_id,
+          from_user_id: payment.user_id,
+          to_user_id: payment.recipient_id,
           from_user: payment.from_user
         }));
         
