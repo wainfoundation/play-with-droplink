@@ -22,31 +22,41 @@ interface UserData {
   plan?: string;
 }
 
-const usePiAuth = () => {
+interface AuthResult {
+  user: UserData | null;
+  piUser: PiUser | null;
+}
+
+// Export as a named function so it can be imported as: import { usePiAuth } from "@/hooks/usePiAuth"
+export function usePiAuth() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [piUser, setPiUser] = useState<PiUser | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [piAuthenticating, setPiAuthenticating] = useState(false);
 
   useEffect(() => {
     // Check if Pi Network SDK is available in the window object
     if (window.Pi) {
-      window.Pi.init({ version: "2.0", sandbox: true }).then(() => {
-        console.log("Pi Network SDK initialized");
-      }).catch((err: Error) => {
-        console.error("Error initializing Pi Network SDK:", err);
-        setError("Failed to initialize Pi Network SDK");
-        setLoading(false);
-      });
+      window.Pi.init({ version: "2.0", sandbox: true })
+        .then(() => {
+          console.log("Pi Network SDK initialized");
+          setLoading(false);
+        })
+        .catch((err: Error) => {
+          console.error("Error initializing Pi Network SDK:", err);
+          setError("Failed to initialize Pi Network SDK");
+          setLoading(false);
+        });
     } else {
       setError("Pi Network SDK not available");
       setLoading(false);
     }
   }, []);
 
-  const authenticate = async () => {
+  const handlePiLogin = async () => {
     try {
-      setLoading(true);
+      setPiAuthenticating(true);
       setError(null);
 
       if (!window.Pi) {
@@ -60,11 +70,17 @@ const usePiAuth = () => {
 
       if (authResult) {
         console.log("Pi Auth Result:", authResult);
-        setPiUser(authResult.user);
+        // Convert to PiUser format
+        const piUserData: PiUser = {
+          id: authResult.user.uid, // Use uid as id
+          username: authResult.user.username || "",
+          uid: authResult.user.uid
+        };
+        setPiUser(piUserData);
         
-        // Using explicit query to avoid deep instantiation
+        // Using correct table name 'user_profiles' instead of 'users'
         const { data: existingUser, error: fetchError } = await supabase
-          .from("users")
+          .from('user_profiles')
           .select()
           .eq("uid", authResult.user.uid)
           .maybeSingle();
@@ -79,7 +95,7 @@ const usePiAuth = () => {
         if (!existingUser) {
           // Register new user
           const { data: newUser, error: createError } = await supabase
-            .from("users")
+            .from('user_profiles')
             .insert({
               username: authResult.user.username,
               uid: authResult.user.uid,
@@ -110,7 +126,7 @@ const usePiAuth = () => {
         }
 
         setIsAuthenticated(true);
-        return { user: userData, piUser: authResult.user };
+        return { user: userData, piUser: piUserData };
       }
       
       return null;
@@ -119,7 +135,7 @@ const usePiAuth = () => {
       setError(err instanceof Error ? err.message : "Unknown error during authentication");
       return null;
     } finally {
-      setLoading(false);
+      setPiAuthenticating(false);
     }
   };
 
@@ -134,8 +150,10 @@ const usePiAuth = () => {
     error,
     piUser,
     isAuthenticated,
-    authenticate,
+    piAuthenticating,
+    handlePiLogin,
   };
-};
+}
 
+// Also export as default for backward compatibility
 export default usePiAuth;

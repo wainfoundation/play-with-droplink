@@ -31,11 +31,18 @@ const RecentTips = ({ userId }: { userId: string }) => {
       try {
         setLoading(true);
         
-        // Using explicit type annotation to avoid deep instantiation issues
+        // Use payments table with proper join rather than non-existent tips table
         const { data, error } = await supabase
-          .from("tips")
-          .select("*, from_user:users!tips_from_user_id_fkey(id, username, avatar_url)")
-          .eq("to_user_id", userId)
+          .from("payments")
+          .select(`
+            id, 
+            amount, 
+            created_at, 
+            user_id as from_user_id, 
+            recipient_id:user_id as to_user_id,
+            from_user:user_profiles!user_id(id, username, avatar_url)
+          `)
+          .eq("recipient_id", userId)
           .order("created_at", { ascending: false })
           .limit(5);
           
@@ -44,7 +51,17 @@ const RecentTips = ({ userId }: { userId: string }) => {
           return;
         }
         
-        setTips(data || []);
+        // Proper type casting to match Tip interface
+        const formattedTips = (data || []).map((payment): Tip => ({
+          id: payment.id,
+          amount: payment.amount,
+          created_at: payment.created_at,
+          from_user_id: payment.from_user_id,
+          to_user_id: payment.to_user_id,
+          from_user: payment.from_user
+        }));
+        
+        setTips(formattedTips);
       } catch (err) {
         console.error("Error in fetchTips:", err);
       } finally {
