@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthResponse } from "@supabase/supabase-js";
@@ -40,20 +39,20 @@ export function usePiAuth() {
   useEffect(() => {
     // Check if Pi Network SDK is available in the window object
     if (window.Pi) {
-      // Use a Promise pattern correctly with proper error handling
-      Promise.resolve()
-        .then(() => {
-          return window.Pi.init({ version: "2.0", sandbox: true });
-        })
-        .then(() => {
+      // Initialize Pi SDK with proper promise chaining
+      const initializePi = async () => {
+        try {
+          await window.Pi.init({ version: "2.0", sandbox: true });
           console.log("Pi Network SDK initialized");
-          setLoading(false);
-        })
-        .catch((err: Error) => {
+        } catch (err) {
           console.error("Error initializing Pi Network SDK:", err);
           setError("Failed to initialize Pi Network SDK");
+        } finally {
           setLoading(false);
-        });
+        }
+      };
+      
+      initializePi();
     } else {
       setError("Pi Network SDK not available");
       setLoading(false);

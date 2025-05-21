@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,16 +30,10 @@ const RecentTips = ({ userId }: { userId: string }) => {
       try {
         setLoading(true);
         
-        // Check payments table schema and use correct field names
+        // Query the payments table correctly
         const { data, error } = await supabase
           .from("payments")
-          .select(`
-            id, 
-            amount, 
-            created_at, 
-            user_id,
-            from_user:user_profiles!user_id(id, username, avatar_url)
-          `)
+          .select("id, amount, created_at, user_id, from_user:user_profiles!user_id(id, username, avatar_url)")
           .eq("recipient_id", userId)
           .order("created_at", { ascending: false })
           .limit(5);
@@ -60,16 +53,14 @@ const RecentTips = ({ userId }: { userId: string }) => {
         }
         
         // Safely transform the data to match our Tip interface
-        const formattedTips: Tip[] = data.map((payment: any) => {
-          return {
-            id: payment.id,
-            amount: payment.amount,
-            created_at: payment.created_at,
-            from_user_id: payment.user_id,
-            to_user_id: userId, // Since we're querying where recipient_id = userId
-            from_user: payment.from_user
-          };
-        });
+        const formattedTips: Tip[] = data.map((payment: any) => ({
+          id: payment.id,
+          amount: payment.amount,
+          created_at: payment.created_at,
+          from_user_id: payment.user_id,
+          to_user_id: userId, // Since we're querying where recipient_id = userId
+          from_user: payment.from_user
+        }));
         
         setTips(formattedTips);
       } catch (err) {

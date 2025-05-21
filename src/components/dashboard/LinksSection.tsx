@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
+import { toast } from "@/hooks/use-toast";
+import { playSound, sounds } from '@/utils/sounds';
 import ProfileUrlDisplay from "./ProfileUrlDisplay";
 import EmptyLinksState from "./EmptyLinksState";
 import LinksLoadingState from "./LinksLoadingState";
@@ -14,6 +16,7 @@ const LinksSection = () => {
   const [isAddingLink, setIsAddingLink] = useState(false);
   const [isEditingLink, setIsEditingLink] = useState<string | null>(null);
   const [profileUrl, setProfileUrl] = useState<string>("");
+  const [previousLinkCount, setPreviousLinkCount] = useState(0);
   const { user, profile } = useUser();
   const { links, isLoading, fetchLinks, handleReorderLink } = useLinks(user?.id);
 
@@ -23,6 +26,24 @@ const LinksSection = () => {
       setProfileUrl(`${baseUrl}/@${profile.username}`);
     }
   }, [profile]);
+
+  // Check if user has completed initial link setup
+  useEffect(() => {
+    // Only run this effect if links are loaded and not currently adding/editing
+    if (!isLoading && links && previousLinkCount !== links.length) {
+      // If user went from 0 to at least 1 link, consider setup complete
+      if (previousLinkCount === 0 && links.length > 0) {
+        playSound(sounds.setupComplete, 0.5);
+        toast({
+          title: "Setup Complete!",
+          description: "Great job! You've added your first link.",
+        });
+      }
+      
+      // Update the previous count
+      setPreviousLinkCount(links.length);
+    }
+  }, [links, isLoading, previousLinkCount]);
 
   const renderContent = () => {
     if (isLoading) {

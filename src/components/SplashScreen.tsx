@@ -1,6 +1,8 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { playSound, sounds } from '@/utils/sounds';
+import { Progress } from "@/components/ui/progress";
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -10,20 +12,36 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      onComplete();
-    }, 2500);
-
-    // Animate progress
+    // Total loading time in milliseconds
+    const totalLoadTime = 2500;
+    // Update interval in milliseconds
+    const updateInterval = 25;
+    // Calculate the number of updates needed
+    const totalUpdates = totalLoadTime / updateInterval;
+    // Calculate progress increment per update
+    const progressIncrement = 100 / totalUpdates;
+    
+    // Start progress animation
     const interval = setInterval(() => {
       setProgress((prevProgress) => {
         if (prevProgress >= 100) {
           clearInterval(interval);
           return 100;
         }
-        return prevProgress + 5;
+        return Math.min(prevProgress + progressIncrement, 100);
       });
-    }, 100);
+    }, updateInterval);
+    
+    // Complete the loading after the total time
+    const timer = setTimeout(() => {
+      // Play sound when loading completes
+      playSound(sounds.loadingComplete, 0.6);
+      
+      // Small delay after sound before transitioning
+      setTimeout(() => {
+        onComplete();
+      }, 300);
+    }, totalLoadTime);
 
     return () => {
       clearTimeout(timer);
@@ -78,14 +96,24 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           by MRWAIN ORGANIZATION
         </motion.p>
         
+        {/* Progress Percentage */}
+        <motion.p
+          className="mt-6 text-white/90 font-medium"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
+        >
+          {Math.round(progress)}%
+        </motion.p>
+        
         {/* Progress Bar */}
-        <motion.div className="mt-8 h-1 w-48 rounded-full bg-white/20">
-          <motion.div 
-            className="h-full rounded-full bg-white"
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.1 }}
-          />
+        <motion.div 
+          className="mt-2 w-64"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7 }}
+        >
+          <Progress value={progress} className="h-2" />
         </motion.div>
       </motion.div>
     </motion.div>

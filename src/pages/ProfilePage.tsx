@@ -313,7 +313,9 @@ const ProfilePage = () => {
             
             {/* Display recent tips if available - fix the prop name to match the component */}
             {profileData.id && (
-              <RecentTips userId={profileData.id} />
+              <div className="mt-6">
+                <RecentTips userId={profileData.id} />
+              </div>
             )}
           </div>
         </div>
