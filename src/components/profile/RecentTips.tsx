@@ -22,6 +22,16 @@ interface Tip {
   from_user: TipUser | null;
 }
 
+// Use a specific type for the raw database response to avoid deep instantiation
+type PaymentRecord = {
+  id: string;
+  amount: number;
+  created_at: string;
+  user_id: string;
+  recipient_id: string;
+  from_user: TipUser | null;
+};
+
 const RecentTips = ({ userId }: { userId: string }) => {
   const [tips, setTips] = useState<Tip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,7 +41,6 @@ const RecentTips = ({ userId }: { userId: string }) => {
       try {
         setLoading(true);
         
-        // Use a more specific type assertion to avoid deep type instantiation
         const { data, error } = await supabase
           .from("payments")
           .select("id, amount, created_at, user_id, recipient_id, from_user:user_profiles!user_id(id, username, avatar_url)")
@@ -50,8 +59,10 @@ const RecentTips = ({ userId }: { userId: string }) => {
           return;
         }
         
-        // Explicitly cast the result to avoid TypeScript recursion
-        const formattedTips = (data as any[]).map((payment): Tip => ({
+        // Use type assertion with a simple type to avoid deep instantiation
+        const records = data as unknown as PaymentRecord[];
+        
+        const formattedTips = records.map((payment): Tip => ({
           id: payment.id,
           amount: payment.amount,
           created_at: payment.created_at,
