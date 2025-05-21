@@ -8,10 +8,13 @@ import { toast } from "@/hooks/use-toast";
 import { authenticateWithPi, initPiNetwork } from "@/services/piPaymentService";
 import { supabase } from "@/integrations/supabase/client";
 import PiBrowserPrompt from "@/components/PiBrowserPrompt";
+import PiBrowserDialog from "@/components/PiBrowserDialog";
+import { isRunningInPiBrowser } from "@/utils/pi-sdk";
 
 const Signup = () => {
   const [piAuthenticating, setPiAuthenticating] = useState(false);
   const navigate = useNavigate();
+  const isPiBrowser = isRunningInPiBrowser();
 
   // Initialize Pi SDK on component mount
   useEffect(() => {
@@ -120,7 +123,7 @@ const Signup = () => {
               {piAuthenticating ? "Authenticating..." : "Sign up with Pi Network"}
             </Button>
             
-            <PiBrowserPrompt />
+            {!isPiBrowser && <PiBrowserPrompt />}
             
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
@@ -134,6 +137,11 @@ const Signup = () => {
         </div>
       </main>
       <Footer />
+      
+      {/* Pi Browser Dialog - will only show if not in Pi Browser */}
+      <PiBrowserDialog 
+        redirectUrl="https://pinet.com/@droplink"
+      />
     </div>
   );
 };

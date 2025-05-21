@@ -7,10 +7,13 @@ import { useUser } from "@/context/UserContext";
 import { PiAuthButton } from "@/components/auth/PiAuthButton";
 import { initPiNetwork } from "@/services/piPaymentService";
 import PiBrowserPrompt from "@/components/PiBrowserPrompt";
+import PiBrowserDialog from "@/components/PiBrowserDialog";
+import { isRunningInPiBrowser } from "@/utils/pi-sdk";
 
 const Login = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useUser();
+  const isPiBrowser = isRunningInPiBrowser();
 
   useEffect(() => {
     // Initialize Pi Network SDK
@@ -36,7 +39,7 @@ const Login = () => {
           <div className="bg-white rounded-xl shadow-lg p-8">
             <PiAuthButton />
             
-            <PiBrowserPrompt />
+            {!isPiBrowser && <PiBrowserPrompt />}
             
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
@@ -50,6 +53,11 @@ const Login = () => {
         </div>
       </main>
       <Footer />
+      
+      {/* Pi Browser Dialog - will only show if not in Pi Browser */}
+      <PiBrowserDialog 
+        redirectUrl="https://pinet.com/@droplink"
+      />
     </div>
   );
 };
