@@ -8,7 +8,7 @@ export interface PiAuthResult {
   accessToken: string;
   user: {
     uid: string;
-    username: string;
+    username: string; // Making username required to match the expected type
   };
 }
 
@@ -70,9 +70,17 @@ export const authenticateWithPi = async (
       return null;
     };
 
-    const auth = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
-    console.log("Authentication successful:", auth);
-    return auth;
+    // Get authentication result and ensure username is never undefined
+    const authResult = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
+    
+    // Ensure the username is always a string, never undefined
+    if (!authResult.user.username) {
+      console.warn("Pi auth returned undefined username, using empty string instead");
+      authResult.user.username = ""; // Provide a default empty string if no username
+    }
+    
+    console.log("Authentication successful:", authResult);
+    return authResult as PiAuthResult; // Explicitly cast to our interface
   } catch (error) {
     console.error("Authentication failed:", error);
     return null;
