@@ -9,6 +9,7 @@ import { isPasswordCompromised } from "@/utils/passwordSecurity";
 export async function validatePasswordSecurity(password: string): Promise<{
   isValid: boolean;
   message?: string;
+  isCompromised?: boolean;
 }> {
   if (!password) {
     return { isValid: false, message: "Password is required" };
@@ -19,13 +20,21 @@ export async function validatePasswordSecurity(password: string): Promise<{
   }
   
   // Check for password complexity
-  const hasLetter = /[a-zA-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasUppercase = /[A-Z]/.test(password);
   const hasNumber = /[0-9]/.test(password);
+  const hasSpecial = /[^A-Za-z0-9]/.test(password);
   
-  if (!hasLetter || !hasNumber) {
+  let complexity = 0;
+  if (hasLowercase) complexity++;
+  if (hasUppercase) complexity++;
+  if (hasNumber) complexity++;
+  if (hasSpecial) complexity++;
+  
+  if (complexity < 3) {
     return { 
       isValid: false, 
-      message: "Password must contain both letters and numbers" 
+      message: "Password must include at least 3 of the following: lowercase letters, uppercase letters, numbers, and special characters" 
     };
   }
   
@@ -35,20 +44,35 @@ export async function validatePasswordSecurity(password: string): Promise<{
   if (isCompromised) {
     return {
       isValid: false,
-      message: "This password has appeared in data breaches. Please use a stronger password."
+      message: "This password has appeared in data breaches. Please use a stronger password.",
+      isCompromised: true
     };
   }
   
-  return { isValid: true };
+  return { isValid: true, isCompromised: false };
 }
 
 /**
  * Generates a secure random password
  * @param length - Length of the password (default: 16)
+ * @param options - Options for password generation
  * @returns A secure random password
  */
-export function generateSecurePassword(length = 16): string {
-  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+';
+export function generateSecurePassword(length = 16, options = { 
+  includeLowercase: true,
+  includeUppercase: true, 
+  includeNumbers: true, 
+  includeSpecial: true
+}): string {
+  let charset = '';
+  if (options.includeLowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
+  if (options.includeUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  if (options.includeNumbers) charset += '0123456789';
+  if (options.includeSpecial) charset += '!@#$%^&*()-_=+';
+  
+  // Fallback to ensure we have some charset
+  if (charset === '') charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  
   let password = '';
   
   // Generate a cryptographically secure random password

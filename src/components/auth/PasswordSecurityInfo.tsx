@@ -5,9 +5,22 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 interface PasswordSecurityInfoProps {
   isCompromised?: boolean;
   showInfo?: boolean;
+  isChecking?: boolean;
 }
 
-export function PasswordSecurityInfo({ isCompromised, showInfo = true }: PasswordSecurityInfoProps) {
+export function PasswordSecurityInfo({ isCompromised, showInfo = true, isChecking = false }: PasswordSecurityInfoProps) {
+  if (isChecking) {
+    return (
+      <Alert className="mt-4 bg-slate-50">
+        <Shield className="h-4 w-4 text-primary" />
+        <AlertTitle>Checking Password</AlertTitle>
+        <AlertDescription>
+          Checking if this password has appeared in known data breaches...
+        </AlertDescription>
+      </Alert>
+    );
+  }
+  
   if (isCompromised) {
     return (
       <Alert variant="destructive" className="mt-4">

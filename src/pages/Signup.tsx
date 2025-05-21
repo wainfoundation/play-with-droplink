@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,8 @@ import { toast } from "@/hooks/use-toast";
 import { authenticateWithPi } from "@/services/piPaymentService";
 import { supabase } from "@/integrations/supabase/client";
 import { isPasswordCompromised } from "@/utils/passwordSecurity";
+import { PasswordStrengthMeter } from "@/components/auth/PasswordStrengthMeter";
+import { PasswordSecurityInfo } from "@/components/auth/PasswordSecurityInfo";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -22,6 +23,7 @@ const Signup = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [piAuthenticating, setPiAuthenticating] = useState(false);
   const [isCheckingPassword, setIsCheckingPassword] = useState(false);
+  const [isPasswordCompromisedState, setIsPasswordCompromisedState] = useState<boolean | undefined>(undefined);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,6 +34,13 @@ const Signup = () => {
       }
     });
   }, [navigate]);
+
+  // Reset compromised state when password changes
+  useEffect(() => {
+    if (formData.password) {
+      setIsPasswordCompromisedState(undefined);
+    }
+  }, [formData.password]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -46,6 +55,22 @@ const Signup = () => {
       ...formData,
       agreeTerms: checked
     });
+  };
+
+  const checkPasswordSecurity = async (password: string) => {
+    if (password.length < 8) return false;
+    
+    setIsCheckingPassword(true);
+    try {
+      const compromised = await isPasswordCompromised(password);
+      setIsPasswordCompromisedState(compromised);
+      return !compromised;
+    } catch (error) {
+      console.error("Error checking password security:", error);
+      return true; // Allow password if check fails
+    } finally {
+      setIsCheckingPassword(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,12 +107,18 @@ const Signup = () => {
         return;
       }
       
-      // New feature: Check if password has been compromised
-      setIsCheckingPassword(true);
-      const compromised = await isPasswordCompromised(formData.password);
-      setIsCheckingPassword(false);
-      
-      if (compromised) {
+      // Check if password has been compromised if we haven't already
+      if (isPasswordCompromisedState === undefined) {
+        const isSecure = await checkPasswordSecurity(formData.password);
+        if (!isSecure) {
+          toast({
+            title: "Insecure Password",
+            description: "This password has appeared in data breaches. Please choose a different password for your security.",
+            variant: "destructive",
+          });
+          return;
+        }
+      } else if (isPasswordCompromisedState === true) {
         toast({
           title: "Insecure Password",
           description: "This password has appeared in data breaches. Please choose a different password for your security.",
@@ -275,12 +306,19 @@ const Signup = () => {
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleChange}
+                  onBlur={() => formData.password.length >= 8 && checkPasswordSecurity(formData.password)}
                   required
                 />
-                <p className="text-xs text-gray-500">
-                  Must be at least 8 characters with letters and numbers. <br/>
-                  For your security, we check if passwords have been exposed in data breaches.
-                </p>
+                
+                {/* Password Strength Meter */}
+                {formData.password && <PasswordStrengthMeter password={formData.password} />}
+                
+                {/* Password Security Info */}
+                <PasswordSecurityInfo 
+                  isCompromised={isPasswordCompromisedState} 
+                  showInfo={!isPasswordCompromisedState && !isCheckingPassword} 
+                  isChecking={isCheckingPassword}
+                />
               </div>
               
               <div className="flex items-start">

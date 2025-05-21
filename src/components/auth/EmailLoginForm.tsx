@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,15 +9,38 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
 import { isPasswordCompromised } from "@/utils/passwordSecurity";
+import { PasswordSecurityInfo } from "@/components/auth/PasswordSecurityInfo";
 
 export function EmailLoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCheckingPassword, setIsCheckingPassword] = useState(false);
+  const [isPasswordCompromised, setIsPasswordCompromised] = useState<boolean | undefined>(undefined);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { refreshUserData } = useUser();
+
+  // Reset compromised state when password changes
+  useEffect(() => {
+    if (password) {
+      setIsPasswordCompromised(undefined);
+    }
+  }, [password]);
+
+  const checkPasswordSecurity = async () => {
+    if (!password || password.length < 8) return;
+    
+    setIsCheckingPassword(true);
+    try {
+      const compromised = await isPasswordCompromised(password);
+      setIsPasswordCompromised(compromised);
+    } catch (error) {
+      console.error("Error checking password security:", error);
+    } finally {
+      setIsCheckingPassword(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,19 +58,29 @@ export function EmailLoginForm() {
         return;
       }
       
-      // Check if password has been compromised
-      setIsCheckingPassword(true);
-      const compromised = await isPasswordCompromised(password);
-      setIsCheckingPassword(false);
-      
-      if (compromised) {
-        // Allow login but warn the user
+      // Check if password has been compromised if not already checked
+      if (isPasswordCompromised === undefined) {
+        setIsCheckingPassword(true);
+        const compromised = await isPasswordCompromised(password);
+        setIsPasswordCompromised(compromised);
+        setIsCheckingPassword(false);
+        
+        if (compromised) {
+          // Allow login but warn the user
+          toast({
+            title: "Security Warning",
+            description: "Your password appears in known data breaches. Please change it after logging in.",
+            variant: "warning",
+          });
+          // Continue with login despite the warning
+        }
+      } else if (isPasswordCompromised) {
+        // Show warning if we already know the password is compromised
         toast({
           title: "Security Warning",
           description: "Your password appears in known data breaches. Please change it after logging in.",
           variant: "warning",
         });
-        // Continue with login despite the warning
       }
       
       // Use Supabase auth to login with email and password
@@ -114,8 +147,18 @@ export function EmailLoginForm() {
           placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          onBlur={checkPasswordSecurity}
           required
         />
+        
+        {/* Password Security Info */}
+        {isPasswordCompromised !== undefined && (
+          <PasswordSecurityInfo 
+            isCompromised={isPasswordCompromised}
+            showInfo={!isPasswordCompromised}
+            isChecking={isCheckingPassword}
+          />
+        )}
       </div>
       
       <Button 

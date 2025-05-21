@@ -50,3 +50,73 @@ export async function isPasswordCompromised(password: string): Promise<boolean> 
     return false; // Default to allowing the password if check fails
   }
 }
+
+/**
+ * Calculate password strength score (0-4)
+ * 0 = Very Weak, 1 = Weak, 2 = Fair, 3 = Good, 4 = Strong
+ * 
+ * @param password - Password to evaluate
+ * @returns Score from 0-4 and feedback messages
+ */
+export function calculatePasswordStrength(password: string): { 
+  score: number;
+  feedback: string[];
+} {
+  if (!password) {
+    return { score: 0, feedback: ["Password is required"] };
+  }
+
+  const feedback: string[] = [];
+  let score = 0;
+  
+  // Length check
+  if (password.length < 8) {
+    feedback.push("Password should be at least 8 characters long");
+  } else if (password.length >= 12) {
+    score += 1;
+  }
+
+  // Character diversity checks
+  const hasLowercase = /[a-z]/.test(password);
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasNumbers = /[0-9]/.test(password);
+  const hasSpecialChars = /[^A-Za-z0-9]/.test(password);
+  
+  // Add to score based on character diversity
+  let diversityScore = 0;
+  if (hasLowercase) diversityScore++;
+  if (hasUppercase) diversityScore++;
+  if (hasNumbers) diversityScore++;
+  if (hasSpecialChars) diversityScore++;
+  
+  score += Math.min(3, diversityScore);
+  
+  // Add feedback based on missing character types
+  if (!hasLowercase) feedback.push("Add lowercase letters");
+  if (!hasUppercase) feedback.push("Add uppercase letters");
+  if (!hasNumbers) feedback.push("Add numbers");
+  if (!hasSpecialChars) feedback.push("Add special characters (e.g., !@#$%)");
+  
+  // Check for common patterns
+  if (/^[0-9]+$/.test(password)) {
+    score = Math.max(0, score - 1);
+    feedback.push("Avoid using only numbers");
+  }
+  
+  if (/^[a-zA-Z]+$/.test(password)) {
+    score = Math.max(0, score - 1);
+    feedback.push("Avoid using only letters");
+  }
+  
+  // Common passwords or patterns (simplified check for common sequences)
+  const commonPatterns = ['password', '123456', 'qwerty', 'admin', 'welcome'];
+  if (commonPatterns.some(pattern => password.toLowerCase().includes(pattern))) {
+    score = Math.max(0, score - 1);
+    feedback.push("Avoid common words or patterns");
+  }
+  
+  return {
+    score: score,
+    feedback: feedback.length > 0 ? feedback : ["Strong password"]
+  };
+}
