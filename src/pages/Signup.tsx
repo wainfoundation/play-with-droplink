@@ -12,6 +12,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { isPasswordCompromised } from "@/utils/passwordSecurity";
 import { PasswordStrengthMeter } from "@/components/auth/PasswordStrengthMeter";
 import { PasswordSecurityInfo } from "@/components/auth/PasswordSecurityInfo";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -25,6 +27,8 @@ const Signup = () => {
   const [isCheckingPassword, setIsCheckingPassword] = useState(false);
   const [isPasswordCompromisedState, setIsPasswordCompromisedState] = useState<boolean | undefined>(undefined);
   const navigate = useNavigate();
+  const [signupSuccess, setSignupSuccess] = useState(false);
+  const [signupEmail, setSignupEmail] = useState("");
 
   useEffect(() => {
     // Check if user is already logged in
@@ -127,14 +131,15 @@ const Signup = () => {
         return;
       }
       
-      // Use Supabase Auth to create a new user
+      // Use Supabase Auth to create a new user with email confirmation enabled
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
           data: {
             username: formData.username,
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/login`,
         }
       });
       
@@ -142,13 +147,23 @@ const Signup = () => {
         throw new Error(authError.message);
       }
       
-      toast({
-        title: "Account Created!",
-        description: `Welcome to Droplink, @${formData.username}!`,
-      });
-      
-      // Redirect to dashboard
-      navigate('/dashboard');
+      // Check if the user needs to confirm their email
+      if (!authData.session) {
+        setSignupSuccess(true);
+        setSignupEmail(formData.email);
+        toast({
+          title: "Verification Email Sent",
+          description: "Please check your inbox and confirm your email address to complete registration.",
+        });
+      } else {
+        toast({
+          title: "Account Created!",
+          description: `Welcome to Droplink, @${formData.username}!`,
+        });
+        
+        // Redirect to dashboard if email confirmation not required
+        navigate('/dashboard');
+      }
       
     } catch (error) {
       console.error("Registration error:", error);
@@ -231,6 +246,56 @@ const Signup = () => {
       setPiAuthenticating(false);
     }
   };
+
+  // If signup is successful, show confirmation message
+  if (signupSuccess) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-grow flex items-center justify-center py-12 px-4">
+          <div className="w-full max-w-md">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold text-primary">Check Your Email</h1>
+              <p className="text-gray-600 mt-2">Almost there! Just one more step...</p>
+            </div>
+            
+            <div className="bg-white rounded-xl shadow-lg p-8">
+              <Alert className="mb-6 bg-blue-50">
+                <Info className="h-5 w-5" />
+                <AlertTitle>Verification Required</AlertTitle>
+                <AlertDescription>
+                  We've sent a confirmation email to <strong>{signupEmail}</strong>.
+                  <br />Please check your inbox and click the verification link to activate your account.
+                </AlertDescription>
+              </Alert>
+              
+              <div className="space-y-4">
+                <p className="text-gray-600">
+                  The email might take a few minutes to arrive. If you don't see it, please check your spam folder.
+                </p>
+                
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => window.location.reload()}
+                  className="w-full"
+                >
+                  I've confirmed my email
+                </Button>
+                
+                <div className="text-center">
+                  <Link to="/login" className="text-primary hover:underline font-medium">
+                    Return to login
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">

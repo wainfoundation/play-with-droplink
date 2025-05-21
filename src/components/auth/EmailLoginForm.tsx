@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
 import { isPasswordCompromised as checkPasswordCompromised } from "@/utils/passwordSecurity";
 import { PasswordSecurityInfo } from "@/components/auth/PasswordSecurityInfo";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export function EmailLoginForm() {
   const [email, setEmail] = useState("");
@@ -16,6 +19,8 @@ export function EmailLoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCheckingPassword, setIsCheckingPassword] = useState(false);
   const [isPasswordCompromised, setIsPasswordCompromised] = useState<boolean | undefined>(undefined);
+  const [emailUnconfirmed, setEmailUnconfirmed] = useState(false);
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
   const { refreshUserData } = useUser();
@@ -26,6 +31,13 @@ export function EmailLoginForm() {
       setIsPasswordCompromised(undefined);
     }
   }, [password]);
+
+  // Reset email unconfirmed state when email changes
+  useEffect(() => {
+    if (email) {
+      setEmailUnconfirmed(false);
+    }
+  }, [email]);
 
   const checkPasswordSecurity = async () => {
     if (!password || password.length < 8) return;
@@ -38,6 +50,40 @@ export function EmailLoginForm() {
       console.error("Error checking password security:", error);
     } finally {
       setIsCheckingPassword(false);
+    }
+  };
+
+  const sendConfirmationEmail = async () => {
+    if (!unconfirmedEmail) return;
+    
+    try {
+      setIsSubmitting(true);
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: unconfirmedEmail,
+        options: {
+          emailRedirectTo: `${window.location.origin}/login`,
+        }
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Confirmation Email Sent",
+        description: "Please check your inbox for the verification link.",
+      });
+      
+    } catch (error) {
+      console.error("Error sending confirmation email:", error);
+      toast({
+        title: "Failed to Send Email",
+        description: "An error occurred. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -83,13 +129,28 @@ export function EmailLoginForm() {
       }
       
       // Use Supabase auth to login with email and password
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
       
+      // Handle common auth errors
       if (error) {
         console.error("Supabase login error:", error);
+        
+        // Check if this is an email confirmation error
+        if (error.message.includes("Email not confirmed") || 
+            error.message.toLowerCase().includes("email confirmation")) {
+          setEmailUnconfirmed(true);
+          setUnconfirmedEmail(email);
+          toast({
+            title: "Email Not Confirmed",
+            description: "Please check your inbox and confirm your email address before signing in.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
         toast({
           title: "Login Failed",
           description: error.message || "Invalid email or password",
@@ -121,6 +182,23 @@ export function EmailLoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {emailUnconfirmed && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Your email address has not been confirmed yet. 
+            <Button 
+              variant="link" 
+              className="p-0 h-auto text-white underline ml-1"
+              onClick={sendConfirmationEmail}
+              disabled={isSubmitting}
+            >
+              Resend confirmation email
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+      
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input
