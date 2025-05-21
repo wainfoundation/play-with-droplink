@@ -31,6 +31,7 @@ const RecentTips = ({ userId }: { userId: string }) => {
       try {
         setLoading(true);
         
+        // Use a more specific type assertion to avoid deep type instantiation
         const { data, error } = await supabase
           .from("payments")
           .select("id, amount, created_at, user_id, recipient_id, from_user:user_profiles!user_id(id, username, avatar_url)")
@@ -49,8 +50,8 @@ const RecentTips = ({ userId }: { userId: string }) => {
           return;
         }
         
-        // Map the data to our Tip interface with safer typing approach
-        const formattedTips = data.map((payment: any): Tip => ({
+        // Explicitly cast the result to avoid TypeScript recursion
+        const formattedTips = (data as any[]).map((payment): Tip => ({
           id: payment.id,
           amount: payment.amount,
           created_at: payment.created_at,
