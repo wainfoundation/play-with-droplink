@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -44,17 +43,16 @@ export function usePiAuth() {
         // After successful Pi authentication, try to find or create a user in Supabase
         let existingUser: UserProfile | null = null;
         
-        // Use explicit typing for the query response
-        type UserQueryResult = UserProfile[];
-        
-        // Use simple object for query response without relying on deep types
-        const { data, error } = await supabase
+        // Use simple type casting to avoid complex generics
+        const result = await supabase
           .from('user_profiles')
           .select('*')
-          .eq('pi_user_id', piAuthData.user.uid) as {
-            data: UserQueryResult | null;
-            error: any;
-          };
+          .eq('pi_user_id', piAuthData.user.uid);
+          
+        const { data, error } = result as unknown as {
+          data: UserProfile[] | null;
+          error: any;
+        };
         
         if (error) {
           console.error("Error checking for existing Pi user:", error);
