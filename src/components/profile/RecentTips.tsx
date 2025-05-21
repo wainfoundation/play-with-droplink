@@ -1,171 +1,118 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Badge } from "@/components/ui/badge";
-import { Pi } from "lucide-react";
+
+import { useState, useEffect } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Tip {
   id: string;
-  amount: number | string;
+  amount: number;
+  sender_id: string;
+  sender_username?: string;
   created_at: string;
-  memo: string;
-  from_username?: string;
-  user_id?: string;
 }
 
-interface RecentTipsProps {
-  userId: string;
-  limit?: number;
+interface TipWithSender extends Tip {
+  sender?: {
+    username?: string;
+  }
 }
 
-const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
-  const [tips, setTips] = useState<Tip[]>([]);
+interface Props {
+  profileId: string;
+}
+
+const RecentTips = ({ profileId }: Props) => {
+  const [tips, setTips] = useState<TipWithSender[]>([]);
   const [loading, setLoading] = useState(true);
-  const [totalReceived, setTotalReceived] = useState(0);
-
+  
   useEffect(() => {
     const fetchRecentTips = async () => {
       try {
         setLoading(true);
         
-        // Use explicit types for Supabase responses to avoid deep type instantiation
-        let tipsData: Tip[] | null = null;
-        let tipsError = null;
-
-        // Fetch the most recent tips
-        const tipsResponse = await supabase
-          .from('payments')
-          .select('id, amount, created_at, memo, user_id')
-          .eq('status', 'completed')
-          .eq('recipient_id', userId)
+        // Use explicit type annotation for the Supabase response
+        const { data, error } = await supabase
+          .from('tips')
+          .select(`
+            id,
+            amount,
+            sender_id,
+            created_at,
+            sender:sender_id (username)
+          `)
+          .eq('receiver_id', profileId)
           .order('created_at', { ascending: false })
-          .limit(limit);
+          .limit(5);
           
-        tipsData = tipsResponse.data;
-        tipsError = tipsResponse.error;
-        
-        if (tipsError) {
-          console.error("Failed to fetch tips:", tipsError);
+        if (error) {
+          console.error('Error fetching tips:', error);
           return;
         }
-        
-        // Fetch total tips received using the database function
-        let totalData: number | null = null;
-        let totalError = null;
 
-        const totalResponse = await supabase
-          .rpc('get_total_tips_received', { user_id_param: userId });
-          
-        totalData = totalResponse.data;
-        totalError = totalResponse.error;
-        
-        if (totalError) {
-          console.error("Failed to fetch total tips:", totalError);
-        } else if (totalData !== null) {
-          setTotalReceived(totalData);
-        }
-        
-        if (!tipsData || tipsData.length === 0) {
-          setTips([]);
-          setLoading(false);
-          return;
-        }
-        
-        // Get usernames for the tippers
-        const userIds = tipsData
-          .filter(tip => tip.user_id)
-          .map(tip => tip.user_id as string);
-        
-        if (userIds.length > 0) {
-          // Use an explicit type for the user profiles query
-          let usersData: { id: string, username: string }[] | null = null;
-          let usersError = null;
-
-          const usersResponse = await supabase
-            .from('user_profiles')
-            .select('id, username')
-            .in('id', userIds);
-            
-          usersData = usersResponse.data;
-          usersError = usersResponse.error;
-          
-          if (!usersError && usersData) {
-            const usernameMap: Record<string, string> = {};
-            
-            usersData.forEach(user => {
-              if (user.id) {
-                usernameMap[user.id] = user.username;
-              }
-            });
-            
-            const tipsWithUsernames = tipsData.map(tip => ({
-              ...tip,
-              from_username: tip.user_id && usernameMap[tip.user_id] ? usernameMap[tip.user_id] : 'Anonymous'
-            }));
-            
-            setTips(tipsWithUsernames);
-          } else {
-            setTips(tipsData);
-          }
-        } else {
-          setTips(tipsData);
-        }
-        
-        setLoading(false);
+        setTips(data || []);
       } catch (err) {
-        console.error("Error fetching tips:", err);
+        console.error('Failed to fetch recent tips:', err);
+      } finally {
         setLoading(false);
       }
     };
     
-    fetchRecentTips();
-  }, [userId, limit]);
-
+    if (profileId) {
+      fetchRecentTips();
+    }
+  }, [profileId]);
+  
   if (loading) {
-    return <div className="py-4 text-center text-gray-500">Loading tips...</div>;
-  }
-
-  if (tips.length === 0) {
-    return null; // Don't show anything if no tips
-  }
-
-  return (
-    <div className="mt-6 pt-6 border-t">
-      <div className="flex justify-between items-center mb-3">
-        <h3 className="font-medium">Recent Tips</h3>
-        <Badge className="flex items-center gap-1 px-3 py-1">
-          <Pi className="h-3.5 w-3.5" /> {totalReceived.toFixed(2)} received
-        </Badge>
-      </div>
-      
-      <div className="space-y-2">
-        {tips.map(tip => {
-          // Pre-process the amount to avoid type issues in JSX
-          let displayAmount = "0.00";
-          
-          if (typeof tip.amount === 'string' && tip.amount) {
-            displayAmount = parseFloat(tip.amount).toFixed(2);
-          } else if (typeof tip.amount === 'number') {
-            displayAmount = tip.amount.toFixed(2);
-          }
-          
-          return (
-            <div key={tip.id} className="bg-gray-50 p-3 rounded-lg text-sm">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-medium">
-                    {tip.from_username || 'Anonymous'} tipped <span className="text-primary">
-                      {displayAmount} Pi
-                    </span>
-                  </p>
-                  {tip.memo && <p className="text-gray-600 mt-1">{tip.memo}</p>}
-                </div>
-                <span className="text-xs text-gray-500">
-                  {new Date(tip.created_at).toLocaleDateString()}
-                </span>
+    return (
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold mb-3">Recent Tips</h3>
+        <div className="space-y-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="flex items-center space-x-3">
+              <Skeleton className="h-10 w-10 rounded-full" />
+              <div className="space-y-1 flex-1">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-3 w-16" />
               </div>
+              <Skeleton className="h-5 w-12" />
             </div>
-          );
-        })}
+          ))}
+        </div>
+      </div>
+    );
+  }
+  
+  if (tips.length === 0) {
+    return (
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold mb-3">Recent Tips</h3>
+        <p className="text-gray-500 text-sm">No tips received yet</p>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="mt-6">
+      <h3 className="text-lg font-semibold mb-3">Recent Tips</h3>
+      <div className="space-y-3">
+        {tips.map((tip) => (
+          <div key={tip.id} className="flex items-center space-x-3">
+            <Avatar className="h-10 w-10">
+              <AvatarFallback>{(tip.sender?.username || 'A')[0].toUpperCase()}</AvatarFallback>
+              <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${tip.sender?.username || 'Anonymous'}`} />
+            </Avatar>
+            <div className="flex-1">
+              <p className="font-medium">{tip.sender?.username || 'Anonymous'}</p>
+              <p className="text-xs text-gray-500">
+                {new Date(tip.created_at).toLocaleDateString()}
+              </p>
+            </div>
+            <div className="font-medium text-green-600">
+              +{tip.amount} π
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

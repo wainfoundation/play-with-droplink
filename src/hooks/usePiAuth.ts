@@ -6,11 +6,15 @@ import { useToast } from "@/components/ui/use-toast";
 import { authenticateWithPi } from "@/services/piNetwork";
 import { useUser } from "@/context/UserContext";
 
-type UserProfile = {
-  id: string;
+type PiUser = {
+  uid: string;
   username?: string;
-  [key: string]: any;
-};
+}
+
+type PiAuthResult = {
+  accessToken: string;
+  user: PiUser;
+}
 
 export function usePiAuth() {
   const [piAuthenticating, setPiAuthenticating] = useState(false);
@@ -21,23 +25,22 @@ export function usePiAuth() {
   const handlePiLogin = async () => {
     try {
       setPiAuthenticating(true);
-      const authResult = await authenticateWithPi(["username", "payments"]);
+      const authResult = await authenticateWithPi(["username", "payments"]) as PiAuthResult | null;
       
       if (authResult?.user) {
         console.log("Pi authentication successful:", authResult);
         
         // After successful Pi authentication, try to find or create a user in Supabase
         let existingUser = null;
-        let userError = null;
         
-        const userResponse = await supabase
+        // Use explicit type annotation for the Supabase response
+        const { data, error: userError } = await supabase
           .from('user_profiles')
           .select('*')
           .eq('pi_user_id', authResult.user.uid)
           .maybeSingle();
         
-        existingUser = userResponse.data;
-        userError = userResponse.error;
+        existingUser = data;
         
         if (userError) {
           console.error("Error checking for existing Pi user:", userError);
