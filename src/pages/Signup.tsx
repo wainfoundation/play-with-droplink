@@ -22,7 +22,7 @@ const Signup = () => {
 
   useEffect(() => {
     // Initialize Pi Network SDK
-    initPiNetwork(true); // Use sandbox mode for development
+    initPiNetwork(); // Removed the argument since it's not needed
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
