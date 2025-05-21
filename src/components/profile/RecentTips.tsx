@@ -22,15 +22,6 @@ interface Tip {
   from_user?: TipUser;
 }
 
-// Define the payments table data structure
-interface PaymentData {
-  id: string;
-  amount: number;
-  created_at: string;
-  user_id: string;
-  from_user?: TipUser;
-}
-
 const RecentTips = ({ userId }: { userId: string }) => {
   const [tips, setTips] = useState<Tip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,15 +53,18 @@ const RecentTips = ({ userId }: { userId: string }) => {
           return;
         }
         
-        // Manually cast the data to avoid deep type instantiation
-        const formattedTips: Tip[] = data.map((payment: any) => ({
-          id: payment.id,
-          amount: payment.amount,
-          created_at: payment.created_at,
-          from_user_id: payment.user_id,
-          to_user_id: userId, // Since we're querying where recipient_id = userId
-          from_user: payment.from_user
-        }));
+        // Directly map to the Tip interface without relying on type inference
+        const formattedTips = data.map((payment: any) => {
+          const tip: Tip = {
+            id: payment.id,
+            amount: payment.amount,
+            created_at: payment.created_at,
+            from_user_id: payment.user_id,
+            to_user_id: userId,
+            from_user: payment.from_user
+          };
+          return tip;
+        });
         
         setTips(formattedTips);
       } catch (err) {
