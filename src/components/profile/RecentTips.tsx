@@ -23,6 +23,15 @@ interface Tip {
   from_user: TipUser | null;
 }
 
+// Define a simpler interface for raw data from Supabase
+interface PaymentData {
+  id: string;
+  amount: number;
+  created_at: string;
+  user_id: string;
+  from_user: TipUser | null;
+}
+
 const RecentTips = ({ userId }: { userId: string }) => {
   const [tips, setTips] = useState<Tip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,14 +66,25 @@ const RecentTips = ({ userId }: { userId: string }) => {
         // Handle the data without complex type inference
         const formattedTips: Tip[] = [];
         
-        for (const payment of data) {
+        for (const payment of data as PaymentData[]) {
+          // Ensure from_user is properly handled
+          let tipUser: TipUser | null = null;
+          
+          if (payment.from_user && typeof payment.from_user === 'object') {
+            tipUser = {
+              id: payment.from_user.id,
+              username: payment.from_user.username,
+              avatar_url: payment.from_user.avatar_url
+            };
+          }
+          
           formattedTips.push({
             id: payment.id,
             amount: payment.amount,
             created_at: payment.created_at,
             from_user_id: payment.user_id,
             to_user_id: userId,
-            from_user: payment.from_user
+            from_user: tipUser
           });
         }
         
