@@ -115,7 +115,7 @@ const Pricing = () => {
   const starterFeatures = [
     "Unlimited Links",
     "Connect All Social Profiles",
-    "Sell Products with Pi Payments",
+    "Pi AdNetwork",
     "Basic Analytics",
     "Email Support",
     "Community Forums Access"
@@ -139,6 +139,7 @@ const Pricing = () => {
   
   const premiumFeatures = [
     "Everything in Pro",
+    "Sell Products with Pi Payments",
     "Tailored Onboarding",
     "Priority Support (4-Hour)",
     "Historical Insights",
