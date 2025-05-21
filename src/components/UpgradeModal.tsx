@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -16,18 +15,23 @@ interface UpgradeModalProps {
   isOpen: boolean;
   onClose: () => void;
   featureName?: string;
+  onNavigateToPricing: () => void; // New prop to handle navigation
 }
 
-const UpgradeModal = ({ isOpen, onClose, featureName = "this feature" }: UpgradeModalProps) => {
-  const navigate = useNavigate();
-
+const UpgradeModal = ({ 
+  isOpen, 
+  onClose, 
+  featureName = "this feature",
+  onNavigateToPricing
+}: UpgradeModalProps) => {
+  
   const handleUpgradeClick = () => {
-    navigate('/pricing');
+    onNavigateToPricing(); // Use the callback instead of direct navigation
     onClose();
   };
 
   const handleViewPlansClick = () => {
-    navigate('/pricing');
+    onNavigateToPricing(); // Use the callback instead of direct navigation
     onClose();
   };
 

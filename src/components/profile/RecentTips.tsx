@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,7 +21,7 @@ interface Tip {
   from_user: TipUser | null;
 }
 
-// Define PaymentData type to properly map Supabase response
+// Simplified PaymentData type to avoid circular references
 interface PaymentData {
   id: string;
   amount: number;
@@ -45,7 +44,6 @@ const RecentTips = ({ userId }: { userId: string }) => {
       try {
         setLoading(true);
         
-        // Query the payments table correctly
         const { data, error } = await supabase
           .from("payments")
           .select("id, amount, created_at, user_id, recipient_id, from_user:user_profiles!user_id(id, username, avatar_url)")
@@ -56,37 +54,25 @@ const RecentTips = ({ userId }: { userId: string }) => {
         if (error) {
           console.error("Error fetching tips:", error);
           setTips([]);
-          setLoading(false);
           return;
         }
         
-        // Handle case where data might be null
         if (!data || !Array.isArray(data)) {
           setTips([]);
-          setLoading(false);
           return;
         }
         
-        // Convert the data to the expected format with proper typing
-        const formattedTips = data.map((payment: PaymentData) => {
-          // Extract user data safely
-          let fromUser: TipUser | null = null;
-          
-          if (payment.from_user) {
-            fromUser = {
-              id: payment.from_user.id,
-              username: payment.from_user.username,
-              avatar_url: payment.from_user.avatar_url
-            };
-          }
-          
+        // Explicitly type the data to avoid deep type instantiation
+        const typedData = data as unknown as PaymentData[];
+        
+        const formattedTips = typedData.map((payment: PaymentData) => {
           return {
             id: payment.id,
             amount: payment.amount,
             created_at: payment.created_at,
             from_user_id: payment.user_id,
-            to_user_id: userId,
-            from_user: fromUser
+            to_user_id: payment.recipient_id,
+            from_user: payment.from_user
           };
         });
         

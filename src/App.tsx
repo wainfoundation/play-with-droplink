@@ -1,12 +1,11 @@
 
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import { HelmetProvider } from "react-helmet-async";
 import SplashScreen from "./components/SplashScreen";
-import Navbar from "./components/Navbar";
 import { UserProvider } from "./context/UserContext";
-import { UpgradeModalProvider, UpgradeModalContext } from "./hooks/useUpgradeModal";
+import { UpgradeModalProvider } from "./hooks/useUpgradeModal";
 import UpgradeModal from "./components/UpgradeModal";
 import Home from "./pages/Home";
 import Features from "./pages/Features";
@@ -49,25 +48,33 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Toaster />
+            {/* Modal needs to be inside Router */}
+            <UpgradeModalConsumer />
           </Router>
-          
-          {/* Global access to the upgrade modal */}
-          <UpgradeModalConsumer />
         </UpgradeModalProvider>
       </UserProvider>
     </HelmetProvider>
   );
 }
 
-// Component to consume the upgrade modal context and render the modal
+// Component to consume the upgrade modal context and render the modal inside Router context
 const UpgradeModalConsumer = () => {
-  const { isModalOpen, featureName, closeUpgradeModal } = React.useContext(UpgradeModalContext);
+  const navigate = useNavigate(); // Now this is inside Router context
+  const { isModalOpen, featureName, closeUpgradeModal } = React.useContext(
+    require('./hooks/useUpgradeModal').UpgradeModalContext
+  );
+  
+  // Navigation handler to pass to the modal
+  const handleNavigateToPricing = () => {
+    navigate('/pricing');
+  };
   
   return (
     <UpgradeModal 
       isOpen={isModalOpen} 
       onClose={closeUpgradeModal} 
       featureName={featureName}
+      onNavigateToPricing={handleNavigateToPricing}
     />
   );
 };
