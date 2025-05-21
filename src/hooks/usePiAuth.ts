@@ -33,7 +33,7 @@ export function usePiAuth() {
         // After successful Pi authentication, try to find or create a user in Supabase
         let existingUser = null;
         
-        // Use explicit type annotation for the Supabase response
+        // Use explicit type for the query response
         const { data, error: userError } = await supabase
           .from('user_profiles')
           .select('*')

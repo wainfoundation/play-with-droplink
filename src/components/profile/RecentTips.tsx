@@ -8,7 +8,6 @@ interface Tip {
   id: string;
   amount: number;
   sender_id: string;
-  sender_username?: string;
   created_at: string;
 }
 
@@ -31,15 +30,15 @@ const RecentTips = ({ profileId }: Props) => {
       try {
         setLoading(true);
         
-        // Use explicit type annotation for the Supabase response
+        // Get tips from the payments table, not "tips" table
         const { data, error } = await supabase
-          .from('tips')
+          .from('payments')
           .select(`
             id,
             amount,
-            sender_id,
+            user_id as sender_id,
             created_at,
-            sender:sender_id (username)
+            sender:user_id (username)
           `)
           .eq('receiver_id', profileId)
           .order('created_at', { ascending: false })
@@ -50,7 +49,8 @@ const RecentTips = ({ profileId }: Props) => {
           return;
         }
 
-        setTips(data || []);
+        // Type assertion to help TypeScript recognize the data structure
+        setTips((data || []) as TipWithSender[]);
       } catch (err) {
         console.error('Failed to fetch recent tips:', err);
       } finally {

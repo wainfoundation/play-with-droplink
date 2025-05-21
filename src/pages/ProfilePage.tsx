@@ -313,7 +313,7 @@ const ProfilePage = () => {
             
             {/* Display recent tips if available */}
             {profileData.id && (
-              <RecentTips userId={profileData.id} limit={3} />
+              <RecentTips profileId={profileData.id} />
             )}
           </div>
         </div>
