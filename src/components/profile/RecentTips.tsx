@@ -52,12 +52,18 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
         if (totalError) {
           console.error("Failed to fetch total tips:", totalError);
         } else if (totalData) {
+          // Calculate total using a more explicit type handling
           const total = totalData.reduce((sum, payment) => {
-            const amountValue = typeof payment.amount === 'string' 
-              ? parseFloat(payment.amount) 
-              : payment.amount;
-            return sum + amountValue;
+            // Safely convert string or number to number type
+            let amountNum = 0;
+            if (typeof payment.amount === 'string') {
+              amountNum = parseFloat(payment.amount);
+            } else if (typeof payment.amount === 'number') {
+              amountNum = payment.amount;
+            }
+            return sum + amountNum;
           }, 0);
+          
           setTotalReceived(total);
         }
         
@@ -134,7 +140,9 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
               <div>
                 <p className="font-medium">
                   {tip.from_username || 'Anonymous'} tipped <span className="text-primary">
-                    {parseFloat(tip.amount.toString()).toFixed(2)} Pi
+                    {typeof tip.amount === 'string' 
+                      ? parseFloat(tip.amount).toFixed(2) 
+                      : tip.amount.toFixed(2)} Pi
                   </span>
                 </p>
                 {tip.memo && <p className="text-gray-600 mt-1">{tip.memo}</p>}
