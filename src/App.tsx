@@ -17,6 +17,13 @@ import Dashboard from "./pages/Dashboard";
 import ProfilePage from "./pages/ProfilePage";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import Blog from "./pages/Blog";
+import About from "./pages/About";
+import Careers from "./pages/Careers";
+import Contact from "./pages/Contact";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Cookies from "./pages/Cookies";
 
 // App component
 function App() {
@@ -45,6 +52,13 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/@:username" element={<ProfilePage />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/careers" element={<Careers />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/cookies" element={<Cookies />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Toaster />

@@ -34,8 +34,8 @@ const RecentTips = ({ userId }: { userId: string }) => {
         // Fix: Use correct column names from the payments table
         const { data, error } = await supabase
           .from("payments")
-          .select("id, amount, created_at, user_id, recipient_id:user_id, from_user:user_profiles!user_id(id, username, avatar_url)")
-          .eq("user_id", userId)
+          .select("id, amount, created_at, user_id, to_user_id, from_user:user_profiles!user_id(id, username, avatar_url)")
+          .eq("to_user_id", userId)
           .order("created_at", { ascending: false })
           .limit(5);
           
@@ -59,8 +59,8 @@ const RecentTips = ({ userId }: { userId: string }) => {
             amount: item.amount,
             created_at: item.created_at,
             from_user_id: item.user_id,
-            to_user_id: item.recipient_id || userId, // Use userId as fallback
-            from_user: item.from_user
+            to_user_id: item.to_user_id || userId, // Use userId as fallback
+            from_user: item.from_user || null
           });
         }
         
@@ -110,28 +110,36 @@ const RecentTips = ({ userId }: { userId: string }) => {
         <CardTitle>Recent Tips</CardTitle>
       </CardHeader>
       <CardContent>
-        <ul className="space-y-4">
-          {tips.map((tip) => (
-            <li key={tip.id} className="flex items-center gap-3">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={tip.from_user?.avatar_url || ""} />
-                <AvatarFallback>
-                  {tip.from_user?.username?.charAt(0).toUpperCase() || "?"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <p className="text-sm font-medium">
-                  {tip.from_user?.username || "Anonymous"} tipped π{tip.amount}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {formatDistanceToNow(new Date(tip.created_at), {
-                    addSuffix: true,
-                  })}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ul>
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : tips.length === 0 ? (
+          <p className="text-center text-muted-foreground">No tips received yet.</p>
+        ) : (
+          <ul className="space-y-4">
+            {tips.map((tip) => (
+              <li key={tip.id} className="flex items-center gap-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={tip.from_user?.avatar_url || ""} />
+                  <AvatarFallback>
+                    {tip.from_user?.username?.charAt(0).toUpperCase() || "?"}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">
+                    {tip.from_user?.username || "Anonymous"} tipped π{tip.amount}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatDistanceToNow(new Date(tip.created_at), {
+                      addSuffix: true,
+                    })}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </CardContent>
     </Card>
   );
