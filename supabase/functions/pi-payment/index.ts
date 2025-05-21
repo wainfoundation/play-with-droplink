@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -93,6 +92,18 @@ serve(async (req) => {
             amount: paymentData.amount
           });
       }
+    }
+
+    // If this is a tip payment, record the tip
+    if (paymentData.metadata && paymentData.metadata.type === 'tip' && paymentData.metadata.recipientId) {
+      // Record the tip in a tips table if it exists, or you can just use the payments table
+      console.log("Recording tip to user:", paymentData.metadata.recipientId);
+
+      // You can add additional logic here for tips
+      // For example, updating recipient's total_tips count if such a field exists
+      
+      // You can also notify the recipient about the new tip
+      // For example, by inserting into a notifications table
     }
 
     return new Response(JSON.stringify({ 

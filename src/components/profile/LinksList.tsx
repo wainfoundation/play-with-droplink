@@ -1,5 +1,5 @@
 
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Pi } from "lucide-react";
 
 interface Link {
   id: string;
@@ -13,15 +13,16 @@ interface LinksListProps {
   links: Link[];
   onLinkClick: (link: Link) => void;
   processingTip: boolean;
+  onTipClick: () => void;
 }
 
-const LinksList = ({ links, onLinkClick, processingTip }: LinksListProps) => {
+const LinksList = ({ links, onLinkClick, processingTip, onTipClick }: LinksListProps) => {
   return (
     <div className="w-full space-y-3">
       {links.map((link, index) => (
         <button 
           key={link.id || index} 
-          onClick={() => onLinkClick(link)}
+          onClick={() => link.url === "#tip-in-pi" ? onTipClick() : onLinkClick(link)}
           disabled={link.url === "#tip-in-pi" && processingTip}
           className={`block w-full text-left px-4 py-3 rounded-lg transition-all hover:scale-[1.02] shadow-md
             ${index < 2 
@@ -31,7 +32,11 @@ const LinksList = ({ links, onLinkClick, processingTip }: LinksListProps) => {
         >
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-2">
-              <span role="img" aria-label={link.title}>{link.icon}</span> 
+              {link.url === "#tip-in-pi" ? (
+                <Pi className="h-4 w-4" />
+              ) : (
+                <span role="img" aria-label={link.title}>{link.icon}</span>
+              )}
               {link.url === "#tip-in-pi" && processingTip ? "Processing..." : link.title}
             </span>
             <ExternalLink className="h-4 w-4" />

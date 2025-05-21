@@ -1,0 +1,133 @@
+
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@/components/ui/badge";
+import { Pi } from "lucide-react";
+
+interface Tip {
+  id: string;
+  amount: number;
+  created_at: string;
+  memo: string;
+  from_username?: string;
+}
+
+interface RecentTipsProps {
+  userId: string;
+  limit?: number;
+}
+
+const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
+  const [tips, setTips] = useState<Tip[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [totalReceived, setTotalReceived] = useState(0);
+
+  useEffect(() => {
+    const fetchRecentTips = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch the most recent tips
+        const { data: tipsData, error: tipsError } = await supabase
+          .from('payments')
+          .select('id, amount, created_at, memo, user_id')
+          .eq('status', 'completed')
+          .eq('recipient_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(limit);
+        
+        if (tipsError) {
+          console.error("Failed to fetch tips:", tipsError);
+          return;
+        }
+        
+        // Fetch total tips received
+        const { data: totalData, error: totalError } = await supabase
+          .from('payments')
+          .select('amount')
+          .eq('status', 'completed')
+          .eq('recipient_id', userId);
+        
+        if (totalError) {
+          console.error("Failed to fetch total tips:", totalError);
+        } else {
+          const total = totalData.reduce((sum, payment) => sum + parseFloat(payment.amount), 0);
+          setTotalReceived(total);
+        }
+        
+        // Get usernames for the tippers if needed
+        const userIds = tipsData.map(tip => tip.user_id);
+        
+        if (userIds.length > 0) {
+          const { data: usersData, error: usersError } = await supabase
+            .from('user_profiles')
+            .select('id, username')
+            .in('id', userIds);
+          
+          if (!usersError && usersData) {
+            const usernameMap = Object.fromEntries(
+              usersData.map(user => [user.id, user.username])
+            );
+            
+            const tipsWithUsernames = tipsData.map(tip => ({
+              ...tip,
+              from_username: usernameMap[tip.user_id] || 'Anonymous'
+            }));
+            
+            setTips(tipsWithUsernames);
+          } else {
+            setTips(tipsData);
+          }
+        } else {
+          setTips(tipsData || []);
+        }
+        
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching tips:", err);
+        setLoading(false);
+      }
+    };
+    
+    fetchRecentTips();
+  }, [userId, limit]);
+
+  if (loading) {
+    return <div className="py-4 text-center text-gray-500">Loading tips...</div>;
+  }
+
+  if (tips.length === 0) {
+    return null; // Don't show anything if no tips
+  }
+
+  return (
+    <div className="mt-6 pt-6 border-t">
+      <div className="flex justify-between items-center mb-3">
+        <h3 className="font-medium">Recent Tips</h3>
+        <Badge className="flex items-center gap-1 px-3 py-1">
+          <Pi className="h-3.5 w-3.5" /> {totalReceived.toFixed(2)} received
+        </Badge>
+      </div>
+      
+      <div className="space-y-2">
+        {tips.map(tip => (
+          <div key={tip.id} className="bg-gray-50 p-3 rounded-lg text-sm">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="font-medium">
+                  {tip.from_username || 'Anonymous'} tipped <span className="text-primary">{parseFloat(tip.amount.toString()).toFixed(2)} Pi</span>
+                </p>
+                {tip.memo && <p className="text-gray-600 mt-1">{tip.memo}</p>}
+              </div>
+              <span className="text-xs text-gray-500">
+                {new Date(tip.created_at).toLocaleDateString()}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default RecentTips;

@@ -16,6 +16,7 @@ import ProfileQrCode from "@/components/profile/ProfileQrCode";
 import LinksList from "@/components/profile/LinksList";
 import LoadingState from "@/components/profile/LoadingState";
 import ErrorState from "@/components/profile/ErrorState";
+import TipModal from "@/components/profile/TipModal";
 
 interface Link {
   id: string;
@@ -41,6 +42,7 @@ const ProfilePage = () => {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [processingTip, setProcessingTip] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
+  const [showTipModal, setShowTipModal] = useState(false);
   
   const { user, showAds } = useUser();
 
@@ -119,12 +121,6 @@ const ProfilePage = () => {
     // Register link click in analytics
     if (profileData?.id) {
       try {
-        // Handle special links like "Tip in Pi"
-        if (link.url === "#tip-in-pi") {
-          handleTipInPi();
-          return;
-        }
-        
         // Update click count
         await supabase
           .from('links')
@@ -152,7 +148,7 @@ const ProfilePage = () => {
     }
   };
 
-  const handleTipInPi = async () => {
+  const handleTipSubmit = async (amount: number, message: string) => {
     if (!user) {
       toast({
         title: "Login Required",
@@ -168,11 +164,12 @@ const ProfilePage = () => {
     try {
       // Create a tip payment
       const paymentData = {
-        amount: 1, // Default tip amount
-        memo: `Tip to @${profileData?.username}`,
+        amount: amount,
+        memo: message || `Tip to @${profileData?.username}`,
         metadata: {
           recipientId: profileData?.id,
-          type: 'tip'
+          type: 'tip',
+          message: message
         }
       };
       
@@ -182,6 +179,8 @@ const ProfilePage = () => {
         title: "Sending Tip",
         description: "Follow the Pi payment flow to complete your tip",
       });
+      
+      setShowTipModal(false);
     } catch (error) {
       console.error("Tip error:", error);
       toast({
@@ -192,6 +191,20 @@ const ProfilePage = () => {
     } finally {
       setProcessingTip(false);
     }
+  };
+
+  const handleTipClick = () => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to send a tip",
+        variant: "destructive",
+      });
+      navigate('/login');
+      return;
+    }
+    
+    setShowTipModal(true);
   };
 
   const handleShareProfile = () => {
@@ -266,11 +279,20 @@ const ProfilePage = () => {
               links={profileData.links}
               onLinkClick={handleLinkClick}
               processingTip={processingTip}
+              onTipClick={handleTipClick}
             />
           </div>
         </div>
       </main>
       <Footer />
+      
+      <TipModal
+        isOpen={showTipModal}
+        onOpenChange={setShowTipModal}
+        username={profileData.username}
+        onSubmit={handleTipSubmit}
+        isProcessing={processingTip}
+      />
     </div>
   );
 };
