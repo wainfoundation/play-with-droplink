@@ -29,6 +29,8 @@ export const useAdminStatus = () => {
         setIsLoading(true);
         setError(null);
         
+        console.log("Checking admin status for user:", profile.username);
+        
         // Call our edge function to check admin status
         const { data, error } = await supabase.functions.invoke("check-admin", {
           body: { 
@@ -39,6 +41,8 @@ export const useAdminStatus = () => {
 
         if (error) throw error;
 
+        console.log("Admin check result:", data);
+        
         setIsAdmin(data.isAdmin);
         setAdminData(data.adminData);
 

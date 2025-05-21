@@ -49,6 +49,31 @@ serve(async (req) => {
         .eq('pi_user_id', piUserId);
     }
 
+    // If the user is not found in the admin_users table but is "Wain2020", add them as admin
+    if (!data && username === "Wain2020") {
+      const { data: insertData, error: insertError } = await supabaseAdmin
+        .from('admin_users')
+        .insert({
+          pi_user_id: piUserId,
+          username: username
+        })
+        .select()
+        .single();
+      
+      if (insertError) {
+        console.error("Error adding admin user:", insertError);
+      } else {
+        console.log("Added new admin user:", username);
+        return new Response(
+          JSON.stringify({ 
+            isAdmin: true,
+            adminData: insertData
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
     return new Response(
       JSON.stringify({ 
         isAdmin: !!data,
