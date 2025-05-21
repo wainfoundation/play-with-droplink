@@ -30,10 +30,10 @@ const RecentTips = ({ profileId }: Props) => {
       try {
         setLoading(true);
         
-        // Use a simpler query approach without complex nested selects
+        // Using a more direct query approach
         const { data, error } = await supabase
           .from('payments')
-          .select('id, amount, user_id, created_at, sender:user_profiles!user_id(username)')
+          .select('id, amount, user_id, created_at')
           .eq('receiver_id', profileId)
           .order('created_at', { ascending: false })
           .limit(5);
@@ -44,15 +44,26 @@ const RecentTips = ({ profileId }: Props) => {
         }
 
         // Transform the data to match our expected type
-        const transformedData = (data || []).map(item => ({
-          id: item.id,
-          amount: item.amount,
-          sender_id: item.user_id,
-          created_at: item.created_at,
-          sender: item.sender
-        }));
+        const tipsData: TipWithSender[] = [];
         
-        setTips(transformedData);
+        for (const item of data || []) {
+          // For each payment, fetch the sender's username
+          const { data: userData } = await supabase
+            .from('user_profiles')
+            .select('username')
+            .eq('id', item.user_id)
+            .maybeSingle();
+            
+          tipsData.push({
+            id: item.id,
+            amount: item.amount,
+            sender_id: item.user_id,
+            created_at: item.created_at,
+            sender: userData ? { username: userData.username } : undefined
+          });
+        }
+        
+        setTips(tipsData);
       } catch (err) {
         console.error('Failed to fetch recent tips:', err);
       } finally {
