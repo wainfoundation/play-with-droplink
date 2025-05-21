@@ -33,13 +33,15 @@ const RecentTips = ({ profileId }: Props) => {
       try {
         setLoading(true);
         
-        // Explicitly type the response without using generics
-        const { data, error } = await supabase
+        // Use a type assertion for the data to avoid deep type instantiation
+        const response = await supabase
           .from('payments')
           .select('id, amount, user_id, created_at')
           .eq('recipient_id', profileId)
           .order('created_at', { ascending: false })
           .limit(5);
+          
+        const { data, error } = response;
           
         if (error) {
           console.error('Error fetching tips:', error);
@@ -51,7 +53,7 @@ const RecentTips = ({ profileId }: Props) => {
         
         if (data) {
           for (const payment of data) {
-            // Explicitly create a typed payment object
+            // Explicitly create a typed tip object
             const tipItem: Tip = {
               id: payment.id,
               amount: payment.amount,
@@ -59,12 +61,15 @@ const RecentTips = ({ profileId }: Props) => {
               created_at: payment.created_at
             };
             
-            // Get user data with explicit typing
-            const { data: userData, error: userError } = await supabase
+            // Get user data with explicit response handling
+            const userResponse = await supabase
               .from('user_profiles')
               .select('username')
               .eq('id', tipItem.sender_id)
-              .single();
+              .maybeSingle();
+              
+            const userData = userResponse.data;
+            const userError = userResponse.error;
               
             if (userError && userError.code !== 'PGRST116') { // Not found is not a critical error
               console.error('Error fetching sender data:', userError);
