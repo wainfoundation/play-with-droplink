@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -43,18 +44,13 @@ const RecentTips = ({ profileId }: Props) => {
       try {
         setLoading(true);
         
-        // Use simple type casting instead of complex generics
-        const result = await supabase
+        // Avoid complex typings by using a simpler approach with type assertion
+        const { data, error } = await supabase
           .from('payments')
           .select('id, amount, user_id, created_at')
           .eq('recipient_id', profileId)
           .order('created_at', { ascending: false })
           .limit(5);
-          
-        const { data, error } = result as unknown as {
-          data: PaymentData[] | null;
-          error: any;
-        };
           
         if (error) {
           console.error('Error fetching tips:', error);
@@ -74,17 +70,12 @@ const RecentTips = ({ profileId }: Props) => {
               created_at: payment.created_at
             };
             
-            // Get user data with simple type casting
-            const userResult = await supabase
+            // Get user data with simplification
+            const { data: userData, error: userError } = await supabase
               .from('user_profiles')
               .select('username')
               .eq('id', paymentItem.user_id)
               .limit(1);
-              
-            const { data: userData, error: userError } = userResult as unknown as {
-              data: UserData[] | null;
-              error: any;
-            };
               
             if (userError) {
               console.error('Error fetching sender data:', userError);
