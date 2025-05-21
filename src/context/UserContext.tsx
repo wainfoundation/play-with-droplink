@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { getUserProfile, getUserSubscription } from "@/services/subscriptionService";
 
 export type SubscriptionPlan = "starter" | "pro" | "premium" | null;
 
@@ -38,7 +39,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Set up auth state change listener
     const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         console.log("Auth state change:", event, session?.user?.id);
         setUser(session?.user ?? null);
         
@@ -81,39 +82,18 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const fetchUserData = async (user: any) => {
     try {
       setIsLoading(true);
-      console.log("Fetching user data for:", user.id);
       
-      // Fetch user profile
-      const { data: profileData, error: profileError } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle();
-
-      if (profileError) {
-        console.error("Error fetching profile:", profileError);
-        throw profileError;
+      // Fetch user profile using the service
+      const profileData = await getUserProfile(user.id);
+      if (profileData) {
+        setProfile(profileData);
       }
-
-      setProfile(profileData);
-      console.log("Profile data:", profileData);
-
-      // Fetch active subscription
-      const { data: subscriptionData, error: subscriptionError } = await supabase
-        .from('subscriptions')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('is_active', true)
-        .order('created_at', { ascending: false })
-        .maybeSingle();
-
-      if (subscriptionError) {
-        console.error("Error fetching subscription:", subscriptionError);
-        throw subscriptionError;
+      
+      // Fetch active subscription using the service  
+      const subscriptionData = await getUserSubscription(user.id);
+      if (subscriptionData) {
+        setSubscription(subscriptionData);
       }
-
-      setSubscription(subscriptionData);
-      console.log("Subscription data:", subscriptionData);
     } catch (error) {
       console.error("Error fetching user data:", error);
       toast({
