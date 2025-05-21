@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -29,16 +30,10 @@ const RecentTips = ({ profileId }: Props) => {
       try {
         setLoading(true);
         
-        // Using the payments table with explicit column selections and aliases
+        // Use a simpler query approach without complex nested selects
         const { data, error } = await supabase
           .from('payments')
-          .select(`
-            id,
-            amount,
-            user_id as sender_id,
-            created_at,
-            sender:user_id (username)
-          `)
+          .select('id, amount, user_id, created_at, sender:user_profiles!user_id(username)')
           .eq('receiver_id', profileId)
           .order('created_at', { ascending: false })
           .limit(5);
@@ -48,9 +43,16 @@ const RecentTips = ({ profileId }: Props) => {
           return;
         }
 
-        // Use type assertion to tell TypeScript about the structure
-        const typedData = (data || []) as unknown as TipWithSender[];
-        setTips(typedData);
+        // Transform the data to match our expected type
+        const transformedData = (data || []).map(item => ({
+          id: item.id,
+          amount: item.amount,
+          sender_id: item.user_id,
+          created_at: item.created_at,
+          sender: item.sender
+        }));
+        
+        setTips(transformedData);
       } catch (err) {
         console.error('Failed to fetch recent tips:', err);
       } finally {
