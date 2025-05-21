@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -29,37 +30,42 @@ const RecentTips = ({ profileId }: Props) => {
       try {
         setLoading(true);
         
-        // Use a straightforward approach without complex typing
-        const result = await supabase
+        // Explicitly type the query response to avoid deep inference
+        const { data: payments, error } = await supabase
           .from('payments')
           .select('id, amount, user_id, created_at')
           .eq('receiver_id', profileId)
           .order('created_at', { ascending: false })
           .limit(5);
           
-        if (result.error) {
-          console.error('Error fetching tips:', result.error);
+        if (error) {
+          console.error('Error fetching tips:', error);
           return;
         }
 
-        // Transform the data to match our expected type
         const tipsData: TipWithSender[] = [];
         
-        for (const item of result.data || []) {
-          // For each payment, fetch the sender's username
-          const userResult = await supabase
-            .from('user_profiles')
-            .select('username')
-            .eq('id', item.user_id)
-            .single();
-            
-          tipsData.push({
-            id: item.id,
-            amount: item.amount,
-            sender_id: item.user_id,
-            created_at: item.created_at,
-            sender: userResult.data ? { username: userResult.data.username } : undefined
-          });
+        // Process each payment and fetch user data separately
+        if (payments) {
+          for (const item of payments) {
+            const { data: userData, error: userError } = await supabase
+              .from('user_profiles')
+              .select('username')
+              .eq('id', item.user_id)
+              .single();
+              
+            if (userError && userError.code !== 'PGRST116') {
+              console.error('Error fetching user data:', userError);
+            }
+              
+            tipsData.push({
+              id: item.id,
+              amount: item.amount,
+              sender_id: item.user_id,
+              created_at: item.created_at,
+              sender: userData ? { username: userData.username } : undefined
+            });
+          }
         }
         
         setTips(tipsData);
