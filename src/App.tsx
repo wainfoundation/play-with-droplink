@@ -1,3 +1,4 @@
+
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
@@ -5,7 +6,7 @@ import { HelmetProvider } from "react-helmet-async";
 import SplashScreen from "./components/SplashScreen";
 import Navbar from "./components/Navbar";
 import { UserProvider } from "./context/UserContext";
-import { UpgradeModalProvider } from "./hooks/useUpgradeModal";
+import { UpgradeModalProvider, UpgradeModalContext } from "./hooks/useUpgradeModal";
 import UpgradeModal from "./components/UpgradeModal";
 import Home from "./pages/Home";
 import Features from "./pages/Features";
@@ -17,23 +18,17 @@ import Dashboard from "./pages/Dashboard";
 import ProfilePage from "./pages/ProfilePage";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
-import { UpgradeModalContext } from "./hooks/useUpgradeModal";
 
 // App component
 function App() {
   const [showSplash, setShowSplash] = React.useState(true);
 
-  React.useEffect(() => {
-    // Hide splash screen after 2 seconds
-    const timer = setTimeout(() => {
-      setShowSplash(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
+  const handleSplashComplete = () => {
+    setShowSplash(false);
+  };
 
   if (showSplash) {
-    return <SplashScreen />;
+    return <SplashScreen onComplete={handleSplashComplete} />;
   }
 
   return (

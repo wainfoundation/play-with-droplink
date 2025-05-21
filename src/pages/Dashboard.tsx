@@ -31,6 +31,7 @@ const Dashboard = () => {
     subscription, 
     isLoading, 
     isLoggedIn,
+    isAdmin,
     refreshUserData,
     cancelSubscription
   } = useUser();

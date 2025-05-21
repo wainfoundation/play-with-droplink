@@ -8,7 +8,7 @@ interface UpgradeModalContextType {
   closeUpgradeModal: () => void;
 }
 
-const UpgradeModalContext = createContext<UpgradeModalContextType | undefined>(undefined);
+export const UpgradeModalContext = createContext<UpgradeModalContextType | undefined>(undefined);
 
 export const UpgradeModalProvider = ({ children }: { children: ReactNode }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);

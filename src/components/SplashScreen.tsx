@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { playSound, sounds } from '@/utils/sounds';
 import { Progress } from "@/components/ui/progress";
 
-interface SplashScreenProps {
+export interface SplashScreenProps {
   onComplete: () => void;
 }
 

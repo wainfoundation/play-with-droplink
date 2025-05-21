@@ -29,7 +29,7 @@ interface PaymentData {
   created_at: string;
   user_id: string;
   recipient_id: string;
-  from_user?: {
+  from_user: {
     id: string;
     username: string;
     avatar_url: string | null;
@@ -68,7 +68,7 @@ const RecentTips = ({ userId }: { userId: string }) => {
         }
         
         // Convert the data to the expected format with proper typing
-        const formattedTips = data.map((payment: any) => {
+        const formattedTips = data.map((payment: PaymentData) => {
           // Extract user data safely
           let fromUser: TipUser | null = null;
           
