@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 // Define simplified interfaces for clarity
 interface TipUser {
@@ -22,17 +23,13 @@ interface Tip {
   from_user: TipUser | null;
 }
 
-// Interface for raw data from Supabase
+// We need a more flexible raw data interface that can handle errors
 interface RawTipData {
   id: string;
   amount: number;
   created_at: string;
   user_id: string;
-  from_user?: {
-    id: string;
-    username: string;
-    avatar_url: string | null;
-  } | null;
+  from_user?: TipUser | { error: boolean } | null;
 }
 
 const RecentTips = ({ userId }: { userId: string }) => {
@@ -60,6 +57,11 @@ const RecentTips = ({ userId }: { userId: string }) => {
           
         if (error) {
           console.error("Error fetching tips:", error);
+          toast({
+            title: "Could not load tips",
+            description: "There was an error loading your tips.",
+            variant: "destructive",
+          });
           setTips([]);
           return;
         }
@@ -69,26 +71,33 @@ const RecentTips = ({ userId }: { userId: string }) => {
           return;
         }
         
-        // Use a simpler approach to avoid complex type inference
+        // Convert data to the expected format
         const formattedTips: Tip[] = [];
         
-        for (const item of data as RawTipData[]) {
+        for (const item of data) {
+          // First cast to unknown then to our expected type to avoid type errors
+          const rawItem = item as unknown as RawTipData;
           let tipUser: TipUser | null = null;
           
-          // Safely check if from_user exists and has the required properties
-          if (item.from_user && typeof item.from_user === 'object') {
+          // Check if from_user exists, is an object, and has the required properties
+          if (rawItem.from_user && 
+              typeof rawItem.from_user === 'object' && 
+              !('error' in rawItem.from_user) &&
+              'id' in rawItem.from_user && 
+              'username' in rawItem.from_user) {
+            
             tipUser = {
-              id: item.from_user.id,
-              username: item.from_user.username,
-              avatar_url: item.from_user.avatar_url
+              id: rawItem.from_user.id,
+              username: rawItem.from_user.username,
+              avatar_url: rawItem.from_user.avatar_url
             };
           }
           
           formattedTips.push({
-            id: item.id,
-            amount: item.amount,
-            created_at: item.created_at,
-            from_user_id: item.user_id,
+            id: rawItem.id,
+            amount: rawItem.amount,
+            created_at: rawItem.created_at,
+            from_user_id: rawItem.user_id,
             to_user_id: userId, // Since we're querying where user_id = userId
             from_user: tipUser
           });
@@ -97,6 +106,11 @@ const RecentTips = ({ userId }: { userId: string }) => {
         setTips(formattedTips);
       } catch (err) {
         console.error("Error in fetchTips:", err);
+        toast({
+          title: "Could not load tips",
+          description: "There was an error loading your tips.",
+          variant: "destructive",
+        });
         setTips([]);
       } finally {
         setLoading(false);
