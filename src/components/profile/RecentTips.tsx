@@ -6,7 +6,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 
-// Define explicit types for clarity
+// Define simplified interfaces for clarity
 interface TipUser {
   id: string;
   username: string;
@@ -31,11 +31,11 @@ const RecentTips = ({ userId }: { userId: string }) => {
       try {
         setLoading(true);
         
-        // Fetch payments data without complex type definitions
+        // Fix: Use correct column names from the payments table
         const { data, error } = await supabase
           .from("payments")
-          .select("id, amount, created_at, user_id, recipient_id, from_user:user_profiles!user_id(id, username, avatar_url)")
-          .eq("recipient_id", userId)
+          .select("id, amount, created_at, user_id, recipient_id:user_id, from_user:user_profiles!user_id(id, username, avatar_url)")
+          .eq("user_id", userId)
           .order("created_at", { ascending: false })
           .limit(5);
           
@@ -50,8 +50,7 @@ const RecentTips = ({ userId }: { userId: string }) => {
           return;
         }
         
-        // Simplify by using type assertion and manual mapping
-        // This avoids TypeScript's deep type instantiation issues
+        // Use a simpler approach to avoid complex type inference
         const formattedTips: Tip[] = [];
         
         for (const item of data) {
@@ -60,7 +59,7 @@ const RecentTips = ({ userId }: { userId: string }) => {
             amount: item.amount,
             created_at: item.created_at,
             from_user_id: item.user_id,
-            to_user_id: item.recipient_id,
+            to_user_id: item.recipient_id || userId, // Use userId as fallback
             from_user: item.from_user
           });
         }
