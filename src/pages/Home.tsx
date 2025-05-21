@@ -6,6 +6,7 @@ import Hero from "@/components/Hero";
 import Features from "@/components/Features";
 import Testimonials from "@/components/Testimonials";
 import HowItWorks from "@/components/HowItWorks";
+import DemoSection from "@/components/DemoSection";
 import CTA from "@/components/CTA";
 import FAQ from "@/components/FAQ";
 import { Helmet } from "react-helmet-async";
@@ -25,6 +26,7 @@ const Home = () => {
         <Hero />
         <Features />
         <HowItWorks />
+        <DemoSection />
         <Testimonials />
         <FAQ />
         <CTA />

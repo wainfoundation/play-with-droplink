@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Facebook, Instagram, Menu, Twitter, X, LogOut, UserRound } from "lucide-react";
@@ -30,6 +29,7 @@ const Navbar = () => {
       
       <nav className="hidden md:flex items-center gap-8">
         <Link to="/features" className="nav-link">Features</Link>
+        <Link to="/demo" className="nav-link">Demo</Link>
         <Link to="/pricing" className="nav-link">Pricing</Link>
         <Link to="/templates" className="nav-link">Templates</Link>
         
@@ -107,6 +107,7 @@ const Navbar = () => {
 
           <div className="flex flex-col gap-4 my-6">
             <Link to="/features" className="p-3 hover:bg-muted rounded-md transition-colors">Features</Link>
+            <Link to="/demo" className="p-3 hover:bg-muted rounded-md transition-colors">Demo</Link>
             <Link to="/pricing" className="p-3 hover:bg-muted rounded-md transition-colors">Pricing</Link>
             <Link to="/templates" className="p-3 hover:bg-muted rounded-md transition-colors">Templates</Link>
             
