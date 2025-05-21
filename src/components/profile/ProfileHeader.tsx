@@ -1,0 +1,61 @@
+
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Share2, QrCode } from "lucide-react";
+
+interface ProfileHeaderProps {
+  username: string;
+  displayName: string | null;
+  bio: string | null;
+  avatarUrl: string | null;
+  onShareClick: () => void;
+  onQrCodeClick: () => void;
+}
+
+const ProfileHeader = ({
+  username,
+  displayName,
+  bio,
+  avatarUrl,
+  onShareClick,
+  onQrCodeClick
+}: ProfileHeaderProps) => {
+  return (
+    <div className="flex flex-col items-center">
+      <Avatar className="w-24 h-24 mb-4 border-2 border-primary">
+        <AvatarImage 
+          src={avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${username}`}
+          alt={`${username}'s profile`} 
+        />
+        <AvatarFallback>{username.substring(0, 2).toUpperCase()}</AvatarFallback>
+      </Avatar>
+      
+      <h1 className="text-2xl font-bold mb-1">
+        {displayName || `@${username}`}
+      </h1>
+      <p className="text-gray-500 mb-2">@{username}</p>
+      <p className="text-gray-700 text-center mb-6">{bio || "Digital creator & Pi pioneer"}</p>
+      
+      <div className="flex gap-2 mb-6">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="flex items-center gap-1"
+          onClick={onShareClick}
+        >
+          <Share2 className="w-4 h-4" /> Share
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="flex items-center gap-1"
+          onClick={onQrCodeClick}
+        >
+          <QrCode className="w-4 h-4" /> QR Code
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default ProfileHeader;
