@@ -60,13 +60,27 @@ const RecentTips = ({ userId }: { userId: string }) => {
         const formattedTips: Tip[] = [];
         
         for (const item of data) {
+          // Ensure from_user is properly typed or null
+          let typedFromUser: TipUser | null = null;
+          
+          if (item.from_user && typeof item.from_user === 'object') {
+            // Check if from_user has the required properties
+            if ('id' in item.from_user && 'username' in item.from_user) {
+              typedFromUser = {
+                id: item.from_user.id,
+                username: item.from_user.username,
+                avatar_url: item.from_user.avatar_url
+              };
+            }
+          }
+          
           formattedTips.push({
             id: item.id,
             amount: item.amount,
             created_at: item.created_at,
             from_user_id: item.user_id,
             to_user_id: userId, // Since we're querying where user_id = userId
-            from_user: item.from_user
+            from_user: typedFromUser
           });
         }
         
