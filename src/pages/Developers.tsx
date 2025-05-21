@@ -56,7 +56,7 @@ const Developers = () => {
         <HeroSection />
         
         {/* API Overview */}
-        <ApiDocsSection activeTab={activeTab} setActiveTab={activeTab} />
+        <ApiDocsSection activeTab={activeTab} setActiveTab={setActiveTab} />
         
         {/* Other sections - These will be rendered based on active tab */}
         {activeTab === "webhooks" && <WebhooksSection />}
