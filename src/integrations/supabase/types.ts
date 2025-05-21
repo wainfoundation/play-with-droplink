@@ -217,7 +217,7 @@ export type Database = {
     }
     Functions: {
       get_total_tips_received: {
-        Args: { user_id_param: string }
+        Args: Record<PropertyKey, never> | { user_id_param: string }
         Returns: number
       }
     }

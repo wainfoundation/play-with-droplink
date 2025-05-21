@@ -33,18 +33,16 @@ export function usePiAuth() {
         // After successful Pi authentication, try to find or create a user in Supabase
         let existingUser = null;
         
-        // Use generic Record type to avoid deep type inference
-        type UserProfileRecord = Record<string, any>;
-        
-        const userProfilesResult = await supabase
+        // Fetch profiles without using complex types
+        const userProfilesQuery = await supabase
           .from('user_profiles')
           .select('*')
           .eq('pi_user_id', authResult.user.uid);
         
-        if (userProfilesResult.error) {
-          console.error("Error checking for existing Pi user:", userProfilesResult.error);
-        } else if (userProfilesResult.data && userProfilesResult.data.length > 0) {
-          existingUser = userProfilesResult.data[0] as UserProfileRecord;
+        if (userProfilesQuery.error) {
+          console.error("Error checking for existing Pi user:", userProfilesQuery.error);
+        } else if (userProfilesQuery.data && userProfilesQuery.data.length > 0) {
+          existingUser = userProfilesQuery.data[0];
         }
         
         // If no existing user, create one
@@ -54,7 +52,7 @@ export function usePiAuth() {
           const randomPassword = Math.random().toString(36).slice(2) + Math.random().toString(36).toUpperCase().slice(2);
           
           // Create new user with Supabase
-          const { error: signUpError } = await supabase.auth.signUp({
+          const signUpResult = await supabase.auth.signUp({
             email: piEmail,
             password: randomPassword,
             options: {
@@ -65,8 +63,8 @@ export function usePiAuth() {
             }
           });
           
-          if (signUpError) {
-            throw new Error(`Failed to create account: ${signUpError.message}`);
+          if (signUpResult.error) {
+            throw new Error(`Failed to create account: ${signUpResult.error.message}`);
           }
         }
         

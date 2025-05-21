@@ -30,49 +30,40 @@ const RecentTips = ({ profileId }: Props) => {
       try {
         setLoading(true);
         
-        // Use explicit typing to avoid deep type inference
-        type PaymentData = {
-          id: string;
-          amount: number;
-          user_id: string;
-          created_at: string;
-        };
-        
-        // Explicitly avoid complex type parameters
-        const paymentsResult = await supabase
+        // Simplified query approach to avoid deep type inference
+        const paymentsQuery = await supabase
           .from('payments')
           .select('id, amount, user_id, created_at')
           .eq('receiver_id', profileId)
           .order('created_at', { ascending: false })
           .limit(5);
           
-        if (paymentsResult.error) {
-          console.error('Error fetching tips:', paymentsResult.error);
+        if (paymentsQuery.error) {
+          console.error('Error fetching tips:', paymentsQuery.error);
           return;
         }
 
-        const payments = paymentsResult.data as PaymentData[];
+        // Simple array to hold processed tips
         const tipsData: TipWithSender[] = [];
         
-        // Process each payment and fetch user data separately
-        for (const item of payments || []) {
-          // Type for user data response
-          type UserData = { username: string };
-          
-          const userResult = await supabase
+        // Process each payment one by one
+        for (const payment of paymentsQuery.data || []) {
+          // Fetch user data for this payment
+          const userQuery = await supabase
             .from('user_profiles')
             .select('username')
-            .eq('id', item.user_id)
-            .single();
+            .eq('id', payment.user_id)
+            .limit(1);
             
-          const userData = userResult.error ? undefined : (userResult.data as UserData | null);
-              
+          // Add tip with sender information
           tipsData.push({
-            id: item.id,
-            amount: item.amount,
-            sender_id: item.user_id,
-            created_at: item.created_at,
-            sender: userData ? { username: userData.username } : undefined
+            id: payment.id,
+            amount: payment.amount,
+            sender_id: payment.user_id,
+            created_at: payment.created_at,
+            sender: userQuery.data && userQuery.data.length > 0 
+              ? { username: userQuery.data[0].username } 
+              : undefined
           });
         }
         
