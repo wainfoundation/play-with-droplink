@@ -42,7 +42,7 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
           return;
         }
         
-        // Fetch total tips received
+        // Fetch total tips received - using a simpler query to avoid type issues
         const { data: totalData, error: totalError } = await supabase
           .from('payments')
           .select('amount')
@@ -52,25 +52,23 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
         if (totalError) {
           console.error("Failed to fetch total tips:", totalError);
         } else if (totalData) {
-          // Explicitly calculate total with type checks to avoid TypeScript issues
-          let total = 0;
+          // Calculate total without complex type operations
+          let sum = 0;
           
-          if (Array.isArray(totalData)) {
-            totalData.forEach(payment => {
-              const amount = payment.amount;
-              
-              if (typeof amount === 'number') {
-                total += amount;
-              } else if (typeof amount === 'string') {
-                const parsedAmount = parseFloat(amount);
-                if (!isNaN(parsedAmount)) {
-                  total += parsedAmount;
-                }
+          for (let i = 0; i < totalData.length; i++) {
+            const amount = totalData[i].amount;
+            
+            if (typeof amount === 'number') {
+              sum += amount;
+            } else if (typeof amount === 'string') {
+              const parsedAmount = parseFloat(amount);
+              if (!isNaN(parsedAmount)) {
+                sum += parsedAmount;
               }
-            });
+            }
           }
           
-          setTotalReceived(total);
+          setTotalReceived(sum);
         }
         
         if (!tipsData || tipsData.length === 0) {
