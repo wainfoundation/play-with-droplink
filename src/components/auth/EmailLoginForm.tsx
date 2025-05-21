@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
-import { isPasswordCompromised } from "@/utils/passwordSecurity";
+import { isPasswordCompromised as checkPasswordCompromised } from "@/utils/passwordSecurity";
 import { PasswordSecurityInfo } from "@/components/auth/PasswordSecurityInfo";
 
 export function EmailLoginForm() {
@@ -33,7 +32,7 @@ export function EmailLoginForm() {
     
     setIsCheckingPassword(true);
     try {
-      const compromised = await isPasswordCompromised(password);
+      const compromised = await checkPasswordCompromised(password);
       setIsPasswordCompromised(compromised);
     } catch (error) {
       console.error("Error checking password security:", error);
@@ -61,7 +60,7 @@ export function EmailLoginForm() {
       // Check if password has been compromised if not already checked
       if (isPasswordCompromised === undefined) {
         setIsCheckingPassword(true);
-        const compromised = await isPasswordCompromised(password);
+        const compromised = await checkPasswordCompromised(password);
         setIsPasswordCompromised(compromised);
         setIsCheckingPassword(false);
         
