@@ -57,7 +57,7 @@ const App = () => {
 
   // Authentication-protected route wrapper
   const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-    const isAuthenticated = localStorage.getItem('userToken') || !!supabase?.auth?.session?.user;
+    const isAuthenticated = localStorage.getItem('userToken');
     
     if (!isAuthenticated) {
       return <Navigate to="/login" replace />;
