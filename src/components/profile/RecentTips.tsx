@@ -33,15 +33,13 @@ const RecentTips = ({ profileId }: Props) => {
       try {
         setLoading(true);
         
-        // Use a type assertion for the data to avoid deep type instantiation
-        const response = await supabase
+        // Use the from method directly without type parameters
+        const { data, error } = await supabase
           .from('payments')
           .select('id, amount, user_id, created_at')
           .eq('recipient_id', profileId)
           .order('created_at', { ascending: false })
           .limit(5);
-          
-        const { data, error } = response;
           
         if (error) {
           console.error('Error fetching tips:', error);
@@ -61,15 +59,15 @@ const RecentTips = ({ profileId }: Props) => {
               created_at: payment.created_at
             };
             
-            // Get user data with explicit response handling
-            const userResponse = await supabase
+            // Get user data without using type parameters
+            const userResult = await supabase
               .from('user_profiles')
               .select('username')
               .eq('id', tipItem.sender_id)
               .maybeSingle();
               
-            const userData = userResponse.data;
-            const userError = userResponse.error;
+            const userData = userResult.data;
+            const userError = userResult.error;
               
             if (userError && userError.code !== 'PGRST116') { // Not found is not a critical error
               console.error('Error fetching sender data:', userError);
