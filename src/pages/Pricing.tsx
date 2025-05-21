@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { CheckIcon, ShieldCheck } from "lucide-react";
+import { CheckIcon, ShieldCheck, BadgeDollarSign } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -28,6 +27,7 @@ const PricingCard = ({
   
   // Calculate savings percentage for annual billing
   const savingsPercent = price > 0 ? Math.round(((price - annualPrice) / price) * 100) : 0;
+  const annualSavings = price > 0 ? (price - annualPrice) * 12 : 0;
   
   return (
     <div className={`bg-white rounded-xl shadow-lg p-8 border ${currentPlan ? 'border-green-500' : isPopular ? 'border-primary' : 'border-gray-200'} relative`}>
@@ -46,16 +46,21 @@ const PricingCard = ({
         <span className="text-3xl font-bold">{displayPrice}π</span>
         <span className="text-gray-500">/month</span>
       </div>
-      <p className="text-gray-600 mb-6 text-sm">
+      
+      {/* Enhanced billing info */}
+      <div className="text-gray-600 mb-6 text-sm">
         {billingCycle === 'annual' ? (
-          <>Billed annually ({annualPrice * 12}π/year)</>
+          <div className="space-y-1">
+            <p>Billed annually ({annualPrice * 12}π/year)</p>
+            <div className="flex items-center justify-center gap-1 text-green-600 font-medium bg-green-50 py-1 px-2 rounded-md">
+              <BadgeDollarSign size={16} />
+              <span>Save {savingsPercent}% ({annualSavings}π/year)</span>
+            </div>
+          </div>
         ) : (
-          <>Billed monthly</>
+          <p>Billed monthly</p>
         )}
-        {billingCycle === 'annual' && savingsPercent > 0 && (
-          <span className="ml-1 text-green-600 font-medium">Save {savingsPercent}%</span>
-        )}
-      </p>
+      </div>
       
       <ul className="space-y-3 mb-8">
         {features.map((feature, index) => (
@@ -98,7 +103,14 @@ const Pricing = () => {
   const { isLoggedIn, user, subscription, showAds, isAdmin } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { handleSubscribe, processingPayment, planPricing } = usePiPayment();
+  const { handleSubscribe, processingPayment } = usePiPayment();
+  
+  // Updated pricing with monthly/annual options
+  const planPricing = {
+    starter: { monthly: 10, annual: 8 },
+    pro: { monthly: 15, annual: 12 },
+    premium: { monthly: 22, annual: 18 }
+  };
   
   const starterFeatures = [
     "Unlimited Links",
@@ -167,6 +179,13 @@ const Pricing = () => {
     handleSubscribe(plan, billingCycle);
   };
   
+  // Calculate savings for display in the billing toggle section
+  const calculateSavings = () => {
+    const monthlyTotal = planPricing.pro.monthly * 12;
+    const annualTotal = planPricing.pro.annual * 12;
+    return monthlyTotal - annualTotal;
+  };
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -199,23 +218,33 @@ const Pricing = () => {
             )}
             
             {!isAdmin && (
-              <div className="mt-6 inline-flex items-center p-1 bg-muted rounded-lg">
-                <button
-                  onClick={() => setBillingCycle('annual')}
-                  className={`px-4 py-2 text-sm font-medium rounded-md ${
-                    billingCycle === 'annual' ? 'bg-white shadow-sm' : 'text-gray-500'
-                  }`}
-                >
-                  Annual
-                </button>
-                <button
-                  onClick={() => setBillingCycle('monthly')}
-                  className={`px-4 py-2 text-sm font-medium rounded-md ${
-                    billingCycle === 'monthly' ? 'bg-white shadow-sm' : 'text-gray-500'
-                  }`}
-                >
-                  Monthly
-                </button>
+              <div className="mt-6">
+                <div className="inline-flex items-center p-1 bg-muted rounded-lg">
+                  <button
+                    onClick={() => setBillingCycle('annual')}
+                    className={`px-4 py-2 text-sm font-medium rounded-md ${
+                      billingCycle === 'annual' ? 'bg-white shadow-sm' : 'text-gray-500'
+                    }`}
+                  >
+                    Annual
+                  </button>
+                  <button
+                    onClick={() => setBillingCycle('monthly')}
+                    className={`px-4 py-2 text-sm font-medium rounded-md ${
+                      billingCycle === 'monthly' ? 'bg-white shadow-sm' : 'text-gray-500'
+                    }`}
+                  >
+                    Monthly
+                  </button>
+                </div>
+                
+                {/* Show savings callout for annual billing */}
+                {billingCycle === 'annual' && (
+                  <div className="mt-3 inline-flex items-center bg-green-50 text-green-700 py-1 px-3 rounded-lg text-sm">
+                    <BadgeDollarSign size={16} className="mr-1" />
+                    <span>Save up to {calculateSavings()}π per year with annual billing</span>
+                  </div>
+                )}
               </div>
             )}
             
