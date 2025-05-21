@@ -11,23 +11,24 @@ export const useUserPermissions = () => {
     profile
   } = useUser();
 
-  // Admin users get premium privileges
-  // Regular users map from the subscription data if available
+  // Enhanced security: Strict check for admin status
+  // Admin users get premium privileges only if properly authenticated
   let plan: SubscriptionPlan = 'free'; // Default to free
   
-  if (isAdmin) {
+  if (isLoggedIn && isAdmin) {
     plan = 'premium'; // Admin users get premium plan by default
-  } else if (subscription?.plan) {
+    console.log("Admin privileges granted to authenticated admin user");
+  } else if (isLoggedIn && subscription?.plan) {
     plan = subscription.plan as SubscriptionPlan;
   }
   
-  // Check if subscription is expired
+  // Improved security: Strict check for subscription validity
   const subscriptionEnd = subscription?.expires_at ? new Date(subscription.expires_at) : null;
-  const isSubscriptionActive = subscription?.is_active && 
+  const isSubscriptionActive = isLoggedIn && subscription?.is_active && 
     subscriptionEnd && new Date() < subscriptionEnd;
   
   // If subscription is expired but still marked as active, treat as free plan
-  if (!isSubscriptionActive && plan !== 'free' && !isAdmin) {
+  if (!isSubscriptionActive && plan !== 'free' && !(isLoggedIn && isAdmin)) {
     plan = 'free';
     console.log('Subscription expired but still marked as active. Treating as free plan.');
   }
@@ -52,8 +53,8 @@ export const useUserPermissions = () => {
     hasPrioritySupport: plan === 'premium',
     canUsePiAdNetwork: plan === 'free' || plan === 'starter',
     canSellWithPiPayments: plan === 'premium',
-    // New additional permissions for monitoring in admin
-    hasFullAdminAccess: isAdmin
+    // Enhanced security: Require both login and admin status for full admin access
+    hasFullAdminAccess: isLoggedIn && isAdmin
   };
 
   return {

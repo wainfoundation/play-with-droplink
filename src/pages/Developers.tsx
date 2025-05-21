@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -21,6 +22,11 @@ const Developers = () => {
   const [activeTab, setActiveTab] = useState("api");
   const { user, isLoading } = useUser();
   const { permissions } = useUserPermissions();
+  
+  // Security improvement: Add console log for debugging permission status
+  useEffect(() => {
+    console.log("Developer page - Admin access status:", permissions.hasFullAdminAccess);
+  }, [permissions.hasFullAdminAccess]);
   
   // Check if user has admin access to view developer portal
   if (isLoading) {

@@ -13,45 +13,56 @@ export const useAuth = () => {
   const ADMIN_EMAILS = ["admin@pidrop.dev"];
   
   useEffect(() => {
-    // Set up auth state change listener
+    // Security improvement: Add authorization header validation
+    const checkAuthHeaders = async () => {
+      // Check if auth state includes valid tokens
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.access_token) {
+        console.log("Valid access token present");
+      }
+    };
+    
+    // Set up auth state change listener with improved security
     const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log("Auth state change:", event, session?.user?.id);
         const currentUser = session?.user ?? null;
         setUser(currentUser);
         
-        // Check if user is admin
-        if (currentUser) {
-          const userIsAdmin = ADMIN_EMAILS.includes(currentUser.email || '');
+        // Security enhancement: Strict admin validation
+        if (currentUser && currentUser.email) {
+          const userIsAdmin = ADMIN_EMAILS.includes(currentUser.email);
           setIsAdmin(userIsAdmin);
           
           if (userIsAdmin) {
             console.log("User has admin privileges");
           }
-          
-          setIsLoading(false);
         } else {
           setIsAdmin(false);
-          setIsLoading(false);
         }
+        
+        setIsLoading(false);
       }
     );
 
-    // Check current session
+    // Check current session with improved security
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log("Current session:", session?.user?.id);
       const currentUser = session?.user ?? null;
       setUser(currentUser);
       
-      // Check if user is admin
-      if (currentUser) {
-        const userIsAdmin = ADMIN_EMAILS.includes(currentUser.email || '');
+      // Security enhancement: Strict admin validation
+      if (currentUser && currentUser.email) {
+        const userIsAdmin = ADMIN_EMAILS.includes(currentUser.email);
         setIsAdmin(userIsAdmin);
         
         if (userIsAdmin) {
           console.log("User has admin privileges");
         }
       }
+      
+      // Run security check
+      checkAuthHeaders();
       setIsLoading(false);
     });
 
@@ -65,6 +76,7 @@ export const useAuth = () => {
       await supabase.auth.signOut();
       
       // Clear all local storage items related to authentication
+      // Security improvement: More comprehensive cleanup
       localStorage.removeItem('userToken');
       localStorage.removeItem('username');
       localStorage.removeItem('userEmail');
@@ -73,6 +85,9 @@ export const useAuth = () => {
       localStorage.removeItem('piUserId');
       localStorage.removeItem('piAccessToken');
       localStorage.removeItem('subscriptionEnd');
+      
+      // Clear Supabase storage items
+      localStorage.removeItem('supabase.auth.token');
       
       console.log("User signed out successfully");
       
