@@ -25,7 +25,7 @@ interface PiPaymentCallbacks {
 // Type declaration for the global Pi object
 declare global {
   interface Window {
-    Pi: {
+    Pi?: {
       init: (config: { version: string; sandbox?: boolean }) => void;
       authenticate: (
         scopes: string[],
@@ -46,12 +46,12 @@ const PI_SANDBOX = true;
 // Initialize Pi SDK
 export const initPiNetwork = (): boolean => {
   try {
-    if (window.Pi) {
+    if (typeof window !== 'undefined' && window.Pi) {
       window.Pi.init({ version: "2.0", sandbox: PI_SANDBOX });
       console.log("Pi SDK initialized with sandbox mode:", PI_SANDBOX);
       return true;
     }
-    console.error("Pi SDK not found. Make sure to include the Pi SDK script.");
+    console.warn("Pi SDK not found. This is normal if running server-side or in an environment without the Pi SDK.");
     return false;
   } catch (error) {
     console.error("Failed to initialize Pi SDK:", error);
@@ -64,8 +64,8 @@ export const authenticateWithPi = async (
   scopes: string[] = ["username", "payments"]
 ): Promise<PiAuthResult | null> => {
   try {
-    if (!window.Pi) {
-      console.error("Pi SDK not initialized");
+    if (typeof window === 'undefined' || !window.Pi) {
+      console.error("Pi SDK not initialized or not available");
       return null;
     }
 
@@ -91,8 +91,8 @@ export const createPiPayment = async (
   metadata: Record<string, any> = {}
 ): Promise<any> => {
   try {
-    if (!window.Pi) {
-      console.error("Pi SDK not initialized");
+    if (typeof window === 'undefined' || !window.Pi) {
+      console.error("Pi SDK not initialized or not available");
       return null;
     }
 

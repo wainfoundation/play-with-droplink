@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/components/ui/use-toast";
-import { authenticateWithPi } from "@/services/piPaymentService";
+import { authenticateWithPi } from "@/services/piNetwork";
 import { useUser } from "@/context/UserContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -42,24 +43,23 @@ const Login = () => {
         return;
       }
       
-      // In a real app, make an API call to validate credentials
-      // For now, we'll simulate authentication success
-      console.log("Login attempt with:", { email });
+      // Use Supabase auth to login with email and password
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
       
-      // Mock authentication token (would come from backend in real app)
-      const mockToken = btoa(`${email}:${Date.now()}`);
-      localStorage.setItem('userToken', mockToken);
-      localStorage.setItem('userEmail', email);
-      
-      // Extract username from email for demo purposes
-      const username = email.split('@')[0];
-      localStorage.setItem('username', username);
-      
-      // Set default plan if not already set
-      if (!localStorage.getItem('userPlan')) {
-        localStorage.setItem('userPlan', 'starter');
+      if (error) {
+        console.error("Supabase login error:", error);
+        toast({
+          title: "Login Failed",
+          description: error.message || "Invalid email or password",
+          variant: "destructive",
+        });
+        return;
       }
       
+      // Refresh user data after successful login
       await refreshUserData();
       
       toast({
@@ -88,19 +88,44 @@ const Login = () => {
       if (authResult?.user) {
         console.log("Pi authentication successful:", authResult);
         
-        // Store PI authentication token
-        localStorage.setItem('userToken', authResult.accessToken);
+        // After successful Pi authentication, try to find or create a user in Supabase
+        const { data: existingUser, error: userError } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('pi_user_id', authResult.user.uid)
+          .maybeSingle();
+        
+        if (userError) {
+          console.error("Error checking for existing Pi user:", userError);
+        }
+        
+        // If no existing user, create one
+        if (!existingUser) {
+          // Create a random email and password for the Pi user
+          const piEmail = `pi_${authResult.user.uid}@pi-network.user`;
+          const randomPassword = Math.random().toString(36).slice(2) + Math.random().toString(36).toUpperCase().slice(2);
+          
+          // Create new user with Supabase
+          const { error: signUpError } = await supabase.auth.signUp({
+            email: piEmail,
+            password: randomPassword,
+            options: {
+              data: {
+                username: authResult.user.username || `pi_user_${Date.now().toString().slice(-6)}`,
+                pi_user_id: authResult.user.uid
+              }
+            }
+          });
+          
+          if (signUpError) {
+            throw new Error(`Failed to create account: ${signUpError.message}`);
+          }
+        }
+        
+        // Store Pi authentication tokens
+        localStorage.setItem('piAccessToken', authResult.accessToken);
         localStorage.setItem('piUserId', authResult.user.uid);
-        
-        if (authResult.user.username) {
-          localStorage.setItem('piUsername', authResult.user.username);
-          localStorage.setItem('username', authResult.user.username);
-        }
-        
-        // Set default plan if not already set
-        if (!localStorage.getItem('userPlan')) {
-          localStorage.setItem('userPlan', 'starter');
-        }
+        localStorage.setItem('piUsername', authResult.user.username || '');
         
         await refreshUserData();
         

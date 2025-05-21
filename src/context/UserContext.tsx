@@ -32,20 +32,28 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Set up auth state change listener
     const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (event, session) => {
+        console.log("Auth state change:", event, session?.user?.id);
         setUser(session?.user ?? null);
+        
         if (session?.user) {
-          fetchUserData(session.user);
+          // Only fetch additional data after the synchronous state update
+          setTimeout(() => {
+            fetchUserData(session.user);
+          }, 0);
         } else {
           setProfile(null);
           setSubscription(null);
+          setIsLoading(false);
         }
       }
     );
 
     // Check current session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Current session:", session?.user?.id);
       setUser(session?.user ?? null);
+      
       if (session?.user) {
         fetchUserData(session.user);
       } else {
@@ -59,19 +67,27 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const fetchUserData = async (user: any) => {
-    setIsLoading(true);
     try {
+      setIsLoading(true);
+      console.log("Fetching user data for:", user.id);
+      
       // Fetch user profile
-      const { data: profileData } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('id', user.id)
         .maybeSingle();
 
+      if (profileError) {
+        console.error("Error fetching profile:", profileError);
+        throw profileError;
+      }
+
       setProfile(profileData);
+      console.log("Profile data:", profileData);
 
       // Fetch active subscription
-      const { data: subscriptionData } = await supabase
+      const { data: subscriptionData, error: subscriptionError } = await supabase
         .from('subscriptions')
         .select('*')
         .eq('user_id', user.id)
@@ -79,7 +95,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         .order('created_at', { ascending: false })
         .maybeSingle();
 
+      if (subscriptionError) {
+        console.error("Error fetching subscription:", subscriptionError);
+        throw subscriptionError;
+      }
+
       setSubscription(subscriptionData);
+      console.log("Subscription data:", subscriptionData);
     } catch (error) {
       console.error("Error fetching user data:", error);
       toast({
@@ -99,21 +121,44 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setProfile(null);
-    setSubscription(null);
-    localStorage.removeItem('userToken');
-    localStorage.removeItem('username');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userPlan');
-    localStorage.removeItem('piUsername');
-    localStorage.removeItem('piUserId');
-    localStorage.removeItem('subscriptionEnd');
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+      setProfile(null);
+      setSubscription(null);
+      
+      // Clear all local storage items related to authentication
+      localStorage.removeItem('userToken');
+      localStorage.removeItem('username');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userPlan');
+      localStorage.removeItem('piUsername');
+      localStorage.removeItem('piUserId');
+      localStorage.removeItem('piAccessToken');
+      localStorage.removeItem('subscriptionEnd');
+      
+      console.log("User signed out successfully");
+      
+      toast({
+        title: "Signed Out",
+        description: "You have been successfully signed out",
+      });
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast({
+        title: "Error",
+        description: "Failed to sign out",
+        variant: "destructive",
+      });
+    }
   };
 
   const updateProfile = async (data: any) => {
     try {
+      if (!user) {
+        throw new Error("No user is logged in");
+      }
+      
       const { error } = await supabase
         .from('user_profiles')
         .update(data)
@@ -122,6 +167,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       if (error) throw error;
       
       setProfile(prev => ({ ...prev, ...data }));
+      
       toast({
         title: "Success",
         description: "Profile updated successfully",
@@ -138,17 +184,23 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const cancelSubscription = async (): Promise<boolean> => {
     try {
+      if (!user) {
+        throw new Error("No user is logged in");
+      }
+      
       const { error } = await supabase.functions.invoke('cancel-subscription', {
-        body: { user }
+        body: { user_id: user.id }
       });
       
       if (error) throw error;
       
       await refreshUserData();
+      
       toast({
         title: "Subscription Cancelled",
         description: "Your subscription has been cancelled successfully",
       });
+      
       return true;
     } catch (error) {
       console.error("Error cancelling subscription:", error);

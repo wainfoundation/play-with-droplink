@@ -111,7 +111,14 @@ const AppRoutes = () => {
           </ProtectedRoute>
         } 
       />
-      <Route path="/admin" element={<AdminPortal />} />
+      <Route 
+        path="/admin" 
+        element={
+          <ProtectedRoute>
+            <AdminPortal />
+          </ProtectedRoute>
+        } 
+      />
       
       {/* Handle /demo route - redirect to home */}
       <Route path="/demo" element={<Navigate to="/" replace />} />
