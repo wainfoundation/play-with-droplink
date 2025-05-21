@@ -41,6 +41,11 @@ const Developers = () => {
     return <Navigate to="/" replace />;
   }
   
+  // Handler function for tab changes
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+  };
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
@@ -56,7 +61,7 @@ const Developers = () => {
         <HeroSection />
         
         {/* API Overview */}
-        <ApiDocsSection activeTab={activeTab} setActiveTab={setActiveTab} />
+        <ApiDocsSection activeTab={activeTab} setActiveTab={handleTabChange} />
         
         {/* Other sections - These will be rendered based on active tab */}
         {activeTab === "webhooks" && <WebhooksSection />}
