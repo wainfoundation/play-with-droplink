@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +13,7 @@ import Features from "./pages/Features";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import AdminPortal from "./pages/AdminPortal";
+import ProfilePage from "./pages/ProfilePage";
 
 // Company Pages
 import About from "./pages/About";
@@ -108,8 +108,8 @@ const App = () => {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/cookies" element={<Cookies />} />
             
-            {/* User profile page */}
-            <Route path="/u/:username" element={<div>Profile Page</div>} />
+            {/* User profile page - update to use new ProfilePage component */}
+            <Route path="/u/:username" element={<ProfilePage />} />
             
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />

@@ -17,13 +17,21 @@ const Signup = () => {
     password: "",
     agreeTerms: false
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [piAuthenticating, setPiAuthenticating] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check if user is already logged in
+    const token = localStorage.getItem('userToken');
+    if (token) {
+      navigate('/dashboard');
+      return;
+    }
+    
     // Initialize Pi Network SDK
-    initPiNetwork(); // Removed the argument since it's not needed
-  }, []);
+    initPiNetwork();
+  }, [navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -40,14 +48,69 @@ const Signup = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, we would handle signup logic here
-    console.log("Signup attempt with:", formData);
-    toast({
-      title: "Account Created!",
-      description: "Welcome to Droplink. This is a demo - in a real app, you would be registered now."
-    });
+    
+    try {
+      setIsSubmitting(true);
+      
+      // Validate form data
+      if (!formData.username || !formData.email || !formData.password) {
+        toast({
+          title: "Registration Failed",
+          description: "Please fill in all required fields",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (formData.password.length < 8) {
+        toast({
+          title: "Password Too Short",
+          description: "Password must be at least 8 characters",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (!formData.agreeTerms) {
+        toast({
+          title: "Terms Required",
+          description: "Please agree to the terms and conditions",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // In a real app, we would make an API call to create the account
+      // For now, we'll simulate a successful registration
+      console.log("Registration attempt with:", formData);
+      
+      // Create a user token and store authentication data
+      const mockToken = btoa(`${formData.email}:${Date.now()}`);
+      localStorage.setItem('userToken', mockToken);
+      localStorage.setItem('username', formData.username);
+      localStorage.setItem('userEmail', formData.email);
+      localStorage.setItem('userPlan', 'starter'); // Default plan
+      
+      toast({
+        title: "Account Created!",
+        description: `Welcome to Droplink, @${formData.username}!`,
+      });
+      
+      // Redirect to dashboard
+      navigate('/dashboard');
+      
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast({
+        title: "Registration Failed",
+        description: "An error occurred during account creation",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handlePiSignup = async () => {
@@ -57,21 +120,34 @@ const Signup = () => {
       
       if (authResult?.user) {
         console.log("Pi authentication successful:", authResult);
-        toast({
-          title: "Pi Authentication Successful",
-          description: `Welcome, ${authResult.user.username || "Pioneer"}! Complete your profile to continue.`,
-        });
         
-        // Pre-fill username if available
+        // Store authentication data
+        localStorage.setItem('userToken', authResult.accessToken);
+        localStorage.setItem('piUserId', authResult.user.uid);
+        
         if (authResult.user.username) {
+          localStorage.setItem('piUsername', authResult.user.username);
+          localStorage.setItem('username', authResult.user.username);
+          
+          // Pre-fill username if available
           setFormData(prev => ({
             ...prev,
             username: authResult.user.username || ""
           }));
         }
         
-        // In a real app, you would handle the successful authentication here
-        // For this demo, we're just pre-filling the username
+        // Set default plan
+        localStorage.setItem('userPlan', 'starter');
+        
+        toast({
+          title: "Pi Authentication Successful",
+          description: `Welcome, @${authResult.user.username || "Pioneer"}! You're now registered with Pi Network.`,
+        });
+        
+        // If we already have the username, we can proceed to dashboard
+        if (authResult.user.username) {
+          navigate('/dashboard');
+        }
       } else {
         toast({
           title: "Authentication Failed",

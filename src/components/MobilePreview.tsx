@@ -1,5 +1,22 @@
 
+import { useNavigate } from 'react-router-dom';
+import { useUserPlan } from '@/hooks/use-user-plan';
+
 const MobilePreview = () => {
+  const navigate = useNavigate();
+  const { username } = useUserPlan();
+  
+  // Demo username if not logged in
+  const demoUsername = username || "username";
+  
+  const handleProfileClick = () => {
+    if (username) {
+      navigate(`/u/${username}`);
+    } else {
+      navigate('/signup');
+    }
+  };
+  
   return (
     <section className="py-20 px-6">
       <div className="container mx-auto text-center">
@@ -13,23 +30,26 @@ const MobilePreview = () => {
             <div className="p-6 flex flex-col items-center">
               <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border-2 border-primary">
                 <img 
-                  src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&q=80" 
+                  src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${demoUsername}`}
                   alt="Profile" 
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h3 className="text-lg font-bold mb-1">@username</h3>
+              <h3 className="text-lg font-bold mb-1">@{demoUsername}</h3>
               <p className="text-sm text-gray-500 mb-6">Digital creator & Pi pioneer</p>
               
               <div className="w-full space-y-3">
+                <button 
+                  onClick={handleProfileClick}
+                  className="block w-full bg-primary text-white font-medium py-3 px-4 rounded-lg transition-all hover:bg-secondary hover:scale-[1.02] shadow-md"
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    <span>👤</span> {username ? "View Your Profile" : "Create Your Profile"}
+                  </span>
+                </button>
                 <a href="#" className="block w-full bg-primary text-white font-medium py-3 px-4 rounded-lg transition-all hover:bg-secondary hover:scale-[1.02] shadow-md">
                   <span className="flex items-center justify-center gap-2">
                     <span>💰</span> Tip in Pi
-                  </span>
-                </a>
-                <a href="#" className="block w-full bg-primary text-white font-medium py-3 px-4 rounded-lg transition-all hover:bg-secondary hover:scale-[1.02] shadow-md">
-                  <span className="flex items-center justify-center gap-2">
-                    <span>📚</span> Buy eBook
                   </span>
                 </a>
                 <a href="#" className="block w-full bg-white text-primary border border-primary font-medium py-3 px-4 rounded-lg transition-all hover:bg-muted hover:scale-[1.02] shadow-sm">

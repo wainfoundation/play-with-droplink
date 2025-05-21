@@ -12,6 +12,7 @@ import { authenticateWithPi, initPiNetwork } from "@/services/piNetwork";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [piAuthenticating, setPiAuthenticating] = useState(false);
   const navigate = useNavigate();
 
@@ -22,7 +23,7 @@ const Login = () => {
       navigate('/dashboard');
     }
 
-    // Initialize Pi Network SDK if needed
+    // Initialize Pi Network SDK
     initPiNetwork();
   }, [navigate]);
 
@@ -30,27 +31,42 @@ const Login = () => {
     e.preventDefault();
     
     try {
-      // In a real app, make an API call to validate credentials
-      // For now, we'll simulate authentication success
-      if (email && password) {
-        // Mock authentication token (would come from backend in real app)
-        const mockToken = btoa(`${email}:${Date.now()}`);
-        localStorage.setItem('userToken', mockToken);
-        localStorage.setItem('userEmail', email);
-        
-        toast({
-          title: "Login Successful",
-          description: "Welcome back to Droplink!",
-        });
-        
-        navigate('/dashboard');
-      } else {
+      setIsSubmitting(true);
+      
+      // Validate inputs
+      if (!email || !password) {
         toast({
           title: "Login Failed",
           description: "Please enter both email and password",
           variant: "destructive",
         });
+        return;
       }
+      
+      // In a real app, make an API call to validate credentials
+      // For now, we'll simulate authentication success
+      console.log("Login attempt with:", { email });
+      
+      // Mock authentication token (would come from backend in real app)
+      const mockToken = btoa(`${email}:${Date.now()}`);
+      localStorage.setItem('userToken', mockToken);
+      localStorage.setItem('userEmail', email);
+      
+      // Extract username from email for demo purposes
+      const username = email.split('@')[0];
+      localStorage.setItem('username', username);
+      
+      // Set default plan if not already set
+      if (!localStorage.getItem('userPlan')) {
+        localStorage.setItem('userPlan', 'starter');
+      }
+      
+      toast({
+        title: "Login Successful",
+        description: "Welcome back to Droplink!",
+      });
+      
+      navigate('/dashboard');
     } catch (error) {
       console.error("Login error:", error);
       toast({
@@ -58,6 +74,8 @@ const Login = () => {
         description: "An error occurred during login",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -72,13 +90,20 @@ const Login = () => {
         // Store PI authentication token
         localStorage.setItem('userToken', authResult.accessToken);
         localStorage.setItem('piUserId', authResult.user.uid);
+        
         if (authResult.user.username) {
           localStorage.setItem('piUsername', authResult.user.username);
+          localStorage.setItem('username', authResult.user.username);
+        }
+        
+        // Set default plan if not already set
+        if (!localStorage.getItem('userPlan')) {
+          localStorage.setItem('userPlan', 'starter');
         }
         
         toast({
           title: "Pi Authentication Successful",
-          description: `Welcome, ${authResult.user.username || "Pioneer"}!`,
+          description: `Welcome, ${authResult.user.username ? '@' + authResult.user.username : "Pioneer"}!`,
         });
         
         // Redirect to dashboard
