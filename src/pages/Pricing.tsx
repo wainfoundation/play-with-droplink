@@ -1,10 +1,11 @@
-
 import { useState } from "react";
 import { CheckIcon } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import PiAdsNetwork from "@/components/PiAdsNetwork";
+import useUserPlan from "@/hooks/use-user-plan";
 
 const PricingCard = ({ 
   title, 
@@ -46,6 +47,7 @@ const PricingCard = ({
 
 const Pricing = () => {
   const [annual, setAnnual] = useState(true);
+  const { isLoggedIn, plan, username, showAds } = useUserPlan();
   
   const starterFeatures = [
     "Unlimited Links",
@@ -88,6 +90,13 @@ const Pricing = () => {
       <Navbar />
       <main className="flex-grow py-20 px-6">
         <div className="container mx-auto">
+          {/* Show Pi Ads for Starter plan users */}
+          {showAds && (
+            <div className="mb-8">
+              <PiAdsNetwork placementId="pricing-top" />
+            </div>
+          )}
+          
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold mb-4 text-primary">Pricing Plans</h1>
             <p className="text-xl max-w-2xl mx-auto text-gray-600">
@@ -112,6 +121,14 @@ const Pricing = () => {
                 Monthly
               </button>
             </div>
+            
+            {isLoggedIn && username && plan && (
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg inline-block">
+                <p className="text-sm text-blue-800">
+                  You're currently on the <span className="font-bold">{plan.charAt(0).toUpperCase() + plan.slice(1)}</span> plan
+                </p>
+              </div>
+            )}
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -135,6 +152,13 @@ const Pricing = () => {
               features={premiumFeatures}
             />
           </div>
+          
+          {/* Show another ad in the middle for Starter users */}
+          {showAds && (
+            <div className="my-16">
+              <PiAdsNetwork placementId="pricing-middle" />
+            </div>
+          )}
           
           <div className="mt-16 text-center max-w-3xl mx-auto">
             <h2 className="text-2xl font-bold mb-4">Frequently Asked Questions</h2>
@@ -169,6 +193,13 @@ const Pricing = () => {
               </div>
             </div>
           </div>
+          
+          {/* Show another ad at the bottom for Starter users */}
+          {showAds && (
+            <div className="mt-16">
+              <PiAdsNetwork placementId="pricing-bottom" />
+            </div>
+          )}
         </div>
       </main>
       <Footer />
