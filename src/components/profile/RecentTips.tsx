@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +19,20 @@ interface Tip {
   from_user_id: string;
   to_user_id: string;
   from_user: TipUser | null;
+}
+
+// Define PaymentData type to properly map Supabase response
+interface PaymentData {
+  id: string;
+  amount: number;
+  created_at: string;
+  user_id: string;
+  recipient_id: string;
+  from_user?: {
+    id: string;
+    username: string;
+    avatar_url: string | null;
+  } | null;
 }
 
 const RecentTips = ({ userId }: { userId: string }) => {
@@ -54,17 +67,16 @@ const RecentTips = ({ userId }: { userId: string }) => {
         }
         
         // Convert the data to the expected format
-        const formattedTips: Tip[] = data.map((payment: any) => {
+        const formattedTips: Tip[] = data.map((payment: PaymentData) => {
           // Extract user data safely
           let fromUser: TipUser | null = null;
-          if (payment.from_user && typeof payment.from_user === 'object' && !Array.isArray(payment.from_user)) {
-            if ('id' in payment.from_user && 'username' in payment.from_user) {
-              fromUser = {
-                id: payment.from_user.id,
-                username: payment.from_user.username,
-                avatar_url: payment.from_user.avatar_url
-              };
-            }
+          
+          if (payment.from_user) {
+            fromUser = {
+              id: payment.from_user.id,
+              username: payment.from_user.username,
+              avatar_url: payment.from_user.avatar_url
+            };
           }
           
           return {
