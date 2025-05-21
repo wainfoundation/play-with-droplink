@@ -14,14 +14,14 @@ export interface PaymentCallbacks {
   onError: (error: Error, payment?: any) => void;
 }
 
-const PI_API_KEY = "ldtwy98n3q6f8uvxvoxvnidgiklu21ndbfn5ltqpnfxcftbocc9ujxrcfiwcwkj6";
-
-// Initialize Pi SDK
+// Initialize Pi SDK with environment detection
 export const initPiNetwork = (): boolean => {
   try {
     if (window.Pi) {
-      window.Pi.init({ version: "2.0", sandbox: import.meta.env.DEV });
-      console.log("Pi SDK initialized with sandbox mode:", import.meta.env.DEV);
+      // Check if we're in development or production
+      const isSandbox = import.meta.env.DEV || window.location.hostname.includes('localhost');
+      window.Pi.init({ version: "2.0", sandbox: isSandbox });
+      console.log("Pi SDK initialized with sandbox mode:", isSandbox);
       return true;
     }
     console.error("Pi SDK not found. Make sure to include the Pi SDK script.");
@@ -45,7 +45,22 @@ export const authenticateWithPi = async (
     // Handle any incomplete payments
     const onIncompletePaymentFound = async (payment: any) => {
       console.log("Incomplete payment found:", payment);
-      // Handle incomplete payment
+      // Handle incomplete payment by completing it or canceling it
+      if (payment.status === 'started') {
+        try {
+          await supabase.functions.invoke('pi-payment', {
+            body: { 
+              paymentData: {
+                paymentId: payment.identifier,
+                metadata: payment.metadata || {}
+              }, 
+              user: { id: payment.user_uid } 
+            }
+          });
+        } catch (error) {
+          console.error("Error handling incomplete payment:", error);
+        }
+      }
     };
 
     const auth = await window.Pi.authenticate(scopes, onIncompletePaymentFound);

@@ -19,9 +19,9 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const { user } = await req.json();
+    const { user_id } = await req.json();
 
-    if (!user || !user.id) {
+    if (!user_id) {
       return new Response(JSON.stringify({ error: "User ID is required" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 400,
@@ -35,7 +35,7 @@ serve(async (req) => {
         is_active: false, 
         updated_at: new Date().toISOString() 
       })
-      .eq('user_id', user.id)
+      .eq('user_id', user_id)
       .eq('is_active', true)
       .select();
 
@@ -46,6 +46,16 @@ serve(async (req) => {
       });
     }
 
+    // Log cancellation for accounting/auditing
+    await supabaseClient
+      .from('analytics')
+      .insert({
+        user_id,
+        page_view: false,
+        link_click: false,
+        referrer: "subscription_cancellation"
+      });
+
     return new Response(JSON.stringify({ 
       success: true, 
       message: "Subscription cancelled successfully"
@@ -55,7 +65,8 @@ serve(async (req) => {
     });
     
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

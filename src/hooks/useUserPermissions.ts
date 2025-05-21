@@ -21,7 +21,16 @@ export const useUserPermissions = () => {
     plan = subscription.plan as SubscriptionPlan;
   }
   
+  // Check if subscription is expired
   const subscriptionEnd = subscription?.expires_at ? new Date(subscription.expires_at) : null;
+  const isSubscriptionActive = subscription?.is_active && 
+    subscriptionEnd && new Date() < subscriptionEnd;
+  
+  // If subscription is expired but still marked as active, treat as free plan
+  if (!isSubscriptionActive && plan !== 'free' && !isAdmin) {
+    plan = 'free';
+  }
+  
   const username = profile?.username || null;
 
   // Feature limitations based on plan
@@ -49,6 +58,7 @@ export const useUserPermissions = () => {
     plan,
     username,
     subscriptionEnd,
+    isSubscriptionActive,
     permissions
   };
 };

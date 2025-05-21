@@ -18,6 +18,23 @@ export const useSubscription = (user: any) => {
     try {
       setIsLoading(true);
       const subscriptionData = await getUserSubscription(user.id);
+      
+      // Check if subscription is expired but still marked as active
+      if (subscriptionData && subscriptionData.is_active) {
+        const expiresAt = new Date(subscriptionData.expires_at);
+        const now = new Date();
+        
+        if (now > expiresAt) {
+          // Subscription has expired, update the is_active flag
+          await supabase
+            .from('subscriptions')
+            .update({ is_active: false })
+            .eq('id', subscriptionData.id);
+          
+          subscriptionData.is_active = false;
+        }
+      }
+      
       setSubscription(subscriptionData);
     } catch (error) {
       console.error("Error fetching subscription:", error);
@@ -28,6 +45,15 @@ export const useSubscription = (user: any) => {
 
   useEffect(() => {
     fetchSubscription();
+    
+    // Set up an interval to periodically check subscription status
+    const checkInterval = setInterval(() => {
+      if (user && subscription?.is_active) {
+        fetchSubscription();
+      }
+    }, 60 * 60 * 1000); // Check every hour
+    
+    return () => clearInterval(checkInterval);
   }, [user]);
 
   const cancelSubscription = async (): Promise<boolean> => {
