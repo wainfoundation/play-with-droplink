@@ -22,6 +22,16 @@ interface Tip {
   from_user: TipUser | null;
 }
 
+// Define the shape of raw data directly from Supabase
+interface RawTipData {
+  id: string;
+  amount: number;
+  created_at: string;
+  user_id: string;
+  recipient_id: string;
+  from_user: TipUser | null;
+}
+
 const RecentTips = ({ userId }: { userId: string }) => {
   const [tips, setTips] = useState<Tip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,8 +59,11 @@ const RecentTips = ({ userId }: { userId: string }) => {
           return;
         }
         
-        // Map the data directly to our Tip interface
-        const formattedTips: Tip[] = data.map((payment: any) => ({
+        // Using type assertion to avoid deep type instantiation
+        const typedData = data as RawTipData[];
+        
+        // Map the data to our Tip interface with explicit typing
+        const formattedTips = typedData.map((payment): Tip => ({
           id: payment.id,
           amount: payment.amount,
           created_at: payment.created_at,
