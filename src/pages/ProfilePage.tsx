@@ -4,11 +4,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import PiAdsNetwork from "@/components/PiAdsNetwork";
 import { useUser } from "@/context/UserContext";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { createPiPayment } from "@/services/piPaymentService";
+import { Share2, ExternalLink, QrCode } from "lucide-react";
+import { Helmet } from "react-helmet";
 
 interface Link {
   id: string;
@@ -34,6 +37,7 @@ const ProfilePage = () => {
   const [error, setError] = useState<string | null>(null);
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [processingTip, setProcessingTip] = useState(false);
+  const [showQRCode, setShowQRCode] = useState(false);
   
   const { user, showAds } = useUser();
 
@@ -187,6 +191,22 @@ const ProfilePage = () => {
     }
   };
 
+  const handleShareProfile = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: `${profileData?.display_name || profileData?.username}'s Profile`,
+        url: window.location.href,
+      }).catch(err => console.error('Error sharing:', err));
+    } else {
+      // Fallback for browsers that don't support the Web Share API
+      navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link Copied",
+        description: "Profile URL copied to clipboard",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -220,22 +240,70 @@ const ProfilePage = () => {
     );
   }
 
+  const profileUrl = `https://${window.location.host}/@${profileData.username}`;
+  
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>{profileData.display_name || `@${profileData.username}`} | Droplink</title>
+        <meta name="description" content={profileData.bio || `Check out ${profileData.username}'s profile on Droplink`} />
+        <meta property="og:title" content={`${profileData.display_name || `@${profileData.username}`} | Droplink`} />
+        <meta property="og:description" content={profileData.bio || `Check out ${profileData.username}'s profile on Droplink`} />
+        <meta property="og:image" content={profileData.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${profileData.username}`} />
+        <meta property="og:url" content={profileUrl} />
+        <meta property="og:type" content="profile" />
+      </Helmet>
+      
       <Navbar />
       <main className="flex-grow py-12 px-4">
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-xl shadow-lg p-8">
             <div className="flex flex-col items-center">
-              <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-2 border-primary">
-                <img 
+              <Avatar className="w-24 h-24 mb-4 border-2 border-primary">
+                <AvatarImage 
                   src={profileData.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${profileData.username}`}
-                  alt="Profile" 
-                  className="w-full h-full object-cover"
+                  alt={`${profileData.username}'s profile`} 
                 />
+                <AvatarFallback>{profileData.username.substring(0, 2).toUpperCase()}</AvatarFallback>
+              </Avatar>
+              
+              <h1 className="text-2xl font-bold mb-1">
+                {profileData.display_name || `@${profileData.username}`}
+              </h1>
+              <p className="text-gray-500 mb-2">@{profileData.username}</p>
+              <p className="text-gray-700 text-center mb-6">{profileData.bio || "Digital creator & Pi pioneer"}</p>
+              
+              <div className="flex gap-2 mb-6">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center gap-1"
+                  onClick={handleShareProfile}
+                >
+                  <Share2 className="w-4 h-4" /> Share
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center gap-1"
+                  onClick={() => setShowQRCode(!showQRCode)}
+                >
+                  <QrCode className="w-4 h-4" /> QR Code
+                </Button>
               </div>
-              <h1 className="text-2xl font-bold mb-1">@{profileData.username}</h1>
-              <p className="text-gray-500 mb-6">{profileData.bio || "Digital creator & Pi pioneer"}</p>
+              
+              {showQRCode && (
+                <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                  <div className="text-center">
+                    <img 
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(profileUrl)}`}
+                      alt="Profile QR Code"
+                      className="mx-auto mb-2"
+                    />
+                    <p className="text-sm text-gray-500">Scan to visit my profile</p>
+                  </div>
+                </div>
+              )}
               
               {/* Only show ads for starter plan users if they're logged in */}
               {showAds && (
@@ -250,15 +318,19 @@ const ProfilePage = () => {
                     key={link.id || index} 
                     onClick={() => handleLinkClick(link)}
                     disabled={link.url === "#tip-in-pi" && processingTip}
-                    className={index < 2 
-                      ? "block w-full bg-primary text-white font-medium py-3 px-4 rounded-lg transition-all hover:bg-secondary hover:scale-[1.02] shadow-md" 
-                      : "block w-full bg-white text-primary border border-primary font-medium py-3 px-4 rounded-lg transition-all hover:bg-muted hover:scale-[1.02] shadow-sm"
-                    }
+                    className={`block w-full text-left px-4 py-3 rounded-lg transition-all hover:scale-[1.02] shadow-md
+                      ${index < 2 
+                        ? "bg-primary text-white font-medium hover:bg-secondary" 
+                        : "bg-white text-primary border border-primary font-medium hover:bg-muted"
+                      }`}
                   >
-                    <span className="flex items-center justify-center gap-2">
-                      <span>{link.icon}</span> 
-                      {link.url === "#tip-in-pi" && processingTip ? "Processing..." : link.title}
-                    </span>
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        <span>{link.icon}</span> 
+                        {link.url === "#tip-in-pi" && processingTip ? "Processing..." : link.title}
+                      </span>
+                      <ExternalLink className="h-4 w-4" />
+                    </div>
                   </button>
                 ))}
               </div>

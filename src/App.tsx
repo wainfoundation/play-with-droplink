@@ -90,7 +90,7 @@ const App = () => {
               />
               <Route path="/admin" element={<AdminPortal />} />
               
-              {/* Handle /demo route - redirect to home for now */}
+              {/* Handle /demo route - redirect to home */}
               <Route path="/demo" element={<Navigate to="/" replace />} />
               
               {/* Company Pages */}
@@ -110,8 +110,9 @@ const App = () => {
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/cookies" element={<Cookies />} />
               
-              {/* User profile page */}
+              {/* User profile pages - support both formats */}
               <Route path="/u/:username" element={<ProfilePage />} />
+              <Route path="/@:username" element={<ProfilePage />} />
               
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />

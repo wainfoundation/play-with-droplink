@@ -1,18 +1,27 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { PlusCircle, Link as LinkIcon, Loader2 } from "lucide-react";
+import { PlusCircle, Link as LinkIcon, Loader2, Copy, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
+import { Input } from "@/components/ui/input";
 
 const LinksSection = () => {
   const [isAddingLink, setIsAddingLink] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [links, setLinks] = useState<any[]>([]);
+  const [profileUrl, setProfileUrl] = useState<string>("");
   const { toast } = useToast();
-  const { user } = useUser();
+  const { user, profile } = useUser();
+
+  useEffect(() => {
+    if (profile?.username) {
+      const baseUrl = window.location.origin;
+      setProfileUrl(`${baseUrl}/@${profile.username}`);
+    }
+  }, [profile]);
 
   const fetchLinks = async () => {
     if (!user) return;
@@ -37,6 +46,24 @@ const LinksSection = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLinks();
+  }, [user]);
+
+  const handleCopyProfileUrl = () => {
+    navigator.clipboard.writeText(profileUrl);
+    toast({
+      title: "Link Copied",
+      description: "Your profile URL has been copied to clipboard",
+    });
+  };
+
+  const handleViewProfile = () => {
+    if (profile?.username) {
+      window.open(`/@${profile.username}`, '_blank');
     }
   };
 
@@ -111,6 +138,25 @@ const LinksSection = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {profile?.username && (
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+            <p className="text-sm font-medium mb-2">Your public profile URL</p>
+            <div className="flex gap-2">
+              <Input 
+                value={profileUrl} 
+                readOnly 
+                className="bg-white"
+              />
+              <Button size="icon" variant="outline" onClick={handleCopyProfileUrl}>
+                <Copy className="h-4 w-4" />
+              </Button>
+              <Button size="icon" variant="outline" onClick={handleViewProfile}>
+                <ExternalLink className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
+        
         {renderContent()}
       </CardContent>
     </Card>
