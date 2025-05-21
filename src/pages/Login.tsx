@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,12 @@ import { useToast } from "@/components/ui/use-toast";
 import { authenticateWithPi } from "@/services/piNetwork";
 import { useUser } from "@/context/UserContext";
 import { supabase } from "@/integrations/supabase/client";
+
+type UserProfile = {
+  id: string;
+  username?: string;
+  [key: string]: any;
+};
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -89,11 +94,12 @@ const Login = () => {
         console.log("Pi authentication successful:", authResult);
         
         // After successful Pi authentication, try to find or create a user in Supabase
+        // Use explicit type casting to avoid deep type instantiation
         const { data: existingUser, error: userError } = await supabase
           .from('user_profiles')
           .select('*')
           .eq('pi_user_id', authResult.user.uid)
-          .maybeSingle();
+          .maybeSingle() as { data: UserProfile | null, error: Error | null };
         
         if (userError) {
           console.error("Error checking for existing Pi user:", userError);

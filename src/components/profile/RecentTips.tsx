@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -28,29 +27,28 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
       try {
         setLoading(true);
         
-        // Fetch the most recent tips
+        // Fetch the most recent tips with explicit type casting to avoid deep type instantiation
         const { data: tipsData, error: tipsError } = await supabase
           .from('payments')
           .select('id, amount, created_at, memo, user_id')
           .eq('status', 'completed')
           .eq('recipient_id', userId)
           .order('created_at', { ascending: false })
-          .limit(limit);
+          .limit(limit) as { data: Tip[] | null, error: Error | null };
         
         if (tipsError) {
           console.error("Failed to fetch tips:", tipsError);
           return;
         }
         
-        // Fetch total tips received - using a simple aggregation
+        // Fetch total tips received using the new database function
         const { data: totalData, error: totalError } = await supabase
-          .rpc('get_total_tips_received', { user_id_param: userId });
+          .rpc('get_total_tips_received', { user_id_param: userId }) as { data: number | null, error: Error | null };
         
         if (totalError) {
           console.error("Failed to fetch total tips:", totalError);
-        } else if (totalData) {
-          // Set total from database function result
-          setTotalReceived(Number(totalData) || 0);
+        } else if (totalData !== null) {
+          setTotalReceived(totalData);
         }
         
         if (!tipsData || tipsData.length === 0) {
@@ -68,7 +66,7 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
           const { data: usersData, error: usersError } = await supabase
             .from('user_profiles')
             .select('id, username')
-            .in('id', userIds);
+            .in('id', userIds) as { data: { id: string, username: string }[] | null, error: Error | null };
           
           if (!usersError && usersData) {
             const usernameMap: Record<string, string> = {};
