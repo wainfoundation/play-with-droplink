@@ -6,29 +6,19 @@ import { formatDistanceToNow } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 
-// Define explicit interfaces for the data structure
+// Define explicit types for clarity
 interface TipUser {
   id: string;
   username: string;
   avatar_url: string | null;
 }
 
-// Simplified Tip interface that doesn't rely on nested types
 interface Tip {
   id: string;
   amount: number;
   created_at: string;
   from_user_id: string;
   to_user_id: string;
-  from_user: TipUser | null;
-}
-
-// Define a simpler interface for raw data from Supabase
-interface PaymentData {
-  id: string;
-  amount: number;
-  created_at: string;
-  user_id: string;
   from_user: TipUser | null;
 }
 
@@ -63,30 +53,29 @@ const RecentTips = ({ userId }: { userId: string }) => {
           return;
         }
         
-        // Handle the data without complex type inference
-        const formattedTips: Tip[] = [];
-        
-        for (const payment of data as PaymentData[]) {
-          // Ensure from_user is properly handled
-          let tipUser: TipUser | null = null;
-          
-          if (payment.from_user && typeof payment.from_user === 'object') {
-            tipUser = {
-              id: payment.from_user.id,
-              username: payment.from_user.username,
-              avatar_url: payment.from_user.avatar_url
-            };
+        // Convert the data to the expected format
+        const formattedTips: Tip[] = data.map((payment: any) => {
+          // Extract user data safely
+          let fromUser: TipUser | null = null;
+          if (payment.from_user && typeof payment.from_user === 'object' && !Array.isArray(payment.from_user)) {
+            if ('id' in payment.from_user && 'username' in payment.from_user) {
+              fromUser = {
+                id: payment.from_user.id,
+                username: payment.from_user.username,
+                avatar_url: payment.from_user.avatar_url
+              };
+            }
           }
           
-          formattedTips.push({
+          return {
             id: payment.id,
             amount: payment.amount,
             created_at: payment.created_at,
             from_user_id: payment.user_id,
             to_user_id: userId,
-            from_user: tipUser
-          });
-        }
+            from_user: fromUser
+          };
+        });
         
         setTips(formattedTips);
       } catch (err) {

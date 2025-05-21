@@ -4,6 +4,13 @@ import { useToast } from "@/components/ui/use-toast";
 import { authenticateWithPi, createPiPayment } from "@/services/piPaymentService";
 import { useUser } from "@/context/UserContext";
 
+// Define consistent pricing across the application
+export const planPricing = {
+  starter: { monthly: 6, annual: 5 },
+  pro: { monthly: 10, annual: 8 },
+  premium: { monthly: 15, annual: 12 }
+};
+
 export function usePiPayment() {
   const { toast } = useToast();
   const { user, refreshUserData } = useUser();
@@ -43,23 +50,16 @@ export function usePiPayment() {
     setProcessingPayment(true);
     
     try {
-      // Plan pricing based on tier and billing cycle
-      const planPrices = {
-        starter: { monthly: 10, annual: 8 },
-        pro: { monthly: 15, annual: 12 },
-        premium: { monthly: 22, annual: 18 }
-      };
-      
-      // Calculate amount based on plan and billing cycle
+      // Get plan pricing from consistent planPricing object
       const planName = plan.toLowerCase();
       let amount = 0;
       
       if (planName === "starter") {
-        amount = billingCycle === 'annual' ? planPrices.starter.annual * 12 : planPrices.starter.monthly;
+        amount = billingCycle === 'annual' ? planPricing.starter.annual * 12 : planPricing.starter.monthly;
       } else if (planName === "pro") {
-        amount = billingCycle === 'annual' ? planPrices.pro.annual * 12 : planPrices.pro.monthly;
+        amount = billingCycle === 'annual' ? planPricing.pro.annual * 12 : planPricing.pro.monthly;
       } else if (planName === "premium") {
-        amount = billingCycle === 'annual' ? planPrices.premium.annual * 12 : planPrices.premium.monthly;
+        amount = billingCycle === 'annual' ? planPricing.premium.annual * 12 : planPricing.premium.monthly;
       }
       
       // Calculate expiration date
@@ -109,6 +109,7 @@ export function usePiPayment() {
   return {
     processingPayment,
     handlePiLogin,
-    handleSubscribe
+    handleSubscribe,
+    planPricing
   };
 }
