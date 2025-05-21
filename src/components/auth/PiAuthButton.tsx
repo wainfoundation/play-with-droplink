@@ -1,9 +1,9 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { authenticateWithPi } from "@/services/piPaymentService";
+import { authenticateWithPi, initPiNetwork } from "@/services/piPaymentService";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 
@@ -11,6 +11,11 @@ export function PiAuthButton() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const navigate = useNavigate();
   const { refreshUserData } = useUser();
+
+  // Initialize Pi SDK when component mounts
+  useEffect(() => {
+    initPiNetwork();
+  }, []);
 
   const handlePiAuth = async () => {
     try {

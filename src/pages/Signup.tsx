@@ -5,14 +5,20 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { authenticateWithPi } from "@/services/piPaymentService";
+import { authenticateWithPi, initPiNetwork } from "@/services/piPaymentService";
 import { supabase } from "@/integrations/supabase/client";
+import PiBrowserPrompt from "@/components/PiBrowserPrompt";
 
 const Signup = () => {
   const [piAuthenticating, setPiAuthenticating] = useState(false);
   const navigate = useNavigate();
 
+  // Initialize Pi SDK on component mount
   useEffect(() => {
+    // Initialize Pi Network SDK
+    const initialized = initPiNetwork();
+    console.log("Pi SDK initialization status:", initialized);
+    
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
@@ -113,6 +119,8 @@ const Signup = () => {
               </svg>
               {piAuthenticating ? "Authenticating..." : "Sign up with Pi Network"}
             </Button>
+            
+            <PiBrowserPrompt />
             
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">

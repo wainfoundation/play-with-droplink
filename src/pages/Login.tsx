@@ -5,12 +5,18 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useUser } from "@/context/UserContext";
 import { PiAuthButton } from "@/components/auth/PiAuthButton";
+import { initPiNetwork } from "@/services/piPaymentService";
+import PiBrowserPrompt from "@/components/PiBrowserPrompt";
 
 const Login = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useUser();
 
   useEffect(() => {
+    // Initialize Pi Network SDK
+    const initialized = initPiNetwork();
+    console.log("Pi SDK initialization status:", initialized);
+    
     // Check if user is already logged in
     if (isLoggedIn) {
       navigate('/dashboard');
@@ -29,6 +35,8 @@ const Login = () => {
           
           <div className="bg-white rounded-xl shadow-lg p-8">
             <PiAuthButton />
+            
+            <PiBrowserPrompt />
             
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">

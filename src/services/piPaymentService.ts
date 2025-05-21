@@ -1,54 +1,57 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { isRunningInPiBrowser, initPiNetwork } from "@/utils/pi-sdk";
-
-export interface PaymentData {
-  amount: number;
-  memo: string;
-  metadata?: Record<string, any>;
+// Define interfaces for Pi Network authentication
+interface PiAuthResult {
+  accessToken: string;
+  user: {
+    uid: string;
+    username?: string;
+  };
 }
 
-export interface PaymentCallbacks {
-  onReadyForServerApproval: (paymentId: string) => Promise<void>;
-  onReadyForServerCompletion: (paymentId: string, txid: string) => Promise<void>;
+interface PiPaymentCallbacks {
+  onReadyForServerApproval: (paymentId: string) => void;
+  onReadyForServerCompletion: (paymentId: string, txid: string) => void;
   onCancel: (paymentId: string) => void;
   onError: (error: Error, payment?: any) => void;
 }
 
-// Initialize Pi SDK using our utility
-export const initializeNetwork = () => {
-  return initPiNetwork();
+// Get environment variables
+const PI_API_KEY = "ckta3qej1mjqit2rlqt6nutpw089uynyotj3g9spwqlhrvvggqv7hoe6cn3plgb5";
+const PI_SANDBOX = true;
+
+// Initialize Pi SDK
+export const initPiNetwork = (): boolean => {
+  try {
+    if (typeof window !== 'undefined' && window.Pi) {
+      window.Pi.init({ version: "2.0", sandbox: PI_SANDBOX });
+      console.log("Pi SDK initialized with sandbox mode:", PI_SANDBOX);
+      return true;
+    }
+    console.warn("Pi SDK not found. This is normal if running server-side or in an environment without the Pi SDK.");
+    return false;
+  } catch (error) {
+    console.error("Failed to initialize Pi SDK:", error);
+    return false;
+  }
 };
 
 // Authenticate user with Pi Network
 export const authenticateWithPi = async (
-  scopes: string[] = ["username", "payments", "wallet_address"]
-): Promise<any> => {
+  scopes: string[] = ["username", "payments"]
+): Promise<PiAuthResult | null> => {
   try {
-    if (!isRunningInPiBrowser()) {
+    if (typeof window === 'undefined' || !window.Pi) {
       console.error("Pi SDK not initialized or not available");
       return null;
     }
 
+    // Make sure SDK is initialized
+    initPiNetwork();
+
     // Handle any incomplete payments
-    const onIncompletePaymentFound = async (payment: any) => {
+    const onIncompletePaymentFound = (payment: any) => {
       console.log("Incomplete payment found:", payment);
-      // Handle incomplete payment by completing it or canceling it
-      if (payment.status === 'started') {
-        try {
-          await supabase.functions.invoke('pi-payment', {
-            body: { 
-              paymentData: {
-                paymentId: payment.identifier,
-                metadata: payment.metadata || {}
-              }, 
-              user: { id: payment.user_uid } 
-            }
-          });
-        } catch (error) {
-          console.error("Error handling incomplete payment:", error);
-        }
-      }
+      // Here you would typically handle the incomplete payment
     };
 
     const auth = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
@@ -62,112 +65,115 @@ export const authenticateWithPi = async (
 
 // Create a payment with Pi
 export const createPiPayment = async (
-  paymentData: PaymentData,
+  paymentData: {
+    amount: number;
+    memo: string;
+    metadata?: Record<string, any>;
+  }, 
   user: any
 ): Promise<any> => {
   try {
-    if (!isRunningInPiBrowser()) {
+    // Make sure SDK is initialized
+    initPiNetwork();
+    
+    if (typeof window === 'undefined' || !window.Pi) {
       console.error("Pi SDK not initialized or not available");
       return null;
     }
 
-    const identifier = `payment-${Date.now()}`;
-    
     const payment = {
       amount: paymentData.amount,
-      identifier,
+      identifier: `payment-${Date.now()}`, // Generate a unique identifier
       memo: paymentData.memo,
       metadata: paymentData.metadata || {},
     };
 
-    console.log("Creating Pi payment:", payment);
-
-    const callbacks: PaymentCallbacks = {
+    const callbacks = {
       onReadyForServerApproval: async (paymentId: string) => {
         console.log("Ready for server approval:", paymentId);
         
-        // Record the payment in our database
-        await supabase.functions.invoke('pi-payment', {
-          body: { 
-            paymentData: {
-              ...paymentData,
-              paymentId
-            }, 
-            user 
-          }
-        });
+        // Call our server to record the payment
+        try {
+          const { data, error } = await supabase.functions.invoke('pi-payment', {
+            body: { paymentData: {...payment, paymentId}, user }
+          });
+          
+          if (error) throw error;
+          console.log("Payment recorded on server:", data);
+        } catch (error) {
+          console.error("Error recording payment:", error);
+        }
       },
-      
       onReadyForServerCompletion: async (paymentId: string, txid: string) => {
-        console.log("Payment ready for completion:", paymentId, "Transaction ID:", txid);
+        console.log("Payment completed:", paymentId, "Transaction ID:", txid);
         
-        // Get current environment (sandbox vs production)
-        const isSandbox = import.meta.env.DEV || 
-                          window.location.hostname.includes('localhost') || 
-                          window.location.hostname.includes('lovableproject.com');
-        
-        // Complete the payment in our database
-        await supabase.functions.invoke('complete-payment', {
-          body: { 
-            paymentId,
-            transactionId: txid,
-            status: 'completed',
-            sandbox: isSandbox
-          }
-        });
+        // Call our server to complete the payment
+        try {
+          const { data, error } = await supabase.functions.invoke('complete-payment', {
+            body: { paymentId, transactionId: txid, status: 'completed' }
+          });
+          
+          if (error) throw error;
+          console.log("Payment completed on server:", data);
+          
+          // Show success message
+          toast({
+            title: "Payment Successful",
+            description: `Your payment of ${paymentData.amount} Pi has been completed.`,
+          });
+        } catch (error) {
+          console.error("Error completing payment:", error);
+        }
       },
-      
-      onCancel: (paymentId: string) => {
+      onCancel: async (paymentId: string) => {
         console.log("Payment cancelled:", paymentId);
         
-        // Update the payment status in our database
-        supabase.functions.invoke('complete-payment', {
-          body: { 
-            paymentId,
-            status: 'cancelled'
-          }
+        // Call our server to cancel the payment
+        try {
+          const { data, error } = await supabase.functions.invoke('complete-payment', {
+            body: { paymentId, status: 'cancelled' }
+          });
+          
+          if (error) throw error;
+          console.log("Payment cancelled on server:", data);
+        } catch (error) {
+          console.error("Error cancelling payment:", error);
+        }
+        
+        toast({
+          title: "Payment Cancelled",
+          description: "Your payment has been cancelled.",
+          variant: "destructive",
         });
       },
-      
       onError: (error: Error, payment?: any) => {
         console.error("Payment error:", error, payment);
-        
-        if (payment?.paymentId) {
-          supabase.functions.invoke('complete-payment', {
-            body: { 
-              paymentId: payment.paymentId,
-              status: 'failed',
-              error: error.message
-            }
-          });
-        }
+        toast({
+          title: "Payment Error",
+          description: error.message || "An error occurred during payment processing.",
+          variant: "destructive",
+        });
       },
     };
 
+    // Call Pi Network API to create payment
     return await window.Pi.createPayment(payment, callbacks);
   } catch (error) {
     console.error("Payment creation failed:", error);
+    toast({
+      title: "Payment Error",
+      description: "Failed to create payment.",
+      variant: "destructive",
+    });
     return null;
   }
 };
 
-// Create a reusable function for Pi browser detection with guidance
-export const getPiBrowserStatus = () => {
-  const isPiBrowser = isRunningInPiBrowser();
-  
-  return {
-    isPiBrowser,
-    message: isPiBrowser 
-      ? "Running in Pi Browser" 
-      : "For the best experience with Pi payments, please open this app in Pi Browser.",
-    downloadUrl: "https://minepi.com/download"
-  };
-};
+import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export default {
-  initializeNetwork,
+  initPiNetwork,
   authenticateWithPi,
   createPiPayment,
-  getPiBrowserStatus,
-  isRunningInPiBrowser
 };
