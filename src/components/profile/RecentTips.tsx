@@ -64,12 +64,16 @@ const RecentTips = ({ userId }: { userId: string }) => {
           let typedFromUser: TipUser | null = null;
           
           if (item.from_user && typeof item.from_user === 'object') {
-            // Check if from_user has the required properties
-            if ('id' in item.from_user && 'username' in item.from_user) {
+            // Check if from_user has the required properties and is not null
+            const fromUser = item.from_user;
+            if (fromUser && 
+                typeof fromUser === 'object' && 
+                'id' in fromUser && 
+                'username' in fromUser) {
               typedFromUser = {
-                id: item.from_user.id,
-                username: item.from_user.username,
-                avatar_url: item.from_user.avatar_url
+                id: fromUser.id,
+                username: fromUser.username,
+                avatar_url: fromUser.avatar_url
               };
             }
           }
