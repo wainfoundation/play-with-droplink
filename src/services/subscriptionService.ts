@@ -2,7 +2,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { createPiPayment } from "@/services/piPaymentService";
 
-export type SubscriptionPlan = "starter" | "pro" | "premium";
+export type SubscriptionPlan = "starter" | "pro" | "premium" | "free";
 export type BillingCycle = "monthly" | "annual";
 
 const PLAN_PRICING = {
@@ -20,6 +20,8 @@ interface SubscriptionData {
   expires_at: string;
   started_at: string;
   created_at: string;
+  payment_id?: string;
+  updated_at?: string;
 }
 
 /**
@@ -86,7 +88,7 @@ export async function createSubscription(
       throw error;
     }
     
-    return data;
+    return data as SubscriptionData;
   } catch (error) {
     console.error("Error creating subscription:", error);
     return null;
@@ -112,9 +114,33 @@ export async function getUserSubscription(userId: string): Promise<SubscriptionD
       throw error;
     }
     
-    return data;
+    return data as SubscriptionData | null;
   } catch (error) {
     console.error("Error getting subscription:", error);
+    return null;
+  }
+}
+
+/**
+ * Get user profile
+ * @param userId - The user ID
+ * @returns The user profile data if successful, null if failed
+ */
+export async function getUserProfile(userId: string): Promise<any> {
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    
+    if (error) {
+      throw error;
+    }
+    
+    return data;
+  } catch (error) {
+    console.error("Error getting user profile:", error);
     return null;
   }
 }
