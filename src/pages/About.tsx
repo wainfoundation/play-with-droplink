@@ -70,7 +70,7 @@ const About = () => {
                   <div className="w-32 h-32 rounded-full bg-gradient-hero mx-auto mb-4 flex items-center justify-center">
                     <span className="text-white text-3xl font-bold">JD</span>
                   </div>
-                  <h3 className="text-xl font-semibold">Jane Doe</h3>
+                  <h3 className="text-xl font-semibold">Mrwain</h3>
                   <p className="text-muted-foreground">Founder & CEO</p>
                 </div>
                 <div className="text-center">
