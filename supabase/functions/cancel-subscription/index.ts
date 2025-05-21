@@ -40,6 +40,7 @@ serve(async (req) => {
       .select();
 
     if (updateError) {
+      console.error("Subscription cancellation failed:", updateError.message);
       return new Response(JSON.stringify({ error: `Subscription cancellation failed: ${updateError.message}` }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
@@ -53,9 +54,11 @@ serve(async (req) => {
         user_id,
         page_view: false,
         link_click: false,
-        referrer: "subscription_cancellation"
+        referrer: "subscription_cancellation",
+        custom_data: { action: "cancellation", subscription_id: data?.[0]?.id }
       });
 
+    console.log(`Subscription cancelled successfully for user: ${user_id}`);
     return new Response(JSON.stringify({ 
       success: true, 
       message: "Subscription cancelled successfully"
@@ -66,6 +69,7 @@ serve(async (req) => {
     
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error("Error in cancel-subscription function:", errorMessage);
     return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

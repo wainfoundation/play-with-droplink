@@ -29,6 +29,7 @@ export const useUserPermissions = () => {
   // If subscription is expired but still marked as active, treat as free plan
   if (!isSubscriptionActive && plan !== 'free' && !isAdmin) {
     plan = 'free';
+    console.log('Subscription expired but still marked as active. Treating as free plan.');
   }
   
   const username = profile?.username || null;
@@ -50,7 +51,9 @@ export const useUserPermissions = () => {
     hasDataExport: plan === 'premium',
     hasPrioritySupport: plan === 'premium',
     canUsePiAdNetwork: plan !== 'free',
-    canSellWithPiPayments: plan === 'premium'
+    canSellWithPiPayments: plan === 'premium',
+    // New additional permissions for monitoring in admin
+    hasFullAdminAccess: isAdmin
   };
 
   return {

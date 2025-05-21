@@ -22,7 +22,13 @@ export const useAuth = () => {
         
         // Check if user is admin
         if (currentUser) {
-          setIsAdmin(ADMIN_EMAILS.includes(currentUser.email || ''));
+          const userIsAdmin = ADMIN_EMAILS.includes(currentUser.email || '');
+          setIsAdmin(userIsAdmin);
+          
+          if (userIsAdmin) {
+            console.log("User has admin privileges");
+          }
+          
           setIsLoading(false);
         } else {
           setIsAdmin(false);
@@ -39,7 +45,12 @@ export const useAuth = () => {
       
       // Check if user is admin
       if (currentUser) {
-        setIsAdmin(ADMIN_EMAILS.includes(currentUser.email || ''));
+        const userIsAdmin = ADMIN_EMAILS.includes(currentUser.email || '');
+        setIsAdmin(userIsAdmin);
+        
+        if (userIsAdmin) {
+          console.log("User has admin privileges");
+        }
       }
       setIsLoading(false);
     });

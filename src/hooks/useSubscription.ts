@@ -25,6 +25,7 @@ export const useSubscription = (user: any) => {
         const now = new Date();
         
         if (now > expiresAt) {
+          console.log("Subscription has expired, updating status in database");
           // Subscription has expired, update the is_active flag
           await supabase
             .from('subscriptions')
@@ -32,6 +33,13 @@ export const useSubscription = (user: any) => {
             .eq('id', subscriptionData.id);
           
           subscriptionData.is_active = false;
+          
+          // Notify the user that their subscription has expired
+          toast({
+            title: "Subscription Expired",
+            description: "Your subscription has expired. Some features may be limited.",
+            variant: "destructive",
+          });
         }
       }
       

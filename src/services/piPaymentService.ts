@@ -19,7 +19,10 @@ export const initPiNetwork = (): boolean => {
   try {
     if (window.Pi) {
       // Check if we're in development or production
-      const isSandbox = import.meta.env.DEV || window.location.hostname.includes('localhost');
+      const isSandbox = import.meta.env.DEV || 
+                         window.location.hostname.includes('localhost') || 
+                         window.location.hostname.includes('lovableproject.com');
+      
       window.Pi.init({ version: "2.0", sandbox: isSandbox });
       console.log("Pi SDK initialized with sandbox mode:", isSandbox);
       return true;
@@ -92,6 +95,8 @@ export const createPiPayment = async (
       metadata: paymentData.metadata || {},
     };
 
+    console.log("Creating Pi payment:", payment);
+
     const callbacks: PaymentCallbacks = {
       onReadyForServerApproval: async (paymentId: string) => {
         console.log("Ready for server approval:", paymentId);
@@ -140,7 +145,8 @@ export const createPiPayment = async (
           supabase.functions.invoke('complete-payment', {
             body: { 
               paymentId: payment.paymentId,
-              status: 'failed'
+              status: 'failed',
+              error: error.message
             }
           });
         }
