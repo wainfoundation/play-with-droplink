@@ -31,7 +31,7 @@ const LinksList = ({ links, onLinkClick, processingTip }: LinksListProps) => {
         >
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-2">
-              <span>{link.icon}</span> 
+              <span role="img" aria-label={link.title}>{link.icon}</span> 
               {link.url === "#tip-in-pi" && processingTip ? "Processing..." : link.title}
             </span>
             <ExternalLink className="h-4 w-4" />

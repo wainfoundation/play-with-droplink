@@ -7,9 +7,12 @@ import { PlusCircle, Link as LinkIcon, Loader2, Copy, ExternalLink } from "lucid
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { Input } from "@/components/ui/input";
+import LinkForm from "./LinkForm";
+import LinkItem from "./LinkItem";
 
 const LinksSection = () => {
   const [isAddingLink, setIsAddingLink] = useState(false);
+  const [isEditingLink, setIsEditingLink] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [links, setLinks] = useState<any[]>([]);
   const [profileUrl, setProfileUrl] = useState<string>("");
@@ -67,12 +70,46 @@ const LinksSection = () => {
     }
   };
 
-  const handleAddLink = () => {
-    // This would open a modal or form to add a new link
-    toast({
-      title: "Feature coming soon",
-      description: "Adding new links will be available in the next update",
+  const handleReorderLink = async (direction: 'up' | 'down', linkId: string, currentPosition: number) => {
+    // Find the link to swap positions with
+    const targetLink = links.find(link => {
+      if (direction === 'up') {
+        return link.position < currentPosition;
+      } else {
+        return link.position > currentPosition;
+      }
     });
+    
+    if (!targetLink) return;
+    
+    try {
+      // Swap positions
+      const updates = [
+        { id: linkId, position: targetLink.position },
+        { id: targetLink.id, position: currentPosition }
+      ];
+      
+      // Update both links positions in a transaction
+      for (const update of updates) {
+        const { error } = await supabase
+          .from('links')
+          .update({ position: update.position })
+          .eq('id', update.id);
+          
+        if (error) throw error;
+      }
+      
+      // Refresh links
+      fetchLinks();
+      
+    } catch (error) {
+      console.error("Error reordering links:", error);
+      toast({
+        title: "Error",
+        description: "Failed to reorder links. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Render empty state or links list
@@ -85,7 +122,7 @@ const LinksSection = () => {
       );
     }
     
-    if (links.length === 0) {
+    if (!isAddingLink && links.length === 0) {
       return (
         <div className="bg-blue-50 p-6 rounded-lg text-center">
           <div className="flex justify-center mb-3">
@@ -95,7 +132,7 @@ const LinksSection = () => {
           <p className="text-gray-600 mb-4">Start by adding your first link below</p>
           <Button 
             className="bg-primary hover:bg-primary/90"
-            onClick={handleAddLink}
+            onClick={() => setIsAddingLink(true)}
           >
             <PlusCircle className="mr-2 h-4 w-4" />
             Add Your First Link
@@ -106,25 +143,51 @@ const LinksSection = () => {
     
     return (
       <div className="space-y-4">
-        {links.map(link => (
-          <div key={link.id} className="p-4 border rounded-md flex justify-between items-center">
-            <div>
-              <h3 className="font-medium">{link.title}</h3>
-              <p className="text-sm text-gray-500">{link.url}</p>
-            </div>
-            <div className="text-sm text-gray-500">
-              {link.clicks} clicks
-            </div>
-          </div>
+        {isAddingLink && (
+          <LinkForm 
+            userId={user!.id} 
+            onCancel={() => setIsAddingLink(false)}
+            onSuccess={() => {
+              setIsAddingLink(false);
+              fetchLinks();
+            }}
+          />
+        )}
+        
+        {isEditingLink && (
+          <LinkForm 
+            linkId={isEditingLink}
+            userId={user!.id} 
+            onCancel={() => setIsEditingLink(null)}
+            onSuccess={() => {
+              setIsEditingLink(null);
+              fetchLinks();
+            }}
+            initialData={links.find(link => link.id === isEditingLink)}
+          />
+        )}
+        
+        {links.map((link, index) => (
+          <LinkItem
+            key={link.id}
+            link={link}
+            onEdit={(linkId) => setIsEditingLink(linkId)}
+            onDeleted={fetchLinks}
+            onReorder={handleReorderLink}
+            isFirst={index === 0}
+            isLast={index === links.length - 1}
+          />
         ))}
         
-        <Button 
-          className="w-full mt-4 bg-primary hover:bg-primary/90"
-          onClick={handleAddLink}
-        >
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Add New Link
-        </Button>
+        {!isAddingLink && !isEditingLink && (
+          <Button 
+            className="w-full mt-4 bg-primary hover:bg-primary/90"
+            onClick={() => setIsAddingLink(true)}
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add New Link
+          </Button>
+        )}
       </div>
     );
   };
