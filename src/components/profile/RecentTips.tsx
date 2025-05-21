@@ -30,13 +30,20 @@ const RecentTips = ({ profileId }: Props) => {
       try {
         setLoading(true);
         
-        // Using a more direct query approach
+        // Using type assertion to avoid deep type instantiation
+        type PaymentRow = {
+          id: string;
+          amount: number;
+          user_id: string;
+          created_at: string;
+        };
+        
         const { data, error } = await supabase
           .from('payments')
           .select('id, amount, user_id, created_at')
           .eq('receiver_id', profileId)
           .order('created_at', { ascending: false })
-          .limit(5);
+          .limit(5) as { data: PaymentRow[] | null, error: any };
           
         if (error) {
           console.error('Error fetching tips:', error);

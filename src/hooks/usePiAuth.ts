@@ -33,12 +33,19 @@ export function usePiAuth() {
         // After successful Pi authentication, try to find or create a user in Supabase
         let existingUser = null;
         
+        // Use type assertion to avoid deep type instantiation
+        type UserProfileRow = {
+          id: string;
+          username?: string;
+          [key: string]: any;  // For other fields
+        };
+        
         // Fetch user without complex type parameters
         const { data, error: userError } = await supabase
           .from('user_profiles')
           .select('*')
           .eq('pi_user_id', authResult.user.uid)
-          .maybeSingle();
+          .maybeSingle() as { data: UserProfileRow | null, error: any };
         
         if (userError && userError.code !== 'PGRST116') {
           console.error("Error checking for existing Pi user:", userError);
