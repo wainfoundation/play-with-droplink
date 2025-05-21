@@ -37,8 +37,8 @@ const FAQ = () => {
             <AccordionItem value="item-3">
               <AccordionTrigger className="text-left font-medium">What are Droplink's plans?</AccordionTrigger>
               <AccordionContent>
-                Starter (3π/month): Basic features. Pro (6π/month): Advanced tools like analytics. 
-                Premium (9π/month): Pro features plus priority support. Billed annually.
+                Starter (10π/month): Basic features. Pro (15π/month): Advanced tools like analytics. 
+                Premium (22π/month): Pro features plus priority support. Billed annually.
               </AccordionContent>
             </AccordionItem>
             
