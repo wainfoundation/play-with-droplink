@@ -22,19 +22,11 @@
     
     <!-- Pi Network SDK -->
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <script>
-      // Initialize Pi SDK in sandbox mode (remove sandbox flag for production)
-      document.addEventListener('DOMContentLoaded', function() {
-        if (window.Pi) {
-          window.Pi.init({ version: "2.0", sandbox: true });
-        }
-      });
-    </script>
+    <!-- No script initialization here - we'll do it in React -->
   </head>
 
   <body>
     <div id="root"></div>
-    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -3,8 +3,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { initPiNetwork } from "@/services/piNetwork";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -32,13 +32,41 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Cookies from "./pages/Cookies";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => {
+  const [piInitialized, setPiInitialized] = useState(false);
+
   useEffect(() => {
     // Initialize Pi Network SDK
-    initPiNetwork();
+    const initialized = initPiNetwork();
+    setPiInitialized(initialized);
+    
+    // Log environment info (remove in production)
+    console.log("Environment:", {
+      sandbox: import.meta.env.VITE_PI_SANDBOX,
+      hasApiKey: !!import.meta.env.VITE_PI_API_KEY,
+    });
   }, []);
+
+  // Authentication-protected route wrapper
+  const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+    // For now, we'll use a simple check. In a real app, this would verify JWT tokens
+    const isAuthenticated = localStorage.getItem('userToken');
+    
+    if (!isAuthenticated) {
+      return <Navigate to="/login" replace />;
+    }
+    
+    return <>{children}</>;
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -53,7 +81,14 @@ const App = () => {
             <Route path="/signup" element={<Signup />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/features" element={<Features />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="/admin" element={<AdminPortal />} />
             
             {/* Company Pages */}
@@ -73,7 +108,10 @@ const App = () => {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/cookies" element={<Cookies />} />
             
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            {/* User profile page */}
+            <Route path="/u/:username" element={<div>Profile Page</div>} />
+            
+            {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

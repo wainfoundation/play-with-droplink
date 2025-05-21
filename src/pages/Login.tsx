@@ -16,34 +16,73 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Initialize Pi Network SDK
-    initPiNetwork(true); // Use sandbox mode for development
-  }, []);
+    // Check if user is already logged in
+    const token = localStorage.getItem('userToken');
+    if (token) {
+      navigate('/dashboard');
+    }
 
-  const handleSubmit = (e: React.FormEvent) => {
+    // Initialize Pi Network SDK if needed
+    initPiNetwork();
+  }, [navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, we would handle login logic here
-    console.log("Login attempt with:", { email, password });
-    toast({
-      title: "Login Attempted",
-      description: "This is a demo. In a real app, you would be logged in now.",
-    });
+    
+    try {
+      // In a real app, make an API call to validate credentials
+      // For now, we'll simulate authentication success
+      if (email && password) {
+        // Mock authentication token (would come from backend in real app)
+        const mockToken = btoa(`${email}:${Date.now()}`);
+        localStorage.setItem('userToken', mockToken);
+        localStorage.setItem('userEmail', email);
+        
+        toast({
+          title: "Login Successful",
+          description: "Welcome back to Droplink!",
+        });
+        
+        navigate('/dashboard');
+      } else {
+        toast({
+          title: "Login Failed",
+          description: "Please enter both email and password",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast({
+        title: "Login Failed",
+        description: "An error occurred during login",
+        variant: "destructive",
+      });
+    }
   };
 
   const handlePiLogin = async () => {
     try {
       setPiAuthenticating(true);
-      const authResult = await authenticateWithPi(["username"]);
+      const authResult = await authenticateWithPi(["username", "payments"]);
       
       if (authResult?.user) {
         console.log("Pi authentication successful:", authResult);
+        
+        // Store PI authentication token
+        localStorage.setItem('userToken', authResult.accessToken);
+        localStorage.setItem('piUserId', authResult.user.uid);
+        if (authResult.user.username) {
+          localStorage.setItem('piUsername', authResult.user.username);
+        }
+        
         toast({
           title: "Pi Authentication Successful",
           description: `Welcome, ${authResult.user.username || "Pioneer"}!`,
         });
-        // In a real app, you would handle the successful login here
-        // For now, let's just log the user in
-        navigate('/');
+        
+        // Redirect to dashboard
+        navigate('/dashboard');
       } else {
         toast({
           title: "Authentication Failed",

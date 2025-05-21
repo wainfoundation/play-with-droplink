@@ -39,11 +39,16 @@ declare global {
   }
 }
 
+// Get environment variables
+const PI_API_KEY = import.meta.env.VITE_PI_API_KEY || '';
+const PI_SANDBOX = import.meta.env.VITE_PI_SANDBOX === 'true';
+
 // Initialize Pi SDK
-export const initPiNetwork = (sandbox: boolean = true): boolean => {
+export const initPiNetwork = (): boolean => {
   try {
     if (window.Pi) {
-      window.Pi.init({ version: "2.0", sandbox });
+      window.Pi.init({ version: "2.0", sandbox: PI_SANDBOX });
+      console.log("Pi SDK initialized with sandbox mode:", PI_SANDBOX);
       return true;
     }
     console.error("Pi SDK not found. Make sure to include the Pi SDK script.");
@@ -56,7 +61,7 @@ export const initPiNetwork = (sandbox: boolean = true): boolean => {
 
 // Authenticate user with Pi Network
 export const authenticateWithPi = async (
-  scopes: string[] = ["username"]
+  scopes: string[] = ["username", "payments"]
 ): Promise<PiAuthResult | null> => {
   try {
     if (!window.Pi) {
