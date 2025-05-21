@@ -53,18 +53,19 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
           console.error("Failed to fetch total tips:", totalError);
         } else if (totalData) {
           // Calculate total with explicit type handling to avoid infinite type instantiation
-          let total = 0;
-          
-          if (Array.isArray(totalData)) {
-            for (const payment of totalData) {
-              const amount = payment.amount;
-              if (typeof amount === 'string' && amount) {
-                total += parseFloat(amount);
-              } else if (typeof amount === 'number') {
-                total += amount;
-              }
+          const total = totalData.reduce((sum, payment) => {
+            // Extract the amount value
+            const paymentAmount = payment.amount;
+            
+            // Handle different types explicitly
+            if (typeof paymentAmount === 'string') {
+              return sum + parseFloat(paymentAmount || '0');
+            } else if (typeof paymentAmount === 'number') {
+              return sum + paymentAmount;
             }
-          }
+            
+            return sum; // If none of the above, just return the current sum
+          }, 0);
           
           setTotalReceived(total);
         }
