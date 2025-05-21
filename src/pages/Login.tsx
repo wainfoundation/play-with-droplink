@@ -5,8 +5,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useUser } from "@/context/UserContext";
 import { PiAuthButton } from "@/components/auth/PiAuthButton";
-import { EmailLoginForm } from "@/components/auth/EmailLoginForm";
-import { AuthDivider } from "@/components/auth/AuthDivider";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -31,8 +29,6 @@ const Login = () => {
           
           <div className="bg-white rounded-xl shadow-lg p-8">
             <PiAuthButton />
-            <AuthDivider />
-            <EmailLoginForm />
             
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">

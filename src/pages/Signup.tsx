@@ -1,34 +1,16 @@
+
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { authenticateWithPi } from "@/services/piPaymentService";
 import { supabase } from "@/integrations/supabase/client";
-import { isPasswordCompromised } from "@/utils/passwordSecurity";
-import { PasswordStrengthMeter } from "@/components/auth/PasswordStrengthMeter";
-import { PasswordSecurityInfo } from "@/components/auth/PasswordSecurityInfo";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Info } from "lucide-react";
 
 const Signup = () => {
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    agreeTerms: false
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [piAuthenticating, setPiAuthenticating] = useState(false);
-  const [isCheckingPassword, setIsCheckingPassword] = useState(false);
-  const [isPasswordCompromisedState, setIsPasswordCompromisedState] = useState<boolean | undefined>(undefined);
   const navigate = useNavigate();
-  const [signupSuccess, setSignupSuccess] = useState(false);
-  const [signupEmail, setSignupEmail] = useState("");
 
   useEffect(() => {
     // Check if user is already logged in
@@ -38,144 +20,6 @@ const Signup = () => {
       }
     });
   }, [navigate]);
-
-  // Reset compromised state when password changes
-  useEffect(() => {
-    if (formData.password) {
-      setIsPasswordCompromisedState(undefined);
-    }
-  }, [formData.password]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
-
-  const handleCheckboxChange = (checked: boolean) => {
-    setFormData({
-      ...formData,
-      agreeTerms: checked
-    });
-  };
-
-  const checkPasswordSecurity = async (password: string) => {
-    if (password.length < 8) return false;
-    
-    setIsCheckingPassword(true);
-    try {
-      const compromised = await isPasswordCompromised(password);
-      setIsPasswordCompromisedState(compromised);
-      return !compromised;
-    } catch (error) {
-      console.error("Error checking password security:", error);
-      return true; // Allow password if check fails
-    } finally {
-      setIsCheckingPassword(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      setIsSubmitting(true);
-      
-      // Validate form data
-      if (!formData.username || !formData.email || !formData.password) {
-        toast({
-          title: "Registration Failed",
-          description: "Please fill in all required fields",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      if (formData.password.length < 8) {
-        toast({
-          title: "Password Too Short",
-          description: "Password must be at least 8 characters",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      if (!formData.agreeTerms) {
-        toast({
-          title: "Terms Required",
-          description: "Please agree to the terms and conditions",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      // Check if password has been compromised if we haven't already
-      if (isPasswordCompromisedState === undefined) {
-        const isSecure = await checkPasswordSecurity(formData.password);
-        if (!isSecure) {
-          toast({
-            title: "Insecure Password",
-            description: "This password has appeared in data breaches. Please choose a different password for your security.",
-            variant: "destructive",
-          });
-          return;
-        }
-      } else if (isPasswordCompromisedState === true) {
-        toast({
-          title: "Insecure Password",
-          description: "This password has appeared in data breaches. Please choose a different password for your security.",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      // Use Supabase Auth to create a new user with email confirmation enabled
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            username: formData.username,
-          },
-          emailRedirectTo: `${window.location.origin}/login`,
-        }
-      });
-      
-      if (authError) {
-        throw new Error(authError.message);
-      }
-      
-      // Check if the user needs to confirm their email
-      if (!authData.session) {
-        setSignupSuccess(true);
-        setSignupEmail(formData.email);
-        toast({
-          title: "Verification Email Sent",
-          description: "Please check your inbox and confirm your email address to complete registration.",
-        });
-      } else {
-        toast({
-          title: "Account Created!",
-          description: `Welcome to Droplink, @${formData.username}!`,
-        });
-        
-        // Redirect to dashboard if email confirmation not required
-        navigate('/dashboard');
-      }
-      
-    } catch (error) {
-      console.error("Registration error:", error);
-      toast({
-        title: "Registration Failed",
-        description: error instanceof Error ? error.message : "An error occurred during account creation",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const handlePiSignup = async () => {
     try {
@@ -247,56 +91,6 @@ const Signup = () => {
     }
   };
 
-  // If signup is successful, show confirmation message
-  if (signupSuccess) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <main className="flex-grow flex items-center justify-center py-12 px-4">
-          <div className="w-full max-w-md">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-primary">Check Your Email</h1>
-              <p className="text-gray-600 mt-2">Almost there! Just one more step...</p>
-            </div>
-            
-            <div className="bg-white rounded-xl shadow-lg p-8">
-              <Alert className="mb-6 bg-blue-50">
-                <Info className="h-5 w-5" />
-                <AlertTitle>Verification Required</AlertTitle>
-                <AlertDescription>
-                  We've sent a confirmation email to <strong>{signupEmail}</strong>.
-                  <br />Please check your inbox and click the verification link to activate your account.
-                </AlertDescription>
-              </Alert>
-              
-              <div className="space-y-4">
-                <p className="text-gray-600">
-                  The email might take a few minutes to arrive. If you don't see it, please check your spam folder.
-                </p>
-                
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => window.location.reload()}
-                  className="w-full"
-                >
-                  I've confirmed my email
-                </Button>
-                
-                <div className="text-center">
-                  <Link to="/login" className="text-primary hover:underline font-medium">
-                    Return to login
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -319,105 +113,6 @@ const Signup = () => {
               </svg>
               {piAuthenticating ? "Authenticating..." : "Sign up with Pi Network"}
             </Button>
-            
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or sign up with email</span>
-              </div>
-            </div>
-            
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <div className="flex">
-                  <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                    @
-                  </span>
-                  <Input
-                    id="username"
-                    name="username"
-                    type="text"
-                    placeholder="username"
-                    className="rounded-l-none"
-                    value={formData.username}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={handleChange}
-                  onBlur={() => formData.password.length >= 8 && checkPasswordSecurity(formData.password)}
-                  required
-                />
-                
-                {/* Password Strength Meter */}
-                {formData.password && <PasswordStrengthMeter password={formData.password} />}
-                
-                {/* Password Security Info */}
-                <PasswordSecurityInfo 
-                  isCompromised={isPasswordCompromisedState} 
-                  showInfo={!isPasswordCompromisedState && !isCheckingPassword} 
-                  isChecking={isCheckingPassword}
-                />
-              </div>
-              
-              <div className="flex items-start">
-                <div className="flex items-center h-5">
-                  <Checkbox 
-                    id="terms" 
-                    checked={formData.agreeTerms}
-                    onCheckedChange={handleCheckboxChange}
-                    required
-                  />
-                </div>
-                <div className="ml-3 text-sm">
-                  <label htmlFor="terms" className="text-gray-600">
-                    I agree to the{" "}
-                    <Link to="/terms" className="text-primary hover:underline">
-                      Terms of Service
-                    </Link>{" "}
-                    and{" "}
-                    <Link to="/privacy" className="text-primary hover:underline">
-                      Privacy Policy
-                    </Link>
-                  </label>
-                </div>
-              </div>
-              
-              <Button 
-                type="submit" 
-                className="w-full bg-gradient-hero hover:bg-secondary" 
-                disabled={isSubmitting || isCheckingPassword}
-              >
-                {isSubmitting ? "Creating Account..." : 
-                 isCheckingPassword ? "Checking Password Security..." : "Create Account"}
-              </Button>
-            </form>
             
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">

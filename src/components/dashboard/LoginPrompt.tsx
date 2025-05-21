@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -37,7 +36,7 @@ const LoginPrompt = ({ handlePiLogin }: LoginPromptProps) => {
       </div>
       <h2 className="text-2xl font-bold mb-4">Please Log In to Access Your Dashboard</h2>
       <p className="text-gray-600 mb-6">
-        Sign in with your Pi Network account or email to access your personalized dashboard
+        Sign in with your Pi Network account to access your personalized dashboard
       </p>
       
       <div className="space-y-4">
@@ -48,28 +47,7 @@ const LoginPrompt = ({ handlePiLogin }: LoginPromptProps) => {
         >
           {isPiAuthenticating ? "Authenticating..." : "Sign in with Pi Network"}
         </Button>
-        
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-gray-300" />
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">Or</span>
-          </div>
-        </div>
-        
-        <Button 
-          asChild
-          variant="outline" 
-          className="w-full"
-        >
-          <Link to="/login">Sign in with Email</Link>
-        </Button>
       </div>
-      
-      <p className="mt-6 text-sm text-gray-500">
-        New to Droplink? <Link to="/signup" className="text-primary underline font-medium">Create an account</Link>
-      </p>
     </div>
   );
 };
