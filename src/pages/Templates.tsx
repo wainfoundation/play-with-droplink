@@ -4,9 +4,11 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowRight, Star, Zap } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
+import { Helmet } from "react-helmet-async";
 
 const Templates = () => {
   const [activeTab, setActiveTab] = useState("all");
@@ -19,7 +21,8 @@ const Templates = () => {
       image: "https://images.unsplash.com/photo-1617957718587-60a442884bee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       popular: true,
       new: false,
-      plan: "starter"
+      plan: "starter",
+      colors: ["#00aaff", "#00d4ff"]
     },
     {
       id: 2,
@@ -28,7 +31,8 @@ const Templates = () => {
       image: "https://images.unsplash.com/photo-1581059729227-8a690cd41d2e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       popular: false,
       new: true,
-      plan: "pro"
+      plan: "pro",
+      colors: ["#34c3eb", "#4764e6"]
     },
     {
       id: 3,
@@ -37,7 +41,8 @@ const Templates = () => {
       image: "https://images.unsplash.com/photo-1593077676642-3acbd7a80b7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       popular: true,
       new: false,
-      plan: "pro"
+      plan: "pro",
+      colors: ["#ff7e5f", "#feb47b"]
     },
     {
       id: 4,
@@ -46,7 +51,8 @@ const Templates = () => {
       image: "https://images.unsplash.com/photo-1545259741-2ea3ebf92fe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       popular: false,
       new: false,
-      plan: "premium"
+      plan: "premium",
+      colors: ["#3a7bd5", "#00d2ff"]
     },
     {
       id: 5,
@@ -55,7 +61,8 @@ const Templates = () => {
       image: "https://images.unsplash.com/photo-1559521783-1d1599583485?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       popular: true,
       new: false,
-      plan: "starter"
+      plan: "starter",
+      colors: ["#232526", "#414345"]
     },
     {
       id: 6,
@@ -64,7 +71,8 @@ const Templates = () => {
       image: "https://images.unsplash.com/photo-1527323585280-9036d09125a6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       popular: false,
       new: false,
-      plan: "starter"
+      plan: "starter",
+      colors: ["#48c6ef", "#6f86d6"]
     },
     {
       id: 7,
@@ -73,7 +81,8 @@ const Templates = () => {
       image: "https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       popular: false,
       new: true,
-      plan: "premium"
+      plan: "premium",
+      colors: ["#1a2980", "#26d0ce"]
     },
     {
       id: 8,
@@ -82,7 +91,8 @@ const Templates = () => {
       image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       popular: false,
       new: false,
-      plan: "pro"
+      plan: "pro",
+      colors: ["#0cebeb", "#20e3b2", "#29ffc6"]
     },
     {
       id: 9,
@@ -91,7 +101,8 @@ const Templates = () => {
       image: "https://images.unsplash.com/photo-1617824254359-0941a234789b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       popular: false,
       new: true,
-      plan: "premium"
+      plan: "premium",
+      colors: ["#5433ff", "#20bdff", "#a5fecb"]
     },
     {
       id: 10,
@@ -100,7 +111,8 @@ const Templates = () => {
       image: "https://images.unsplash.com/photo-1625234188513-6054f53aed20?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       popular: true,
       new: false,
-      plan: "pro"
+      plan: "pro",
+      colors: ["#f5f7fa", "#c3cfe2"]
     },
     {
       id: 11,
@@ -109,7 +121,8 @@ const Templates = () => {
       image: "https://images.unsplash.com/photo-1526376043067-5af36c35cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       popular: false,
       new: false,
-      plan: "starter"
+      plan: "starter",
+      colors: ["#4facfe", "#00f2fe"]
     },
     {
       id: 12,
@@ -118,7 +131,8 @@ const Templates = () => {
       image: "https://images.unsplash.com/photo-1519619091416-f5d7e5200702?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       popular: false,
       new: true,
-      plan: "premium"
+      plan: "premium",
+      colors: ["#0f0c29", "#302b63", "#24243e"]
     }
   ];
   
@@ -141,11 +155,15 @@ const Templates = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>Templates | Droplink.space - Link in Bio for Pi Network Creators</title>
+        <meta name="description" content="Choose from our collection of professionally designed templates that make your Droplink profile stand out." />
+      </Helmet>
       <Navbar />
       <main className="flex-grow">
-        <section className="py-16 px-4 bg-muted">
+        <section className="py-16 px-4 bg-gradient-to-br from-blue-50 to-indigo-50">
           <div className="container mx-auto max-w-5xl text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Showcase Your Vision with Beautiful Templates</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">Showcase Your Vision with Beautiful Templates</h1>
             <p className="text-xl mb-10 max-w-3xl mx-auto">
               Choose from our collection of professionally designed, water-inspired templates that make your Droplink profile stand out.
             </p>
@@ -168,14 +186,31 @@ const Templates = () => {
               {filteredTemplates.map(template => (
                 <div key={template.id} className="group bg-background rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
                   <div className="relative overflow-hidden">
-                    <img 
-                      src={template.image} 
-                      alt={template.name} 
-                      className="w-full h-56 object-cover transition-transform group-hover:scale-105"
-                    />
+                    {/* Template preview with gradient overlay */}
+                    <div 
+                      className="w-full h-56"
+                      style={{
+                        background: template.colors.length > 2 
+                          ? `linear-gradient(45deg, ${template.colors.join(', ')})`
+                          : `linear-gradient(45deg, ${template.colors[0]}, ${template.colors[1]})`
+                      }}
+                    >
+                      {/* Template mock content */}
+                      <div className="flex flex-col items-center justify-center h-full">
+                        <div className="w-16 h-16 bg-white rounded-full mb-2"></div>
+                        <div className="w-24 h-3 bg-white/80 rounded-full mb-1.5"></div>
+                        <div className="w-32 h-2 bg-white/60 rounded-full mb-3"></div>
+                        <div className="w-32 h-6 bg-white/90 rounded-full mb-2"></div>
+                        <div className="flex flex-col items-center gap-1.5 w-3/4">
+                          <div className="w-full h-4 bg-white/50 rounded-md"></div>
+                          <div className="w-full h-4 bg-white/50 rounded-md"></div>
+                          <div className="w-full h-4 bg-white/50 rounded-md"></div>
+                        </div>
+                      </div>
+                    </div>
                     <div className="absolute top-3 left-3 flex gap-2">
-                      {template.popular && <Badge className="bg-primary text-white">Popular</Badge>}
-                      {template.new && <Badge variant="secondary">New</Badge>}
+                      {template.popular && <Badge className="bg-primary text-white"><Star className="h-3 w-3 mr-1" /> Popular</Badge>}
+                      {template.new && <Badge variant="secondary"><Zap className="h-3 w-3 mr-1" /> New</Badge>}
                     </div>
                   </div>
                   <div className="p-5">
@@ -186,11 +221,11 @@ const Templates = () => {
                     <div className="flex justify-between items-center">
                       <Link 
                         to={`/templates/${template.id}`}
-                        className="text-primary font-medium hover:underline"
+                        className="text-primary font-medium hover:underline flex items-center"
                       >
-                        Preview
+                        Preview <ArrowRight className="ml-1" size={16} />
                       </Link>
-                      <Button size="sm">Use Template</Button>
+                      <Button size="sm" className="bg-gradient-hero hover:scale-105 transition-transform">Use Template</Button>
                     </div>
                   </div>
                 </div>
@@ -207,12 +242,12 @@ const Templates = () => {
         </section>
         
         {/* Template Plans */}
-        <section className="py-16 px-4 bg-muted">
+        <section className="py-16 px-4 bg-blue-50">
           <div className="container mx-auto max-w-6xl">
             <h2 className="text-3xl font-bold mb-10 text-center">Template Availability by Plan</h2>
             
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-card rounded-xl p-6 shadow-sm">
+              <div className="bg-card rounded-xl p-6 shadow-sm border border-blue-100">
                 <h3 className="text-2xl font-semibold mb-4">Starter</h3>
                 <p className="text-lg mb-2">6π/month</p>
                 <p className="mb-6 text-muted-foreground">Access to 5+ basic templates</p>
@@ -226,12 +261,12 @@ const Templates = () => {
                     Standard layout options
                   </li>
                 </ul>
-                <Button variant="outline" asChild className="w-full">
+                <Button variant="outline" asChild className="w-full hover:bg-blue-50 transition-colors">
                   <Link to="/pricing">Get Starter</Link>
                 </Button>
               </div>
               
-              <div className="bg-card rounded-xl p-6 shadow-sm border-primary border-2">
+              <div className="bg-card rounded-xl p-6 shadow-lg border-primary border-2 transform scale-[1.02]">
                 <div className="bg-primary text-white text-sm font-semibold py-1 px-3 rounded-full w-fit mx-auto -mt-10 mb-4">Most Popular</div>
                 <h3 className="text-2xl font-semibold mb-4">Pro</h3>
                 <p className="text-lg mb-2">10π/month</p>
@@ -250,12 +285,12 @@ const Templates = () => {
                     Link animations
                   </li>
                 </ul>
-                <Button asChild className="w-full">
+                <Button asChild className="w-full bg-gradient-hero hover:scale-105 transition-transform">
                   <Link to="/pricing">Get Pro</Link>
                 </Button>
               </div>
               
-              <div className="bg-card rounded-xl p-6 shadow-sm">
+              <div className="bg-card rounded-xl p-6 shadow-sm border border-blue-100">
                 <h3 className="text-2xl font-semibold mb-4">Premium</h3>
                 <p className="text-lg mb-2">15π/month</p>
                 <p className="mb-6 text-muted-foreground">Access to all 25+ templates</p>
@@ -277,7 +312,7 @@ const Templates = () => {
                     Priority template support
                   </li>
                 </ul>
-                <Button variant="outline" asChild className="w-full">
+                <Button variant="outline" asChild className="w-full hover:bg-blue-50 transition-colors">
                   <Link to="/pricing">Get Premium</Link>
                 </Button>
               </div>
@@ -292,8 +327,8 @@ const Templates = () => {
             <p className="text-xl mb-8">
               Pro and Premium users can create fully customized templates to match their brand identity perfectly.
             </p>
-            <Button size="lg" asChild>
-              <Link to="/signup">Get Started</Link>
+            <Button size="lg" asChild className="bg-gradient-hero hover:scale-105 transition-transform px-8">
+              <Link to="/signup" className="flex items-center gap-2">Get Started <ArrowRight size={18} /></Link>
             </Button>
           </div>
         </section>
