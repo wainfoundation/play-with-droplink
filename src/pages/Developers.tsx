@@ -19,7 +19,7 @@ import DevCTASection from "@/components/developers/DevCTASection";
 
 const Developers = () => {
   const [activeTab, setActiveTab] = useState("api");
-  const { isLoading } = useUser();
+  const { user, isLoading } = useUser();
   const { permissions } = useUserPermissions();
   
   // Check if user has admin access to view developer portal
@@ -33,6 +33,7 @@ const Developers = () => {
   
   // If not an admin, redirect to home page
   if (!permissions.hasFullAdminAccess) {
+    console.log("User does not have admin access, redirecting to home");
     return <Navigate to="/" replace />;
   }
   
@@ -53,10 +54,10 @@ const Developers = () => {
         {/* API Overview */}
         <ApiDocsSection activeTab={activeTab} setActiveTab={setActiveTab} />
         
-        {/* Other Tab Contents - These will be conditionally rendered by the Tabs component */}
-        <WebhooksSection />
-        <PiIntegrationSection />
-        <SdksSection />
+        {/* Other sections - These will be rendered based on active tab */}
+        {activeTab === "webhooks" && <WebhooksSection />}
+        {activeTab === "pi-integration" && <PiIntegrationSection />}
+        {activeTab === "sdks" && <SdksSection />}
         
         {/* Get Started */}
         <GetStartedSection />
