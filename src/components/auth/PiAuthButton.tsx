@@ -22,16 +22,16 @@ export function PiAuthButton() {
   }, []);
 
   const handlePiAuth = async () => {
-    // If not in Pi Browser, show a toast and return
+    // If not in Pi Browser, show a toast and open the dialog
     if (!isPiBrowser) {
-      console.log("Not in Pi Browser, showing toast");
+      console.log("Not in Pi Browser, showing toast and opening dialog");
       toast({
         title: "Pi Browser Required",
         description: "Please open this app in Pi Browser for the best experience",
         variant: "destructive",
       });
       
-      // Try to open the dialog by dispatching a custom event
+      // Dispatch custom event to open the dialog
       window.dispatchEvent(new CustomEvent('open-pi-browser-dialog'));
       return;
     }

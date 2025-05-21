@@ -39,6 +39,20 @@ const PiBrowserDialog = ({
       console.log("Opening Pi Browser dialog");
       setIsOpen(true);
     }
+    
+    // Listen for custom event to open dialog
+    const handleOpenDialog = () => {
+      console.log("Custom event received: open-pi-browser-dialog");
+      if (!isPiBrowser) {
+        setIsOpen(true);
+      }
+    };
+    
+    window.addEventListener('open-pi-browser-dialog', handleOpenDialog);
+    
+    return () => {
+      window.removeEventListener('open-pi-browser-dialog', handleOpenDialog);
+    };
   }, [isPiBrowser, showOnMount]);
 
   const handleClose = () => {

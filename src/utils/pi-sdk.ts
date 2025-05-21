@@ -25,16 +25,24 @@ export const isRunningInPiBrowser = (): boolean => {
     if (typeof window !== 'undefined') {
       // Check for Pi SDK availability
       if (window.Pi) {
+        console.log("Pi SDK detected - running in Pi Browser");
         return true;
       }
       
       // Check for Pi Browser specific user agent strings
       const userAgent = navigator.userAgent.toLowerCase();
       if (userAgent.includes('pibrowser') || userAgent.includes('pi network') || userAgent.includes('pi-browser')) {
+        console.log("Pi Browser detected via user agent");
+        return true;
+      }
+      
+      // Check for Pi-specific objects or properties
+      if (typeof window['PiNetwork'] !== 'undefined' || typeof window['piNetwork'] !== 'undefined') {
+        console.log("Pi-specific objects detected");
         return true;
       }
     }
-    console.log("Not running in Pi Browser");
+    console.log("Not running in Pi Browser - SDK and user agent checks failed");
     return false;
   } catch (error) {
     console.error("Error checking Pi Browser environment:", error);
