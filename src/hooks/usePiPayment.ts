@@ -6,9 +6,9 @@ import { useUser } from "@/context/UserContext";
 
 // Define consistent pricing across the application
 export const planPricing = {
-  starter: { monthly: 3, annual: 3 },
-  pro: { monthly: 6, annual: 6 },
-  premium: { monthly: 9, annual: 9 }
+  starter: { monthly: 8, annual: 8 },
+  pro: { monthly: 12, annual: 12 },
+  premium: { monthly: 18, annual: 18 }
 };
 
 export function usePiPayment() {

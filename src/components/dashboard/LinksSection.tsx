@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useUser } from "@/context/UserContext";
 import { toast } from "@/hooks/use-toast";
 import { playSound, sounds } from '@/utils/sounds';
+import { useUpgradeModal } from "@/hooks/useUpgradeModal";
+import { useUserPlan } from "@/hooks/use-user-plan";
 import ProfileUrlDisplay from "./ProfileUrlDisplay";
 import EmptyLinksState from "./EmptyLinksState";
 import LinksLoadingState from "./LinksLoadingState";
@@ -19,6 +21,8 @@ const LinksSection = () => {
   const [previousLinkCount, setPreviousLinkCount] = useState(0);
   const { user, profile } = useUser();
   const { links, isLoading, fetchLinks, handleReorderLink } = useLinks(user?.id);
+  const { plan, limits } = useUserPlan();
+  const { openUpgradeModal } = useUpgradeModal();
 
   useEffect(() => {
     if (profile?.username) {
@@ -45,13 +49,23 @@ const LinksSection = () => {
     }
   }, [links, isLoading, previousLinkCount]);
 
+  const handleAddLinkClick = () => {
+    // Check if user has reached their link limit
+    if (links.length >= limits.maxLinks && plan === 'free') {
+      openUpgradeModal("Adding more than 1 link");
+      return;
+    }
+    
+    setIsAddingLink(true);
+  };
+
   const renderContent = () => {
     if (isLoading) {
       return <LinksLoadingState />;
     }
     
     if (!isAddingLink && links.length === 0) {
-      return <EmptyLinksState onAddClick={() => setIsAddingLink(true)} />;
+      return <EmptyLinksState onAddClick={handleAddLinkClick} />;
     }
     
     return (
@@ -93,7 +107,25 @@ const LinksSection = () => {
         ))}
         
         {!isAddingLink && !isEditingLink && (
-          <AddLinkButton onClick={() => setIsAddingLink(true)} />
+          <AddLinkButton onClick={handleAddLinkClick} />
+        )}
+        
+        {/* Upgrade prompt for free users */}
+        {plan === 'free' && links.length >= limits.maxLinks && (
+          <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg text-center">
+            <p className="font-medium text-amber-800 mb-1">
+              Free plan limited to {limits.maxLinks} link
+            </p>
+            <p className="text-sm text-amber-700 mb-3">
+              Upgrade to Starter (8π/month) for unlimited links and more features
+            </p>
+            <button
+              onClick={() => openUpgradeModal("unlimited links")}
+              className="bg-gradient-hero text-white px-4 py-1 rounded text-sm font-medium hover:bg-blue-600 transition-colors"
+            >
+              Upgrade Now
+            </button>
+          </div>
         )}
       </div>
     );

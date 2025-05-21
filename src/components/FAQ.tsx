@@ -37,24 +37,24 @@ const FAQ = () => {
             <AccordionItem value="item-3">
               <AccordionTrigger className="text-left font-medium">What are Droplink's plans?</AccordionTrigger>
               <AccordionContent>
-                Starter (10π/month): Basic features. Pro (15π/month): Advanced tools like analytics. 
-                Premium (22π/month): Pro features plus priority support. Billed annually.
+                Starter (8π/month): Unlimited links, basic analytics, and tip withdrawals. 
+                Pro (12π/month): Advanced tools like QR codes and animations. 
+                Premium (18π/month): All Pro features plus priority support and whitelabel options. Billed annually.
               </AccordionContent>
             </AccordionItem>
             
             <AccordionItem value="item-4">
               <AccordionTrigger className="text-left font-medium">Can I customize my page?</AccordionTrigger>
               <AccordionContent>
-                Yes! Choose water-inspired templates and customize links and products, 
-                with advanced options in Pro/Premium.
+                Free users get 1 default theme. Paid plans unlock multiple themes and advanced customization options.
               </AccordionContent>
             </AccordionItem>
             
             <AccordionItem value="item-5">
-              <AccordionTrigger className="text-left font-medium">What's in the Pro trial?</AccordionTrigger>
+              <AccordionTrigger className="text-left font-medium">What's included in the Free plan?</AccordionTrigger>
               <AccordionContent>
-                The 7-day Pro trial includes all Pro features (analytics, themes, QR codes). 
-                Post-trial, it's 6π/month, billed annually.
+                The Free plan includes 1 active link, 1 connected social profile, and a basic page. 
+                Upgrade to Starter (8π/month) to unlock unlimited links, analytics, and more features.
               </AccordionContent>
             </AccordionItem>
             

@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,7 +48,7 @@ const RecentTips = ({ userId }: { userId: string }) => {
         // Query the payments table correctly
         const { data, error } = await supabase
           .from("payments")
-          .select("id, amount, created_at, user_id, from_user:user_profiles!user_id(id, username, avatar_url)")
+          .select("id, amount, created_at, user_id, recipient_id, from_user:user_profiles!user_id(id, username, avatar_url)")
           .eq("recipient_id", userId)
           .order("created_at", { ascending: false })
           .limit(5);
@@ -66,8 +67,8 @@ const RecentTips = ({ userId }: { userId: string }) => {
           return;
         }
         
-        // Convert the data to the expected format
-        const formattedTips: Tip[] = data.map((payment: PaymentData) => {
+        // Convert the data to the expected format with proper typing
+        const formattedTips = data.map((payment: any) => {
           // Extract user data safely
           let fromUser: TipUser | null = null;
           
