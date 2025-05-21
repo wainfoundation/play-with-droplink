@@ -2,24 +2,30 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useUser } from "@/context/UserContext";
 
 interface AnalyticsSectionProps {
   subscription: any;
 }
 
 const AnalyticsSection = ({ subscription }: AnalyticsSectionProps) => {
+  const { isAdmin } = useUser();
+  
+  // Check if user has pro/premium features (either through subscription or admin status)
+  const hasProFeatures = isAdmin || (subscription && (subscription.plan === "pro" || subscription.plan === "premium"));
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Analytics & Insights</CardTitle>
         <CardDescription>
-          {subscription && (subscription.plan === "pro" || subscription.plan === "premium")
+          {hasProFeatures
             ? "Track detailed performance metrics of your page and links" 
             : "Upgrade to Pro or Premium to access detailed analytics"}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {subscription && (subscription.plan === "pro" || subscription.plan === "premium") ? (
+        {hasProFeatures ? (
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-blue-50 p-4 rounded-lg">

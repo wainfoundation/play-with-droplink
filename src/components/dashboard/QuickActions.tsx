@@ -2,6 +2,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { useUser } from "@/context/UserContext";
+import { ShieldCheck } from "lucide-react";
 
 interface QuickActionsProps {
   subscription: any;
@@ -11,6 +13,8 @@ interface QuickActionsProps {
 }
 
 const QuickActions = ({ subscription, profile, navigate, setConfirmCancelOpen }: QuickActionsProps) => {
+  const { isAdmin } = useUser();
+  
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 
@@ -41,17 +45,31 @@ const QuickActions = ({ subscription, profile, navigate, setConfirmCancelOpen }:
       
       <Card>
         <CardHeader>
-          <CardTitle>Current Plan: {subscription ? subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1) : "Free"}</CardTitle>
-          <CardDescription>
-            {subscription ? (
-              <span>Your subscription renews on {formatDate(subscription.expires_at)}</span>
-            ) : (
-              "You are currently using the free version."
-            )}
-          </CardDescription>
+          {isAdmin ? (
+            <>
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-green-600" />
+                <CardTitle>Admin Account</CardTitle>
+              </div>
+              <CardDescription>
+                All premium features are unlocked
+              </CardDescription>
+            </>
+          ) : (
+            <>
+              <CardTitle>Current Plan: {subscription ? subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1) : "Free"}</CardTitle>
+              <CardDescription>
+                {subscription ? (
+                  <span>Your subscription renews on {formatDate(subscription.expires_at)}</span>
+                ) : (
+                  "You are currently using the free version."
+                )}
+              </CardDescription>
+            </>
+          )}
         </CardHeader>
         <CardContent>
-          {!subscription && (
+          {!subscription && !isAdmin && (
             <div className="text-sm mb-4">
               <p>Upgrade to access premium features like:</p>
               <ul className="list-disc pl-5 mt-2 space-y-1">
@@ -61,9 +79,25 @@ const QuickActions = ({ subscription, profile, navigate, setConfirmCancelOpen }:
               </ul>
             </div>
           )}
+          {isAdmin && (
+            <div className="text-sm mb-4">
+              <p className="text-green-600 font-medium">Admin features:</p>
+              <ul className="list-disc pl-5 mt-2 space-y-1">
+                <li>Full access to all premium features</li>
+                <li>Test all subscription plans</li>
+                <li>No payments required</li>
+              </ul>
+            </div>
+          )}
         </CardContent>
         <CardFooter>
-          {subscription ? (
+          {isAdmin ? (
+            <Link to="/admin" className="w-full">
+              <Button className="w-full bg-green-600 hover:bg-green-700">
+                Go to Admin Portal
+              </Button>
+            </Link>
+          ) : subscription ? (
             <Button 
               variant="outline" 
               className="w-full" 

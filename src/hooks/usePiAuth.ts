@@ -6,14 +6,23 @@ import { useToast } from "@/components/ui/use-toast";
 import { authenticateWithPi } from "@/services/piNetwork";
 import { useUser } from "@/context/UserContext";
 
-type PiUser = {
+// Explicit interface definitions to avoid deep type instantiations
+interface PiUser {
   uid: string;
   username?: string;
 }
 
-type PiAuthResult = {
+interface PiAuthResult {
   accessToken: string;
   user: PiUser;
+}
+
+// Define types for Supabase responses
+interface UserProfile {
+  id: string;
+  username?: string;
+  pi_user_id?: string;
+  [key: string]: any; // Allow additional fields for flexibility
 }
 
 export function usePiAuth() {
@@ -25,59 +34,61 @@ export function usePiAuth() {
   const handlePiLogin = async () => {
     try {
       setPiAuthenticating(true);
-      const authResult = await authenticateWithPi(["username", "payments"]) as PiAuthResult | null;
+      // Cast the result explicitly to avoid type instantiation depth issues
+      const authResult = await authenticateWithPi(["username", "payments"]);
       
-      if (authResult?.user) {
-        console.log("Pi authentication successful:", authResult);
+      if (authResult && "user" in authResult) {
+        const piAuthData = authResult as PiAuthResult;
+        console.log("Pi authentication successful:", piAuthData);
         
         // After successful Pi authentication, try to find or create a user in Supabase
-        let existingUser = null;
+        let existingUser: UserProfile | null = null;
         
-        // Fetch profiles without using complex types
-        const userProfilesQuery = await supabase
+        // Use simple object for query response without relying on deep types
+        const { data, error } = await supabase
           .from('user_profiles')
           .select('*')
-          .eq('pi_user_id', authResult.user.uid);
+          .eq('pi_user_id', piAuthData.user.uid);
         
-        if (userProfilesQuery.error) {
-          console.error("Error checking for existing Pi user:", userProfilesQuery.error);
-        } else if (userProfilesQuery.data && userProfilesQuery.data.length > 0) {
-          existingUser = userProfilesQuery.data[0];
+        if (error) {
+          console.error("Error checking for existing Pi user:", error);
+        } else if (data && data.length > 0) {
+          existingUser = data[0] as UserProfile;
         }
         
         // If no existing user, create one
         if (!existingUser) {
           // Create a random email and password for the Pi user
-          const piEmail = `pi_${authResult.user.uid}@pi-network.user`;
+          const piEmail = `pi_${piAuthData.user.uid}@pi-network.user`;
           const randomPassword = Math.random().toString(36).slice(2) + Math.random().toString(36).toUpperCase().slice(2);
           
           // Create new user with Supabase
-          const signUpResult = await supabase.auth.signUp({
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email: piEmail,
             password: randomPassword,
             options: {
               data: {
-                username: authResult.user.username || `pi_user_${Date.now().toString().slice(-6)}`,
-                pi_user_id: authResult.user.uid
+                username: piAuthData.user.username || `pi_user_${Date.now().toString().slice(-6)}`,
+                pi_user_id: piAuthData.user.uid
               }
             }
           });
           
-          if (signUpResult.error) {
-            throw new Error(`Failed to create account: ${signUpResult.error.message}`);
+          if (signUpError) {
+            throw new Error(`Failed to create account: ${signUpError.message}`);
           }
         }
         
         // Store Pi authentication tokens
-        localStorage.setItem('piAccessToken', authResult.accessToken);
-        localStorage.setItem('piUserId', authResult.user.uid);
-        localStorage.setItem('piUsername', authResult.user.username || '');
+        localStorage.setItem('piAccessToken', piAuthData.accessToken);
+        localStorage.setItem('piUserId', piAuthData.user.uid);
+        localStorage.setItem('piUsername', piAuthData.user.username || '');
         
         await refreshUserData();
         
         toast({
           title: "Pi Authentication Successful",
-          description: `Welcome, ${authResult.user.username ? '@' + authResult.user.username : "Pioneer"}!`,
+          description: `Welcome, ${piAuthData.user.username ? '@' + piAuthData.user.username : "Pioneer"}!`,
         });
         
         // Redirect to dashboard

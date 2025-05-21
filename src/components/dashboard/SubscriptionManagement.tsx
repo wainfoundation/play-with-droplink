@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { CheckIcon, CalendarCheck } from "lucide-react";
+import { CheckIcon, CalendarCheck, ShieldCheck } from "lucide-react";
+import { useUser } from "@/context/UserContext";
 
 interface SubscriptionManagementProps {
   subscription: any;
@@ -19,6 +19,7 @@ const SubscriptionManagement = ({
   setConfirmCancelOpen 
 }: SubscriptionManagementProps) => {
   const [billingCycle, setBillingCycle] = useState('annual'); // 'annual' or 'monthly'
+  const { isAdmin } = useUser();
   
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -61,19 +62,33 @@ const SubscriptionManagement = ({
             <h3 className="text-lg font-medium mb-2">Current Plan</h3>
             <div className="bg-blue-50 p-4 rounded-lg flex flex-col md:flex-row md:justify-between md:items-center">
               <div>
-                <span className="font-bold text-primary">
-                  {subscription 
-                    ? `${subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1)} (${getCurrentBillingCycle()})` 
-                    : "Free"}
-                </span>
-                {subscription && (
+                {isAdmin ? (
+                  <div className="flex items-center">
+                    <ShieldCheck className="h-5 w-5 text-green-600 mr-2" />
+                    <span className="font-bold text-green-600">
+                      Admin Access (All Features Unlocked)
+                    </span>
+                  </div>
+                ) : (
+                  <span className="font-bold text-primary">
+                    {subscription 
+                      ? `${subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1)} (${getCurrentBillingCycle()})` 
+                      : "Free"}
+                  </span>
+                )}
+                {subscription && !isAdmin && (
                   <p className="text-sm text-gray-600 flex items-center mt-1">
                     <CalendarCheck className="h-4 w-4 mr-1" />
                     Renews on {formatDate(subscription.expires_at)}
                   </p>
                 )}
+                {isAdmin && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    As an admin, you have full access to all premium features
+                  </p>
+                )}
               </div>
-              {subscription && (
+              {subscription && !isAdmin && (
                 <Button 
                   variant="outline" 
                   className="mt-3 md:mt-0"
@@ -85,7 +100,7 @@ const SubscriptionManagement = ({
             </div>
           </div>
           
-          {!subscription && (
+          {!subscription && !isAdmin && (
             <div>
               <h3 className="text-lg font-medium mb-4">Choose a Plan</h3>
               
@@ -164,7 +179,11 @@ const SubscriptionManagement = ({
           
           <div>
             <h3 className="text-lg font-medium mb-2">Payment History</h3>
-            {subscription ? (
+            {isAdmin ? (
+              <div className="bg-blue-50 p-4 rounded-lg text-center">
+                <p className="text-gray-700">No payment required for admin accounts</p>
+              </div>
+            ) : subscription ? (
               <div className="bg-blue-50 p-4 rounded-lg">
                 <div className="flex justify-between border-b pb-2 mb-2">
                   <span>Last payment</span>

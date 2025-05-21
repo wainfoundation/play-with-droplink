@@ -12,6 +12,7 @@ interface UserContextType {
   isLoading: boolean;
   isLoggedIn: boolean;
   showAds: boolean;
+  isAdmin: boolean;
   refreshUserData: () => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (data: any) => Promise<void>;
@@ -20,14 +21,19 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
+// Admin emails - add your email here
+const ADMIN_EMAILS = ["admin@pidrop.dev"];
+
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [subscription, setSubscription] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   
   const isLoggedIn = !!user;
-  const showAds = isLoggedIn && (!subscription || subscription.plan === "starter");
+  // Only show ads if user is logged in, not an admin, and either doesn't have a subscription or has a starter plan
+  const showAds = isLoggedIn && !isAdmin && (!subscription || subscription.plan === "starter");
 
   useEffect(() => {
     // Set up auth state change listener
@@ -36,7 +42,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         console.log("Auth state change:", event, session?.user?.id);
         setUser(session?.user ?? null);
         
+        // Check if user is admin
         if (session?.user) {
+          setIsAdmin(ADMIN_EMAILS.includes(session.user.email || ''));
+          
           // Only fetch additional data after the synchronous state update
           setTimeout(() => {
             fetchUserData(session.user);
@@ -44,6 +53,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         } else {
           setProfile(null);
           setSubscription(null);
+          setIsAdmin(false);
           setIsLoading(false);
         }
       }
@@ -54,7 +64,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       console.log("Current session:", session?.user?.id);
       setUser(session?.user ?? null);
       
+      // Check if user is admin
       if (session?.user) {
+        setIsAdmin(ADMIN_EMAILS.includes(session.user.email || ''));
         fetchUserData(session.user);
       } else {
         setIsLoading(false);
@@ -220,6 +232,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     isLoading,
     isLoggedIn,
     showAds,
+    isAdmin,
     refreshUserData,
     signOut,
     updateProfile,

@@ -9,11 +9,20 @@ export const useUserPlan = () => {
     subscription, 
     isLoading, 
     profile, 
-    showAds
+    showAds,
+    isAdmin
   } = useUser();
 
-  // Map from the subscription data if available
-  const plan = subscription?.plan as SubscriptionPlan || 'starter';
+  // Admin users get premium privileges
+  // Regular users map from the subscription data if available
+  let plan: SubscriptionPlan = 'starter';
+  
+  if (isAdmin) {
+    plan = 'premium'; // Admin users get premium plan by default
+  } else if (subscription?.plan) {
+    plan = subscription.plan as SubscriptionPlan;
+  }
+  
   const subscriptionEnd = subscription?.expires_at ? new Date(subscription.expires_at) : null;
   const username = profile?.username || null;
 

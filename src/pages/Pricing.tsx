@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, ShieldCheck } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,8 @@ const PricingCard = ({
   ctaText = "Get Started",
   ctaAction,
   currentPlan = false,
-  processingPayment = false
+  processingPayment = false,
+  isAdmin = false
 }) => {
   // Calculate display price based on billing cycle
   const displayPrice = billingCycle === 'annual' ? annualPrice : price;
@@ -67,10 +67,25 @@ const PricingCard = ({
       
       <Button 
         onClick={ctaAction}
-        className={`w-full ${currentPlan ? 'bg-green-500 hover:bg-green-600 cursor-not-allowed' : isPopular ? 'bg-gradient-hero hover:bg-secondary' : 'bg-white border border-primary text-primary hover:bg-muted'}`}
-        disabled={currentPlan || processingPayment}
+        className={`w-full ${
+          currentPlan 
+            ? 'bg-green-500 hover:bg-green-600 cursor-not-allowed' 
+            : isAdmin 
+              ? 'bg-green-600 hover:bg-green-700'
+              : isPopular 
+                ? 'bg-gradient-hero hover:bg-secondary' 
+                : 'bg-white border border-primary text-primary hover:bg-muted'
+        }`}
+        disabled={currentPlan || processingPayment || (isAdmin && title !== "Admin Portal")}
       >
-        {processingPayment ? "Processing..." : currentPlan ? "Current Plan" : ctaText}
+        {processingPayment 
+          ? "Processing..." 
+          : currentPlan 
+            ? "Current Plan" 
+            : isAdmin 
+              ? "Included with Admin" 
+              : ctaText
+        }
       </Button>
     </div>
   );
@@ -80,7 +95,7 @@ const Pricing = () => {
   const [billingCycle, setBillingCycle] = useState('annual'); // 'annual' or 'monthly'
   const [processingPayment, setProcessingPayment] = useState(false);
   
-  const { isLoggedIn, user, subscription, showAds } = useUser();
+  const { isLoggedIn, user, subscription, showAds, isAdmin } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -187,6 +202,10 @@ const Pricing = () => {
   };
   
   const isPlanActive = (plan: string): boolean => {
+    if (isAdmin) {
+      // For admins, treat all plans as available but not marked as "current"
+      return false;
+    }
     if (!subscription) return false;
     return subscription.plan.toLowerCase() === plan.toLowerCase();
   };
@@ -222,26 +241,41 @@ const Pricing = () => {
               Choose a plan to amplify your presence and join our community-driven ecosystem.
             </p>
             
-            <div className="mt-6 inline-flex items-center p-1 bg-muted rounded-lg">
-              <button
-                onClick={() => setBillingCycle('annual')}
-                className={`px-4 py-2 text-sm font-medium rounded-md ${
-                  billingCycle === 'annual' ? 'bg-white shadow-sm' : 'text-gray-500'
-                }`}
-              >
-                Annual (Save 20%)
-              </button>
-              <button
-                onClick={() => setBillingCycle('monthly')}
-                className={`px-4 py-2 text-sm font-medium rounded-md ${
-                  billingCycle === 'monthly' ? 'bg-white shadow-sm' : 'text-gray-500'
-                }`}
-              >
-                Monthly
-              </button>
-            </div>
+            {/* Admin notice */}
+            {isAdmin && (
+              <div className="mt-6 p-4 bg-green-100 border border-green-300 rounded-lg inline-block">
+                <p className="text-green-800 flex items-center">
+                  <ShieldCheck className="h-5 w-5 mr-2" />
+                  <span className="font-bold">Admin account detected</span>
+                </p>
+                <p className="text-sm text-green-700 mt-1">
+                  As an admin, you have access to all premium features without payment
+                </p>
+              </div>
+            )}
             
-            {isLoggedIn && subscription && (
+            {!isAdmin && (
+              <div className="mt-6 inline-flex items-center p-1 bg-muted rounded-lg">
+                <button
+                  onClick={() => setBillingCycle('annual')}
+                  className={`px-4 py-2 text-sm font-medium rounded-md ${
+                    billingCycle === 'annual' ? 'bg-white shadow-sm' : 'text-gray-500'
+                  }`}
+                >
+                  Annual (Save 20%)
+                </button>
+                <button
+                  onClick={() => setBillingCycle('monthly')}
+                  className={`px-4 py-2 text-sm font-medium rounded-md ${
+                    billingCycle === 'monthly' ? 'bg-white shadow-sm' : 'text-gray-500'
+                  }`}
+                >
+                  Monthly
+                </button>
+              </div>
+            )}
+            
+            {isLoggedIn && subscription && !isAdmin && (
               <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg inline-block">
                 <p className="text-sm text-blue-800">
                   You're currently on the <span className="font-bold">
@@ -259,10 +293,17 @@ const Pricing = () => {
               annualPrice={planPrices.starter.annual}
               billingCycle={billingCycle}
               features={starterFeatures}
-              ctaText={isLoggedIn ? "Subscribe Now" : "Sign Up & Subscribe"}
-              ctaAction={() => handleSubscribe("Starter")}
+              ctaText={isAdmin ? "Admin Access" : isLoggedIn ? "Subscribe Now" : "Sign Up & Subscribe"}
+              ctaAction={() => isAdmin ? 
+                toast({
+                  title: "Admin Access",
+                  description: "You already have access to all features as an admin",
+                }) : 
+                handleSubscribe("Starter")
+              }
               currentPlan={isPlanActive("starter") && userBillingCycle === billingCycle}
               processingPayment={processingPayment}
+              isAdmin={isAdmin}
             />
             
             <PricingCard
@@ -272,10 +313,17 @@ const Pricing = () => {
               billingCycle={billingCycle}
               features={proFeatures}
               isPopular={true}
-              ctaText={isLoggedIn ? "Subscribe Now" : "Sign Up & Subscribe"}
-              ctaAction={() => handleSubscribe("Pro")}
+              ctaText={isAdmin ? "Admin Access" : isLoggedIn ? "Subscribe Now" : "Sign Up & Subscribe"}
+              ctaAction={() => isAdmin ? 
+                toast({
+                  title: "Admin Access",
+                  description: "You already have access to all features as an admin",
+                }) : 
+                handleSubscribe("Pro")
+              }
               currentPlan={isPlanActive("pro") && userBillingCycle === billingCycle}
               processingPayment={processingPayment}
+              isAdmin={isAdmin}
             />
             
             <PricingCard
@@ -284,10 +332,17 @@ const Pricing = () => {
               annualPrice={planPrices.premium.annual}
               billingCycle={billingCycle}
               features={premiumFeatures}
-              ctaText={isLoggedIn ? "Subscribe Now" : "Sign Up & Subscribe"}
-              ctaAction={() => handleSubscribe("Premium")}
+              ctaText={isAdmin ? "Admin Access" : isLoggedIn ? "Subscribe Now" : "Sign Up & Subscribe"}
+              ctaAction={() => isAdmin ? 
+                toast({
+                  title: "Admin Access",
+                  description: "You already have access to all features as an admin",
+                }) : 
+                handleSubscribe("Premium")
+              }
               currentPlan={isPlanActive("premium") && userBillingCycle === billingCycle}
               processingPayment={processingPayment}
+              isAdmin={isAdmin}
             />
           </div>
           

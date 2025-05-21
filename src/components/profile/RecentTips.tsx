@@ -4,6 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 
+// Define explicit interfaces to avoid type instantiation depth issues
 interface Tip {
   id: string;
   amount: number;
@@ -11,10 +12,23 @@ interface Tip {
   created_at: string;
 }
 
+interface SenderInfo {
+  username?: string;
+}
+
 interface TipWithSender extends Tip {
-  sender?: {
-    username?: string;
-  }
+  sender?: SenderInfo;
+}
+
+interface PaymentData {
+  id: string;
+  amount: number;
+  user_id: string;
+  created_at: string;
+}
+
+interface UserData {
+  username?: string;
 }
 
 interface Props {
@@ -30,39 +44,40 @@ const RecentTips = ({ profileId }: Props) => {
       try {
         setLoading(true);
         
-        // Simplified query approach to avoid deep type inference
-        const paymentsQuery = await supabase
+        // Use simple object for query response
+        const { data: paymentsData, error: paymentsError } = await supabase
           .from('payments')
           .select('id, amount, user_id, created_at')
           .eq('receiver_id', profileId)
           .order('created_at', { ascending: false })
           .limit(5);
           
-        if (paymentsQuery.error) {
-          console.error('Error fetching tips:', paymentsQuery.error);
+        if (paymentsError) {
+          console.error('Error fetching tips:', paymentsError);
           return;
         }
 
-        // Simple array to hold processed tips
+        // Process payments one by one
         const tipsData: TipWithSender[] = [];
         
-        // Process each payment one by one
-        for (const payment of paymentsQuery.data || []) {
-          // Fetch user data for this payment
-          const userQuery = await supabase
+        for (const payment of paymentsData || []) {
+          const paymentItem = payment as PaymentData;
+          
+          // Get user data
+          const { data: userData, error: userError } = await supabase
             .from('user_profiles')
             .select('username')
-            .eq('id', payment.user_id)
+            .eq('id', paymentItem.user_id)
             .limit(1);
             
           // Add tip with sender information
           tipsData.push({
-            id: payment.id,
-            amount: payment.amount,
-            sender_id: payment.user_id,
-            created_at: payment.created_at,
-            sender: userQuery.data && userQuery.data.length > 0 
-              ? { username: userQuery.data[0].username } 
+            id: paymentItem.id,
+            amount: paymentItem.amount,
+            sender_id: paymentItem.user_id,
+            created_at: paymentItem.created_at,
+            sender: userData && userData.length > 0 
+              ? { username: (userData[0] as UserData).username } 
               : undefined
           });
         }
