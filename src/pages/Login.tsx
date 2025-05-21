@@ -94,12 +94,18 @@ const Login = () => {
         console.log("Pi authentication successful:", authResult);
         
         // After successful Pi authentication, try to find or create a user in Supabase
-        // Use explicit type casting to avoid deep type instantiation
-        const { data: existingUser, error: userError } = await supabase
+        // Use variable to store the query result instead of inline type casting
+        let existingUser: UserProfile | null = null;
+        let userError = null;
+        
+        const userResponse = await supabase
           .from('user_profiles')
           .select('*')
           .eq('pi_user_id', authResult.user.uid)
-          .maybeSingle() as { data: UserProfile | null, error: Error | null };
+          .maybeSingle();
+        
+        existingUser = userResponse.data;
+        userError = userResponse.error;
         
         if (userError) {
           console.error("Error checking for existing Pi user:", userError);

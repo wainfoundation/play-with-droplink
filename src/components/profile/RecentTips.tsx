@@ -27,23 +27,36 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
       try {
         setLoading(true);
         
-        // Fetch the most recent tips with explicit type casting to avoid deep type instantiation
-        const { data: tipsData, error: tipsError } = await supabase
+        // Use explicit types for Supabase responses to avoid deep type instantiation
+        let tipsData: Tip[] | null = null;
+        let tipsError = null;
+
+        // Fetch the most recent tips
+        const tipsResponse = await supabase
           .from('payments')
           .select('id, amount, created_at, memo, user_id')
           .eq('status', 'completed')
           .eq('recipient_id', userId)
           .order('created_at', { ascending: false })
-          .limit(limit) as { data: Tip[] | null, error: Error | null };
+          .limit(limit);
+          
+        tipsData = tipsResponse.data;
+        tipsError = tipsResponse.error;
         
         if (tipsError) {
           console.error("Failed to fetch tips:", tipsError);
           return;
         }
         
-        // Fetch total tips received using the new database function
-        const { data: totalData, error: totalError } = await supabase
-          .rpc('get_total_tips_received', { user_id_param: userId }) as { data: number | null, error: Error | null };
+        // Fetch total tips received using the database function
+        let totalData: number | null = null;
+        let totalError = null;
+
+        const totalResponse = await supabase
+          .rpc('get_total_tips_received', { user_id_param: userId });
+          
+        totalData = totalResponse.data;
+        totalError = totalResponse.error;
         
         if (totalError) {
           console.error("Failed to fetch total tips:", totalError);
@@ -63,10 +76,17 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
           .map(tip => tip.user_id as string);
         
         if (userIds.length > 0) {
-          const { data: usersData, error: usersError } = await supabase
+          // Use an explicit type for the user profiles query
+          let usersData: { id: string, username: string }[] | null = null;
+          let usersError = null;
+
+          const usersResponse = await supabase
             .from('user_profiles')
             .select('id, username')
-            .in('id', userIds) as { data: { id: string, username: string }[] | null, error: Error | null };
+            .in('id', userIds);
+            
+          usersData = usersResponse.data;
+          usersError = usersResponse.error;
           
           if (!usersError && usersData) {
             const usernameMap: Record<string, string> = {};
