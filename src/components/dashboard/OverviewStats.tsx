@@ -2,14 +2,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { TrendingUp, Users, MousePointerClick } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface OverviewStatsProps {
   pageViews: number;
   linkClicks: number;
   conversionRate: number;
+  isLoading?: boolean;
 }
 
-const OverviewStats = ({ pageViews, linkClicks, conversionRate }: OverviewStatsProps) => {
+const OverviewStats = ({ pageViews, linkClicks, conversionRate, isLoading = false }: OverviewStatsProps) => {
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -41,7 +43,11 @@ const OverviewStats = ({ pageViews, linkClicks, conversionRate }: OverviewStatsP
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{pageViews.toLocaleString()}</div>
+            {isLoading ? (
+              <Skeleton className="h-8 w-24" />
+            ) : (
+              <div className="text-3xl font-bold">{pageViews.toLocaleString()}</div>
+            )}
             <p className="text-xs text-gray-500 mt-1">Last 30 days</p>
           </CardContent>
         </Card>
@@ -56,7 +62,11 @@ const OverviewStats = ({ pageViews, linkClicks, conversionRate }: OverviewStatsP
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{linkClicks.toLocaleString()}</div>
+            {isLoading ? (
+              <Skeleton className="h-8 w-24" />
+            ) : (
+              <div className="text-3xl font-bold">{linkClicks.toLocaleString()}</div>
+            )}
             <p className="text-xs text-gray-500 mt-1">Last 30 days</p>
           </CardContent>
         </Card>
@@ -71,7 +81,11 @@ const OverviewStats = ({ pageViews, linkClicks, conversionRate }: OverviewStatsP
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{conversionRate}%</div>
+            {isLoading ? (
+              <Skeleton className="h-8 w-24" />
+            ) : (
+              <div className="text-3xl font-bold">{conversionRate}%</div>
+            )}
             <p className="text-xs text-gray-500 mt-1">Clicks per view</p>
           </CardContent>
         </Card>

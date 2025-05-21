@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CheckIcon, CalendarCheck, ShieldCheck } from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import { planPricing } from "@/hooks/usePiPayment";
 
 interface SubscriptionManagementProps {
   subscription: any;
@@ -30,12 +30,6 @@ const SubscriptionManagement = ({
     });
   };
   
-  const planPrices = {
-    starter: { monthly: 10, annual: 8 },
-    pro: { monthly: 15, annual: 12 },
-    premium: { monthly: 22, annual: 18 }
-  };
-
   // Determine if current subscription is annual or monthly
   const getCurrentBillingCycle = (): string => {
     if (!subscription) return 'monthly';
@@ -112,7 +106,7 @@ const SubscriptionManagement = ({
                       billingCycle === 'annual' ? 'bg-white shadow-sm' : 'text-gray-500'
                     }`}
                   >
-                    Annual (Save 20%)
+                    Annual
                   </button>
                   <button
                     onClick={() => setBillingCycle('monthly')}
@@ -128,9 +122,9 @@ const SubscriptionManagement = ({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <SubscriptionPlanCard 
                   title="Starter"
-                  price={billingCycle === 'annual' ? planPrices.starter.annual : planPrices.starter.monthly}
+                  price={planPricing.starter[billingCycle === 'annual' ? 'annual' : 'monthly']}
                   billingPeriod={billingCycle === 'annual' 
-                    ? `Billed annually (${planPrices.starter.annual * 12}π)` 
+                    ? `Billed annually (${planPricing.starter.annual * 12}π)` 
                     : "Billed monthly"}
                   features={[
                     "Unlimited Links",
@@ -144,9 +138,9 @@ const SubscriptionManagement = ({
                 
                 <SubscriptionPlanCard 
                   title="Pro"
-                  price={billingCycle === 'annual' ? planPrices.pro.annual : planPrices.pro.monthly}
+                  price={planPricing.pro[billingCycle === 'annual' ? 'annual' : 'monthly']}
                   billingPeriod={billingCycle === 'annual' 
-                    ? `Billed annually (${planPrices.pro.annual * 12}π)` 
+                    ? `Billed annually (${planPricing.pro.annual * 12}π)` 
                     : "Billed monthly"}
                   features={[
                     "Everything in Starter",
@@ -160,9 +154,9 @@ const SubscriptionManagement = ({
                 
                 <SubscriptionPlanCard 
                   title="Premium"
-                  price={billingCycle === 'annual' ? planPrices.premium.annual : planPrices.premium.monthly}
+                  price={planPricing.premium[billingCycle === 'annual' ? 'annual' : 'monthly']}
                   billingPeriod={billingCycle === 'annual' 
-                    ? `Billed annually (${planPrices.premium.annual * 12}π)` 
+                    ? `Billed annually (${planPricing.premium.annual * 12}π)` 
                     : "Billed monthly"}
                   features={[
                     "Everything in Pro",

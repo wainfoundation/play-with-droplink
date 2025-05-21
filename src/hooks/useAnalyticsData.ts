@@ -8,10 +8,15 @@ export function useAnalyticsData() {
   const [pageViews, setPageViews] = useState(0);
   const [linkClicks, setLinkClicks] = useState(0);
   const [conversionRate, setConversionRate] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     const fetchAnalyticsData = async () => {
-      if (!profile || !profile.id) return;
+      setIsLoading(true);
+      if (!profile || !profile.id) {
+        setIsLoading(false);
+        return;
+      }
       
       try {
         // Fetch page views
@@ -36,9 +41,9 @@ export function useAnalyticsData() {
           console.error("Error fetching link clicks:", clicksError);
         }
         
-        // Set data with real values or fallback to simulated values
-        const views = viewsCount !== null ? viewsCount : Math.floor(Math.random() * 1000) + 100;
-        const clicks = clicksCount !== null ? clicksCount : Math.floor(views * (Math.random() * 0.7 + 0.1));
+        // Set data with real values
+        const views = viewsCount !== null ? viewsCount : 0;
+        const clicks = clicksCount !== null ? clicksCount : 0;
         const rate = views > 0 ? +(clicks / views * 100).toFixed(1) : 0;
         
         setPageViews(views);
@@ -47,14 +52,12 @@ export function useAnalyticsData() {
       } catch (error) {
         console.error("Error fetching analytics data:", error);
         
-        // Fallback to simulated data
-        const randomViews = Math.floor(Math.random() * 1000) + 100;
-        const randomClicks = Math.floor(randomViews * (Math.random() * 0.7 + 0.1));
-        const randomRate = +(randomClicks / randomViews * 100).toFixed(1);
-        
-        setPageViews(randomViews);
-        setLinkClicks(randomClicks);
-        setConversionRate(randomRate);
+        // In case of error, set default values
+        setPageViews(0);
+        setLinkClicks(0);
+        setConversionRate(0);
+      } finally {
+        setIsLoading(false);
       }
     };
     
@@ -64,6 +67,7 @@ export function useAnalyticsData() {
   return {
     pageViews,
     linkClicks,
-    conversionRate
+    conversionRate,
+    isLoading
   };
 }

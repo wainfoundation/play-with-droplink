@@ -1,13 +1,14 @@
+
 import { useState } from "react";
 import { CheckIcon, ShieldCheck } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import PiAdsNetwork from "@/components/PiAdsNetwork";
 import { useUser } from "@/context/UserContext";
-import { createPiPayment } from "@/services/piPaymentService";
 import { useToast } from "@/hooks/use-toast";
+import { usePiPayment } from "@/hooks/usePiPayment";
 
 const PricingCard = ({ 
   title, 
@@ -93,11 +94,11 @@ const PricingCard = ({
 
 const Pricing = () => {
   const [billingCycle, setBillingCycle] = useState('annual'); // 'annual' or 'monthly'
-  const [processingPayment, setProcessingPayment] = useState(false);
   
   const { isLoggedIn, user, subscription, showAds, isAdmin } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { handleSubscribe, processingPayment, planPricing } = usePiPayment();
   
   const starterFeatures = [
     "Unlimited Links",
@@ -135,72 +136,6 @@ const Pricing = () => {
     "Community Contributor Status"
   ];
   
-  const planPrices = {
-    starter: { monthly: 10, annual: 8 },
-    pro: { monthly: 15, annual: 12 },
-    premium: { monthly: 22, annual: 18 }
-  };
-  
-  const handleSubscribe = async (plan: string) => {
-    if (!isLoggedIn) {
-      navigate('/login');
-      return;
-    }
-    
-    setProcessingPayment(true);
-    
-    try {
-      // Get price based on plan and billing cycle
-      const planName = plan.toLowerCase();
-      let amount = 0;
-      
-      if (planName === "starter") {
-        amount = billingCycle === 'annual' ? planPrices.starter.annual * 12 : planPrices.starter.monthly;
-      } else if (planName === "pro") {
-        amount = billingCycle === 'annual' ? planPrices.pro.annual * 12 : planPrices.pro.monthly;
-      } else if (planName === "premium") {
-        amount = billingCycle === 'annual' ? planPrices.premium.annual * 12 : planPrices.premium.monthly;
-      }
-      
-      // Calculate expiration date
-      const expireDate = new Date();
-      if (billingCycle === 'annual') {
-        expireDate.setFullYear(expireDate.getFullYear() + 1);
-      } else {
-        expireDate.setMonth(expireDate.getMonth() + 1);
-      }
-      
-      // Create payment through Pi Network
-      const paymentData = {
-        amount,
-        memo: `${plan} Plan Subscription (${billingCycle === 'annual' ? 'Annual' : 'Monthly'})`,
-        metadata: {
-          isSubscription: true,
-          plan: planName,
-          duration: billingCycle,
-          expiresAt: expireDate.toISOString()
-        }
-      };
-      
-      await createPiPayment(paymentData, user);
-      
-      // The payment flow will be handled by callbacks in piPaymentService
-      toast({
-        title: "Payment Processing",
-        description: "Follow the Pi payment flow to complete your subscription",
-      });
-    } catch (error) {
-      console.error("Subscription error:", error);
-      toast({
-        title: "Subscription failed",
-        description: "There was an error processing your subscription",
-        variant: "destructive",
-      });
-    } finally {
-      setProcessingPayment(false);
-    }
-  };
-  
   const isPlanActive = (plan: string): boolean => {
     if (isAdmin) {
       // For admins, treat all plans as available but not marked as "current"
@@ -222,6 +157,15 @@ const Pricing = () => {
   };
   
   const userBillingCycle = getCurrentBillingCycle();
+  
+  const handleSubscribeClick = (plan: string) => {
+    if (!isLoggedIn) {
+      navigate('/login');
+      return;
+    }
+    
+    handleSubscribe(plan, billingCycle);
+  };
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -262,7 +206,7 @@ const Pricing = () => {
                     billingCycle === 'annual' ? 'bg-white shadow-sm' : 'text-gray-500'
                   }`}
                 >
-                  Annual (Save 20%)
+                  Annual
                 </button>
                 <button
                   onClick={() => setBillingCycle('monthly')}
@@ -289,8 +233,8 @@ const Pricing = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <PricingCard
               title="Starter"
-              price={planPrices.starter.monthly}
-              annualPrice={planPrices.starter.annual}
+              price={planPricing.starter.monthly}
+              annualPrice={planPricing.starter.annual}
               billingCycle={billingCycle}
               features={starterFeatures}
               ctaText={isAdmin ? "Admin Access" : isLoggedIn ? "Subscribe Now" : "Sign Up & Subscribe"}
@@ -299,7 +243,7 @@ const Pricing = () => {
                   title: "Admin Access",
                   description: "You already have access to all features as an admin",
                 }) : 
-                handleSubscribe("Starter")
+                handleSubscribeClick("Starter")
               }
               currentPlan={isPlanActive("starter") && userBillingCycle === billingCycle}
               processingPayment={processingPayment}
@@ -308,8 +252,8 @@ const Pricing = () => {
             
             <PricingCard
               title="Pro"
-              price={planPrices.pro.monthly}
-              annualPrice={planPrices.pro.annual}
+              price={planPricing.pro.monthly}
+              annualPrice={planPricing.pro.annual}
               billingCycle={billingCycle}
               features={proFeatures}
               isPopular={true}
@@ -319,7 +263,7 @@ const Pricing = () => {
                   title: "Admin Access",
                   description: "You already have access to all features as an admin",
                 }) : 
-                handleSubscribe("Pro")
+                handleSubscribeClick("Pro")
               }
               currentPlan={isPlanActive("pro") && userBillingCycle === billingCycle}
               processingPayment={processingPayment}
@@ -328,8 +272,8 @@ const Pricing = () => {
             
             <PricingCard
               title="Premium"
-              price={planPrices.premium.monthly}
-              annualPrice={planPrices.premium.annual}
+              price={planPricing.premium.monthly}
+              annualPrice={planPricing.premium.annual}
               billingCycle={billingCycle}
               features={premiumFeatures}
               ctaText={isAdmin ? "Admin Access" : isLoggedIn ? "Subscribe Now" : "Sign Up & Subscribe"}
@@ -338,7 +282,7 @@ const Pricing = () => {
                   title: "Admin Access",
                   description: "You already have access to all features as an admin",
                 }) : 
-                handleSubscribe("Premium")
+                handleSubscribeClick("Premium")
               }
               currentPlan={isPlanActive("premium") && userBillingCycle === billingCycle}
               processingPayment={processingPayment}
@@ -353,6 +297,7 @@ const Pricing = () => {
             </div>
           )}
           
+          {/* FAQ section */}
           <div className="mt-16 text-center max-w-3xl mx-auto">
             <h2 className="text-2xl font-bold mb-4">Frequently Asked Questions</h2>
             
@@ -365,9 +310,9 @@ const Pricing = () => {
               </div>
               
               <div>
-                <h3 className="font-bold text-lg">What's the difference between monthly and annual billing?</h3>
+                <h3 className="font-bold text-lg">What's in the Pro trial?</h3>
                 <p className="text-gray-600 mt-2">
-                  Annual billing offers a 20% discount compared to monthly billing. You'll be charged once per year instead of monthly, and your subscription will last for 12 months.
+                  The 7-day Pro trial includes all Pro features (analytics, themes, QR codes). After the trial period, it's 6π/month, billed annually.
                 </p>
               </div>
               

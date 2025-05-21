@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -116,7 +117,7 @@ serve(async (req) => {
     });
     
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

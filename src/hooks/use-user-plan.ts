@@ -1,5 +1,6 @@
 
 import { useUser } from '@/context/UserContext';
+import { planPricing } from '@/hooks/usePiPayment';
 
 export type SubscriptionPlan = 'starter' | 'pro' | 'premium' | null;
 
@@ -26,15 +27,8 @@ export const useUserPlan = () => {
   const subscriptionEnd = subscription?.expires_at ? new Date(subscription.expires_at) : null;
   const username = profile?.username || null;
 
-  const updatePlan = () => {
-    // This is now handled by the UserContext and Supabase
-    console.warn('updatePlan is deprecated. Plans are managed through Pi payments.');
-  };
-
-  const setSubscriptionEndDate = () => {
-    // This is now handled by the UserContext and Supabase
-    console.warn('setSubscriptionEndDate is deprecated. Subscription dates are managed through Pi payments.');
-  };
+  // Get the raw pricing information
+  const pricing = planPricing;
 
   return {
     isLoggedIn,
@@ -42,8 +36,7 @@ export const useUserPlan = () => {
     username,
     subscriptionEnd,
     isLoading,
-    updatePlan,
-    setSubscriptionEndDate,
+    pricing,
     showAds,
   };
 };
