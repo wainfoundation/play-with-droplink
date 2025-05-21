@@ -42,33 +42,15 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
           return;
         }
         
-        // Fetch total tips received - using a simpler query to avoid type issues
+        // Fetch total tips received - using a simple aggregation
         const { data: totalData, error: totalError } = await supabase
-          .from('payments')
-          .select('amount')
-          .eq('status', 'completed')
-          .eq('recipient_id', userId);
+          .rpc('get_total_tips_received', { user_id_param: userId });
         
         if (totalError) {
           console.error("Failed to fetch total tips:", totalError);
         } else if (totalData) {
-          // Calculate total without complex type operations
-          let sum = 0;
-          
-          for (let i = 0; i < totalData.length; i++) {
-            const amount = totalData[i].amount;
-            
-            if (typeof amount === 'number') {
-              sum += amount;
-            } else if (typeof amount === 'string') {
-              const parsedAmount = parseFloat(amount);
-              if (!isNaN(parsedAmount)) {
-                sum += parsedAmount;
-              }
-            }
-          }
-          
-          setTotalReceived(sum);
+          // Set total from database function result
+          setTotalReceived(Number(totalData) || 0);
         }
         
         if (!tipsData || tipsData.length === 0) {
