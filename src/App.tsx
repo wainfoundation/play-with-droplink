@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { HelmetProvider } from "react-helmet-async";
 import SplashScreen from "./components/SplashScreen";
 import { UserProvider } from "./context/UserContext";
-import { UpgradeModalProvider } from "./hooks/useUpgradeModal";
+import { UpgradeModalProvider, useUpgradeModal } from "./hooks/useUpgradeModal";
 import UpgradeModal from "./components/UpgradeModal";
 import Home from "./pages/Home";
 import Features from "./pages/Features";
@@ -60,9 +60,7 @@ function App() {
 // Component to consume the upgrade modal context and render the modal inside Router context
 const UpgradeModalConsumer = () => {
   const navigate = useNavigate(); // Now this is inside Router context
-  const { isModalOpen, featureName, closeUpgradeModal } = React.useContext(
-    require('./hooks/useUpgradeModal').UpgradeModalContext
-  );
+  const { isModalOpen, featureName, closeUpgradeModal } = useUpgradeModal();
   
   // Navigation handler to pass to the modal
   const handleNavigateToPricing = () => {

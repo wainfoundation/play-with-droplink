@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,8 +22,7 @@ interface Tip {
   from_user: TipUser | null;
 }
 
-// Simplified PaymentData type to avoid circular references
-interface PaymentData {
+interface RawPaymentData {
   id: string;
   amount: number;
   created_at: string;
@@ -62,19 +62,17 @@ const RecentTips = ({ userId }: { userId: string }) => {
           return;
         }
         
-        // Explicitly type the data to avoid deep type instantiation
-        const typedData = data as unknown as PaymentData[];
+        // Use the explicitly defined type to handle the data
+        const rawData = data as unknown as RawPaymentData[];
         
-        const formattedTips = typedData.map((payment: PaymentData) => {
-          return {
-            id: payment.id,
-            amount: payment.amount,
-            created_at: payment.created_at,
-            from_user_id: payment.user_id,
-            to_user_id: payment.recipient_id,
-            from_user: payment.from_user
-          };
-        });
+        const formattedTips: Tip[] = rawData.map(payment => ({
+          id: payment.id,
+          amount: payment.amount,
+          created_at: payment.created_at,
+          from_user_id: payment.user_id,
+          to_user_id: payment.recipient_id,
+          from_user: payment.from_user
+        }));
         
         setTips(formattedTips);
       } catch (err) {
