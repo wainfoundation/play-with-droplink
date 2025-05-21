@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -30,43 +29,36 @@ const RecentTips = ({ profileId }: Props) => {
       try {
         setLoading(true);
         
-        // Using type assertion to avoid deep type instantiation
-        type PaymentRow = {
-          id: string;
-          amount: number;
-          user_id: string;
-          created_at: string;
-        };
-        
-        const { data, error } = await supabase
+        // Use a straightforward approach without complex typing
+        const result = await supabase
           .from('payments')
           .select('id, amount, user_id, created_at')
           .eq('receiver_id', profileId)
           .order('created_at', { ascending: false })
-          .limit(5) as { data: PaymentRow[] | null, error: any };
+          .limit(5);
           
-        if (error) {
-          console.error('Error fetching tips:', error);
+        if (result.error) {
+          console.error('Error fetching tips:', result.error);
           return;
         }
 
         // Transform the data to match our expected type
         const tipsData: TipWithSender[] = [];
         
-        for (const item of data || []) {
+        for (const item of result.data || []) {
           // For each payment, fetch the sender's username
-          const { data: userData } = await supabase
+          const userResult = await supabase
             .from('user_profiles')
             .select('username')
             .eq('id', item.user_id)
-            .maybeSingle();
+            .single();
             
           tipsData.push({
             id: item.id,
             amount: item.amount,
             sender_id: item.user_id,
             created_at: item.created_at,
-            sender: userData ? { username: userData.username } : undefined
+            sender: userResult.data ? { username: userResult.data.username } : undefined
           });
         }
         
