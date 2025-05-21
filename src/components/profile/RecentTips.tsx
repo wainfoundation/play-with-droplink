@@ -10,7 +10,7 @@ interface Tip {
   created_at: string;
   memo: string;
   from_username?: string;
-  user_id?: string; // Adding this to avoid recursive type instantiation
+  user_id?: string;
 }
 
 interface RecentTipsProps {
@@ -35,7 +35,7 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
           .eq('status', 'completed')
           .eq('recipient_id', userId)
           .order('created_at', { ascending: false })
-          .limit(limit);
+          .limit(limit || 3);
         
         if (tipsError) {
           console.error("Failed to fetch tips:", tipsError);
@@ -51,13 +51,20 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
         
         if (totalError) {
           console.error("Failed to fetch total tips:", totalError);
-        } else {
-          const total = totalData.reduce((sum, payment) => sum + parseFloat(payment.amount.toString()), 0);
+        } else if (totalData) {
+          const total = totalData.reduce((sum, payment) => 
+            sum + parseFloat(typeof payment.amount === 'string' ? payment.amount : payment.amount.toString()), 0);
           setTotalReceived(total);
         }
         
-        // Get usernames for the tippers if needed
-        const userIds = tipsData?.map(tip => tip.user_id) || [];
+        if (!tipsData || tipsData.length === 0) {
+          setTips([]);
+          setLoading(false);
+          return;
+        }
+        
+        // Get usernames for the tippers
+        const userIds = tipsData.filter(tip => tip.user_id).map(tip => tip.user_id as string);
         
         if (userIds.length > 0) {
           const { data: usersData, error: usersError } = await supabase
@@ -81,10 +88,10 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
             
             setTips(tipsWithUsernames);
           } else {
-            setTips(tipsData || []);
+            setTips(tipsData);
           }
         } else {
-          setTips(tipsData || []);
+          setTips(tipsData);
         }
         
         setLoading(false);
@@ -120,7 +127,9 @@ const RecentTips = ({ userId, limit = 3 }: RecentTipsProps) => {
             <div className="flex justify-between items-start">
               <div>
                 <p className="font-medium">
-                  {tip.from_username || 'Anonymous'} tipped <span className="text-primary">{parseFloat(tip.amount.toString()).toFixed(2)} Pi</span>
+                  {tip.from_username || 'Anonymous'} tipped <span className="text-primary">
+                    {parseFloat(typeof tip.amount === 'string' ? tip.amount : tip.amount.toString()).toFixed(2)} Pi
+                  </span>
                 </p>
                 {tip.memo && <p className="text-gray-600 mt-1">{tip.memo}</p>}
               </div>

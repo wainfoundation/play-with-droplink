@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate as useReactRouterNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PiAdsNetwork from "@/components/PiAdsNetwork";
@@ -17,6 +16,7 @@ import LinksList from "@/components/profile/LinksList";
 import LoadingState from "@/components/profile/LoadingState";
 import ErrorState from "@/components/profile/ErrorState";
 import TipModal from "@/components/profile/TipModal";
+import RecentTips from "@/components/profile/RecentTips";
 
 interface Link {
   id: string;
@@ -24,6 +24,7 @@ interface Link {
   url: string;
   icon: string;
   clicks: number;
+  type?: "featured" | "social" | "regular";
 }
 
 interface ProfileData {
@@ -45,6 +46,7 @@ const ProfilePage = () => {
   const [showTipModal, setShowTipModal] = useState(false);
   
   const { user, showAds } = useUser();
+  const navigate = useReactRouterNavigate();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -95,14 +97,46 @@ const ProfilePage = () => {
             .select();
         }
         
-        // If no links found, use default links
+        // Process links to categorize them
+        const processedLinks = linksData ? linksData.map(link => {
+          // Determine link type based on URL or position
+          let type: "featured" | "social" | "regular" | undefined = undefined;
+          
+          // Check if it's a social link
+          if (
+            link.url.includes('instagram.com') ||
+            link.url.includes('twitter.com') ||
+            link.url.includes('facebook.com') ||
+            link.url.includes('linkedin.com') ||
+            link.url.includes('youtube.com') ||
+            link.icon.toLowerCase() === 'instagram' ||
+            link.icon.toLowerCase() === 'twitter' ||
+            link.icon.toLowerCase() === 'facebook' ||
+            link.icon.toLowerCase() === 'linkedin' ||
+            link.icon.toLowerCase() === 'youtube'
+          ) {
+            type = "social";
+          } 
+          // First two links are featured by default
+          else if (linksData.indexOf(link) < 2) {
+            type = "featured";
+          }
+          // Everything else is regular
+          else {
+            type = "regular";
+          }
+          
+          return { ...link, type };
+        }) : [];
+        
+        // Default links if none found
         const defaultLinks = [
           { id: 'default-1', title: "Tip in Pi", url: "#tip-in-pi", icon: "💰", clicks: 0 },
         ];
         
         setProfileData({
           ...profileData,
-          links: linksData && linksData.length > 0 ? linksData : defaultLinks,
+          links: processedLinks && processedLinks.length > 0 ? processedLinks : defaultLinks,
         });
         
         setLoading(false);
@@ -281,6 +315,11 @@ const ProfilePage = () => {
               processingTip={processingTip}
               onTipClick={handleTipClick}
             />
+            
+            {/* Display recent tips if available */}
+            {profileData.id && (
+              <RecentTips userId={profileData.id} limit={3} />
+            )}
           </div>
         </div>
       </main>
