@@ -24,6 +24,7 @@ import Contact from "./pages/Contact";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Cookies from "./pages/Cookies";
+import GDPR from "./pages/GDPR";
 
 // App component
 function App() {
@@ -59,6 +60,7 @@ function App() {
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/cookies" element={<Cookies />} />
+              <Route path="/gdpr" element={<GDPR />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Toaster />

@@ -69,6 +69,9 @@ const Footer = () => {
             <li><Link to="/cookies" className="text-sm hover:text-primary transition-colors flex items-center gap-2">
               <Cookie size={16} /> Cookie Policy
             </Link></li>
+            <li><Link to="/gdpr" className="text-sm hover:text-primary transition-colors flex items-center gap-2">
+              <Shield size={16} /> GDPR Compliance
+            </Link></li>
           </ul>
 
           <div className="mt-8 pt-4 border-t border-gray-200">
