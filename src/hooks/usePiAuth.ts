@@ -40,7 +40,8 @@ export function usePiAuth() {
   useEffect(() => {
     // Check if Pi Network SDK is available in the window object
     if (window.Pi) {
-      window.Pi.init({ version: "2.0", sandbox: true })
+      // Use a Promise pattern correctly with proper error handling
+      Promise.resolve(window.Pi.init({ version: "2.0", sandbox: true }))
         .then(() => {
           console.log("Pi Network SDK initialized");
           setLoading(false);

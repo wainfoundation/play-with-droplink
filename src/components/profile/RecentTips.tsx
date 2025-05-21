@@ -41,7 +41,7 @@ const RecentTips = ({ userId }: { userId: string }) => {
       try {
         setLoading(true);
         
-        // Use payments table with proper join 
+        // Use payments table with correctly named columns
         const { data, error } = await supabase
           .from("payments")
           .select(`
@@ -61,15 +61,23 @@ const RecentTips = ({ userId }: { userId: string }) => {
           return;
         }
         
-        // Proper type casting to match Tip interface
-        const formattedTips = (data || []).map((payment: PaymentData): Tip => ({
-          id: payment.id,
-          amount: payment.amount,
-          created_at: payment.created_at,
-          from_user_id: payment.user_id,
-          to_user_id: payment.recipient_id,
-          from_user: payment.from_user
-        }));
+        // Handle case where data might be null
+        if (!data || !Array.isArray(data)) {
+          setTips([]);
+          return;
+        }
+        
+        // Type checking to ensure we're working with the expected data structure
+        const formattedTips = data.map((payment): Tip => {
+          return {
+            id: payment.id,
+            amount: payment.amount,
+            created_at: payment.created_at,
+            from_user_id: payment.user_id,
+            to_user_id: payment.recipient_id,
+            from_user: payment.from_user
+          };
+        });
         
         setTips(formattedTips);
       } catch (err) {
