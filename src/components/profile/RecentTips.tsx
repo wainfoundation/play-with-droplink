@@ -22,6 +22,19 @@ interface Tip {
   from_user: TipUser | null;
 }
 
+// Interface for raw data from Supabase
+interface RawTipData {
+  id: string;
+  amount: number;
+  created_at: string;
+  user_id: string;
+  from_user?: {
+    id: string;
+    username: string;
+    avatar_url: string | null;
+  } | null;
+}
+
 const RecentTips = ({ userId }: { userId: string }) => {
   const [tips, setTips] = useState<Tip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,23 +72,16 @@ const RecentTips = ({ userId }: { userId: string }) => {
         // Use a simpler approach to avoid complex type inference
         const formattedTips: Tip[] = [];
         
-        for (const item of data) {
-          // Ensure from_user is properly typed or null
-          let typedFromUser: TipUser | null = null;
+        for (const item of data as RawTipData[]) {
+          let tipUser: TipUser | null = null;
           
+          // Safely check if from_user exists and has the required properties
           if (item.from_user && typeof item.from_user === 'object') {
-            // Check if from_user has the required properties and is not null
-            const fromUser = item.from_user;
-            if (fromUser && 
-                typeof fromUser === 'object' && 
-                'id' in fromUser && 
-                'username' in fromUser) {
-              typedFromUser = {
-                id: fromUser.id,
-                username: fromUser.username,
-                avatar_url: fromUser.avatar_url
-              };
-            }
+            tipUser = {
+              id: item.from_user.id,
+              username: item.from_user.username,
+              avatar_url: item.from_user.avatar_url
+            };
           }
           
           formattedTips.push({
@@ -84,7 +90,7 @@ const RecentTips = ({ userId }: { userId: string }) => {
             created_at: item.created_at,
             from_user_id: item.user_id,
             to_user_id: userId, // Since we're querying where user_id = userId
-            from_user: typedFromUser
+            from_user: tipUser
           });
         }
         
