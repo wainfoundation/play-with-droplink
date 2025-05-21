@@ -1,17 +1,18 @@
-
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, Navigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useUser } from "@/context/UserContext";
-import { Navigate } from "react-router-dom";
-import { Code, Users, Settings, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Code, Users, Settings, BarChart3 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
+import { useAdminStatus } from "@/hooks/useAdminStatus";
+import { useUser } from "@/context/UserContext";
 
 const Admin = () => {
-  const { isAdmin, isLoading } = useUser();
+  const { isLoading: userLoading } = useUser();
+  const { isAdmin, isLoading: adminLoading, error } = useAdminStatus();
+  const isLoading = userLoading || adminLoading;
   
   // If still loading, show loading state
   if (isLoading) {

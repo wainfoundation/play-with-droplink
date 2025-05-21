@@ -14,6 +14,7 @@ interface UserContextType {
   isLoggedIn: boolean;
   showAds: boolean;
   isAdmin: boolean;
+  setIsAdmin: (value: boolean) => void;
   refreshUserData: () => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (data: any) => Promise<void>;
@@ -23,9 +24,10 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const { user, isLoading: authLoading, isAdmin, isLoggedIn, signOut } = useAuth();
+  const { user, isLoading: authLoading, isLoggedIn, signOut } = useAuth();
   const { profile, isLoading: profileLoading, updateProfile, refreshProfile } = useUserProfile(user);
   const { subscription, isLoading: subscriptionLoading, cancelSubscription, refreshSubscription } = useSubscription(user);
+  const [isAdmin, setIsAdmin] = useState(false);
   
   // Overall loading state
   const isLoading = authLoading || profileLoading || subscriptionLoading;
@@ -49,6 +51,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     isLoggedIn,
     showAds,
     isAdmin,
+    setIsAdmin,
     refreshUserData,
     signOut,
     updateProfile,

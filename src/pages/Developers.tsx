@@ -1,12 +1,11 @@
-
 import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
 import { Helmet } from "react-helmet-async";
-import { useUser } from "@/context/UserContext";
 import { useUserPermissions } from "@/hooks/useUserPermissions";
+import { useAdminStatus } from "@/hooks/useAdminStatus";
 
 // Import developer components
 import AdminBanner from "@/components/developers/AdminBanner";
@@ -20,16 +19,15 @@ import DevCTASection from "@/components/developers/DevCTASection";
 
 const Developers = () => {
   const [activeTab, setActiveTab] = useState("api");
-  const { user, isLoading } = useUser();
-  const { permissions } = useUserPermissions();
+  const { isAdmin, isLoading: adminLoading } = useAdminStatus();
   
   // Security improvement: Add console log for debugging permission status
   useEffect(() => {
-    console.log("Developer page - Admin access status:", permissions.hasFullAdminAccess);
-  }, [permissions.hasFullAdminAccess]);
+    console.log("Developer page - Admin access status:", isAdmin);
+  }, [isAdmin]);
   
   // Check if user has admin access to view developer portal
-  if (isLoading) {
+  if (adminLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p>Loading...</p>
@@ -38,7 +36,7 @@ const Developers = () => {
   }
   
   // If not an admin, redirect to home page
-  if (!permissions.hasFullAdminAccess) {
+  if (!isAdmin) {
     console.log("User does not have admin access, redirecting to home");
     return <Navigate to="/" replace />;
   }
@@ -58,7 +56,7 @@ const Developers = () => {
         <HeroSection />
         
         {/* API Overview */}
-        <ApiDocsSection activeTab={activeTab} setActiveTab={setActiveTab} />
+        <ApiDocsSection activeTab={activeTab} setActiveTab={activeTab} />
         
         {/* Other sections - These will be rendered based on active tab */}
         {activeTab === "webhooks" && <WebhooksSection />}
