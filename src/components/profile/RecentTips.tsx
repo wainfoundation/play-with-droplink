@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
@@ -41,6 +40,7 @@ const RecentTips = ({ userId }: { userId: string }) => {
       try {
         setLoading(true);
         
+        // Use explicit type definition to avoid deep instantiation
         const { data, error } = await supabase
           .from("payments")
           .select("id, amount, created_at, user_id, recipient_id, from_user:user_profiles!user_id(id, username, avatar_url)")
@@ -59,10 +59,8 @@ const RecentTips = ({ userId }: { userId: string }) => {
           return;
         }
         
-        // Use type assertion with a simple type to avoid deep instantiation
-        const records = data as unknown as PaymentRecord[];
-        
-        const formattedTips = records.map((payment): Tip => ({
+        // Use a simpler approach with type assertion to avoid deep type instantiation
+        const formattedTips = (data as any[]).map((payment): Tip => ({
           id: payment.id,
           amount: payment.amount,
           created_at: payment.created_at,
