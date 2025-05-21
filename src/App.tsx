@@ -25,7 +25,10 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Cookies from "./pages/Cookies";
 import GDPR from "./pages/GDPR";
-import Demo from "./pages/Demo"; // Add this import
+import Demo from "./pages/Demo";
+import Help from "./pages/Help";
+import CreatorDirectory from "./pages/CreatorDirectory";
+import Developers from "./pages/Developers";
 
 // App component
 function App() {
@@ -62,7 +65,10 @@ function App() {
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/cookies" element={<Cookies />} />
               <Route path="/gdpr" element={<GDPR />} />
-              <Route path="/demo" element={<Demo />} /> {/* Add this route */}
+              <Route path="/demo" element={<Demo />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/creators" element={<CreatorDirectory />} />
+              <Route path="/developers" element={<Developers />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Toaster />
