@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -44,42 +43,54 @@ const RecentTips = ({ profileId }: Props) => {
       try {
         setLoading(true);
         
-        // Use simple object for query response
-        const { data: paymentsData, error: paymentsError } = await supabase
+        // Use type assertion instead of relying on automatic type inference
+        const { data, error } = await supabase
           .from('payments')
           .select('id, amount, user_id, created_at')
-          .eq('receiver_id', profileId)
+          .eq('recipient_id', profileId)
           .order('created_at', { ascending: false })
           .limit(5);
           
-        if (paymentsError) {
-          console.error('Error fetching tips:', paymentsError);
+        if (error) {
+          console.error('Error fetching tips:', error);
           return;
         }
 
-        // Process payments one by one
+        // Process payments one by one with explicit typing
         const tipsData: TipWithSender[] = [];
         
-        for (const payment of paymentsData || []) {
-          const paymentItem = payment as PaymentData;
-          
-          // Get user data
-          const { data: userData, error: userError } = await supabase
-            .from('user_profiles')
-            .select('username')
-            .eq('id', paymentItem.user_id)
-            .limit(1);
+        if (data) {
+          for (const payment of data) {
+            // Explicitly type the payment object
+            const paymentItem = {
+              id: payment.id,
+              amount: payment.amount,
+              user_id: payment.user_id,
+              created_at: payment.created_at
+            };
             
-          // Add tip with sender information
-          tipsData.push({
-            id: paymentItem.id,
-            amount: paymentItem.amount,
-            sender_id: paymentItem.user_id,
-            created_at: paymentItem.created_at,
-            sender: userData && userData.length > 0 
-              ? { username: (userData[0] as UserData).username } 
-              : undefined
-          });
+            // Get user data with explicit typing
+            const { data: userData, error: userError } = await supabase
+              .from('user_profiles')
+              .select('username')
+              .eq('id', paymentItem.user_id)
+              .limit(1);
+              
+            if (userError) {
+              console.error('Error fetching sender data:', userError);
+            }
+            
+            // Add tip with sender information
+            tipsData.push({
+              id: paymentItem.id,
+              amount: paymentItem.amount,
+              sender_id: paymentItem.user_id,
+              created_at: paymentItem.created_at,
+              sender: userData && userData.length > 0 
+                ? { username: userData[0].username } 
+                : undefined
+            });
+          }
         }
         
         setTips(tipsData);
