@@ -11,15 +11,19 @@ import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-muted/20 to-primary/10">
       <Navbar />
       <main className="flex-grow">
         <Hero />
-        <HowItWorks />
-        <MobilePreview />
-        <Features />
-        <Testimonials />
-        <FAQ />
+        <div className="relative">
+          {/* Decorative background elements */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/30 to-transparent pointer-events-none" />
+          <HowItWorks />
+          <MobilePreview />
+          <Features />
+          <Testimonials />
+          <FAQ />
+        </div>
         <CTA />
       </main>
       <Footer />

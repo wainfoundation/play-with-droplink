@@ -3,7 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap');
 
 @layer base {
   :root {
@@ -93,7 +93,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground font-sans antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -108,43 +108,43 @@
   
   .gradient-hero::before {
     content: '';
-    @apply absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/30 to-blue-300/30 animate-wave z-10;
+    @apply absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 z-10;
   }
 
   .floating-icon {
-    @apply absolute text-white/70 animate-float pointer-events-none;
+    @apply absolute text-white/30 pointer-events-none;
   }
 
   .cta-button {
-    @apply relative overflow-hidden bg-primary text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 hover:bg-secondary hover:scale-105 shadow-md hover:shadow-lg;
+    @apply relative overflow-hidden bg-white text-primary font-bold px-8 py-4 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-2xl;
   }
 
   .cta-button-outline {
-    @apply relative overflow-hidden bg-transparent border-2 border-white text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 hover:bg-secondary hover:scale-105 hover:border-secondary shadow-md hover:shadow-lg;
+    @apply relative overflow-hidden bg-transparent border-2 border-white text-white font-bold px-8 py-4 rounded-xl transition-all duration-300 hover:bg-white hover:text-primary hover:scale-105 shadow-lg hover:shadow-2xl;
   }
 
   .feature-card {
-    @apply bg-white p-8 rounded-xl shadow-md transition-all duration-300 hover:translate-y-[-5px] hover:shadow-lg text-center;
+    @apply bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-lg transition-all duration-300 hover:translate-y-[-8px] hover:shadow-2xl text-center border border-white/20;
   }
 
   .feature-icon {
-    @apply text-5xl text-primary mb-6 transition-transform duration-300;
+    @apply text-5xl text-primary mb-6 transition-transform duration-300 hover:scale-110;
   }
 
   .step-card {
-    @apply relative bg-white p-8 rounded-xl shadow-md transition-all duration-300 hover:translate-y-[-5px] hover:shadow-lg text-center;
+    @apply relative bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-lg transition-all duration-300 hover:translate-y-[-8px] hover:shadow-2xl text-center border border-white/20;
   }
 
   .step-card::before {
-    @apply absolute top-[-15px] left-[20px] bg-primary text-white rounded-full w-[30px] h-[30px] flex items-center justify-center text-base font-semibold;
+    @apply absolute top-[-15px] left-[20px] bg-gradient-hero text-white rounded-full w-[30px] h-[30px] flex items-center justify-center text-base font-bold shadow-lg;
   }
 
   .testimonial-card {
-    @apply bg-white p-6 rounded-xl shadow-md flex items-start gap-4 transition-all duration-300 hover:translate-y-[-5px];
+    @apply bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-lg flex items-start gap-4 transition-all duration-300 hover:translate-y-[-5px] border border-white/20;
   }
 
   .nav-link {
-    @apply relative text-foreground font-medium transition-colors duration-300 hover:text-primary;
+    @apply relative text-foreground font-medium transition-all duration-300 hover:text-primary;
   }
 
   .nav-link::after {
@@ -154,4 +154,20 @@
   .nav-link:hover::after {
     @apply w-full;
   }
+}
+
+/* Enhanced animations */
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
