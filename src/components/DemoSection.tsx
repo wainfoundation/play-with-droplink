@@ -4,8 +4,11 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import DemoPreview from "@/components/DemoPreview";
+import { useUser } from "@/context/UserContext";
 
 const DemoSection = () => {
+  const { isLoggedIn, profile } = useUser();
+
   return (
     <section className="py-24 px-4 bg-muted/50 relative overflow-hidden">
       <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full blur-3xl"></div>
@@ -26,9 +29,15 @@ const DemoSection = () => {
                   Try the Demo <ArrowRight size={16} />
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="hover:bg-muted/50 transition-colors">
-                <Link to="/signup">Create Your Own</Link>
-              </Button>
+              {isLoggedIn && profile ? (
+                <Button asChild variant="outline" className="hover:bg-muted/50 transition-colors">
+                  <Link to={`/${profile.username}`}>View Your Profile</Link>
+                </Button>
+              ) : (
+                <Button asChild variant="outline" className="hover:bg-muted/50 transition-colors">
+                  <Link to="/signup">Create Your Own</Link>
+                </Button>
+              )}
             </div>
           </div>
           <div className="flex justify-center">

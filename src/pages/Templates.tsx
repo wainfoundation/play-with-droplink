@@ -4,144 +4,77 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowRight, Star, Zap } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { ArrowRight, Star, Zap, Eye, Lock } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
 import { Helmet } from "react-helmet-async";
+import { useUserPermissions } from "@/hooks/useUserPermissions";
 
 const Templates = () => {
   const [activeTab, setActiveTab] = useState("all");
+  const { plan, permissions } = useUserPermissions();
   
-  const templates = [
-    {
-      id: 1,
-      name: "Aqua",
-      category: "basic",
-      image: "https://images.unsplash.com/photo-1617957718587-60a442884bee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      popular: true,
-      new: false,
-      plan: "starter",
-      colors: ["#00aaff", "#00d4ff"]
-    },
-    {
-      id: 2,
-      name: "Ocean",
-      category: "premium",
-      image: "https://images.unsplash.com/photo-1581059729227-8a690cd41d2e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      popular: false,
-      new: true,
-      plan: "pro",
-      colors: ["#34c3eb", "#4764e6"]
-    },
-    {
-      id: 3,
-      name: "Coral",
-      category: "creator",
-      image: "https://images.unsplash.com/photo-1593077676642-3acbd7a80b7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      popular: true,
-      new: false,
-      plan: "pro",
-      colors: ["#ff7e5f", "#feb47b"]
-    },
-    {
-      id: 4,
-      name: "Wave",
-      category: "business",
-      image: "https://images.unsplash.com/photo-1545259741-2ea3ebf92fe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      popular: false,
-      new: false,
-      plan: "premium",
-      colors: ["#3a7bd5", "#00d2ff"]
-    },
-    {
-      id: 5,
-      name: "Tide",
-      category: "minimalist",
-      image: "https://images.unsplash.com/photo-1559521783-1d1599583485?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      popular: true,
-      new: false,
-      plan: "starter",
-      colors: ["#232526", "#414345"]
-    },
-    {
-      id: 6,
-      name: "Splash",
-      category: "basic",
-      image: "https://images.unsplash.com/photo-1527323585280-9036d09125a6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      popular: false,
-      new: false,
-      plan: "starter",
-      colors: ["#48c6ef", "#6f86d6"]
-    },
-    {
-      id: 7,
-      name: "Marina",
-      category: "premium",
-      image: "https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      popular: false,
-      new: true,
-      plan: "premium",
-      colors: ["#1a2980", "#26d0ce"]
-    },
-    {
-      id: 8,
-      name: "Lagoon",
-      category: "creator",
-      image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      popular: false,
-      new: false,
-      plan: "pro",
-      colors: ["#0cebeb", "#20e3b2", "#29ffc6"]
-    },
-    {
-      id: 9,
-      name: "Ripple",
-      category: "business",
-      image: "https://images.unsplash.com/photo-1617824254359-0941a234789b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      popular: false,
-      new: true,
-      plan: "premium",
-      colors: ["#5433ff", "#20bdff", "#a5fecb"]
-    },
-    {
-      id: 10,
-      name: "Foam",
-      category: "minimalist",
-      image: "https://images.unsplash.com/photo-1625234188513-6054f53aed20?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      popular: true,
-      new: false,
-      plan: "pro",
-      colors: ["#f5f7fa", "#c3cfe2"]
-    },
-    {
-      id: 11,
-      name: "Cascade",
-      category: "basic",
-      image: "https://images.unsplash.com/photo-1526376043067-5af36c35cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      popular: false,
-      new: false,
-      plan: "starter",
-      colors: ["#4facfe", "#00f2fe"]
-    },
-    {
-      id: 12,
-      name: "Deep",
-      category: "premium",
-      image: "https://images.unsplash.com/photo-1519619091416-f5d7e5200702?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      popular: false,
-      new: true,
-      plan: "premium",
-      colors: ["#0f0c29", "#302b63", "#24243e"]
-    }
-  ];
+  // Generate 100 templates with varied properties
+  const generateTemplates = () => {
+    const categories = ["basic", "premium", "minimalist", "creator", "business", "artistic"];
+    const plans = ["starter", "pro", "premium"];
+    const baseNames = [
+      "Aqua", "Ocean", "Coral", "Wave", "Tide", "Splash", "Marina", "Lagoon", "Ripple", "Foam",
+      "Cascade", "Deep", "Flow", "Drift", "Current", "Shore", "Bay", "Stream", "River", "Lake",
+      "Pond", "Falls", "Spring", "Brook", "Delta", "Cove", "Reef", "Surf", "Waves", "Blue",
+      "Azure", "Cyan", "Teal", "Navy", "Sapphire", "Indigo", "Cobalt", "Turquoise", "Mint", "Sage",
+      "Forest", "Emerald", "Jade", "Lime", "Olive", "Pine", "Moss", "Leaf", "Fern", "Ivy",
+      "Rose", "Ruby", "Crimson", "Scarlet", "Cherry", "Wine", "Burgundy", "Coral", "Salmon", "Pink",
+      "Purple", "Violet", "Lavender", "Plum", "Orchid", "Magenta", "Fuchsia", "Mauve", "Lilac", "Grape",
+      "Orange", "Amber", "Gold", "Honey", "Peach", "Apricot", "Sunset", "Dawn", "Fire", "Flame",
+      "Silver", "Pearl", "Platinum", "Crystal", "Diamond", "Marble", "Stone", "Granite", "Slate", "Ash",
+      "Snow", "Ice", "Cloud", "Storm", "Thunder", "Lightning", "Rain", "Mist", "Fog", "Breeze"
+    ];
+
+    return Array.from({ length: 100 }, (_, index) => {
+      const categoryIndex = index % categories.length;
+      const planIndex = index % plans.length;
+      const nameIndex = index % baseNames.length;
+      
+      return {
+        id: index + 1,
+        name: baseNames[nameIndex],
+        category: categories[categoryIndex],
+        popular: index < 10,
+        new: index >= 90,
+        plan: plans[planIndex],
+        colors: generateColors(index),
+        preview: `https://images.unsplash.com/photo-${1500000000000 + index}?w=400&h=600&fit=crop`
+      };
+    });
+  };
+
+  const generateColors = (index: number) => {
+    const colorSets = [
+      ["#00aaff", "#00d4ff"],
+      ["#34c3eb", "#4764e6"],
+      ["#ff7e5f", "#feb47b"],
+      ["#3a7bd5", "#00d2ff"],
+      ["#232526", "#414345"],
+      ["#48c6ef", "#6f86d6"],
+      ["#1a2980", "#26d0ce"],
+      ["#0cebeb", "#20e3b2", "#29ffc6"],
+      ["#5433ff", "#20bdff", "#a5fecb"],
+      ["#f5f7fa", "#c3cfe2"]
+    ];
+    return colorSets[index % colorSets.length];
+  };
+
+  const templates = generateTemplates();
   
   const filteredTemplates = activeTab === "all" 
     ? templates 
     : templates.filter(template => template.category === activeTab);
 
-  const getPlanBadge = (plan: string) => {
-    switch(plan) {
+  const getPlanBadge = (templatePlan: string) => {
+    switch(templatePlan) {
       case "starter":
         return <Badge variant="outline">Starter</Badge>;
       case "pro":
@@ -153,19 +86,54 @@ const Templates = () => {
     }
   };
 
+  const canPreviewTemplate = (templatePlan: string) => {
+    const planHierarchy = { starter: 1, pro: 2, premium: 3 };
+    const userPlanLevel = planHierarchy[plan as keyof typeof planHierarchy] || 0;
+    const templatePlanLevel = planHierarchy[templatePlan as keyof typeof planHierarchy] || 1;
+    
+    return userPlanLevel >= templatePlanLevel;
+  };
+
+  const TemplatePreview = ({ template }: { template: any }) => (
+    <div className="w-full max-w-sm mx-auto">
+      <div 
+        className="w-full h-96 rounded-lg shadow-lg"
+        style={{
+          background: template.colors.length > 2 
+            ? `linear-gradient(45deg, ${template.colors.join(', ')})`
+            : `linear-gradient(45deg, ${template.colors[0]}, ${template.colors[1]})`
+        }}
+      >
+        <div className="flex flex-col items-center justify-center h-full p-6 text-white">
+          <div className="w-20 h-20 bg-white/90 rounded-full mb-4"></div>
+          <div className="w-32 h-4 bg-white/80 rounded-full mb-2"></div>
+          <div className="w-40 h-3 bg-white/60 rounded-full mb-6"></div>
+          <div className="w-40 h-8 bg-white/90 rounded-lg mb-3"></div>
+          <div className="flex flex-col gap-2 w-full max-w-40">
+            <div className="w-full h-6 bg-white/50 rounded-md"></div>
+            <div className="w-full h-6 bg-white/50 rounded-md"></div>
+            <div className="w-full h-6 bg-white/50 rounded-md"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
         <title>Templates | Droplink.space - Link in Bio for Pi Network Creators</title>
-        <meta name="description" content="Choose from our collection of professionally designed templates that make your Droplink profile stand out." />
+        <meta name="description" content="Choose from our collection of 100+ professionally designed templates that make your Droplink profile stand out." />
       </Helmet>
       <Navbar />
       <main className="flex-grow">
         <section className="py-16 px-4 bg-gradient-to-br from-blue-50 to-indigo-50">
           <div className="container mx-auto max-w-5xl text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">Showcase Your Vision with Beautiful Templates</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+              100+ Beautiful Templates
+            </h1>
             <p className="text-xl mb-10 max-w-3xl mx-auto">
-              Choose from our collection of professionally designed, water-inspired templates that make your Droplink profile stand out.
+              Choose from our extensive collection of professionally designed templates. Preview available based on your plan.
             </p>
             <Tabs defaultValue="all" className="max-w-3xl mx-auto" onValueChange={setActiveTab}>
               <TabsList className="grid grid-cols-3 md:grid-cols-6 mb-8">
@@ -186,7 +154,6 @@ const Templates = () => {
               {filteredTemplates.map(template => (
                 <div key={template.id} className="group bg-background rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
                   <div className="relative overflow-hidden">
-                    {/* Template preview with gradient overlay */}
                     <div 
                       className="w-full h-56"
                       style={{
@@ -195,7 +162,6 @@ const Templates = () => {
                           : `linear-gradient(45deg, ${template.colors[0]}, ${template.colors[1]})`
                       }}
                     >
-                      {/* Template mock content */}
                       <div className="flex flex-col items-center justify-center h-full">
                         <div className="w-16 h-16 bg-white rounded-full mb-2"></div>
                         <div className="w-24 h-3 bg-white/80 rounded-full mb-1.5"></div>
@@ -219,13 +185,26 @@ const Templates = () => {
                       {getPlanBadge(template.plan)}
                     </div>
                     <div className="flex justify-between items-center">
-                      <Link 
-                        to={`/templates/${template.id}`}
-                        className="text-primary font-medium hover:underline flex items-center"
-                      >
-                        Preview <ArrowRight className="ml-1" size={16} />
-                      </Link>
-                      <Button size="sm" className="bg-gradient-hero hover:scale-105 transition-transform">Use Template</Button>
+                      {canPreviewTemplate(template.plan) ? (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="ghost" size="sm" className="text-primary font-medium hover:underline flex items-center">
+                              <Eye className="mr-1" size={16} /> Preview
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-md">
+                            <TemplatePreview template={template} />
+                          </DialogContent>
+                        </Dialog>
+                      ) : (
+                        <div className="flex items-center text-muted-foreground text-sm">
+                          <Lock className="mr-1" size={16} />
+                          Upgrade to preview
+                        </div>
+                      )}
+                      <Button size="sm" className="bg-gradient-hero hover:scale-105 transition-transform">
+                        Use Template
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -244,13 +223,13 @@ const Templates = () => {
         {/* Template Plans */}
         <section className="py-16 px-4 bg-blue-50">
           <div className="container mx-auto max-w-6xl">
-            <h2 className="text-3xl font-bold mb-10 text-center">Template Availability by Plan</h2>
+            <h2 className="text-3xl font-bold mb-10 text-center">Template Access by Plan</h2>
             
             <div className="grid md:grid-cols-3 gap-8">
               <div className="bg-card rounded-xl p-6 shadow-sm border border-blue-100">
                 <h3 className="text-2xl font-semibold mb-4">Starter</h3>
                 <p className="text-lg mb-2">6π/month</p>
-                <p className="mb-6 text-muted-foreground">Access to 5+ basic templates</p>
+                <p className="mb-6 text-muted-foreground">Access to 30+ basic templates with preview</p>
                 <ul className="space-y-2 mb-8">
                   <li className="flex items-center">
                     <svg className="text-primary mr-2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -259,6 +238,10 @@ const Templates = () => {
                   <li className="flex items-center">
                     <svg className="text-primary mr-2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     Standard layout options
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="text-primary mr-2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Template preview access
                   </li>
                 </ul>
                 <Button variant="outline" asChild className="w-full hover:bg-blue-50 transition-colors">
@@ -270,7 +253,7 @@ const Templates = () => {
                 <div className="bg-primary text-white text-sm font-semibold py-1 px-3 rounded-full w-fit mx-auto -mt-10 mb-4">Most Popular</div>
                 <h3 className="text-2xl font-semibold mb-4">Pro</h3>
                 <p className="text-lg mb-2">10π/month</p>
-                <p className="mb-6 text-muted-foreground">Access to 15+ premium templates</p>
+                <p className="mb-6 text-muted-foreground">Access to 70+ templates with full preview</p>
                 <ul className="space-y-2 mb-8">
                   <li className="flex items-center">
                     <svg className="text-primary mr-2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -282,7 +265,7 @@ const Templates = () => {
                   </li>
                   <li className="flex items-center">
                     <svg className="text-primary mr-2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    Link animations
+                    All template previews
                   </li>
                 </ul>
                 <Button asChild className="w-full bg-gradient-hero hover:scale-105 transition-transform">
@@ -293,11 +276,11 @@ const Templates = () => {
               <div className="bg-card rounded-xl p-6 shadow-sm border border-blue-100">
                 <h3 className="text-2xl font-semibold mb-4">Premium</h3>
                 <p className="text-lg mb-2">15π/month</p>
-                <p className="mb-6 text-muted-foreground">Access to all 25+ templates</p>
+                <p className="mb-6 text-muted-foreground">Access to all 100+ templates with full customization</p>
                 <ul className="space-y-2 mb-8">
                   <li className="flex items-center">
                     <svg className="text-primary mr-2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    Full template customization
+                    Full template library access
                   </li>
                   <li className="flex items-center">
                     <svg className="text-primary mr-2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -317,19 +300,6 @@ const Templates = () => {
                 </Button>
               </div>
             </div>
-          </div>
-        </section>
-        
-        {/* Create Your Own */}
-        <section className="py-16 px-4">
-          <div className="container mx-auto max-w-4xl text-center">
-            <h2 className="text-3xl font-bold mb-4">Looking for Something Custom?</h2>
-            <p className="text-xl mb-8">
-              Pro and Premium users can create fully customized templates to match their brand identity perfectly.
-            </p>
-            <Button size="lg" asChild className="bg-gradient-hero hover:scale-105 transition-transform px-8">
-              <Link to="/signup" className="flex items-center gap-2">Get Started <ArrowRight size={18} /></Link>
-            </Button>
           </div>
         </section>
         

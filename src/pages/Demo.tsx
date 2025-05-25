@@ -7,8 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, Check, MousePointer, BarChart4 } from "lucide-react";
+import { useUser } from "@/context/UserContext";
 
 const Demo = () => {
+  const { isLoggedIn, profile } = useUser();
+
   return (
     <>
       <Helmet>
@@ -67,11 +70,19 @@ const Demo = () => {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4 pt-6">
-                <Button asChild size="lg" className="bg-gradient-hero hover:scale-105 transition-transform duration-200">
-                  <Link to="/signup" className="flex items-center gap-2">
-                    Create Your Own <ArrowRight size={16} />
-                  </Link>
-                </Button>
+                {isLoggedIn && profile ? (
+                  <Button asChild size="lg" className="bg-gradient-hero hover:scale-105 transition-transform duration-200">
+                    <Link to={`/${profile.username}`} className="flex items-center gap-2">
+                      View Your Profile <ArrowRight size={16} />
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button asChild size="lg" className="bg-gradient-hero hover:scale-105 transition-transform duration-200">
+                    <Link to="/signup" className="flex items-center gap-2">
+                      Create Your Own <ArrowRight size={16} />
+                    </Link>
+                  </Button>
+                )}
                 <Button asChild variant="outline" size="lg" className="hover:bg-blue-50">
                   <Link to="/features">Explore Features</Link>
                 </Button>
@@ -90,9 +101,15 @@ const Demo = () => {
             <p className="text-lg mb-6 max-w-2xl mx-auto">
               Sign up for free and start connecting with your audience through a beautiful, customizable link in bio page that accepts Pi payments.
             </p>
-            <Button asChild size="lg" className="bg-gradient-hero hover:scale-105 transition-transform">
-              <Link to="/signup">Get Started for Free</Link>
-            </Button>
+            {isLoggedIn && profile ? (
+              <Button asChild size="lg" className="bg-gradient-hero hover:scale-105 transition-transform">
+                <Link to="/dashboard">Go to Dashboard</Link>
+              </Button>
+            ) : (
+              <Button asChild size="lg" className="bg-gradient-hero hover:scale-105 transition-transform">
+                <Link to="/signup">Get Started for Free</Link>
+              </Button>
+            )}
           </div>
         </div>
       </main>
