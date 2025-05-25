@@ -48,10 +48,10 @@ export const useGroupChat = (groupId: string) => {
       const typedMessages = (data || []).map(msg => ({
         ...msg,
         message_type: msg.message_type as 'text' | 'image' | 'file' | 'system',
-        user_profiles: msg.user_profiles ? {
-          username: msg.user_profiles.username || '',
-          display_name: msg.user_profiles.display_name || undefined,
-          avatar_url: msg.user_profiles.avatar_url || undefined,
+        user_profiles: msg.user_profiles && typeof msg.user_profiles === 'object' && !Array.isArray(msg.user_profiles) ? {
+          username: (msg.user_profiles as any).username || '',
+          display_name: (msg.user_profiles as any).display_name || undefined,
+          avatar_url: (msg.user_profiles as any).avatar_url || undefined,
         } : undefined
       }));
       
@@ -174,10 +174,10 @@ export const useGroupChat = (groupId: string) => {
             const typedMessage: GroupMessage = {
               ...data,
               message_type: data.message_type as 'text' | 'image' | 'file' | 'system',
-              user_profiles: data.user_profiles ? {
-                username: data.user_profiles.username || '',
-                display_name: data.user_profiles.display_name || undefined,
-                avatar_url: data.user_profiles.avatar_url || undefined,
+              user_profiles: data.user_profiles && typeof data.user_profiles === 'object' && !Array.isArray(data.user_profiles) ? {
+                username: (data.user_profiles as any).username || '',
+                display_name: (data.user_profiles as any).display_name || undefined,
+                avatar_url: (data.user_profiles as any).avatar_url || undefined,
               } : undefined
             };
             setMessages(prev => [...prev, typedMessage]);

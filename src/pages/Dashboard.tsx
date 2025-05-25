@@ -13,16 +13,37 @@ import SubscriptionManagement from "@/components/dashboard/SubscriptionManagemen
 import AnalyticsSection from "@/components/dashboard/AnalyticsSection";
 import DashboardLoading from "@/components/dashboard/DashboardLoading";
 import LoginPrompt from "@/components/dashboard/LoginPrompt";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const Dashboard = () => {
-  const { isLoggedIn, isLoading } = useUser();
+  const { isLoggedIn, isLoading, profile, user, subscription } = useUser();
+  const navigate = useNavigate();
+  const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
+  const [processingPayment, setProcessingPayment] = useState(false);
+
+  const handlePiLogin = () => {
+    navigate('/login');
+  };
+
+  const handleSubscribe = async () => {
+    setProcessingPayment(true);
+    try {
+      // Handle subscription logic here
+      console.log('Subscribe clicked');
+    } catch (error) {
+      console.error('Subscription error:', error);
+    } finally {
+      setProcessingPayment(false);
+    }
+  };
 
   if (isLoading) {
     return <DashboardLoading />;
   }
 
   if (!isLoggedIn) {
-    return <LoginPrompt />;
+    return <LoginPrompt handlePiLogin={handlePiLogin} />;
   }
 
   return (
@@ -30,23 +51,43 @@ const Dashboard = () => {
       <Navbar />
       <main className="pt-16">
         <div className="container mx-auto px-4 py-8">
-          <DashboardHeader />
+          <DashboardHeader 
+            username={profile?.username || user?.email || 'User'}
+            subscription={subscription}
+          />
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             {/* Main content area */}
             <div className="lg:col-span-2 space-y-8">
-              <OverviewStats />
+              <OverviewStats 
+                pageViews={1234}
+                linkClicks={567}
+                conversionRate={12.5}
+              />
               <LinksSection />
               <ProductsSection />
             </div>
             
             {/* Sidebar */}
             <div className="space-y-6">
-              <ProfileUrlDisplay />
-              <QuickActions />
+              <ProfileUrlDisplay 
+                profileUrl={`https://droplink.gg/${profile?.username || 'user'}`}
+                username={profile?.username || 'user'}
+              />
+              <QuickActions 
+                subscription={subscription}
+                profile={profile}
+                navigate={navigate}
+                setConfirmCancelOpen={setConfirmCancelOpen}
+              />
               <GroupsSection />
-              <SubscriptionManagement />
-              <AnalyticsSection />
+              <SubscriptionManagement 
+                subscription={subscription}
+                handleSubscribe={handleSubscribe}
+                processingPayment={processingPayment}
+                setConfirmCancelOpen={setConfirmCancelOpen}
+              />
+              <AnalyticsSection subscription={subscription} />
             </div>
           </div>
         </div>
