@@ -5,11 +5,14 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export function PiAuthButton() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const navigate = useNavigate();
   const { refreshUserData } = useUser();
+  const { handleError } = useErrorHandler();
 
   const handleAuth = async () => {
     try {
@@ -34,7 +37,7 @@ export function PiAuthButton() {
       });
       
       if (error) {
-        throw new Error(error.message);
+        throw error;
       }
       
       toast({
@@ -44,13 +47,25 @@ export function PiAuthButton() {
       
       await refreshUserData();
       navigate('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
       console.error("Auth error:", error);
-      toast({
-        title: "Authentication Error",
-        description: "Failed to create Pi Network account. Please try again.",
-        variant: "destructive",
-      });
+      
+      // Handle specific auth errors
+      if (error.message?.includes('Email rate limit exceeded')) {
+        toast({
+          title: "Rate Limit Exceeded",
+          description: "Too many signup attempts. Please try again later.",
+          variant: "destructive",
+        });
+      } else if (error.message?.includes('Signups not allowed')) {
+        toast({
+          title: "Signups Temporarily Disabled",
+          description: "Account creation is temporarily disabled. Please try again later.",
+          variant: "destructive",
+        });
+      } else {
+        handleError(error, "Pi Network authentication");
+      }
     } finally {
       setIsAuthenticating(false);
     }
@@ -64,10 +79,19 @@ export function PiAuthButton() {
         disabled={isAuthenticating}
         size="lg"
       >
-        <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/>
-        </svg>
-        {isAuthenticating ? "Connecting to Pi Network..." : "Continue with Pi Network"}
+        {isAuthenticating ? (
+          <div className="flex items-center gap-2">
+            <LoadingSpinner size="sm" />
+            <span>Connecting to Pi Network...</span>
+          </div>
+        ) : (
+          <>
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/>
+            </svg>
+            Continue with Pi Network
+          </>
+        )}
       </Button>
     </div>
   );

@@ -3,42 +3,30 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { User } from '@supabase/supabase-js';
+import { useErrorHandler } from './useErrorHandler';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const { handleError } = useErrorHandler();
 
   // Admin emails - add your email here
   const ADMIN_EMAILS = ["admin@pidrop.dev"];
   
   useEffect(() => {
-    // Security improvement: Add authorization header and token validation
-    const checkAuthHeaders = async () => {
-      // Check if auth state includes valid tokens
-      const { data } = await supabase.auth.getSession();
-      
-      if (data.session?.access_token) {
-        // Validate token expiry
-        if (new Date(data.session.expires_at * 1000) < new Date()) {
-          console.warn("Access token has expired");
-          await signOut(); // Force sign out if token expired
-          return false;
-        }
-        console.log("Valid access token present");
-        return true;
-      }
-      return false;
-    };
-    
+    let isMounted = true;
+
     // Set up auth state change listener with improved security
     const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (!isMounted) return;
+        
         console.log("Auth state change:", event, session?.user?.id);
         const currentUser = session?.user ?? null;
         setUser(currentUser);
         
-        // Security enhancement: Strict admin validation with email verification
+        // Enhanced security: Strict admin validation with email verification
         if (currentUser && currentUser.email && currentUser.email_confirmed_at) {
           const userIsAdmin = ADMIN_EMAILS.includes(currentUser.email);
           setIsAdmin(userIsAdmin);
@@ -51,18 +39,43 @@ export const useAuth = () => {
         }
         
         setIsLoading(false);
+
+        // Handle specific auth events
+        if (event === 'SIGNED_IN') {
+          toast({
+            title: "Welcome back!",
+            description: "You have successfully signed in.",
+          });
+        } else if (event === 'SIGNED_OUT') {
+          toast({
+            title: "Signed out",
+            description: "You have been successfully signed out.",
+          });
+        } else if (event === 'PASSWORD_RECOVERY') {
+          toast({
+            title: "Password recovery",
+            description: "Check your email for password reset instructions.",
+          });
+        }
       }
     );
 
     // Check current session with improved security
     const initAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          throw error;
+        }
+        
+        if (!isMounted) return;
+        
         console.log("Current session:", session?.user?.id);
         const currentUser = session?.user ?? null;
         setUser(currentUser);
         
-        // Security enhancement: Strict admin validation with email verification
+        // Enhanced security: Strict admin validation with email verification
         if (currentUser && currentUser.email && currentUser.email_confirmed_at) {
           const userIsAdmin = ADMIN_EMAILS.includes(currentUser.email);
           setIsAdmin(userIsAdmin);
@@ -72,41 +85,42 @@ export const useAuth = () => {
           }
         }
         
-        // Run security check
-        await checkAuthHeaders();
         setIsLoading(false);
       } catch (error) {
-        console.error("Error initializing auth:", error);
-        setUser(null);
-        setIsAdmin(false);
-        setIsLoading(false);
+        if (isMounted) {
+          handleError(error, "initializing auth");
+          setUser(null);
+          setIsAdmin(false);
+          setIsLoading(false);
+        }
       }
     };
 
     initAuth();
 
     return () => {
+      isMounted = false;
       authSubscription.unsubscribe();
     };
-  }, []);
+  }, [handleError]);
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
+      setIsLoading(true);
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        throw error;
+      }
       
       // Clear all local storage items related to authentication
-      // Security improvement: More comprehensive cleanup
-      localStorage.removeItem('userToken');
-      localStorage.removeItem('username');
-      localStorage.removeItem('userEmail');
-      localStorage.removeItem('userPlan');
-      localStorage.removeItem('piUsername');
-      localStorage.removeItem('piUserId');
-      localStorage.removeItem('piAccessToken');
-      localStorage.removeItem('subscriptionEnd');
+      const keysToRemove = [
+        'userToken', 'username', 'userEmail', 'userPlan', 
+        'piUsername', 'piUserId', 'piAccessToken', 'subscriptionEnd',
+        'supabase.auth.token', 'cookie-consent'
+      ];
       
-      // Clear Supabase storage items
-      localStorage.removeItem('supabase.auth.token');
+      keysToRemove.forEach(key => localStorage.removeItem(key));
       
       // Clear any session cookies
       document.cookie.split(';').forEach(c => {
@@ -115,20 +129,12 @@ export const useAuth = () => {
       
       console.log("User signed out successfully");
       
-      toast({
-        title: "Signed Out",
-        description: "You have been successfully signed out",
-      });
-      
       // Force page reload to clear any in-memory state
       window.location.href = '/';
     } catch (error) {
-      console.error("Error signing out:", error);
-      toast({
-        title: "Error",
-        description: "Failed to sign out",
-        variant: "destructive",
-      });
+      handleError(error, "signing out");
+    } finally {
+      setIsLoading(false);
     }
   };
 

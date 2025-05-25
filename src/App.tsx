@@ -6,6 +6,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./context/UserContext";
 import AdminStatusProvider from "./components/admin/AdminStatusProvider";
+import { ErrorBoundary } from "./components/ui/error-boundary";
+import { NetworkStatus } from "./components/network/NetworkStatus";
+import { CookieConsent } from "./components/privacy/CookieConsent";
+import { FeedbackWidget } from "./components/feedback/FeedbackWidget";
+import { MetaTags } from "./components/seo/MetaTags";
+import { SecurityHeaders } from "./components/security/SecurityHeaders";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import ProfilePage from "./pages/ProfilePage";
@@ -35,51 +41,65 @@ import AdminPortal from "./pages/AdminPortal";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <UserProvider>
-      <AdminStatusProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/store" element={<Store />} />
-              <Route path="/groups" element={<Groups />} />
-              <Route path="/groups/:groupId/chat" element={<GroupChat />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/features" element={<Features />} />
-              <Route path="/pricing" element={<Pricing />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/help" element={<Help />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/cookies" element={<Cookies />} />
-              <Route path="/gdpr" element={<GDPR />} />
-              <Route path="/demo" element={<Demo />} />
-              <Route path="/templates" element={<Templates />} />
-              <Route path="/developers" element={<Developers />} />
-              <Route path="/community" element={<Community />} />
-              <Route path="/creators" element={<CreatorDirectory />} />
-              <Route path="/careers" element={<Careers />} />
-              <Route path="/faq" element={<AllFaqs />} />
-              <Route path="/admin-portal" element={<AdminPortal />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/:username" element={<ProfilePage />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AdminStatusProvider>
-    </UserProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <UserProvider>
+        <AdminStatusProvider>
+          <TooltipProvider>
+            <MetaTags />
+            <SecurityHeaders />
+            <NetworkStatus />
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/store" element={<Store />} />
+                <Route path="/groups" element={<Groups />} />
+                <Route path="/groups/:groupId/chat" element={<GroupChat />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/features" element={<Features />} />
+                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/help" element={<Help />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/cookies" element={<Cookies />} />
+                <Route path="/gdpr" element={<GDPR />} />
+                <Route path="/demo" element={<Demo />} />
+                <Route path="/templates" element={<Templates />} />
+                <Route path="/developers" element={<Developers />} />
+                <Route path="/community" element={<Community />} />
+                <Route path="/creators" element={<CreatorDirectory />} />
+                <Route path="/careers" element={<Careers />} />
+                <Route path="/faq" element={<AllFaqs />} />
+                <Route path="/admin-portal" element={<AdminPortal />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/:username" element={<ProfilePage />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+            <CookieConsent />
+            <FeedbackWidget />
+          </TooltipProvider>
+        </AdminStatusProvider>
+      </UserProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

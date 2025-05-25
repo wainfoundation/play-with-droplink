@@ -1,96 +1,77 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { motion } from "framer-motion";
-import { TrendingUp, Users, MousePointerClick } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Eye, MousePointer, TrendingUp } from "lucide-react";
+import { useAnalyticsData } from "@/hooks/useAnalyticsData";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { ErrorMessage } from "@/components/ui/error-message";
 
 interface OverviewStatsProps {
-  pageViews: number;
-  linkClicks: number;
-  conversionRate: number;
-  isLoading?: boolean;
+  pageViews?: number;
+  linkClicks?: number;
+  conversionRate?: number;
 }
 
-const OverviewStats = ({ pageViews, linkClicks, conversionRate, isLoading = false }: OverviewStatsProps) => {
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-  
-  const item = {
-    hidden: { y: 20, opacity: 0 },
-    show: { y: 0, opacity: 1 }
-  };
-  
+const OverviewStats = ({ 
+  pageViews: propPageViews, 
+  linkClicks: propLinkClicks, 
+  conversionRate: propConversionRate 
+}: OverviewStatsProps) => {
+  const { 
+    pageViews: dataPageViews, 
+    linkClicks: dataLinkClicks, 
+    conversionRate: dataConversionRate, 
+    isLoading 
+  } = useAnalyticsData();
+
+  // Use real data if available, otherwise fall back to props
+  const pageViews = dataPageViews ?? propPageViews ?? 0;
+  const linkClicks = dataLinkClicks ?? propLinkClicks ?? 0;
+  const conversionRate = dataConversionRate ?? propConversionRate ?? 0;
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Analytics Overview</CardTitle>
+          <CardDescription>Your profile performance at a glance</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-center py-8">
+            <LoadingSpinner size="lg" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <motion.div 
-      className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
-      variants={container}
-      initial="hidden"
-      animate="show"
-    >
-      <motion.div variants={item}>
-        <Card className="overflow-hidden border-l-4 border-l-blue-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500 flex items-center">
-              <Users className="h-4 w-4 mr-2 text-blue-500" />
-              Page Views
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-24" />
-            ) : (
-              <div className="text-3xl font-bold">{pageViews.toLocaleString()}</div>
-            )}
-            <p className="text-xs text-gray-500 mt-1">Last 30 days</p>
-          </CardContent>
-        </Card>
-      </motion.div>
-      
-      <motion.div variants={item}>
-        <Card className="overflow-hidden border-l-4 border-l-green-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500 flex items-center">
-              <MousePointerClick className="h-4 w-4 mr-2 text-green-500" />
-              Link Clicks
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-24" />
-            ) : (
-              <div className="text-3xl font-bold">{linkClicks.toLocaleString()}</div>
-            )}
-            <p className="text-xs text-gray-500 mt-1">Last 30 days</p>
-          </CardContent>
-        </Card>
-      </motion.div>
-      
-      <motion.div variants={item}>
-        <Card className="overflow-hidden border-l-4 border-l-purple-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500 flex items-center">
-              <TrendingUp className="h-4 w-4 mr-2 text-purple-500" />
-              Conversion Rate
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-24" />
-            ) : (
-              <div className="text-3xl font-bold">{conversionRate}%</div>
-            )}
-            <p className="text-xs text-gray-500 mt-1">Clicks per view</p>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </motion.div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Analytics Overview</CardTitle>
+        <CardDescription>Your profile performance at a glance</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="text-center p-4 bg-blue-50 rounded-lg">
+            <Eye className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-blue-900">{pageViews.toLocaleString()}</div>
+            <div className="text-sm text-blue-700">Page Views</div>
+          </div>
+          
+          <div className="text-center p-4 bg-green-50 rounded-lg">
+            <MousePointer className="h-8 w-8 text-green-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-green-900">{linkClicks.toLocaleString()}</div>
+            <div className="text-sm text-green-700">Link Clicks</div>
+          </div>
+          
+          <div className="text-center p-4 bg-purple-50 rounded-lg">
+            <TrendingUp className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-purple-900">{conversionRate}%</div>
+            <div className="text-sm text-purple-700">Conversion Rate</div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
