@@ -1,4 +1,3 @@
-
 import { useUser } from "@/context/UserContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
