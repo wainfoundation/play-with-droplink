@@ -1,10 +1,12 @@
 
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import PiDomainFeatures from "@/components/PiDomainFeatures";
+import PiDomainSetup from "@/components/PiDomainSetup";
 import Features from "@/components/Features";
 import HowItWorks from "@/components/HowItWorks";
 import MobilePreview from "@/components/MobilePreview";
-import Testimonials from "@/components/Testimonials";
+import PiDomainTestimonials from "@/components/PiDomainTestimonials";
 import FAQ from "@/components/FAQ";
 import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
@@ -18,10 +20,12 @@ const Index = () => {
         <div className="relative">
           {/* Decorative background elements */}
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/30 to-transparent pointer-events-none" />
+          <PiDomainFeatures />
+          <PiDomainSetup />
           <HowItWorks />
           <MobilePreview />
           <Features />
-          <Testimonials />
+          <PiDomainTestimonials />
           <FAQ />
         </div>
         <CTA />

@@ -103,7 +103,7 @@
 
 @layer components {
   .gradient-hero {
-    @apply bg-gradient-hero relative overflow-hidden;
+    @apply bg-gradient-to-br from-primary/20 via-background to-secondary/20 relative overflow-hidden;
   }
   
   .gradient-hero::before {
@@ -112,7 +112,7 @@
   }
 
   .floating-icon {
-    @apply absolute text-white/30 pointer-events-none;
+    @apply absolute text-foreground/20 pointer-events-none;
   }
 
   .cta-button {
@@ -136,7 +136,7 @@
   }
 
   .step-card::before {
-    @apply absolute top-[-15px] left-[20px] bg-gradient-hero text-white rounded-full w-[30px] h-[30px] flex items-center justify-center text-base font-bold shadow-lg;
+    @apply absolute top-[-15px] left-[20px] bg-gradient-to-r from-primary to-secondary text-white rounded-full w-[30px] h-[30px] flex items-center justify-center text-base font-bold shadow-lg;
   }
 
   .testimonial-card {
@@ -168,6 +168,19 @@
   }
 }
 
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px); 
+  }
+  50% { 
+    transform: translateY(-20px); 
+  }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
