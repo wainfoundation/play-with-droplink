@@ -10,6 +10,7 @@ import Help from "./pages/Help";
 import Contact from "./pages/Contact";
 import Careers from "./pages/Careers";
 import Community from "./pages/Community";
+import Legal from "./pages/Legal";
 import NotFound from "./pages/NotFound";
 import { UserProvider } from "./context/UserContext";
 import { GoToTop } from "@/components/GoToTop";
@@ -31,6 +32,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/careers" element={<Careers />} />
           <Route path="/community" element={<Community />} />
+          <Route path="/legal" element={<Legal />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <GoToTop />
