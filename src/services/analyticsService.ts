@@ -11,7 +11,7 @@ type AnalyticsEvent = {
 };
 
 /**
- * Track an analytics event using the new database functions
+ * Track an analytics event using direct database queries
  */
 export async function trackEvent(
   userId: string,
@@ -19,23 +19,45 @@ export async function trackEvent(
 ): Promise<boolean> {
   try {
     if (event.link_click && event.link_id) {
-      // Use the track_link_click function
-      const { error } = await supabase.rpc('track_link_click', {
-        link_id_param: event.link_id,
-        user_agent_param: event.user_agent || navigator.userAgent,
-        ip_address_param: null, // Will be handled server-side
-        referrer_param: event.referrer || document.referrer
-      });
-      
-      if (error) throw error;
+      // Get the link to find the owner
+      const { data: link } = await supabase
+        .from('links')
+        .select('user_id')
+        .eq('id', event.link_id)
+        .single();
+
+      if (link) {
+        // Insert analytics record
+        const { error: analyticsError } = await supabase
+          .from('analytics')
+          .insert({
+            user_id: link.user_id,
+            link_id: event.link_id,
+            link_click: true,
+            user_agent: event.user_agent || navigator.userAgent,
+            referrer: event.referrer || document.referrer
+          });
+
+        if (analyticsError) throw analyticsError;
+
+        // Update click count
+        const { error: updateError } = await supabase
+          .from('links')
+          .update({ clicks: supabase.raw('COALESCE(clicks, 0) + 1') })
+          .eq('id', event.link_id);
+
+        if (updateError) throw updateError;
+      }
     } else if (event.page_view) {
-      // Use the track_page_view function
-      const { error } = await supabase.rpc('track_page_view', {
-        profile_user_id: userId,
-        user_agent_param: event.user_agent || navigator.userAgent,
-        ip_address_param: null, // Will be handled server-side
-        referrer_param: event.referrer || document.referrer
-      });
+      // Insert page view analytics
+      const { error } = await supabase
+        .from('analytics')
+        .insert({
+          user_id: userId,
+          page_view: true,
+          user_agent: event.user_agent || navigator.userAgent,
+          referrer: event.referrer || document.referrer
+        });
       
       if (error) throw error;
     }
