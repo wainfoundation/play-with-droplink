@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { authenticateWithPi, createPiPayment } from "@/services/piPaymentService";
 import { useUser } from "@/context/UserContext";
 
 // Define consistent pricing across the application
@@ -17,24 +16,11 @@ export function usePiPayment() {
   const [processingPayment, setProcessingPayment] = useState(false);
 
   const handlePiLogin = async () => {
-    try {
-      const auth = await authenticateWithPi(["username", "payments"]);
-      if (auth) {
-        refreshUserData();
-        
-        toast({
-          title: "Logged in successfully",
-          description: `Welcome, ${auth.user.username || "User"}!`,
-        });
-      }
-    } catch (error) {
-      console.error("Pi authentication failed:", error);
-      toast({
-        title: "Authentication failed",
-        description: "Could not log in with Pi Network",
-        variant: "destructive",
-      });
-    }
+    // Bypass Pi login for testing
+    toast({
+      title: "Pi Login Bypassed",
+      description: "Pi authentication is disabled for testing",
+    });
   };
 
   const handleSubscribe = async (plan: string, billingCycle: string) => {
@@ -50,50 +36,18 @@ export function usePiPayment() {
     setProcessingPayment(true);
     
     try {
-      // Get plan pricing from consistent planPricing object
-      const planName = plan.toLowerCase();
-      let amount = 0;
+      // Simulate payment processing for testing
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      if (planName === "starter") {
-        amount = billingCycle === 'annual' ? planPricing.starter.annual * 12 : planPricing.starter.monthly;
-      } else if (planName === "pro") {
-        amount = billingCycle === 'annual' ? planPricing.pro.annual * 12 : planPricing.pro.monthly;
-      } else if (planName === "premium") {
-        amount = billingCycle === 'annual' ? planPricing.premium.annual * 12 : planPricing.premium.monthly;
-      }
-      
-      // Calculate expiration date
-      const expireDate = new Date();
-      if (billingCycle === 'annual') {
-        expireDate.setFullYear(expireDate.getFullYear() + 1);
-      } else {
-        expireDate.setMonth(expireDate.getMonth() + 1);
-      }
-      
-      // Create payment through Pi Network
-      const paymentData = {
-        amount,
-        memo: `${plan} Plan Subscription (${billingCycle === 'annual' ? 'Annual' : 'Monthly'})`,
-        metadata: {
-          isSubscription: true,
-          plan: planName,
-          duration: billingCycle,
-          expiresAt: expireDate.toISOString()
-        }
-      };
-      
-      await createPiPayment(paymentData, user);
-      
-      // The payment flow will be handled by callbacks in piPaymentService
       toast({
-        title: "Payment Processing",
-        description: "Follow the Pi payment flow to complete your subscription",
+        title: "Payment Successful (Test Mode)",
+        description: `${plan} plan subscription activated for testing`,
       });
       
-      // After a successful payment, refresh user data to get updated subscription
+      // Simulate successful subscription by refreshing user data
       setTimeout(() => {
         refreshUserData();
-      }, 5000);
+      }, 1000);
     } catch (error) {
       console.error("Subscription error:", error);
       toast({

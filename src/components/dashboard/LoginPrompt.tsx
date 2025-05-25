@@ -3,27 +3,58 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useUser } from "@/context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 interface LoginPromptProps {
   handlePiLogin: () => Promise<void>;
 }
 
 const LoginPrompt = ({ handlePiLogin }: LoginPromptProps) => {
-  const [isPiAuthenticating, setIsPiAuthenticating] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const { refreshUserData } = useUser();
+  const navigate = useNavigate();
   
-  const handlePiAuthClick = async () => {
+  const handleTestLogin = async () => {
     try {
-      setIsPiAuthenticating(true);
-      await handlePiLogin();
-    } catch (error) {
-      console.error("Pi authentication error:", error);
+      setIsAuthenticating(true);
+      
+      // Create a test user account
+      const testEmail = `test_${Date.now()}@droplink.test`;
+      const testPassword = "testpassword123";
+      
+      const { data, error } = await supabase.auth.signUp({
+        email: testEmail,
+        password: testPassword,
+        options: {
+          data: {
+            username: `testuser_${Date.now()}`,
+            pi_uid: `test_${Date.now()}`
+          }
+        }
+      });
+      
+      if (error) {
+        throw new Error(error.message);
+      }
+      
       toast({
-        title: "Authentication Failed",
-        description: "Could not authenticate with Pi Network. Please try again.",
+        title: "Test Login Successful",
+        description: "You're now logged in with a test account!",
+      });
+      
+      await refreshUserData();
+      navigate('/dashboard');
+    } catch (error) {
+      console.error("Test auth error:", error);
+      toast({
+        title: "Test Auth Error",
+        description: "Failed to create test account",
         variant: "destructive",
       });
     } finally {
-      setIsPiAuthenticating(false);
+      setIsAuthenticating(false);
     }
   };
 
@@ -36,17 +67,23 @@ const LoginPrompt = ({ handlePiLogin }: LoginPromptProps) => {
       </div>
       <h2 className="text-2xl font-bold mb-4">Please Log In to Access Your Dashboard</h2>
       <p className="text-gray-600 mb-6">
-        Sign in with your Pi Network account to access your personalized dashboard
+        Create a test account to explore the dashboard features
       </p>
       
       <div className="space-y-4">
         <Button 
-          onClick={handlePiAuthClick} 
+          onClick={handleTestLogin} 
           className="w-full bg-gradient-hero hover:bg-secondary"
-          disabled={isPiAuthenticating}
+          disabled={isAuthenticating}
         >
-          {isPiAuthenticating ? "Authenticating..." : "Sign in with Pi Network"}
+          {isAuthenticating ? "Creating Test Account..." : "Create Test Account (Bypass Pi Auth)"}
         </Button>
+        
+        <div className="text-center">
+          <p className="text-sm text-gray-500">
+            Pi Network authentication is temporarily disabled for testing
+          </p>
+        </div>
       </div>
     </div>
   );

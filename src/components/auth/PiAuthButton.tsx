@@ -3,95 +3,50 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { authenticateWithPi, initPiNetwork } from "@/services/piPaymentService";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
-import { isRunningInPiBrowser } from "@/utils/pi-sdk";
 
 export function PiAuthButton() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const navigate = useNavigate();
   const { refreshUserData } = useUser();
-  const isPiBrowser = isRunningInPiBrowser();
 
-  console.log("PiAuthButton - isPiBrowser:", isPiBrowser);
-
-  // Initialize Pi SDK when component mounts
-  useEffect(() => {
-    initPiNetwork();
-  }, []);
-
-  const handlePiAuth = async () => {
-    // If not in Pi Browser, show a toast and open the dialog
-    if (!isPiBrowser) {
-      console.log("Not in Pi Browser, showing toast and opening dialog");
-      toast({
-        title: "Pi Browser Required",
-        description: "Please open this app in Pi Browser for the best experience",
-        variant: "destructive",
-      });
-      
-      // Dispatch custom event to open the dialog
-      window.dispatchEvent(new CustomEvent('open-pi-browser-dialog'));
-      return;
-    }
-    
+  // Test mode bypass - creates a demo user
+  const handleTestAuth = async () => {
     try {
       setIsAuthenticating(true);
-      const authResult = await authenticateWithPi(["username", "payments", "wallet_address"]);
       
-      if (authResult?.user) {
-        console.log("Pi authentication successful:", authResult);
-        
-        // Check if user exists
-        const { data: existingUser } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('id', authResult.user.uid)
-          .maybeSingle();
-          
-        if (existingUser) {
-          // User exists, sign them in with Pi credentials
-          const { data, error } = await supabase.auth.signInWithPassword({
-            email: `pi_${authResult.user.uid}@pinetwork.user`,
-            password: authResult.user.uid
-          });
-          
-          if (error) {
-            throw error;
+      // Create a test user account
+      const testEmail = `test_${Date.now()}@droplink.test`;
+      const testPassword = "testpassword123";
+      
+      const { data, error } = await supabase.auth.signUp({
+        email: testEmail,
+        password: testPassword,
+        options: {
+          data: {
+            username: `testuser_${Date.now()}`,
+            pi_uid: `test_${Date.now()}`
           }
-          
-          // Refresh user data
-          await refreshUserData();
-          
-          toast({
-            title: "Authentication Successful",
-            description: `Welcome back, @${authResult.user.username || "Pioneer"}!`,
-          });
-          
-          navigate('/dashboard');
-          return;
-        } else {
-          // User doesn't exist, redirect to signup
-          toast({
-            title: "Account Not Found",
-            description: "Please sign up to create an account",
-          });
-          navigate('/signup');
-          return;
         }
-      } else {
-        toast({
-          title: "Authentication Failed",
-          description: "Could not authenticate with Pi Network",
-          variant: "destructive",
-        });
+      });
+      
+      if (error) {
+        throw new Error(error.message);
       }
-    } catch (error) {
-      console.error("Pi authentication error:", error);
+      
       toast({
-        title: "Authentication Error",
-        description: "An error occurred during Pi authentication",
+        title: "Test Login Successful",
+        description: "You're now logged in with a test account!",
+      });
+      
+      await refreshUserData();
+      navigate('/dashboard');
+    } catch (error) {
+      console.error("Test auth error:", error);
+      toast({
+        title: "Test Auth Error",
+        description: "Failed to create test account",
         variant: "destructive",
       });
     } finally {
@@ -100,15 +55,23 @@ export function PiAuthButton() {
   };
 
   return (
-    <Button 
-      onClick={handlePiAuth}
-      className="w-full bg-gradient-hero hover:bg-secondary flex items-center justify-center gap-2"
-      disabled={isAuthenticating}
-    >
-      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/>
-      </svg>
-      {isAuthenticating ? "Authenticating..." : "Sign in with Pi Network"}
-    </Button>
+    <div className="space-y-4">
+      <Button 
+        onClick={handleTestAuth}
+        className="w-full bg-gradient-hero hover:bg-secondary flex items-center justify-center gap-2"
+        disabled={isAuthenticating}
+      >
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/>
+        </svg>
+        {isAuthenticating ? "Creating Test Account..." : "Test Login (Bypass Pi Auth)"}
+      </Button>
+      
+      <div className="text-center">
+        <p className="text-sm text-gray-500">
+          Pi Network authentication is temporarily disabled for testing
+        </p>
+      </div>
+    </div>
   );
 }

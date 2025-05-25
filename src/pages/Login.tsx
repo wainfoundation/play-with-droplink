@@ -5,24 +5,14 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useUser } from "@/context/UserContext";
 import { PiAuthButton } from "@/components/auth/PiAuthButton";
-import { initPiNetwork } from "@/services/piPaymentService";
-import PiBrowserPrompt from "@/components/PiBrowserPrompt";
-import PiBrowserDialog from "@/components/PiBrowserDialog";
-import { isRunningInPiBrowser } from "@/utils/pi-sdk";
 
 const Login = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useUser();
-  // Perform check directly for debugging
-  const isPiBrowser = isRunningInPiBrowser();
   
-  console.log("Login page - isPiBrowser:", isPiBrowser, "isLoggedIn:", isLoggedIn);
+  console.log("Login page - isLoggedIn:", isLoggedIn);
 
   useEffect(() => {
-    // Initialize Pi Network SDK
-    const initialized = initPiNetwork();
-    console.log("Pi SDK initialization status:", initialized);
-    
     // Check if user is already logged in
     if (isLoggedIn) {
       navigate('/dashboard');
@@ -42,8 +32,6 @@ const Login = () => {
           <div className="bg-white rounded-xl shadow-lg p-8">
             <PiAuthButton />
             
-            {!isPiBrowser && <PiBrowserPrompt />}
-            
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Don't have an account?{" "}
@@ -56,12 +44,6 @@ const Login = () => {
         </div>
       </main>
       <Footer />
-      
-      {/* Always render the dialog, it will only show if not in Pi Browser */}
-      <PiBrowserDialog 
-        redirectUrl="https://pinet.com/@droplink"
-        showOnMount={true}
-      />
     </div>
   );
 };
