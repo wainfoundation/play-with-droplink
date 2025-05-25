@@ -1,4 +1,3 @@
-
 import { useUser } from "@/context/UserContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -28,7 +27,7 @@ const Dashboard = () => {
     navigate('/login');
   };
 
-  const handleSubscribe = async (plan: string) => {
+  const handleSubscribe = async (plan: string): Promise<void> => {
     setProcessingPayment(true);
     try {
       await piHandleSubscribe(plan, 'monthly'); // Default to monthly billing
