@@ -1,6 +1,7 @@
 
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import WorkflowShowcase from "@/components/WorkflowShowcase";
 import PiDomainFeatures from "@/components/PiDomainFeatures";
 import PiDomainSetup from "@/components/PiDomainSetup";
 import Features from "@/components/Features";
@@ -17,6 +18,7 @@ const Index = () => {
       <Navbar />
       <main className="flex-grow">
         <Hero />
+        <WorkflowShowcase />
         <div className="relative">
           {/* Decorative background elements */}
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/30 to-transparent pointer-events-none" />

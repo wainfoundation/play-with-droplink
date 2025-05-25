@@ -1,3 +1,4 @@
+
 import { useUser } from "@/context/UserContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -12,8 +13,9 @@ import SubscriptionManagement from "@/components/dashboard/SubscriptionManagemen
 import AnalyticsSection from "@/components/dashboard/AnalyticsSection";
 import DashboardLoading from "@/components/dashboard/DashboardLoading";
 import LoginPrompt from "@/components/dashboard/LoginPrompt";
+import MobileDashboard from "@/components/dashboard/MobileDashboard";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePiPayment } from "@/hooks/usePiPayment";
 
 const Dashboard = () => {
@@ -21,7 +23,19 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const { handleSubscribe: piHandleSubscribe } = usePiPayment();
+
+  // Check if mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handlePiLogin = async (): Promise<void> => {
     navigate('/login');
@@ -30,7 +44,7 @@ const Dashboard = () => {
   const handleSubscribe = async (plan: string): Promise<void> => {
     setProcessingPayment(true);
     try {
-      await piHandleSubscribe(plan, 'monthly'); // Default to monthly billing
+      await piHandleSubscribe(plan, 'monthly');
       console.log('Subscribe clicked for plan:', plan);
     } catch (error) {
       console.error('Subscription error:', error);
@@ -47,50 +61,68 @@ const Dashboard = () => {
     return <LoginPrompt handlePiLogin={handlePiLogin} />;
   }
 
+  const mockStats = {
+    pageViews: 1234,
+    linkClicks: 567,
+    conversionRate: 12.5
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-primary/10">
       <Navbar />
       <main className="pt-16">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-6 lg:py-8">
           <DashboardHeader 
             username={profile?.username || user?.email || 'User'}
             subscription={subscription}
           />
           
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            {/* Main content area */}
-            <div className="lg:col-span-2 space-y-8">
-              <OverviewStats 
-                pageViews={1234}
-                linkClicks={567}
-                conversionRate={12.5}
-              />
-              <LinksSection />
-              <ProductsSection />
-            </div>
-            
-            {/* Sidebar */}
-            <div className="space-y-6">
-              <ProfileUrlDisplay 
-                profileUrl={`https://droplink.gg/${profile?.username || 'user'}`}
+          {/* Mobile Layout */}
+          {isMobile ? (
+            <div className="mt-6">
+              <MobileDashboard 
                 username={profile?.username || 'user'}
-              />
-              <QuickActions 
                 subscription={subscription}
-                profile={profile}
-                navigate={navigate}
-                setConfirmCancelOpen={setConfirmCancelOpen}
+                stats={mockStats}
               />
-              <GroupsSection />
-              <SubscriptionManagement 
-                subscription={subscription}
-                handleSubscribe={handleSubscribe}
-                processingPayment={processingPayment}
-                setConfirmCancelOpen={setConfirmCancelOpen}
-              />
-              <AnalyticsSection subscription={subscription} />
             </div>
-          </div>
+          ) : (
+            /* Desktop Layout */
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8 mt-6">
+              {/* Main content area */}
+              <div className="lg:col-span-2 space-y-8">
+                <OverviewStats 
+                  pageViews={mockStats.pageViews}
+                  linkClicks={mockStats.linkClicks}
+                  conversionRate={mockStats.conversionRate}
+                />
+                <LinksSection />
+                <ProductsSection />
+              </div>
+              
+              {/* Sidebar */}
+              <div className="space-y-6">
+                <ProfileUrlDisplay 
+                  profileUrl={`https://droplink.gg/${profile?.username || 'user'}`}
+                  username={profile?.username || 'user'}
+                />
+                <QuickActions 
+                  subscription={subscription}
+                  profile={profile}
+                  navigate={navigate}
+                  setConfirmCancelOpen={setConfirmCancelOpen}
+                />
+                <GroupsSection />
+                <SubscriptionManagement 
+                  subscription={subscription}
+                  handleSubscribe={handleSubscribe}
+                  processingPayment={processingPayment}
+                  setConfirmCancelOpen={setConfirmCancelOpen}
+                />
+                <AnalyticsSection subscription={subscription} />
+              </div>
+            </div>
+          )}
         </div>
       </main>
       <Footer />
