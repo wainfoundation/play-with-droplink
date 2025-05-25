@@ -74,6 +74,57 @@ export type Database = {
           },
         ]
       }
+      digital_products: {
+        Row: {
+          category: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          download_count: number
+          file_url: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          price: number
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          download_count?: number
+          file_url?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          price?: number
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          download_count?: number
+          file_url?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          price?: number
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       links: {
         Row: {
           clicks: number | null
@@ -112,6 +163,62 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      orders: {
+        Row: {
+          amount: number
+          buyer_id: string
+          created_at: string
+          currency: string
+          download_expires_at: string | null
+          download_link: string | null
+          id: string
+          pi_payment_id: string | null
+          pi_transaction_id: string | null
+          product_id: string
+          seller_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          buyer_id: string
+          created_at?: string
+          currency?: string
+          download_expires_at?: string | null
+          download_link?: string | null
+          id?: string
+          pi_payment_id?: string | null
+          pi_transaction_id?: string | null
+          product_id: string
+          seller_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          buyer_id?: string
+          created_at?: string
+          currency?: string
+          download_expires_at?: string | null
+          download_link?: string | null
+          id?: string
+          pi_payment_id?: string | null
+          pi_transaction_id?: string | null
+          product_id?: string
+          seller_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "digital_products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payments: {
         Row: {
