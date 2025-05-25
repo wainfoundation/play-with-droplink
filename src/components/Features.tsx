@@ -124,7 +124,8 @@ const Features = () => {
     {
       name: "Pro", 
       price: "15π/month",
-      features: ["Email capture", "Advanced analytics", "Group access", "50+ templates", "SEO tools"]
+      features: ["Email capture", "Advanced analytics", "Group access", "50+ templates", "SEO tools"],
+      isPopular: true
     },
     {
       name: "Premium",
@@ -214,19 +215,19 @@ const Features = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {plans.map((plan, index) => (
               <div key={index} className={`relative p-6 rounded-2xl border-2 transition-all duration-300 hover:scale-105 ${
-                plan.name === 'Pro' 
+                plan.isPopular 
                   ? 'border-primary bg-primary/5' 
                   : 'border-muted bg-background'
               }`}>
-                {plan.name === 'Pro' && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-primary text-white px-4 py-1 rounded-full text-sm font-semibold">
+                {plan.isPopular && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                    <div className="bg-primary text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg border-2 border-white">
                       Most Popular
-                    </span>
+                    </div>
                   </div>
                 )}
                 
-                <div className="text-center mb-6">
+                <div className="text-center mb-6 pt-2">
                   <h4 className="text-xl font-bold mb-2">{plan.name}</h4>
                   <div className="text-3xl font-bold text-primary">{plan.price}</div>
                 </div>
