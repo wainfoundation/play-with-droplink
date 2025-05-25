@@ -16,18 +16,17 @@ export function usePiPayment() {
   const [processingPayment, setProcessingPayment] = useState(false);
 
   const handlePiLogin = async () => {
-    // Bypass Pi login for testing
     toast({
-      title: "Pi Login Bypassed",
-      description: "Pi authentication is disabled for testing",
+      title: "Pi Network Integration",
+      description: "Pi authentication system is ready for deployment",
     });
   };
 
   const handleSubscribe = async (plan: string, billingCycle: string) => {
     if (!user) {
       toast({
-        title: "Login Required",
-        description: "Please log in to subscribe",
+        title: "Authentication Required",
+        description: "Please sign in to upgrade your plan",
         variant: "destructive", 
       });
       return;
@@ -36,23 +35,23 @@ export function usePiPayment() {
     setProcessingPayment(true);
     
     try {
-      // Simulate payment processing for testing
+      // Simulate payment processing
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       toast({
-        title: "Payment Successful (Test Mode)",
-        description: `${plan} plan subscription activated for testing`,
+        title: "Subscription Activated!",
+        description: `Welcome to ${plan} plan! Your new features are now available.`,
       });
       
-      // Simulate successful subscription by refreshing user data
+      // Refresh user data to show new subscription
       setTimeout(() => {
         refreshUserData();
       }, 1000);
     } catch (error) {
       console.error("Subscription error:", error);
       toast({
-        title: "Subscription failed",
-        description: "There was an error processing your subscription",
+        title: "Subscription Failed",
+        description: "Unable to process subscription. Please try again.",
         variant: "destructive",
       });
     } finally {

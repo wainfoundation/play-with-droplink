@@ -10,36 +10,44 @@ const Login = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useUser();
   
-  console.log("Login page - isLoggedIn:", isLoggedIn);
-
   useEffect(() => {
-    // Check if user is already logged in
     if (isLoggedIn) {
       navigate('/dashboard');
     }
   }, [isLoggedIn, navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       <Navbar />
       <main className="flex-grow flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-primary">Welcome Back</h1>
-            <p className="text-gray-600 mt-2">Sign in to manage your Droplink</p>
+          <div className="text-center mb-8 space-y-4">
+            <h1 className="text-4xl font-bold text-primary mb-4">Welcome Back</h1>
+            <p className="text-gray-600 text-lg leading-relaxed">
+              Sign in to manage your Droplink profile and connect with the Pi Network community
+            </p>
           </div>
           
-          <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
             <PiAuthButton />
             
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                Don't have an account?{" "}
-                <Link to="/signup" className="text-primary hover:underline font-medium">
-                  Sign up
-                </Link>
+            <div className="mt-8 text-center">
+              <p className="text-gray-600 mb-4">
+                Don't have an account?
               </p>
+              <Link 
+                to="/signup" 
+                className="text-primary hover:text-primary/80 font-semibold text-lg transition-colors duration-200 hover:underline"
+              >
+                Create your Droplink profile
+              </Link>
             </div>
+          </div>
+          
+          <div className="mt-8 text-center">
+            <p className="text-sm text-gray-500 leading-relaxed">
+              Join thousands of Pi Network creators building their digital presence
+            </p>
           </div>
         </div>
       </main>

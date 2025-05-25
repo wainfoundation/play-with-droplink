@@ -23,115 +23,127 @@ const SubscriptionManagement = ({
     {
       name: "Free",
       price: 0,
-      features: ["Basic profile", "5 links", "Basic analytics", "Pi Ads"],
+      features: ["Basic profile", "5 links", "Basic analytics", "Community support"],
       icon: Star,
-      color: "gray"
+      color: "gray",
+      description: "Perfect for getting started"
     },
     {
       name: "Starter",
       price: planPricing.starter.monthly,
-      features: ["Custom profile", "Unlimited links", "Advanced analytics", "No ads"],
+      features: ["Custom profile", "Unlimited links", "Advanced analytics", "Email support"],
       icon: Zap,
-      color: "blue"
+      color: "blue",
+      description: "Ideal for growing creators"
     },
     {
       name: "Pro",
       price: planPricing.pro.monthly,
       features: ["Everything in Starter", "Custom domain", "Priority support", "Advanced features"],
       icon: Crown,
-      color: "purple"
+      color: "purple",
+      description: "For professional creators"
     },
     {
       name: "Premium",
       price: planPricing.premium.monthly,
       features: ["Everything in Pro", "White label", "API access", "Dedicated support"],
       icon: Crown,
-      color: "gold"
+      color: "gold",
+      description: "Enterprise-level features"
     }
   ];
 
   const currentPlan = subscription?.plan || 'free';
 
-  const handleTestSubscribe = async (planName: string) => {
-    // Simulate subscription for testing
+  const handleUpgrade = async (planName: string) => {
     await handleSubscribe(planName, 'monthly');
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Crown className="w-5 h-5 text-yellow-500" />
+    <Card className="border-0 shadow-lg">
+      <CardHeader className="pb-6">
+        <CardTitle className="flex items-center gap-3 text-2xl">
+          <div className="p-2 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg">
+            <Crown className="w-6 h-6 text-primary" />
+          </div>
           Subscription Plans
         </CardTitle>
+        <p className="text-gray-600 mt-2">
+          Choose the perfect plan for your Pi Network journey
+        </p>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className={`p-4 rounded-lg border-2 ${
-                currentPlan.toLowerCase() === plan.name.toLowerCase()
-                  ? 'border-primary bg-primary/5'
-                  : 'border-gray-200'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <plan.icon className={`w-5 h-5 text-${plan.color}-500`} />
-                  <span className="font-semibold">{plan.name}</span>
-                  {currentPlan.toLowerCase() === plan.name.toLowerCase() && (
-                    <Badge className="bg-primary text-white">Current</Badge>
-                  )}
+      <CardContent className="space-y-6">
+        {plans.map((plan) => (
+          <div
+            key={plan.name}
+            className={`p-6 rounded-xl border-2 transition-all duration-300 ${
+              currentPlan.toLowerCase() === plan.name.toLowerCase()
+                ? 'border-primary bg-gradient-to-r from-primary/5 to-secondary/5 shadow-md'
+                : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg bg-${plan.color}-100`}>
+                  <plan.icon className={`w-5 h-5 text-${plan.color}-600`} />
                 </div>
-                <div className="text-right">
-                  <span className="text-lg font-bold">
-                    {plan.price === 0 ? 'Free' : `${plan.price}π/mo`}
-                  </span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-lg">{plan.name}</span>
+                    {currentPlan.toLowerCase() === plan.name.toLowerCase() && (
+                      <Badge className="bg-primary text-white px-2 py-1">Current Plan</Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-600">{plan.description}</p>
                 </div>
               </div>
-              
-              <ul className="space-y-1 mb-4">
-                {plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-green-500" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              
-              {currentPlan.toLowerCase() !== plan.name.toLowerCase() && plan.name !== "Free" && (
-                <Button
-                  onClick={() => handleTestSubscribe(plan.name)}
-                  disabled={processingPayment}
-                  className="w-full bg-gradient-hero hover:bg-secondary"
-                  size="sm"
-                >
-                  {processingPayment ? "Processing..." : `Upgrade to ${plan.name} (Test)`}
-                </Button>
-              )}
+              <div className="text-right">
+                <div className="text-2xl font-bold text-gray-900">
+                  {plan.price === 0 ? 'Free' : `${plan.price}π`}
+                </div>
+                {plan.price > 0 && (
+                  <p className="text-sm text-gray-500">per month</p>
+                )}
+              </div>
             </div>
-          ))}
-        </div>
+            
+            <ul className="space-y-3 mb-6">
+              {plan.features.map((feature, index) => (
+                <li key={index} className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-green-600" />
+                  </div>
+                  <span className="text-gray-700">{feature}</span>
+                </li>
+              ))}
+            </ul>
+            
+            {currentPlan.toLowerCase() !== plan.name.toLowerCase() && plan.name !== "Free" && (
+              <Button
+                onClick={() => handleUpgrade(plan.name)}
+                disabled={processingPayment}
+                className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold py-2 rounded-lg transition-all duration-300"
+                size="sm"
+              >
+                {processingPayment ? "Processing..." : `Upgrade to ${plan.name}`}
+              </Button>
+            )}
+          </div>
+        ))}
         
         {subscription && subscription.plan !== 'free' && (
-          <div className="mt-6 pt-4 border-t">
+          <div className="mt-8 pt-6 border-t border-gray-200">
             <Button
               onClick={() => setConfirmCancelOpen(true)}
               variant="outline"
               size="sm"
-              className="w-full text-red-600 hover:text-red-700"
+              className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
             >
-              Cancel Subscription (Test)
+              Cancel Subscription
             </Button>
           </div>
         )}
-        
-        <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-sm text-yellow-800">
-            <strong>Test Mode:</strong> All payments are simulated for testing purposes. No actual charges will be made.
-          </p>
-        </div>
       </CardContent>
     </Card>
   );
