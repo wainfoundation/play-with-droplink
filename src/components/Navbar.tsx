@@ -21,18 +21,15 @@ import {
 } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { useSignOut } from 'react-pi';
 
 const Navbar = () => {
-  const { user, isLoggedIn, profile, logout } = useUser();
+  const { user, isLoggedIn, profile, signOut } = useUser();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { toast } = useToast();
-  const { signOut } = useSignOut();
 
   const handleLogout = async () => {
     try {
       await signOut();
-      logout();
       toast({
         title: "Logged out",
         description: "You have been successfully logged out.",

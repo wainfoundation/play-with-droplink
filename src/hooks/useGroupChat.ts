@@ -44,7 +44,18 @@ export const useGroupChat = (groupId: string) => {
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setMessages(data || []);
+      
+      const typedMessages = (data || []).map(msg => ({
+        ...msg,
+        message_type: msg.message_type as 'text' | 'image' | 'file' | 'system',
+        user_profiles: msg.user_profiles ? {
+          username: msg.user_profiles.username || '',
+          display_name: msg.user_profiles.display_name || undefined,
+          avatar_url: msg.user_profiles.avatar_url || undefined,
+        } : undefined
+      }));
+      
+      setMessages(typedMessages);
     } catch (error) {
       console.error('Error fetching messages:', error);
       toast({
@@ -160,7 +171,16 @@ export const useGroupChat = (groupId: string) => {
             .single();
 
           if (!error && data) {
-            setMessages(prev => [...prev, data]);
+            const typedMessage: GroupMessage = {
+              ...data,
+              message_type: data.message_type as 'text' | 'image' | 'file' | 'system',
+              user_profiles: data.user_profiles ? {
+                username: data.user_profiles.username || '',
+                display_name: data.user_profiles.display_name || undefined,
+                avatar_url: data.user_profiles.avatar_url || undefined,
+              } : undefined
+            };
+            setMessages(prev => [...prev, typedMessage]);
           }
         }
       )
@@ -176,7 +196,11 @@ export const useGroupChat = (groupId: string) => {
           setMessages(prev =>
             prev.map(msg =>
               msg.id === payload.new.id
-                ? { ...msg, ...payload.new }
+                ? { 
+                    ...msg, 
+                    ...payload.new, 
+                    message_type: payload.new.message_type as 'text' | 'image' | 'file' | 'system'
+                  }
                 : msg
             )
           );

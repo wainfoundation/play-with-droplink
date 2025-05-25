@@ -90,10 +90,20 @@ export const useGroups = () => {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) throw new Error('Not authenticated');
 
+      if (!groupData.name) throw new Error('Group name is required');
+
       const { data, error } = await supabase
         .from('groups')
         .insert({
-          ...groupData,
+          name: groupData.name,
+          description: groupData.description,
+          price: groupData.price || 0,
+          currency: groupData.currency || 'Pi',
+          is_private: groupData.is_private || false,
+          max_members: groupData.max_members,
+          image_url: groupData.image_url,
+          category: groupData.category,
+          tags: groupData.tags,
           creator_id: user.user.id,
         })
         .select()
