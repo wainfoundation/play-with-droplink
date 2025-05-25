@@ -15,22 +15,24 @@ import DashboardLoading from "@/components/dashboard/DashboardLoading";
 import LoginPrompt from "@/components/dashboard/LoginPrompt";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { usePiPayment } from "@/hooks/usePiPayment";
 
 const Dashboard = () => {
   const { isLoggedIn, isLoading, profile, user, subscription } = useUser();
   const navigate = useNavigate();
   const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const { handleSubscribe: piHandleSubscribe } = usePiPayment();
 
   const handlePiLogin = () => {
     navigate('/login');
   };
 
-  const handleSubscribe = async () => {
+  const handleSubscribe = async (plan: string) => {
     setProcessingPayment(true);
     try {
-      // Handle subscription logic here
-      console.log('Subscribe clicked');
+      await piHandleSubscribe(plan, 'monthly'); // Default to monthly billing
+      console.log('Subscribe clicked for plan:', plan);
     } catch (error) {
       console.error('Subscription error:', error);
     } finally {
