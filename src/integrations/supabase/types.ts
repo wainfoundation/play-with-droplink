@@ -202,13 +202,108 @@ export type Database = {
         }
         Relationships: []
       }
+      user_consents: {
+        Row: {
+          auth_consent: boolean | null
+          consented: boolean
+          consented_at: string | null
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          user_id: string
+          username_consent: boolean | null
+          wallet_consent: boolean | null
+        }
+        Insert: {
+          auth_consent?: boolean | null
+          consented?: boolean
+          consented_at?: string | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id: string
+          username_consent?: boolean | null
+          wallet_consent?: boolean | null
+        }
+        Update: {
+          auth_consent?: boolean | null
+          consented?: boolean
+          consented_at?: string | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+          username_consent?: boolean | null
+          wallet_consent?: boolean | null
+        }
+        Relationships: []
+      }
+      user_metadata: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          og_description: string | null
+          og_image: string | null
+          og_title: string | null
+          title: string | null
+          twitter_description: string | null
+          twitter_image: string | null
+          twitter_title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          og_description?: string | null
+          og_image?: string | null
+          og_title?: string | null
+          title?: string | null
+          twitter_description?: string | null
+          twitter_image?: string | null
+          twitter_title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          og_description?: string | null
+          og_image?: string | null
+          og_title?: string | null
+          title?: string | null
+          twitter_description?: string | null
+          twitter_image?: string | null
+          twitter_title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_metadata_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_profiles: {
         Row: {
           avatar_url: string | null
           bio: string | null
           created_at: string | null
+          custom_domain: string | null
           display_name: string | null
           id: string
+          pi_domain: string | null
+          theme: Json | null
           updated_at: string | null
           username: string
         }
@@ -216,8 +311,11 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
+          custom_domain?: string | null
           display_name?: string | null
           id: string
+          pi_domain?: string | null
+          theme?: Json | null
           updated_at?: string | null
           username: string
         }
@@ -225,8 +323,11 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
+          custom_domain?: string | null
           display_name?: string | null
           id?: string
+          pi_domain?: string | null
+          theme?: Json | null
           updated_at?: string | null
           username?: string
         }
@@ -240,6 +341,18 @@ export type Database = {
       get_total_tips_received: {
         Args: Record<PropertyKey, never> | { user_id_param: string }
         Returns: number
+      }
+      update_user_custom_domain: {
+        Args: { user_id: string; domain_value: string }
+        Returns: Json
+      }
+      update_user_domain: {
+        Args: { user_id: string; domain_field: string; domain_value: string }
+        Returns: Json
+      }
+      update_user_pi_domain: {
+        Args: { user_id: string; domain_value: string }
+        Returns: Json
       }
     }
     Enums: {
