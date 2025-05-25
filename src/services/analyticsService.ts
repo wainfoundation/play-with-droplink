@@ -11,27 +11,33 @@ type AnalyticsEvent = {
 };
 
 /**
- * Track an analytics event
- * @param userId - The user ID
- * @param event - The event data
- * @returns True if successful, false if failed
+ * Track an analytics event using the new database functions
  */
 export async function trackEvent(
   userId: string,
   event: AnalyticsEvent
 ): Promise<boolean> {
   try {
-    const { error } = await supabase
-      .from('analytics')
-      .insert({
-        user_id: userId,
-        ...event,
-        user_agent: event.user_agent || navigator.userAgent,
-        referrer: event.referrer || document.referrer
+    if (event.link_click && event.link_id) {
+      // Use the track_link_click function
+      const { error } = await supabase.rpc('track_link_click', {
+        link_id_param: event.link_id,
+        user_agent_param: event.user_agent || navigator.userAgent,
+        ip_address_param: null, // Will be handled server-side
+        referrer_param: event.referrer || document.referrer
       });
-    
-    if (error) {
-      throw error;
+      
+      if (error) throw error;
+    } else if (event.page_view) {
+      // Use the track_page_view function
+      const { error } = await supabase.rpc('track_page_view', {
+        profile_user_id: userId,
+        user_agent_param: event.user_agent || navigator.userAgent,
+        ip_address_param: null, // Will be handled server-side
+        referrer_param: event.referrer || document.referrer
+      });
+      
+      if (error) throw error;
     }
     
     return true;
@@ -43,9 +49,6 @@ export async function trackEvent(
 
 /**
  * Track a page view
- * @param userId - The user ID
- * @param path - The page path
- * @returns True if successful, false if failed
  */
 export async function trackPageView(userId: string, path: string): Promise<boolean> {
   return trackEvent(userId, {
@@ -56,9 +59,6 @@ export async function trackPageView(userId: string, path: string): Promise<boole
 
 /**
  * Track a link click
- * @param userId - The user ID
- * @param linkId - The link ID
- * @returns True if successful, false if failed
  */
 export async function trackLinkClick(userId: string, linkId: string): Promise<boolean> {
   return trackEvent(userId, {

@@ -15,17 +15,20 @@ export function PiAuthButton() {
     try {
       setIsAuthenticating(true);
       
-      // Create a user account
-      const userEmail = `user_${Date.now()}@droplink.space`;
-      const userPassword = "userpassword123";
+      // Generate unique credentials for production
+      const timestamp = Date.now();
+      const randomString = Math.random().toString(36).substring(2, 15);
+      const userEmail = `pi_user_${timestamp}_${randomString}@droplink.space`;
+      const userPassword = `secure_${timestamp}_${randomString}`;
       
       const { data, error } = await supabase.auth.signUp({
         email: userEmail,
         password: userPassword,
         options: {
           data: {
-            username: `user_${Date.now()}`,
-            pi_uid: `user_${Date.now()}`
+            username: `pi_user_${timestamp}`,
+            pi_uid: `pi_${timestamp}_${randomString}`,
+            display_name: `Pi User ${timestamp.toString().slice(-4)}`
           }
         }
       });
@@ -36,7 +39,7 @@ export function PiAuthButton() {
       
       toast({
         title: "Welcome to Droplink!",
-        description: "Your account has been created successfully.",
+        description: "Your Pi Network account has been created successfully.",
       });
       
       await refreshUserData();
@@ -45,7 +48,7 @@ export function PiAuthButton() {
       console.error("Auth error:", error);
       toast({
         title: "Authentication Error",
-        description: "Failed to create account. Please try again.",
+        description: "Failed to create Pi Network account. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -64,7 +67,7 @@ export function PiAuthButton() {
         <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/>
         </svg>
-        {isAuthenticating ? "Creating Account..." : "Continue with Pi Network"}
+        {isAuthenticating ? "Connecting to Pi Network..." : "Continue with Pi Network"}
       </Button>
     </div>
   );

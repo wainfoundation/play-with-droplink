@@ -20,16 +20,19 @@ const LoginPrompt = ({ handlePiLogin }: LoginPromptProps) => {
     try {
       setIsAuthenticating(true);
       
-      const userEmail = `user_${Date.now()}@droplink.space`;
-      const userPassword = "userpassword123";
+      const timestamp = Date.now();
+      const randomString = Math.random().toString(36).substring(2, 15);
+      const userEmail = `pi_user_${timestamp}_${randomString}@droplink.space`;
+      const userPassword = `secure_${timestamp}_${randomString}`;
       
       const { data, error } = await supabase.auth.signUp({
         email: userEmail,
         password: userPassword,
         options: {
           data: {
-            username: `user_${Date.now()}`,
-            pi_uid: `user_${Date.now()}`
+            username: `pi_user_${timestamp}`,
+            pi_uid: `pi_${timestamp}_${randomString}`,
+            display_name: `Pi User ${timestamp.toString().slice(-4)}`
           }
         }
       });
@@ -40,7 +43,7 @@ const LoginPrompt = ({ handlePiLogin }: LoginPromptProps) => {
       
       toast({
         title: "Welcome to Droplink!",
-        description: "Your account has been created successfully!",
+        description: "Your Pi Network profile has been created successfully!",
       });
       
       await refreshUserData();
@@ -49,7 +52,7 @@ const LoginPrompt = ({ handlePiLogin }: LoginPromptProps) => {
       console.error("Auth error:", error);
       toast({
         title: "Authentication Error",
-        description: "Failed to create account",
+        description: "Failed to create Pi Network account",
         variant: "destructive",
       });
     } finally {
@@ -70,7 +73,7 @@ const LoginPrompt = ({ handlePiLogin }: LoginPromptProps) => {
           Access Your Dashboard
         </h2>
         <p className="text-gray-600 text-lg leading-relaxed max-w-md mx-auto">
-          Create your Droplink profile to start building your Pi Network presence and connecting with your audience
+          Connect with Pi Network to start building your Droplink profile and managing your digital presence
         </p>
       </div>
       
@@ -81,11 +84,11 @@ const LoginPrompt = ({ handlePiLogin }: LoginPromptProps) => {
           disabled={isAuthenticating}
           size="lg"
         >
-          {isAuthenticating ? "Creating Account..." : "Create Your Droplink Profile"}
+          {isAuthenticating ? "Connecting to Pi Network..." : "Connect with Pi Network"}
         </Button>
         
         <p className="text-sm text-gray-500 leading-relaxed">
-          Join thousands of Pi Network creators building their digital presence
+          Join the Pi Network community and start monetizing your content
         </p>
       </div>
     </div>

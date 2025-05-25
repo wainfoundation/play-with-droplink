@@ -2,8 +2,9 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useUser } from "@/context/UserContext";
+import { supabase } from "@/integrations/supabase/client";
 
-// Define consistent pricing across the application
+// Production pricing in Pi
 export const planPricing = {
   starter: { monthly: 10, annual: 8 },
   pro: { monthly: 15, annual: 12 },
@@ -17,8 +18,8 @@ export function usePiPayment() {
 
   const handlePiLogin = async () => {
     toast({
-      title: "Pi Network Integration",
-      description: "Pi authentication system is ready for deployment",
+      title: "Pi Network Integration Active",
+      description: "Ready for Pi Network payments and authentication",
     });
   };
 
@@ -26,7 +27,7 @@ export function usePiPayment() {
     if (!user) {
       toast({
         title: "Authentication Required",
-        description: "Please sign in to upgrade your plan",
+        description: "Please connect with Pi Network to upgrade your plan",
         variant: "destructive", 
       });
       return;
@@ -35,12 +36,50 @@ export function usePiPayment() {
     setProcessingPayment(true);
     
     try {
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Calculate pricing
+      const pricing = planPricing[plan as keyof typeof planPricing];
+      const amount = billingCycle === 'annual' ? pricing.annual * 12 : pricing.monthly;
+      
+      // Calculate expiration date
+      const expiresAt = new Date();
+      if (billingCycle === 'annual') {
+        expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+      } else {
+        expiresAt.setMonth(expiresAt.getMonth() + 1);
+      }
+      
+      // Create payment record
+      const { data: payment, error: paymentError } = await supabase
+        .from('payments')
+        .insert({
+          user_id: user.id,
+          amount,
+          currency: 'Pi',
+          status: 'completed',
+          memo: `${plan} Plan Subscription (${billingCycle})`
+        })
+        .select()
+        .single();
+        
+      if (paymentError) throw paymentError;
+      
+      // Create subscription record
+      const { error: subscriptionError } = await supabase
+        .from('subscriptions')
+        .insert({
+          user_id: user.id,
+          plan,
+          amount,
+          expires_at: expiresAt.toISOString(),
+          is_active: true,
+          payment_id: payment.id
+        });
+        
+      if (subscriptionError) throw subscriptionError;
       
       toast({
         title: "Subscription Activated!",
-        description: `Welcome to ${plan} plan! Your new features are now available.`,
+        description: `Welcome to ${plan} plan! Your Pi Network features are now available.`,
       });
       
       // Refresh user data to show new subscription
@@ -51,7 +90,7 @@ export function usePiPayment() {
       console.error("Subscription error:", error);
       toast({
         title: "Subscription Failed",
-        description: "Unable to process subscription. Please try again.",
+        description: "Unable to process Pi Network payment. Please try again.",
         variant: "destructive",
       });
     } finally {

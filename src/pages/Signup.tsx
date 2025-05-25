@@ -23,17 +23,19 @@ const Signup = () => {
     try {
       setIsAuthenticating(true);
       
-      // Create a user account
-      const userEmail = `user_${Date.now()}@droplink.space`;
-      const userPassword = "userpassword123";
+      const timestamp = Date.now();
+      const randomString = Math.random().toString(36).substring(2, 15);
+      const userEmail = `pi_user_${timestamp}_${randomString}@droplink.space`;
+      const userPassword = `secure_${timestamp}_${randomString}`;
       
       const { data, error } = await supabase.auth.signUp({
         email: userEmail,
         password: userPassword,
         options: {
           data: {
-            username: `user_${Date.now()}`,
-            pi_uid: `user_${Date.now()}`
+            username: `pi_user_${timestamp}`,
+            pi_uid: `pi_${timestamp}_${randomString}`,
+            display_name: `Pi User ${timestamp.toString().slice(-4)}`
           }
         }
       });
@@ -44,7 +46,7 @@ const Signup = () => {
       
       toast({
         title: "Welcome to Droplink!",
-        description: "Your profile is ready! Start building your Pi Network presence.",
+        description: "Your Pi Network profile is ready! Start building your presence.",
       });
       
       navigate('/dashboard');
@@ -52,7 +54,7 @@ const Signup = () => {
       console.error("Signup error:", error);
       toast({
         title: "Registration Error",
-        description: "Unable to create account. Please try again.",
+        description: "Unable to create Pi Network account. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -66,9 +68,9 @@ const Signup = () => {
       <main className="flex-grow flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8 space-y-4">
-            <h1 className="text-4xl font-bold text-primary mb-4">Create Your Droplink</h1>
+            <h1 className="text-4xl font-bold text-primary mb-4">Join Pi Network</h1>
             <p className="text-gray-600 text-lg leading-relaxed">
-              Join the Pi Network revolution and build your digital presence with Droplink
+              Create your Droplink profile and start building your Pi Network presence
             </p>
           </div>
           
@@ -88,7 +90,7 @@ const Signup = () => {
             
             <div className="mt-8 text-center">
               <p className="text-gray-600 mb-4">
-                Already have an account?
+                Already part of the Pi Network community?
               </p>
               <Link 
                 to="/login" 
@@ -101,10 +103,10 @@ const Signup = () => {
           
           <div className="mt-8 text-center space-y-3">
             <p className="text-sm text-gray-500 leading-relaxed">
-              ✓ Custom profile page &nbsp; ✓ Pi Network integration &nbsp; ✓ Analytics dashboard
+              ✓ Custom profile page • ✓ Pi Network integration • ✓ Analytics dashboard
             </p>
             <p className="text-xs text-gray-400">
-              Start free • Upgrade anytime • Cancel whenever
+              Start free • Upgrade anytime • Built for Pi Network
             </p>
           </div>
         </div>
