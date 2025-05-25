@@ -135,7 +135,7 @@ const Features = () => {
   ];
 
   return (
-    <section className="py-20 px-4 bg-gradient-to-b from-background to-muted/30" id="features">
+    <section className="py-20 px-4 bg-gradient-to-b from-background to-muted/30 scroll-mt-20" id="features">
       <div className="container mx-auto">
         {/* Header */}
         <div className="text-center mb-16">

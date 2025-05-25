@@ -258,7 +258,7 @@ const Features = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow py-12 px-6">
+      <main className="flex-grow pt-20 py-12 px-6">
         <div className="container mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold mb-6 text-primary">Features & Capabilities</h1>

@@ -1,35 +1,21 @@
 
-import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import WorkflowShowcase from "@/components/WorkflowShowcase";
-import PiDomainFeatures from "@/components/PiDomainFeatures";
-import PiDomainSetup from "@/components/PiDomainSetup";
 import Features from "@/components/Features";
-import HowItWorks from "@/components/HowItWorks";
-import MobilePreview from "@/components/MobilePreview";
-import PiDomainTestimonials from "@/components/PiDomainTestimonials";
-import FAQ from "@/components/FAQ";
+import Testimonials from "@/components/Testimonials";
 import CTA from "@/components/CTA";
+import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-muted/20 to-primary/10">
+    <div className="min-h-screen">
       <Navbar />
-      <main className="flex-grow">
+      <main className="pt-16">
         <Hero />
-        <WorkflowShowcase />
-        <div className="relative">
-          {/* Decorative background elements */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/30 to-transparent pointer-events-none" />
-          <PiDomainFeatures />
-          <PiDomainSetup />
-          <HowItWorks />
-          <MobilePreview />
-          <Features />
-          <PiDomainTestimonials />
-          <FAQ />
-        </div>
+        <Features />
+        <Testimonials />
+        <FAQ />
         <CTA />
       </main>
       <Footer />
