@@ -1,56 +1,7 @@
 
 import { Link } from 'react-router-dom';
-import { useEffect, useRef } from 'react';
 
 const Hero = () => {
-  const typedTextRef = useRef<HTMLSpanElement>(null);
-  const words = ['creators', 'entrepreneurs', 'influencers', 'artists', 'developers'];
-  
-  useEffect(() => {
-    let wordIndex = 0;
-    let charIndex = 0;
-    let isDeleting = false;
-    let typingSpeed = 100;
-    
-    const type = () => {
-      const currentWord = words[wordIndex];
-      
-      if (isDeleting) {
-        if (typedTextRef.current) {
-          typedTextRef.current.textContent = currentWord.substring(0, charIndex - 1);
-        }
-        charIndex--;
-        typingSpeed = 50;
-      } else {
-        if (typedTextRef.current) {
-          typedTextRef.current.textContent = currentWord.substring(0, charIndex + 1);
-        }
-        charIndex++;
-        typingSpeed = 150;
-      }
-      
-      if (!isDeleting && charIndex === currentWord.length) {
-        isDeleting = true;
-        typingSpeed = 1500;
-      } else if (isDeleting && charIndex === 0) {
-        isDeleting = false;
-        wordIndex = (wordIndex + 1) % words.length;
-        typingSpeed = 500;
-      }
-      
-      setTimeout(type, typingSpeed);
-    };
-    
-    setTimeout(type, 500);
-    
-    return () => {
-      const highestId = window.setTimeout(() => {}, 0);
-      for (let i = 0; i < highestId; i++) {
-        clearTimeout(i);
-      }
-    };
-  }, []);
-  
   return (
     <section className="relative overflow-hidden">
       {/* Enhanced gradient background */}
@@ -68,7 +19,7 @@ const Hero = () => {
       
       <div className="relative z-20 container mx-auto px-4 sm:px-6 py-16 sm:py-20 md:py-28 lg:py-32 min-h-[600px] sm:min-h-[700px] flex items-center">
         <div className="max-w-6xl mx-auto text-center">
-          {/* Mobile-optimized Pi Domain Badge */}
+          {/* Pi Domain Badge */}
           <div className="animate-fade-in opacity-0 transform translate-y-5" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
             <div className="inline-flex items-center gap-2 sm:gap-3 bg-white/95 backdrop-blur-sm border border-primary/20 rounded-full px-4 sm:px-6 py-2 sm:py-3 mb-6 sm:mb-8 shadow-lg text-xs sm:text-sm">
               <div className="w-2 sm:w-3 h-2 sm:h-3 bg-green-400 rounded-full animate-pulse"></div>
@@ -77,7 +28,7 @@ const Hero = () => {
             </div>
           </div>
           
-          {/* Mobile-optimized headline */}
+          {/* Main headline */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 sm:mb-8 leading-tight animate-fade-in opacity-0 transform translate-y-5" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
             <span className="bg-gradient-to-r from-foreground via-foreground to-foreground/80 bg-clip-text text-transparent block mb-2">
               Connect Your
@@ -90,14 +41,14 @@ const Hero = () => {
             </span>
           </h1>
           
-          {/* Mobile-optimized description */}
+          {/* Description */}
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl mb-8 sm:mb-12 text-muted-foreground animate-fade-in opacity-0 transform translate-y-5 max-w-4xl mx-auto px-4" style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}>
             Transform your Pi Network identity into a powerful hub. One memorable URL: 
             <br className="hidden sm:block" />
             <strong className="text-primary text-sm sm:text-base md:text-lg lg:text-xl">yourname.pi</strong> → <strong className="text-secondary text-sm sm:text-base md:text-lg lg:text-xl">droplink.space/@yourname</strong>
           </p>
 
-          {/* Mobile-optimized Domain Example */}
+          {/* Domain Example */}
           <div className="animate-fade-in opacity-0 transform translate-y-5 mb-8 sm:mb-12 px-4" style={{ animationDelay: '0.7s', animationFillMode: 'forwards' }}>
             <div className="bg-white/95 backdrop-blur-sm border border-primary/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-2xl mx-auto shadow-xl">
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm sm:text-base md:text-lg font-medium">
@@ -109,7 +60,7 @@ const Hero = () => {
             </div>
           </div>
           
-          {/* Mobile-optimized CTA buttons */}
+          {/* CTA buttons */}
           <div className="flex flex-col gap-4 sm:gap-6 justify-center animate-fade-in opacity-0 transform translate-y-5 mb-12 sm:mb-16 px-4" style={{ animationDelay: '0.8s', animationFillMode: 'forwards' }}>
             <Link 
               to="/signup" 
@@ -126,7 +77,7 @@ const Hero = () => {
             </Link>
           </div>
           
-          {/* Mobile-optimized trust indicators */}
+          {/* Trust indicators */}
           <div className="animate-fade-in opacity-0 transform translate-y-5 px-4" style={{ animationDelay: '1s', animationFillMode: 'forwards' }}>
             <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6">Trusted by Pi Network pioneers worldwide</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-muted-foreground">
@@ -147,7 +98,7 @@ const Hero = () => {
         </div>
       </div>
       
-      {/* Mobile-optimized Floating Icons */}
+      {/* Floating Icons */}
       <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
         <div className="floating-icon top-[15%] left-[5%] sm:left-[10%] text-2xl sm:text-4xl md:text-6xl opacity-20 animate-float">
           π
