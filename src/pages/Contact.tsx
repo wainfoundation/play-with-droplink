@@ -1,12 +1,38 @@
 
+import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, MessageCircle, Phone } from "lucide-react";
+import { useContactForm } from "@/hooks/useContactForm";
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: ""
+  });
+
+  const { submitContactForm, isSubmitting } = useContactForm();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const success = await submitContactForm(formData);
+    if (success) {
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -59,31 +85,56 @@ const Contact = () => {
             <div>
               <h2 className="text-2xl font-bold mb-6">Send us a Message</h2>
               
-              <form className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">Name</label>
-                  <Input placeholder="Your name" />
+                  <Input 
+                    name="name"
+                    placeholder="Your name" 
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium mb-2">Email</label>
-                  <Input type="email" placeholder="your@email.com" />
+                  <Input 
+                    name="email"
+                    type="email" 
+                    placeholder="your@email.com" 
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium mb-2">Subject</label>
-                  <Input placeholder="How can we help?" />
+                  <Input 
+                    name="subject"
+                    placeholder="How can we help?" 
+                    value={formData.subject}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium mb-2">Message</label>
                   <Textarea 
+                    name="message"
                     placeholder="Tell us more about your question or feedback"
                     rows={6}
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
                   />
                 </div>
                 
-                <Button className="w-full">Send Message</Button>
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? "Sending..." : "Send Message"}
+                </Button>
               </form>
             </div>
           </div>

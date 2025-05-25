@@ -3,37 +3,21 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageSquare, X } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
+import { useFeedback } from "@/hooks/useFeedback";
 
 export function FeedbackWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [feedback, setFeedback] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { submitFeedback, isSubmitting } = useFeedback();
 
-  const submitFeedback = async () => {
+  const handleSubmit = async () => {
     if (!feedback.trim()) return;
     
-    setIsSubmitting(true);
-    try {
-      // Here you would send feedback to your backend
-      console.log("Feedback submitted:", feedback);
-      
-      toast({
-        title: "Feedback Sent!",
-        description: "Thank you for your feedback. We'll review it shortly.",
-      });
-      
+    const success = await submitFeedback(feedback);
+    if (success) {
       setFeedback("");
       setIsOpen(false);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to send feedback. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -73,7 +57,7 @@ export function FeedbackWidget() {
             
             <div className="flex gap-2">
               <Button
-                onClick={submitFeedback}
+                onClick={handleSubmit}
                 disabled={!feedback.trim() || isSubmitting}
                 className="flex-1"
               >
