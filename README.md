@@ -1,73 +1,85 @@
-# Welcome to your Lovable project
 
-## Project info
+# Droplink - Pi Network Application
 
-**URL**: https://lovable.dev/projects/9082bd0f-081d-4917-b964-e8b0b68987ad
+## Overview
 
-## How can I edit this code?
+Droplink is a comprehensive link-in-bio platform built for the Pi Network ecosystem. It allows users to create beautiful, customizable profile pages with multiple links that can be shared through a single URL, making it perfect for Pi Network pioneers who want to share their content, products, or services.
 
-There are several ways of editing your application.
+## Features
 
-**Use Lovable**
+- **Multiple Links**: Add unlimited links to your profile
+- **Pi Network Integration**: Native Pi authentication and payment support
+- **Link Analytics**: Track clicks and visitor data
+- **Custom Themes**: Personalize your profile with custom themes and styles
+- **Subscription Plans**: Free, Starter, Pro, and Premium tiers with increasing capabilities
+- **Pi Payments**: Accept Pi payments for products and services
+- **Profile QR Code**: Generate QR codes for offline traffic
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/9082bd0f-081d-4917-b964-e8b0b68987ad) and start prompting.
+## Pi Network Integration
 
-Changes made via Lovable will be committed automatically to this repo.
+This application features full Pi Network integration:
 
-**Use your preferred IDE**
+### Authentication
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Users can authenticate with Pi Network using the Pi Browser. The authentication flow is handled by the Pi SDK and allows users to authenticate with their Pi Network accounts.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Payments
 
-Follow these steps:
+The application supports Pi payments for subscriptions and products. The payment flow is integrated with the Pi SDK and allows users to make payments using Pi cryptocurrency.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js & npm - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Pi Browser (for testing Pi Network features)
+
+### Local Development
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Step 1: Clone the repository
+git clone <REPOSITORY_URL>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Step 2: Navigate to the project directory
+cd droplink
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Step 3: Install the necessary dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 4: Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Pi Network SDK Integration
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+The application uses the Pi Network SDK for authentication and payments. Key integration points:
 
-**Use GitHub Codespaces**
+1. **SDK Initialization**: The Pi SDK is initialized in the application with proper sandbox/production mode detection.
+2. **Authentication**: Users can sign in using their Pi Network accounts.
+3. **Payments**: The application supports Pi payments for subscriptions and features.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Environment Variables
 
-## What technologies are used for this project?
+Create a `.env` file with the following variables:
 
-This project is built with:
+```
+VITE_PI_API_KEY=your_pi_api_key
+VITE_PI_SANDBOX=true  # Set to false for production
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Deployment
 
-## How can I deploy this project?
+1. Build the project:
+```sh
+npm run build
+```
 
-Simply open [Lovable](https://lovable.dev/projects/9082bd0f-081d-4917-b964-e8b0b68987ad) and click on Share -> Publish.
+2. Deploy using your preferred hosting service or directly through Lovable by clicking on Share -> Publish.
 
-## Can I connect a custom domain to my Lovable project?
+## License
 
-Yes, you can!
+This project is licensed under the PiOS License - see the LICENSE file for details.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Support
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+For support or questions, contact us at mrwainorganization@gmail.com
