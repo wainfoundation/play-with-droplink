@@ -24,19 +24,32 @@ const Home = () => {
         <meta property="og:description" content="Transform your .pi domain into a powerful business hub. Connect to Droplink for Pi payments, professional profiles, and seamless Pi Browser integration." />
         <meta property="og:url" content="https://droplink.space" />
       </Helmet>
-      <Navbar />
-      <main>
-        <Hero />
-        <PiDomainFeatures />
-        <PiDomainSetup />
-        <Features />
-        <PiDomainTestimonials />
-        <HowItWorks />
-        <DemoSection />
-        <FAQ />
-        <CTA />
-      </main>
-      <Footer />
+      
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-primary/10">
+        <Navbar />
+        <main className="overflow-x-hidden">
+          <Hero />
+          
+          {/* Enhanced mobile spacing and layout */}
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/30 to-transparent pointer-events-none" />
+            
+            {/* Mobile-optimized sections with better spacing */}
+            <div className="space-y-8 sm:space-y-12 md:space-y-16">
+              <PiDomainFeatures />
+              <PiDomainSetup />
+              <HowItWorks />
+              <DemoSection />
+              <Features />
+              <PiDomainTestimonials />
+              <FAQ />
+            </div>
+          </div>
+          
+          <CTA />
+        </main>
+        <Footer />
+      </div>
     </>
   );
 };
