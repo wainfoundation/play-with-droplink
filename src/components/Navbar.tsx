@@ -1,152 +1,362 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Facebook, Instagram, Menu, Twitter, X, LogOut, UserRound } from "lucide-react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { useSignOut } from 'react-pi';
 
 const Navbar = () => {
+  const { user, isLoggedIn, profile, logout } = useUser();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { isLoggedIn, signOut, profile } = useUser();
-  const navigate = useNavigate();
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  const { toast } = useToast();
+  const { signOut } = useSignOut();
 
   const handleLogout = async () => {
-    await signOut();
-    navigate('/login');
+    try {
+      await signOut();
+      logout();
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out.",
+      });
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast({
+        title: "Logout Failed",
+        description: "Could not log out. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
-    <header className="bg-white sticky top-0 z-50 shadow-sm px-6 md:px-12 py-4 flex justify-between items-center">
-      <Link to="/" className="flex items-center gap-2 font-poppins font-bold text-2xl text-primary">
-        <svg className="w-6 h-6 transform transition-transform duration-300 group-hover:rotate-12" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8zM7.83 14c.37 0 .67.26.74.62.41 2.22 2.28 2.98 3.64 2.87.43-.02.79.32.79.75 0 .4-.32.73-.72.75-2.13.13-4.62-1.09-5.19-4.12-.08-.45.28-.87.74-.87z"/>
-        </svg>
-        Droplink
-      </Link>
-      
-      <nav className="hidden md:flex items-center gap-8">
-        <Link to="/features" className="nav-link">Features</Link>
-        <Link to="/demo" className="nav-link">Demo</Link>
-        <Link to="/pricing" className="nav-link">Pricing</Link>
-        <Link to="/templates" className="nav-link">Templates</Link>
-        
-        {isLoggedIn ? (
-          <>
-            <Link to="/dashboard" className="nav-link">Dashboard</Link>
-            <Button 
-              variant="ghost" 
-              className="flex items-center gap-2 text-primary" 
-              onClick={handleLogout}
-            >
-              <LogOut size={18} />
-              Log Out
-            </Button>
-            {profile && (
-              <Button asChild variant="outline" className="flex items-center gap-2">
-                <Link to="/dashboard">
-                  <UserRound size={18} />
-                  {profile.username || 'Account'}
-                </Link>
-              </Button>
-            )}
-          </>
-        ) : (
-          <>
-            <Link to="/login" className="nav-link">Log In</Link>
-            <Button asChild className="bg-gradient-hero hover:bg-secondary">
-              <Link to="/signup">Start Free</Link>
-            </Button>
-          </>
-        )}
-      </nav>
-
-      <div className="hidden md:flex items-center gap-4">
-        <a href="https://instagram.com" aria-label="Instagram" className="text-primary hover:text-secondary transition-colors">
-          <Instagram size={20} />
-        </a>
-        <a href="https://twitter.com" aria-label="Twitter" className="text-primary hover:text-secondary transition-colors">
-          <Twitter size={20} />
-        </a>
-        <a href="https://facebook.com" aria-label="Facebook" className="text-primary hover:text-secondary transition-colors">
-          <Facebook size={20} />
-        </a>
-      </div>
-
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="md:hidden" 
-        onClick={toggleMobileMenu}
-        aria-label="Menu"
-      >
-        <Menu className="h-6 w-6 text-primary" />
-      </Button>
-
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 bg-white z-50 flex flex-col p-6 md:hidden overflow-y-auto">
-          <div className="flex justify-between items-center mb-6">
-            <Link to="/" className="flex items-center gap-2 font-poppins font-bold text-2xl text-primary">
-              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8zM7.83 14c.37 0 .67.26.74.62.41 2.22 2.28 2.98 3.64 2.87.43-.02.79.32.79.75 0 .4-.32.73-.72.75-2.13.13-4.62-1.09-5.19-4.12-.08-.45.28-.87.74-.87z"/>
-              </svg>
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">D</span>
+            </div>
+            <span className="font-bold text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Droplink
+            </span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
+              Home
             </Link>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleMobileMenu}
-              aria-label="Close menu"
-            >
-              <X className="h-6 w-6 text-primary" />
-            </Button>
+            <Link to="/features" className="text-muted-foreground hover:text-foreground transition-colors">
+              Features
+            </Link>
+            <Link to="/pricing" className="text-muted-foreground hover:text-foreground transition-colors">
+              Pricing
+            </Link>
+            <Link to="/store" className="text-muted-foreground hover:text-foreground transition-colors">
+              Store
+            </Link>
+            <Link to="/groups" className="text-muted-foreground hover:text-foreground transition-colors">
+              Groups
+            </Link>
+            <Link to="/templates" className="text-muted-foreground hover:text-foreground transition-colors">
+              Templates
+            </Link>
+            <Link to="/help" className="text-muted-foreground hover:text-foreground transition-colors">
+              Help
+            </Link>
           </div>
 
-          <div className="flex flex-col gap-4 my-6">
-            <Link to="/features" className="p-3 hover:bg-muted rounded-md transition-colors">Features</Link>
-            <Link to="/demo" className="p-3 hover:bg-muted rounded-md transition-colors">Demo</Link>
-            <Link to="/pricing" className="p-3 hover:bg-muted rounded-md transition-colors">Pricing</Link>
-            <Link to="/templates" className="p-3 hover:bg-muted rounded-md transition-colors">Templates</Link>
-            
-            {isLoggedIn ? (
+          {/* Authentication Buttons */}
+          <div className="hidden md:flex items-center space-x-4">
+            {isLoggedIn && user && profile ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={profile.avatar_url} alt={profile.username} />
+                      <AvatarFallback>{profile.username.charAt(0).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{profile.display_name || user?.username}</p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {profile.username}@droplink.gg
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard">Dashboard</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to={`/${profile.username}`}>Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin">Admin</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
               <>
-                <Link to="/dashboard" className="p-3 hover:bg-muted rounded-md transition-colors">Dashboard</Link>
-                <Button 
-                  variant="ghost" 
-                  className="flex items-center justify-start gap-2 p-3 hover:bg-muted rounded-md transition-colors"
+                <Link to="/login">
+                  <Button variant="outline" size="sm">
+                    Log In
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button size="sm">Sign Up</Button>
+                </Link>
+              </>
+            )}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <Sheet>
+            <SheetTrigger asChild className="md:hidden">
+              <Button variant="ghost" className="mr-2 px-0">
+                <Menu className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="sm:max-w-xs">
+              <SheetHeader>
+                <SheetTitle>Menu</SheetTitle>
+                <SheetDescription>
+                  Explore the app and manage your account.
+                </SheetDescription>
+              </SheetHeader>
+              <div className="divide-y divide-border">
+                <div className="grid gap-4 py-4">
+                  <Link
+                    to="/"
+                    className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Home
+                  </Link>
+                  <Link
+                    to="/features"
+                    className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Features
+                  </Link>
+                  <Link
+                    to="/pricing"
+                    className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Pricing
+                  </Link>
+                  <Link
+                    to="/store"
+                    className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Store
+                  </Link>
+                  <Link
+                    to="/groups"
+                    className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Groups
+                  </Link>
+                  <Link
+                    to="/templates"
+                    className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Templates
+                  </Link>
+                  <Link
+                    to="/help"
+                    className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Help
+                  </Link>
+                </div>
+                <div className="grid gap-4 py-4">
+                  {isLoggedIn && user && profile ? (
+                    <>
+                      <Link
+                        to="/dashboard"
+                        className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        Dashboard
+                      </Link>
+                      <Link
+                        to={`/${profile.username}`}
+                        className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        Profile
+                      </Link>
+                      <Link
+                        to="/admin"
+                        className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        Admin
+                      </Link>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full justify-center"
+                        onClick={handleLogout}
+                      >
+                        Log Out
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Link to="/login">
+                        <Button variant="outline" size="sm" className="w-full justify-center">
+                          Log In
+                        </Button>
+                      </Link>
+                      <Link to="/signup">
+                        <Button size="sm" className="w-full justify-center">Sign Up</Button>
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-background border-t border-border">
+          <div className="px-2 pt-2 pb-3 space-y-1">
+            <Link
+              to="/"
+              className="block px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link
+              to="/features"
+              className="block px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Features
+            </Link>
+            <Link
+              to="/pricing"
+              className="block px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Pricing
+            </Link>
+            <Link
+              to="/store"
+              className="block px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Store
+            </Link>
+            <Link
+              to="/groups"
+              className="block px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Groups
+            </Link>
+            <Link
+              to="/templates"
+              className="block px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Templates
+            </Link>
+            <Link
+              to="/help"
+              className="block px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Help
+            </Link>
+            
+            {isLoggedIn && user && profile ? (
+              <>
+                <Link
+                  to="/dashboard"
+                  className="block px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to={`/${profile.username}`}
+                  className="block px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Profile
+                </Link>
+                <Link
+                  to="/admin"
+                  className="block px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Admin
+                </Link>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-center"
                   onClick={handleLogout}
                 >
-                  <LogOut size={18} />
                   Log Out
                 </Button>
               </>
             ) : (
               <>
-                <Link to="/login" className="p-3 hover:bg-muted rounded-md transition-colors">Log In</Link>
-                <Button asChild className="mt-2 bg-gradient-hero hover:bg-secondary">
-                  <Link to="/signup">Start Free</Link>
-                </Button>
+                <Link to="/login">
+                  <Button variant="outline" size="sm" className="w-full justify-center">
+                    Log In
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button size="sm" className="w-full justify-center">Sign Up</Button>
+                </Link>
               </>
             )}
           </div>
-
-          <div className="mt-auto flex justify-center gap-8 py-6">
-            <a href="https://instagram.com" aria-label="Instagram" className="text-primary hover:text-secondary transition-colors">
-              <Instagram size={24} />
-            </a>
-            <a href="https://twitter.com" aria-label="Twitter" className="text-primary hover:text-secondary transition-colors">
-              <Twitter size={24} />
-            </a>
-            <a href="https://facebook.com" aria-label="Facebook" className="text-primary hover:text-secondary transition-colors">
-              <Facebook size={24} />
-            </a>
-          </div>
         </div>
       )}
-    </header>
+    </nav>
   );
 };
 

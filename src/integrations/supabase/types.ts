@@ -125,6 +125,193 @@ export type Database = {
         }
         Relationships: []
       }
+      group_invitations: {
+        Row: {
+          created_at: string
+          expires_at: string
+          group_id: string
+          id: string
+          invitee_id: string
+          inviter_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          group_id: string
+          id?: string
+          invitee_id: string
+          inviter_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          group_id?: string
+          id?: string
+          invitee_id?: string
+          inviter_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_invitations_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_memberships: {
+        Row: {
+          expires_at: string | null
+          group_id: string
+          id: string
+          joined_at: string
+          payment_id: string | null
+          role: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          expires_at?: string | null
+          group_id: string
+          id?: string
+          joined_at?: string
+          payment_id?: string | null
+          role?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          expires_at?: string | null
+          group_id?: string
+          id?: string
+          joined_at?: string
+          payment_id?: string | null
+          role?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_memberships_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_messages: {
+        Row: {
+          content: string
+          created_at: string
+          group_id: string
+          id: string
+          is_deleted: boolean
+          is_edited: boolean
+          message_type: string
+          reply_to_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          group_id: string
+          id?: string
+          is_deleted?: boolean
+          is_edited?: boolean
+          message_type?: string
+          reply_to_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          group_id?: string
+          id?: string
+          is_deleted?: boolean
+          is_edited?: boolean
+          message_type?: string
+          reply_to_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_messages_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "group_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      groups: {
+        Row: {
+          category: string | null
+          created_at: string
+          creator_id: string
+          currency: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          is_private: boolean
+          max_members: number | null
+          member_count: number
+          name: string
+          price: number
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          creator_id: string
+          currency?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          is_private?: boolean
+          max_members?: number | null
+          member_count?: number
+          name: string
+          price?: number
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          creator_id?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          is_private?: boolean
+          max_members?: number | null
+          member_count?: number
+          name?: string
+          price?: number
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       links: {
         Row: {
           clicks: number | null
