@@ -23,7 +23,7 @@ const Dashboard = () => {
   const [processingPayment, setProcessingPayment] = useState(false);
   const { handleSubscribe: piHandleSubscribe } = usePiPayment();
 
-  const handlePiLogin = () => {
+  const handlePiLogin = async (): Promise<void> => {
     navigate('/login');
   };
 
