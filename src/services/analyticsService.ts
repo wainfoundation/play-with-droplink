@@ -22,7 +22,7 @@ export async function trackEvent(
       // Get the link to find the owner
       const { data: link } = await supabase
         .from('links')
-        .select('user_id')
+        .select('user_id, clicks')
         .eq('id', event.link_id)
         .single();
 
@@ -40,10 +40,11 @@ export async function trackEvent(
 
         if (analyticsError) throw analyticsError;
 
-        // Update click count
+        // Update click count by incrementing the current value
+        const currentClicks = link.clicks || 0;
         const { error: updateError } = await supabase
           .from('links')
-          .update({ clicks: supabase.raw('COALESCE(clicks, 0) + 1') })
+          .update({ clicks: currentClicks + 1 })
           .eq('id', event.link_id);
 
         if (updateError) throw updateError;
