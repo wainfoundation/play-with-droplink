@@ -141,7 +141,8 @@ const ProfilePage = () => {
         if (profileData.active_sticker_ids) {
           if (Array.isArray(profileData.active_sticker_ids)) {
             // If it's already an array, filter to ensure all items are strings
-            activeStickerIds = profileData.active_sticker_ids.filter((id): id is string => typeof id === 'string');
+            activeStickerIds = profileData.active_sticker_ids
+              .filter((id): id is string => typeof id === 'string');
           } else if (typeof profileData.active_sticker_ids === 'string') {
             // If it's a JSON string, try to parse it
             try {
