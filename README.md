@@ -38,7 +38,7 @@ The application supports Pi payments for subscriptions and products. The payment
 
 ```sh
 # Step 1: Clone the repository
-git clone <REPOSITORY_URL>
+git clone https://github.com/ReimagineTruth/drop-link-v2.git
 
 # Step 2: Navigate to the project directory
 cd droplink
