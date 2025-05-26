@@ -1,13 +1,12 @@
-
 import { useState, useEffect } from "react";
 import { CheckIcon, XIcon } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { authenticateWithPi } from "@/services/piNetwork";
+import { authenticateWithPi } from "@/utils/pi-sdk";
 
 interface FeatureItem {
   name: string;
@@ -18,7 +17,6 @@ interface FeatureItem {
 }
 
 const Features = () => {
-  const { toast } = useToast();
   const [userPlan, setUserPlan] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState<string | null>(null);

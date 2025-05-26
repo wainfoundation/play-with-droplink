@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -36,8 +37,8 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <HelmetProvider>
-      <UserProvider>
-        <TooltipProvider>
+      <TooltipProvider>
+        <UserProvider>
           <PiBrowserGuard>
             <Toaster />
             <Sonner />
@@ -70,8 +71,8 @@ const App = () => (
               </Routes>
             </BrowserRouter>
           </PiBrowserGuard>
-        </TooltipProvider>
-      </UserProvider>
+        </UserProvider>
+      </TooltipProvider>
     </HelmetProvider>
   </QueryClientProvider>
 );
