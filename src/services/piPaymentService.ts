@@ -1,4 +1,3 @@
-
 // Define interfaces for Pi Network authentication
 interface PiAuthResult {
   accessToken: string;
@@ -16,8 +15,8 @@ interface PiPaymentCallbacks {
 }
 
 // Get environment variables
-const PI_API_KEY = "ckta3qej1mjqit2rlqt6nutpw089uynyotj3g9spwqlhrvvggqv7hoe6cn3plgb5";
-const PI_SANDBOX = true;
+const PI_API_KEY = process.env.NEXT_PUBLIC_PI_API_KEY || import.meta.env.VITE_PI_API_KEY;
+const PI_SANDBOX = process.env.NODE_ENV === 'development';
 
 // Initialize Pi SDK
 export const initPiNetwork = (): boolean => {
@@ -83,7 +82,7 @@ export const createPiPayment = async (
 
     const payment = {
       amount: paymentData.amount,
-      identifier: `payment-${Date.now()}`, // Generate a unique identifier
+      identifier: `payment-${Date.now()}`,
       memo: paymentData.memo,
       metadata: paymentData.metadata || {},
     };
@@ -92,35 +91,41 @@ export const createPiPayment = async (
       onReadyForServerApproval: async (paymentId: string) => {
         console.log("Ready for server approval:", paymentId);
         
-        // Call our server to record the payment
         try {
-          const { data, error } = await supabase.functions.invoke('pi-payment', {
-            body: { paymentData: {...payment, paymentId}, user }
+          const response = await fetch('/api/pi-sdk/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              paymentId, 
+              paymentData: payment,
+              signature: 'generated_signature_here'
+            })
           });
           
-          if (error) throw error;
-          console.log("Payment recorded on server:", data);
+          if (!response.ok) throw new Error('Payment verification failed');
+          const data = await response.json();
+          console.log("Payment verified on server:", data);
         } catch (error) {
-          console.error("Error recording payment:", error);
+          console.error("Error verifying payment:", error);
         }
       },
       onReadyForServerCompletion: async (paymentId: string, txid: string) => {
         console.log("Payment completed:", paymentId, "Transaction ID:", txid);
         
-        // Call our server to complete the payment
         try {
-          const { data, error } = await supabase.functions.invoke('complete-payment', {
-            body: { paymentId, transactionId: txid, status: 'completed' }
+          const response = await fetch('/api/pi-sdk/complete-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              paymentId, 
+              transactionId: txid, 
+              status: 'completed' 
+            })
           });
           
-          if (error) throw error;
+          if (!response.ok) throw new Error('Payment completion failed');
+          const data = await response.json();
           console.log("Payment completed on server:", data);
-          
-          // Show success message
-          toast({
-            title: "Payment Successful",
-            description: `Your payment of ${paymentData.amount} Pi has been completed.`,
-          });
         } catch (error) {
           console.error("Error completing payment:", error);
         }
@@ -128,43 +133,31 @@ export const createPiPayment = async (
       onCancel: async (paymentId: string) => {
         console.log("Payment cancelled:", paymentId);
         
-        // Call our server to cancel the payment
         try {
-          const { data, error } = await supabase.functions.invoke('complete-payment', {
-            body: { paymentId, status: 'cancelled' }
+          const response = await fetch('/api/pi-sdk/complete-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              paymentId, 
+              status: 'cancelled' 
+            })
           });
           
-          if (error) throw error;
+          if (!response.ok) throw new Error('Payment cancellation failed');
+          const data = await response.json();
           console.log("Payment cancelled on server:", data);
         } catch (error) {
           console.error("Error cancelling payment:", error);
         }
-        
-        toast({
-          title: "Payment Cancelled",
-          description: "Your payment has been cancelled.",
-          variant: "destructive",
-        });
       },
       onError: (error: Error, payment?: any) => {
         console.error("Payment error:", error, payment);
-        toast({
-          title: "Payment Error",
-          description: error.message || "An error occurred during payment processing.",
-          variant: "destructive",
-        });
       },
     };
 
-    // Call Pi Network API to create payment
     return await window.Pi.createPayment(payment, callbacks);
   } catch (error) {
     console.error("Payment creation failed:", error);
-    toast({
-      title: "Payment Error",
-      description: "Failed to create payment.",
-      variant: "destructive",
-    });
     return null;
   }
 };
