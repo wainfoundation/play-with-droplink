@@ -25,6 +25,8 @@ export {
 // Re-export utility functions
 export {
   isRunningInPiBrowser,
+  redirectToPiBrowser,
+  autoDetectAndRedirect,
   getNativeFeatures,
   isAdNetworkSupported,
   initPiNetwork,
@@ -44,6 +46,8 @@ import {
 } from './pi-ads';
 import {
   isRunningInPiBrowser,
+  redirectToPiBrowser,
+  autoDetectAndRedirect,
   getNativeFeatures,
   isAdNetworkSupported,
   initPiNetwork,
@@ -53,6 +57,8 @@ import {
 
 export default {
   isRunningInPiBrowser,
+  redirectToPiBrowser,
+  autoDetectAndRedirect,
   initPiNetwork,
   getNativeFeatures,
   isAdNetworkSupported,
