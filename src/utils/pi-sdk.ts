@@ -113,6 +113,42 @@ export const isRunningInPiBrowser = (): boolean => {
   }
 };
 
+// Get native features available in Pi Browser
+export const getNativeFeatures = async (): Promise<NativeFeature[]> => {
+  try {
+    if (!window.Pi) {
+      PiLogger.warn('native_features_not_available', { reason: 'pi_sdk_not_available' });
+      return [];
+    }
+
+    // In development mode, return mock features
+    if (import.meta.env.DEV) {
+      console.log("Mock native features returned");
+      return ["inline_media", "request_permission", "ad_network"];
+    }
+
+    const features = await window.Pi.nativeFeaturesList();
+    PiLogger.info('native_features_retrieved', { features });
+    return features;
+  } catch (error) {
+    PiLogger.error('native_features_error', error);
+    return [];
+  }
+};
+
+// Check if ad network is supported
+export const isAdNetworkSupported = async (): Promise<boolean> => {
+  try {
+    const features = await getNativeFeatures();
+    const supported = features.includes("ad_network");
+    PiLogger.info('ad_network_check', { supported, features });
+    return supported;
+  } catch (error) {
+    PiLogger.error('ad_network_check_error', error);
+    return false;
+  }
+};
+
 // Initialize Pi SDK according to official documentation
 export const initPiNetwork = (): boolean => {
   try {
@@ -168,6 +204,33 @@ export const initPiNetwork = (): boolean => {
             }, 2000);
             
             return { paymentId: paymentData.identifier };
+          },
+          nativeFeaturesList: async () => {
+            console.log("Mock Pi.nativeFeaturesList called");
+            return ["inline_media", "request_permission", "ad_network"];
+          },
+          openShareDialog: (title: string, message: string) => {
+            console.log("Mock Pi.openShareDialog called:", title, message);
+          },
+          openUrlInSystemBrowser: async (url: string) => {
+            console.log("Mock Pi.openUrlInSystemBrowser called:", url);
+          },
+          Ads: {
+            showAd: async (adType: AdType) => {
+              console.log("Mock Pi.Ads.showAd called:", adType);
+              if (adType === "rewarded") {
+                return { type: "rewarded", result: "AD_REWARDED", adId: "mock-ad-" + Date.now() };
+              }
+              return { type: "interstitial", result: "AD_CLOSED" };
+            },
+            isAdReady: async (adType: AdType) => {
+              console.log("Mock Pi.Ads.isAdReady called:", adType);
+              return { type: adType, ready: true };
+            },
+            requestAd: async (adType: AdType) => {
+              console.log("Mock Pi.Ads.requestAd called:", adType);
+              return { type: adType, result: "AD_LOADED" };
+            }
           }
         };
       }
