@@ -11,6 +11,8 @@ import HowItWorks from "@/components/HowItWorks";
 import DemoSection from "@/components/DemoSection";
 import CTA from "@/components/CTA";
 import FAQ from "@/components/FAQ";
+import CommunityLove from "@/components/CommunityLove";
+import TemplatesShowcase from "@/components/TemplatesShowcase";
 import { Helmet } from "react-helmet-async";
 
 const Home = () => {
@@ -41,7 +43,9 @@ const Home = () => {
               <HowItWorks />
               <DemoSection />
               <Features />
+              <TemplatesShowcase />
               <PiDomainTestimonials />
+              <CommunityLove />
               <FAQ />
             </div>
           </div>
