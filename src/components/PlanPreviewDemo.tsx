@@ -168,31 +168,21 @@ const PlanPreviewDemo: React.FC<PlanPreviewDemoProps> = ({ selectedPlan }) => {
         <div className="flex justify-between items-center">
           <span className="text-xs font-medium text-gray-700">Features</span>
           <div className="flex gap-2">
-            {config.features.analytics ? (
-              <BarChart3 className="w-4 h-4 text-primary" title="Analytics" />
-            ) : (
-              <BarChart3 className="w-4 h-4 text-gray-300" title="Analytics (Locked)" />
-            )}
-            {config.features.qrCode ? (
-              <QrCode className="w-4 h-4 text-primary" title="QR Code" />
-            ) : (
-              <QrCode className="w-4 h-4 text-gray-300" title="QR Code (Locked)" />
-            )}
-            {config.features.customThemes ? (
-              <Palette className="w-4 h-4 text-primary" title="Custom Themes" />
-            ) : (
-              <Palette className="w-4 h-4 text-gray-300" title="Custom Themes (Locked)" />
-            )}
-            {config.features.scheduling ? (
-              <Calendar className="w-4 h-4 text-primary" title="Link Scheduling" />
-            ) : (
-              <Calendar className="w-4 h-4 text-gray-300" title="Link Scheduling (Locked)" />
-            )}
-            {config.features.customCSS ? (
-              <Settings className="w-4 h-4 text-primary" title="Custom CSS" />
-            ) : (
-              <Settings className="w-4 h-4 text-gray-300" title="Custom CSS (Locked)" />
-            )}
+            <BarChart3 className={`w-4 h-4 ${
+              config.features.analytics ? 'text-primary' : 'text-gray-300'
+            }`} />
+            <QrCode className={`w-4 h-4 ${
+              config.features.qrCode ? 'text-primary' : 'text-gray-300'
+            }`} />
+            <Palette className={`w-4 h-4 ${
+              config.features.customThemes ? 'text-primary' : 'text-gray-300'
+            }`} />
+            <Calendar className={`w-4 h-4 ${
+              config.features.scheduling ? 'text-primary' : 'text-gray-300'
+            }`} />
+            <Settings className={`w-4 h-4 ${
+              config.features.customCSS ? 'text-primary' : 'text-gray-300'
+            }`} />
           </div>
         </div>
       </div>
