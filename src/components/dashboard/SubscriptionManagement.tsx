@@ -24,38 +24,35 @@ const SubscriptionManagement = ({
       name: "Free",
       price: 0,
       features: [
-        "3 links maximum",
-        "2 social profiles", 
-        "1 basic template only",
-        "Pi Ad Network (with ads)",
-        "Droplink badge (required)",
+        "Unlimited links",
+        "Pi Tip button", 
         "Basic analytics",
-        "Community support",
-        "Template preview only"
+        "1 template",
+        "Community support"
       ],
       limitations: [
         "No .pi domain",
         "No custom themes",
-        "No email capture",
-        "Limited features"
+        "No QR codes",
+        "Droplink badge required",
+        "Limited template access"
       ],
       icon: Star,
       color: "gray",
-      description: "Limited starter experience"
+      description: "Get started with essential features"
     },
     {
       name: "Starter",
       price: planPricing.starter.monthly,
       features: [
-        "Unlimited links",
-        "Unlimited social profiles",
-        "5 premium templates",
-        "Remove Droplink badge",
-        ".pi domain support",
+        "Everything in Free",
         "Custom themes",
-        "Email capture forms",
-        "Advanced analytics",
-        "Priority email support"
+        "Link animations",
+        "QR codes",
+        "20+ templates",
+        "Email support",
+        "Remove Droplink badge",
+        ".pi domain support"
       ],
       icon: Zap,
       color: "blue",
@@ -66,14 +63,11 @@ const SubscriptionManagement = ({
       price: planPricing.pro.monthly,
       features: [
         "Everything in Starter",
-        "15 premium templates",
-        "QR code generation",
-        "Link scheduling",
-        "Link animations",
-        "Location analytics",
-        "SEO optimization tools",
-        "Password protection",
-        "Multi-language support",
+        "Email capture",
+        "Advanced analytics",
+        "Group access",
+        "50+ templates",
+        "SEO tools",
         "Priority support"
       ],
       icon: Crown,
@@ -85,15 +79,13 @@ const SubscriptionManagement = ({
       price: planPricing.premium.monthly,
       features: [
         "Everything in Pro",
-        "Unlimited templates",
-        "White label/branding removal",
-        "Custom CSS editor",
-        "File uploads",
-        "API access",
-        "Team collaboration",
+        "Digital store",
+        "Booking system",
+        "100+ templates",
+        "Priority support",
+        "Whitelabel",
         "Advanced automations",
-        "Data export",
-        "Dedicated support"
+        "API access"
       ],
       icon: Crown,
       color: "gold",
@@ -117,7 +109,7 @@ const SubscriptionManagement = ({
           Subscription Plans
         </CardTitle>
         <p className="text-gray-600 mt-2">
-          Unlock your full potential with Pi Network's most powerful link-in-bio platform
+          Choose the plan that fits your needs - start free, upgrade as you grow
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -128,17 +120,17 @@ const SubscriptionManagement = ({
               currentPlan.toLowerCase() === plan.name.toLowerCase()
                 ? 'border-primary bg-gradient-to-r from-primary/5 to-secondary/5 shadow-md'
                 : plan.name === 'Free'
-                ? 'border-red-200 bg-red-50/50'
+                ? 'border-gray-200 bg-gray-50/50'
                 : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
             }`}
           >
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className={`p-2 rounded-lg ${
-                  plan.name === 'Free' ? 'bg-red-100' : `bg-${plan.color}-100`
+                  plan.name === 'Free' ? 'bg-gray-100' : `bg-${plan.color}-100`
                 }`}>
                   <plan.icon className={`w-5 h-5 ${
-                    plan.name === 'Free' ? 'text-red-600' : `text-${plan.color}-600`
+                    plan.name === 'Free' ? 'text-gray-600' : `text-${plan.color}-600`
                   }`} />
                 </div>
                 <div>
@@ -146,9 +138,6 @@ const SubscriptionManagement = ({
                     <span className="font-bold text-lg">{plan.name}</span>
                     {currentPlan.toLowerCase() === plan.name.toLowerCase() && (
                       <Badge className="bg-primary text-white px-2 py-1">Current Plan</Badge>
-                    )}
-                    {plan.name === 'Free' && (
-                      <Badge className="bg-red-500 text-white px-2 py-1">Limited</Badge>
                     )}
                   </div>
                   <p className="text-sm text-gray-600">{plan.description}</p>
@@ -216,7 +205,7 @@ const SubscriptionManagement = ({
             {plan.name === "Free" && currentPlan.toLowerCase() === "free" && (
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-3">
                 <p className="text-amber-800 text-sm font-medium">
-                  🚀 Ready to unlock your full potential? Upgrade to remove limitations!
+                  🚀 Ready to unlock premium features? Upgrade starting at just 10π/month!
                 </p>
               </div>
             )}

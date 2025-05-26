@@ -20,14 +20,13 @@ const FreePlanLimitations = ({ feature, showUpgradeButton = true }: FreePlanLimi
   }
 
   const limitationMessages = [
-    `Limited to ${limits.maxLinks} link only`,
-    `Only ${limits.maxSocialProfiles} social profile connection`,
-    "Only 1 basic template available",
+    "Limited to 1 basic template only",
     "Droplink badge required (upgrade to remove)",
     "No .pi domain connection",
-    "No analytics features",
+    "No custom themes or animations", 
+    "No QR code generation",
     "Community support only",
-    "Pi Ad Network (with ads)"
+    "Basic analytics only"
   ];
 
   return (

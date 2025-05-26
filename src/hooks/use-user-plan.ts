@@ -30,24 +30,27 @@ export const useUserPlan = () => {
   // Get the raw pricing information
   const pricing = planPricing;
 
-  // Strict limitations for free plan to encourage upgrades - matching pricing page
+  // Updated limitations based on the pricing image
   const limits = {
-    maxLinks: plan === 'free' ? 1 : Infinity, // Only 1 link for free
-    maxSocialProfiles: plan === 'free' ? 1 : Infinity, // Only 1 social profile for free
-    maxTemplates: plan === 'free' ? 1 : plan === 'starter' ? 5 : plan === 'pro' ? 15 : 100,
-    canWithdrawTips: plan !== 'free',
-    hasAnalytics: plan !== 'free', // Basic analytics only for paid plans
-    hasQRCode: plan === 'pro' || plan === 'premium',
-    hasAdvancedThemes: plan !== 'free',
+    maxLinks: Infinity, // All plans get unlimited links now
+    maxSocialProfiles: Infinity, // All plans get unlimited social profiles
+    maxTemplates: plan === 'free' ? 1 : plan === 'starter' ? 20 : plan === 'pro' ? 50 : 100,
+    canWithdrawTips: true, // All plans can receive Pi tips
+    hasAnalytics: true, // All plans have basic analytics
+    hasAdvancedAnalytics: plan === 'pro' || plan === 'premium',
+    hasQRCode: plan === 'starter' || plan === 'pro' || plan === 'premium',
+    hasAdvancedThemes: plan === 'starter' || plan === 'pro' || plan === 'premium',
     hasCustomDomain: plan !== 'free',
     hasPiDomain: plan !== 'free', // .pi domain only for paid plans
-    hasLinkAnimations: plan === 'pro' || plan === 'premium',
+    hasLinkAnimations: plan === 'starter' || plan === 'pro' || plan === 'premium',
     hasScheduling: plan === 'pro' || plan === 'premium',
     hasSEOTools: plan === 'pro' || plan === 'premium',
     hasFileUploads: plan === 'premium',
     hasWhitelabel: plan === 'premium',
     hasDataExport: plan === 'premium',
     hasPrioritySupport: plan === 'premium',
+    hasEmailSupport: plan === 'starter' || plan === 'pro' || plan === 'premium',
+    hasCommunitySupport: true, // All plans have community support
     canUsePiAdNetwork: plan === 'free' || plan === 'starter', // Pi ads for free and starter
     showDroplinkBadge: plan === 'free', // Badge only shown on free accounts
     hasTemplatePreview: true, // All users can preview all templates
@@ -57,8 +60,7 @@ export const useUserPlan = () => {
       if (plan === 'pro') return ['free', 'starter', 'pro'].includes(templateTier);
       return true; // Premium can use all templates
     },
-    hasEmailCapture: plan !== 'free',
-    hasAdvancedAnalytics: plan === 'pro' || plan === 'premium',
+    hasEmailCapture: plan === 'pro' || plan === 'premium',
     hasLocationAnalytics: plan === 'pro' || plan === 'premium',
     hasBrandingRemoval: plan === 'premium',
     hasAPIAccess: plan === 'premium',
@@ -68,9 +70,12 @@ export const useUserPlan = () => {
     hasCustomCSS: plan === 'premium',
     hasTeamAccess: plan === 'premium',
     hasAutomations: plan === 'premium',
+    hasDigitalStore: plan === 'premium',
+    hasBookingSystem: plan === 'premium',
+    hasGroupAccess: plan === 'pro' || plan === 'premium',
     // Additional features from pricing page
     hasMultiFactorAuth: plan === 'pro' || plan === 'premium',
-    hasCustomButtonStyles: plan === 'pro' || plan === 'premium',
+    hasCustomButtonStyles: plan === 'starter' || plan === 'pro' || plan === 'premium',
     hasSpotlightLinks: plan === 'pro' || plan === 'premium',
     hasPerformanceAnalytics: plan === 'pro' || plan === 'premium',
     hasEmailPhoneCollection: plan === 'pro' || plan === 'premium',

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
@@ -48,12 +49,7 @@ const LinksSection = () => {
   }, [links, isLoading, previousLinkCount]);
 
   const handleAddLinkClick = () => {
-    // Check if user has reached their link limit - free plan only gets 1 link
-    if (links.length >= limits.maxLinks && plan === 'free') {
-      openUpgradeModal("Adding more than 1 link");
-      return;
-    }
-    
+    // All plans now get unlimited links based on the new pricing
     setIsAddingLink(true);
   };
 
@@ -106,24 +102,6 @@ const LinksSection = () => {
         
         {!isAddingLink && !isEditingLink && (
           <AddLinkButton onClick={handleAddLinkClick} />
-        )}
-        
-        {/* Updated upgrade prompt for free users - only 1 link allowed */}
-        {plan === 'free' && links.length >= limits.maxLinks && (
-          <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg text-center">
-            <p className="font-medium text-amber-800 mb-1">
-              Free plan limited to {limits.maxLinks} link only
-            </p>
-            <p className="text-sm text-amber-700 mb-3">
-              Upgrade to Starter (10π/month) for unlimited links and remove the Droplink badge
-            </p>
-            <button
-              onClick={() => openUpgradeModal("unlimited links")}
-              className="bg-gradient-hero text-white px-4 py-1 rounded text-sm font-medium hover:bg-blue-600 transition-colors"
-            >
-              Upgrade Now
-            </button>
-          </div>
         )}
       </div>
     );
