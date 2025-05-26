@@ -197,10 +197,14 @@ export type Database = {
           currency: string
           description: string | null
           download_count: number
+          download_expires_hours: number | null
+          file_size: number | null
+          file_type: string | null
           file_url: string | null
           id: string
           image_url: string | null
           is_active: boolean
+          max_downloads: number | null
           price: number
           tags: string[] | null
           title: string
@@ -213,10 +217,14 @@ export type Database = {
           currency?: string
           description?: string | null
           download_count?: number
+          download_expires_hours?: number | null
+          file_size?: number | null
+          file_type?: string | null
           file_url?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean
+          max_downloads?: number | null
           price?: number
           tags?: string[] | null
           title: string
@@ -229,10 +237,14 @@ export type Database = {
           currency?: string
           description?: string | null
           download_count?: number
+          download_expires_hours?: number | null
+          file_size?: number | null
+          file_type?: string | null
           file_url?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean
+          max_downloads?: number | null
           price?: number
           tags?: string[] | null
           title?: string
@@ -240,6 +252,51 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      download_logs: {
+        Row: {
+          downloaded_at: string | null
+          id: string
+          ip_address: string | null
+          order_id: string | null
+          product_id: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          downloaded_at?: string | null
+          id?: string
+          ip_address?: string | null
+          order_id?: string | null
+          product_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          downloaded_at?: string | null
+          id?: string
+          ip_address?: string | null
+          order_id?: string | null
+          product_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "download_logs_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "download_logs_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "digital_products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       feedback_submissions: {
         Row: {
@@ -598,13 +655,17 @@ export type Database = {
       }
       orders: {
         Row: {
+          access_token: string | null
           amount: number
+          buyer_email: string | null
           buyer_id: string
           created_at: string
           currency: string
+          download_count: number | null
           download_expires_at: string | null
           download_link: string | null
           id: string
+          max_downloads: number | null
           pi_payment_id: string | null
           pi_transaction_id: string | null
           product_id: string
@@ -613,13 +674,17 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          access_token?: string | null
           amount: number
+          buyer_email?: string | null
           buyer_id: string
           created_at?: string
           currency?: string
+          download_count?: number | null
           download_expires_at?: string | null
           download_link?: string | null
           id?: string
+          max_downloads?: number | null
           pi_payment_id?: string | null
           pi_transaction_id?: string | null
           product_id: string
@@ -628,13 +693,17 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          access_token?: string | null
           amount?: number
+          buyer_email?: string | null
           buyer_id?: string
           created_at?: string
           currency?: string
+          download_count?: number | null
           download_expires_at?: string | null
           download_link?: string | null
           id?: string
+          max_downloads?: number | null
           pi_payment_id?: string | null
           pi_transaction_id?: string | null
           product_id?: string
@@ -698,6 +767,75 @@ export type Database = {
             columns: ["subscription_id"]
             isOneToOne: false
             referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      product_reviews: {
+        Row: {
+          created_at: string | null
+          id: string
+          order_id: string | null
+          product_id: string | null
+          rating: number | null
+          review_text: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          order_id?: string | null
+          product_id?: string | null
+          rating?: number | null
+          review_text?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          order_id?: string | null
+          product_id?: string | null
+          rating?: number | null
+          review_text?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "digital_products"
             referencedColumns: ["id"]
           },
         ]
@@ -1057,6 +1195,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_download_product: {
+        Args: { order_id_param: string }
+        Returns: boolean
+      }
       can_send_message: {
         Args: { user_id_param: string }
         Returns: boolean
@@ -1064,6 +1206,10 @@ export type Database = {
       can_start_chat: {
         Args: { user_id_param: string }
         Returns: boolean
+      }
+      generate_download_token: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       get_or_create_daily_quota: {
         Args: { user_id_param: string }

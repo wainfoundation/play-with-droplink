@@ -1,15 +1,13 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Filter, Grid, List, ShoppingBag } from "lucide-react";
 import ProductCard from "./ProductCard";
 import { useDigitalProducts, DigitalProduct } from "@/hooks/useDigitalProducts";
-import { usePiPayment } from "@/hooks/usePiPayment";
 import { useUser } from "@/context/UserContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -21,8 +19,9 @@ const StorePage = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [storeOwner, setStoreOwner] = useState<any>(null);
   const [filteredProducts, setFilteredProducts] = useState<DigitalProduct[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   
-  const { products, loading, fetchProducts, createOrder } = useDigitalProducts();
+  const { products, loading, fetchProducts } = useDigitalProducts();
   const { user } = useUser();
   const { toast } = useToast();
 
@@ -43,6 +42,16 @@ const StorePage = () => {
 
         // Fetch products for this store
         await fetchProducts(profile.id);
+
+        // Fetch available categories
+        const { data: categoriesData } = await supabase
+          .from('product_categories')
+          .select('name')
+          .order('name');
+        
+        if (categoriesData) {
+          setCategories(categoriesData.map(cat => cat.name));
+        }
       } catch (error) {
         console.error('Error fetching store data:', error);
         toast({
@@ -76,114 +85,6 @@ const StorePage = () => {
 
     setFilteredProducts(filtered);
   }, [products, searchTerm, selectedCategory]);
-
-  const handlePurchase = async (product: DigitalProduct) => {
-    if (!user) {
-      toast({
-        title: "Login Required",
-        description: "Please log in to purchase products",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      // Create order first
-      const order = await createOrder({
-        buyer_id: user.id,
-        seller_id: product.user_id,
-        product_id: product.id,
-        amount: product.price,
-        currency: "Pi",
-        status: "pending",
-      });
-
-      if (!order) {
-        throw new Error("Failed to create order");
-      }
-
-      // Initiate Pi payment flow
-      if (typeof window !== 'undefined' && window.Pi) {
-        const payment = {
-          amount: product.price,
-          identifier: `product-${product.id}-${Date.now()}`,
-          memo: `Purchase of ${product.title}`,
-          metadata: {
-            orderId: order.id,
-            productId: product.id,
-            type: 'product_purchase'
-          }
-        };
-
-        const callbacks = {
-          onReadyForServerApproval: async (paymentId: string) => {
-            console.log("Payment ready for approval:", paymentId);
-            // Update order with payment ID
-            await supabase
-              .from('orders')
-              .update({ pi_payment_id: paymentId })
-              .eq('id', order.id);
-          },
-          onReadyForServerCompletion: async (paymentId: string, txid: string) => {
-            console.log("Payment completed:", paymentId, txid);
-            // Update order status and generate download link
-            await supabase
-              .from('orders')
-              .update({ 
-                status: 'completed',
-                pi_transaction_id: txid,
-                download_link: product.file_url,
-                download_expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days
-              })
-              .eq('id', order.id);
-
-            // Update product download count
-            await supabase
-              .from('digital_products')
-              .update({ download_count: product.download_count + 1 })
-              .eq('id', product.id);
-
-            toast({
-              title: "Purchase Successful!",
-              description: "Your download is now available in your orders.",
-            });
-          },
-          onCancel: async (paymentId: string) => {
-            console.log("Payment cancelled:", paymentId);
-            await supabase
-              .from('orders')
-              .update({ status: 'cancelled' })
-              .eq('id', order.id);
-          },
-          onError: (error: Error) => {
-            console.error("Payment error:", error);
-            toast({
-              title: "Payment Error",
-              description: error.message || "Payment failed",
-              variant: "destructive",
-            });
-          },
-        };
-
-        await window.Pi.createPayment(payment, callbacks);
-      } else {
-        toast({
-          title: "Pi Browser Required",
-          description: "This feature requires the Pi Browser to process payments",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error('Purchase error:', error);
-      toast({
-        title: "Purchase Failed",
-        description: "There was an error processing your purchase",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
 
   if (loading) {
     return (
@@ -254,8 +155,8 @@ const StorePage = () => {
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
                 {categories.map((category) => (
-                  <SelectItem key={category} value={category!}>
-                    {category}
+                  <SelectItem key={category} value={category}>
+                    {category.charAt(0).toUpperCase() + category.slice(1)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -305,7 +206,6 @@ const StorePage = () => {
             <ProductCard
               key={product.id}
               product={product}
-              onPurchase={handlePurchase}
               compact={viewMode === "list"}
             />
           ))}
