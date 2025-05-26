@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthResponse } from "@supabase/supabase-js";
+import { loadPiSDK } from "@/utils/pi-sdk-loader";
+import PiLogger from "@/utils/pi-logger";
 
 // Define explicit interfaces for user data
 interface PiUser {
@@ -37,31 +39,32 @@ export function usePiAuth() {
   const [piAuthenticating, setPiAuthenticating] = useState(false);
 
   useEffect(() => {
-    // Check if Pi Network SDK is available in the window object
-    if (window.Pi) {
-      // Initialize Pi SDK with proper promise chaining
-      const initializePi = async () => {
-        try {
-          await window.Pi.init({ version: "2.0", sandbox: true });
-          console.log("Pi Network SDK initialized");
-        } catch (err) {
-          console.error("Error initializing Pi Network SDK:", err);
-          setError("Failed to initialize Pi Network SDK");
-        } finally {
-          setLoading(false);
+    // Initialize Pi SDK with lazy loading
+    const initializePi = async () => {
+      try {
+        PiLogger.info('hook_init_start');
+        
+        if (window.Pi) {
+          const piSDK = await loadPiSDK();
+          piSDK.initPiNetwork();
+          PiLogger.info('hook_init_success', { method: 'window_pi' });
+        } else {
+          PiLogger.warn('hook_init_no_pi', { message: 'Pi SDK not available in window' });
         }
-      };
-      
-      initializePi();
-    } else {
-      setError("Pi Network SDK not available");
-      setLoading(false);
-    }
+      } catch (err) {
+        const error = err instanceof Error ? err.message : 'Unknown initialization error';
+        PiLogger.error('hook_init_error', err as Error);
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    initializePi();
   }, []);
 
   const onIncompletePaymentFound = (payment: any) => {
-    console.log("Incomplete payment found:", payment);
-    // Handle incomplete payment
+    PiLogger.warn('incomplete_payment_in_auth', { paymentId: payment?.identifier });
     return null;
   };
 
@@ -70,20 +73,25 @@ export function usePiAuth() {
       setPiAuthenticating(true);
       setError(null);
 
+      PiLogger.info('auth_login_start');
+      
+      // Load Pi SDK dynamically
+      const piSDK = await loadPiSDK();
+      
       if (!window.Pi) {
         throw new Error("Pi Network SDK not available");
       }
 
-      const authResult = await window.Pi.authenticate(
-        ["username", "payments", "wallet_address"],
-        onIncompletePaymentFound
+      const authResult = await piSDK.authenticateWithPi(
+        ["username", "payments", "wallet_address"]
       ) as PiAuthResult;
 
       if (authResult) {
-        console.log("Pi Auth Result:", authResult);
+        PiLogger.auth('login_pi_success', authResult);
+        
         // Convert to PiUser format
         const piUserData: PiUser = {
-          id: authResult.user.uid, // Use uid as id
+          id: authResult.user.uid,
           username: authResult.user.username || "",
           uid: authResult.user.uid
         };
@@ -137,12 +145,15 @@ export function usePiAuth() {
         }
 
         setIsAuthenticated(true);
+        PiLogger.info('auth_login_complete', { userId: authResult.user.uid });
         return { user: userData, piUser: piUserData };
       }
       
       return null;
     } catch (err) {
-      console.error("Error during Pi authentication:", err);
+      PiLogger.error('auth_login_error', err as Error, { 
+        step: 'pi_authentication' 
+      });
       setError(err instanceof Error ? err.message : "Unknown error during authentication");
       return null;
     } finally {
