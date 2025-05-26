@@ -1,15 +1,13 @@
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Share2, QrCode } from "lucide-react";
-import ActiveStickers from "./ActiveStickers";
 
 interface ProfileHeaderProps {
   username: string;
-  displayName?: string | null;
-  bio?: string | null;
-  avatarUrl?: string | null;
-  activeStickerIds?: string[];
+  displayName: string | null;
+  bio: string | null;
+  avatarUrl: string | null;
   onShareClick: () => void;
   onQrCodeClick: () => void;
 }
@@ -19,60 +17,45 @@ const ProfileHeader = ({
   displayName,
   bio,
   avatarUrl,
-  activeStickerIds = [],
   onShareClick,
-  onQrCodeClick,
+  onQrCodeClick
 }: ProfileHeaderProps) => {
-  const fallbackName = displayName || username;
-
   return (
-    <div className="text-center mb-8 relative">
-      <div className="relative inline-block mb-4">
-        <Avatar className="w-24 h-24 mx-auto relative">
-          <AvatarImage 
-            src={avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${username}`} 
-            alt={fallbackName}
-          />
-          <AvatarFallback className="text-2xl">
-            {fallbackName.slice(0, 2).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
-        
-        {/* Active stickers overlay */}
-        <ActiveStickers 
-          activeStickerIds={activeStickerIds}
-          className="absolute inset-0 w-24 h-24"
-        />
-      </div>
+    <div className="flex flex-col items-center relative">
+      {/* Cover background */}
+      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-hero rounded-t-xl -mx-8"></div>
       
-      <h1 className="text-2xl font-bold mb-2">
+      {/* Profile content with proper spacing */}
+      <Avatar className="w-24 h-24 mt-20 border-4 border-white z-10 shadow-md">
+        <AvatarImage 
+          src={avatarUrl || `https://api.dicebear.com/7.x/adventurer/svg?seed=${username}`}
+          alt={`${username}'s profile`} 
+        />
+        <AvatarFallback>{username.substring(0, 2).toUpperCase()}</AvatarFallback>
+      </Avatar>
+      
+      <h1 className="text-2xl font-bold mt-4 mb-1">
         {displayName || `@${username}`}
       </h1>
+      <p className="text-gray-500 mb-2">@{username}</p>
+      <p className="text-gray-700 text-center mb-6">{bio || "Digital creator & Pi pioneer"}</p>
       
-      {bio && (
-        <p className="text-gray-600 mb-4 max-w-sm mx-auto">
-          {bio}
-        </p>
-      )}
-      
-      <div className="flex justify-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
+      <div className="flex gap-2 mb-6">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="flex items-center gap-1 hover:bg-muted/50 transition-colors"
           onClick={onShareClick}
-          className="flex items-center gap-2"
         >
-          <Share2 className="w-4 h-4" />
-          Share
+          <Share2 className="w-4 h-4" /> Share
         </Button>
-        <Button
-          variant="outline"
-          size="sm"
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="flex items-center gap-1 hover:bg-muted/50 transition-colors"
           onClick={onQrCodeClick}
-          className="flex items-center gap-2"
         >
-          <QrCode className="w-4 h-4" />
-          QR Code
+          <QrCode className="w-4 h-4" /> QR Code
         </Button>
       </div>
     </div>
