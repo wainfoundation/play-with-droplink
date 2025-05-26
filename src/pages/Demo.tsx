@@ -3,10 +3,11 @@ import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PlanPreviewDemo from "@/components/PlanPreviewDemo";
+import PlanFeaturesTable from "@/components/features/PlanFeaturesTable";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowRight, Check, MousePointer, BarChart4, Zap, Crown, Shield, Star, Lock, Palette, Calendar, QrCode, Settings, Eye, Users } from "lucide-react";
+import { ArrowRight, Check, MousePointer, BarChart4, Zap, Crown, Shield, Star, Lock, Palette, Calendar, QrCode, Settings, Eye, Users, DollarSign, TrendingUp } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 
 const Demo = () => {
@@ -30,6 +31,8 @@ const Demo = () => {
         '3 Basic Templates'
       ],
       limitations: [
+        'No .pi Domain',
+        'No Pi Tips',
         'No Analytics',
         'No QR Codes', 
         'No Custom Themes',
@@ -42,18 +45,21 @@ const Demo = () => {
       icon: <Zap className="w-4 h-4" />,
       color: 'bg-blue-500 hover:bg-blue-600',
       price: '8π',
-      templates: 20,
+      templates: 33,
       links: 999,
       features: [
         'Unlimited Links', 
+        '.pi Domain Access',
+        'Pi Tips Enabled',
         'No Ads', 
         'QR Codes', 
         'Basic Analytics', 
         'Email Support',
-        '20+ Templates',
+        '33+ Templates',
         'Custom Button Styles'
       ],
       limitations: [
+        'No Product Sales',
         'No Link Scheduling',
         'No SEO Tools',
         'No Email Capture'
@@ -65,17 +71,19 @@ const Demo = () => {
       icon: <Crown className="w-4 h-4" />,
       color: 'bg-purple-500 hover:bg-purple-600',
       price: '12π',
-      templates: 50,
+      templates: 66,
       links: 999,
       features: [
-        'Everything in Starter', 
+        'Everything in Starter',
+        'Digital Product Sales',
         'Advanced Analytics', 
         'SEO Tools', 
         'Link Scheduling', 
         'Custom Themes',
-        '50+ Premium Templates',
+        '66+ Premium Templates',
         'Email/Phone Collection',
-        'Location Analytics'
+        'Location Analytics',
+        'Hide Droplink Branding'
       ],
       limitations: [
         'No Custom CSS',
@@ -89,7 +97,7 @@ const Demo = () => {
       icon: <Shield className="w-4 h-4" />,
       color: 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600',
       price: '18π',
-      templates: 100,
+      templates: 99,
       links: 999,
       features: [
         'Everything in Pro', 
@@ -97,10 +105,11 @@ const Demo = () => {
         'Priority Support', 
         'Custom CSS', 
         'API Access',
-        '100+ Exclusive Templates',
+        '99+ Exclusive Templates',
         'White-label Option',
         'Historical Analytics',
-        'Team Access'
+        'Team Access',
+        'Data Export'
       ],
       limitations: []
     }
@@ -158,8 +167,8 @@ const Demo = () => {
                 </p>
                 <p className="text-lg text-muted-foreground mb-6">
                   {selectedPlan === 'free' && 'Perfect for getting started with basic link sharing'}
-                  {selectedPlan === 'starter' && 'Great for creators who want unlimited links and professional features'}
-                  {selectedPlan === 'pro' && 'Ideal for serious creators who need advanced analytics and customization'}
+                  {selectedPlan === 'starter' && 'Great for creators who want .pi domains, unlimited links and Pi tips'}
+                  {selectedPlan === 'pro' && 'Ideal for serious creators who want to sell digital products and get advanced analytics'}
                   {selectedPlan === 'premium' && 'Best for businesses wanting to sell products and get full customization'}
                 </p>
               </div>
@@ -223,9 +232,9 @@ const Demo = () => {
                 <p className="text-sm text-blue-700">
                   This live preview shows exactly how your demo.pi profile will appear to visitors. 
                   {selectedPlan === 'free' && ' Notice the Pi ads, single link limitation, and basic template selection.'}
-                  {selectedPlan === 'starter' && ' See unlimited links, no ads, and access to 20+ templates.'}
-                  {selectedPlan === 'pro' && ' Experience advanced features like analytics preview and 50+ premium templates.'}
-                  {selectedPlan === 'premium' && ' Enjoy full customization with 100+ templates and all features unlocked.'}
+                  {selectedPlan === 'starter' && ' See .pi domain, unlimited links, Pi tips, and access to 33+ templates.'}
+                  {selectedPlan === 'pro' && ' Experience digital product sales, advanced analytics and 66+ premium templates.'}
+                  {selectedPlan === 'premium' && ' Enjoy full customization with 99+ templates and all features unlocked.'}
                 </p>
               </div>
 
@@ -250,11 +259,11 @@ const Demo = () => {
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Calendar className={`w-4 h-4 ${
+                    <DollarSign className={`w-4 h-4 ${
                       ['pro', 'premium'].includes(selectedPlan) ? 'text-green-500' : 'text-gray-300'
                     }`} />
                     <span className={['pro', 'premium'].includes(selectedPlan) ? 'text-gray-900' : 'text-gray-400'}>
-                      Scheduling
+                      Product Sales
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -292,6 +301,17 @@ const Demo = () => {
                 <PlanPreviewDemo selectedPlan={selectedPlan} />
               </div>
             </div>
+          </div>
+
+          {/* Plan Features Table */}
+          <div className="mt-20">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4">Complete Feature Comparison</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Compare all features across our subscription plans to find the perfect fit for your needs.
+              </p>
+            </div>
+            <PlanFeaturesTable />
           </div>
           
           <div className="mt-20 bg-blue-50 rounded-2xl p-8 text-center">

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Heart, Share, ExternalLink, Star, Lock, Zap, Crown, Shield, QrCode, BarChart3, Palette, Calendar, Eye, Settings } from "lucide-react";
+import { Heart, Share, ExternalLink, Star, Lock, Zap, Crown, Shield, QrCode, BarChart3, Palette, Calendar, Eye, Settings, TrendingUp, Download, DollarSign, Users } from "lucide-react";
 
 type PlanType = 'free' | 'starter' | 'pro' | 'premium';
 
@@ -20,10 +20,16 @@ const PlanPreviewDemo: React.FC<PlanPreviewDemoProps> = ({ selectedPlan }) => {
       icon: <Star className="w-4 h-4" />,
       badge: "Free",
       badgeColor: "bg-gray-500",
+      badgeEmoji: "❤️",
       links: 1,
       templates: 3,
       showAds: true,
       showDroplinkBadge: true,
+      showPiTips: false,
+      showProductSales: false,
+      showPiDomain: false,
+      showEarnings: false,
+      showAdvancedAnalytics: false,
       features: {
         analytics: false,
         qrCode: false,
@@ -40,10 +46,16 @@ const PlanPreviewDemo: React.FC<PlanPreviewDemoProps> = ({ selectedPlan }) => {
       icon: <Zap className="w-4 h-4" />,
       badge: "Starter",
       badgeColor: "bg-blue-500",
+      badgeEmoji: "⚡",
       links: 999,
-      templates: 20,
+      templates: 33,
       showAds: false,
       showDroplinkBadge: false,
+      showPiTips: true,
+      showProductSales: false,
+      showPiDomain: true,
+      showEarnings: true,
+      showAdvancedAnalytics: false,
       features: {
         analytics: true,
         qrCode: true,
@@ -60,10 +72,16 @@ const PlanPreviewDemo: React.FC<PlanPreviewDemoProps> = ({ selectedPlan }) => {
       icon: <Crown className="w-4 h-4" />,
       badge: "Pro",
       badgeColor: "bg-purple-500", 
+      badgeEmoji: "👑",
       links: 999,
-      templates: 50,
+      templates: 66,
       showAds: false,
       showDroplinkBadge: false,
+      showPiTips: true,
+      showProductSales: true,
+      showPiDomain: true,
+      showEarnings: true,
+      showAdvancedAnalytics: true,
       features: {
         analytics: true,
         qrCode: true,
@@ -72,7 +90,7 @@ const PlanPreviewDemo: React.FC<PlanPreviewDemoProps> = ({ selectedPlan }) => {
         seo: true,
         emailCapture: true,
         customCSS: false,
-        brandingRemoval: false
+        brandingRemoval: true
       }
     },
     premium: {
@@ -80,10 +98,16 @@ const PlanPreviewDemo: React.FC<PlanPreviewDemoProps> = ({ selectedPlan }) => {
       icon: <Shield className="w-4 h-4" />,
       badge: "Premium",
       badgeColor: "bg-gradient-to-r from-yellow-500 to-orange-500",
+      badgeEmoji: "💎",
       links: 999,
-      templates: 100,
+      templates: 99,
       showAds: false, 
       showDroplinkBadge: false,
+      showPiTips: true,
+      showProductSales: true,
+      showPiDomain: true,
+      showEarnings: true,
+      showAdvancedAnalytics: true,
       features: {
         analytics: true,
         qrCode: true,
@@ -122,15 +146,32 @@ const PlanPreviewDemo: React.FC<PlanPreviewDemoProps> = ({ selectedPlan }) => {
     { title: "🚀 My Pi Network App", type: "primary", locked: false },
     { title: "📱 Download My App", type: "secondary", locked: selectedPlan === 'free' },
     { title: "🎥 YouTube Channel", type: "secondary", locked: selectedPlan === 'free' }, 
-    { title: "💰 Tip me in Pi", type: "tip", locked: false },
+    { title: "💰 Tip me in Pi", type: "tip", locked: !config.showPiTips },
     { title: "🎵 My Music", type: "secondary", locked: selectedPlan === 'free' },
     { title: "📚 My Course", type: "secondary", locked: selectedPlan === 'free' }
+  ];
+
+  const demoProducts = [
+    { title: "📘 Pi Development Course", price: "15π", type: "course", locked: !config.showProductSales },
+    { title: "🎨 Design Templates Pack", price: "8π", type: "digital", locked: !config.showProductSales },
+    { title: "💼 1-on-1 Consulting", price: "25π", type: "service", locked: !config.showProductSales }
   ];
 
   const currentTemplate = availableTemplates[selectedTemplate] || availableTemplates[0];
 
   return (
     <div className="w-full max-w-sm mx-auto">
+      {/* Plan Status Badge */}
+      <div className="mb-4 text-center">
+        <Badge className={`text-white ${config.badgeColor} px-3 py-1`}>
+          <span className="mr-1">{config.badgeEmoji}</span>
+          {config.badge} Plan
+        </Badge>
+        {config.showPiDomain && (
+          <p className="text-xs text-green-600 mt-1 font-medium">✅ .pi Domain Active</p>
+        )}
+      </div>
+
       {/* Template Selector */}
       <div className="mb-4 bg-white rounded-lg p-3 shadow-sm">
         <div className="flex items-center justify-between mb-2">
@@ -203,7 +244,9 @@ const PlanPreviewDemo: React.FC<PlanPreviewDemoProps> = ({ selectedPlan }) => {
           <div className="bg-gray-100 px-4 py-2 border-b">
             <div className="bg-white rounded-lg px-3 py-1 flex items-center gap-2">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span className="font-mono text-sm font-bold text-primary">demo.pi</span>
+              <span className="font-mono text-sm font-bold text-primary">
+                {config.showPiDomain ? 'pideveloper.pi' : 'demo.droplink.app'}
+              </span>
             </div>
           </div>
           
@@ -290,19 +333,71 @@ const PlanPreviewDemo: React.FC<PlanPreviewDemoProps> = ({ selectedPlan }) => {
                 </div>
               )}
             </div>
+
+            {/* Product Sales Section (Pro/Premium only) */}
+            {config.showProductSales && (
+              <div className="mb-4">
+                <h3 className="text-sm font-bold text-white mb-2 drop-shadow-md">💼 Digital Products</h3>
+                <div className="space-y-2">
+                  {demoProducts.slice(0, 2).map((product, index) => (
+                    <div key={index} className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-2">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs font-medium text-white">{product.title}</p>
+                          <p className="text-xs text-white/80">{product.price}</p>
+                        </div>
+                        <Button size="sm" className="bg-white/30 hover:bg-white/40 text-white text-xs">
+                          Buy
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Earnings Preview (Starter+ only) */}
+            {config.showEarnings && (
+              <div className="mb-4 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <TrendingUp className="w-3 h-3 text-white" />
+                  <span className="text-xs text-white font-medium">Pi Earnings</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs text-white/90">
+                  <div>
+                    <span className="block">Tips: 45π</span>
+                    {config.showProductSales && <span className="block">Sales: 120π</span>}
+                  </div>
+                  <div>
+                    <span className="block">Total: {config.showProductSales ? '165π' : '45π'}</span>
+                    <span className="block text-white/70">This month</span>
+                  </div>
+                </div>
+              </div>
+            )}
             
-            {/* Analytics Preview (Pro/Premium only) */}
+            {/* Analytics Preview (Starter+ only) */}
             {config.features.analytics && (
               <div className="mb-4 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-3">
                 <div className="flex items-center gap-2 mb-2">
                   <BarChart3 className="w-3 h-3 text-white" />
-                  <span className="text-xs text-white font-medium">Analytics</span>
+                  <span className="text-xs text-white font-medium">
+                    {config.showAdvancedAnalytics ? 'Advanced Analytics' : 'Analytics'}
+                  </span>
                 </div>
                 <div className="flex justify-between text-xs text-white/90">
-                  <span>Views: 1.2k</span>
-                  <span>Clicks: 340</span>
-                  <span>CTR: 28%</span>
+                  <span>Views: {config.showAdvancedAnalytics ? '2.5k' : '1.2k'}</span>
+                  <span>Clicks: {config.showAdvancedAnalytics ? '680' : '340'}</span>
+                  <span>CTR: {config.showAdvancedAnalytics ? '32%' : '28%'}</span>
                 </div>
+                {config.showAdvancedAnalytics && (
+                  <div className="mt-2 pt-2 border-t border-white/20">
+                    <div className="flex justify-between text-xs text-white/80">
+                      <span>Location: Global</span>
+                      <span>Devices: 65% Mobile</span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
             
@@ -360,21 +455,27 @@ const PlanPreviewDemo: React.FC<PlanPreviewDemoProps> = ({ selectedPlan }) => {
             <span className="font-medium">{config.templates}</span>
           </div>
           <div className="flex items-center justify-between text-xs">
+            <span>.pi Domain</span>
+            <span className={`font-medium ${config.showPiDomain ? 'text-green-600' : 'text-gray-400'}`}>
+              {config.showPiDomain ? '✓' : '✗'}
+            </span>
+          </div>
+          <div className="flex items-center justify-between text-xs">
+            <span>Pi Tips</span>
+            <span className={`font-medium ${config.showPiTips ? 'text-green-600' : 'text-gray-400'}`}>
+              {config.showPiTips ? '✓' : '✗'}
+            </span>
+          </div>
+          <div className="flex items-center justify-between text-xs">
+            <span>Product Sales</span>
+            <span className={`font-medium ${config.showProductSales ? 'text-green-600' : 'text-gray-400'}`}>
+              {config.showProductSales ? '✓' : '✗'}
+            </span>
+          </div>
+          <div className="flex items-center justify-between text-xs">
             <span>Analytics</span>
             <span className={`font-medium ${config.features.analytics ? 'text-green-600' : 'text-gray-400'}`}>
               {config.features.analytics ? '✓' : '✗'}
-            </span>
-          </div>
-          <div className="flex items-center justify-between text-xs">
-            <span>QR Codes</span>
-            <span className={`font-medium ${config.features.qrCode ? 'text-green-600' : 'text-gray-400'}`}>
-              {config.features.qrCode ? '✓' : '✗'}
-            </span>
-          </div>
-          <div className="flex items-center justify-between text-xs">
-            <span>Custom CSS</span>
-            <span className={`font-medium ${config.features.customCSS ? 'text-green-600' : 'text-gray-400'}`}>
-              {config.features.customCSS ? '✓' : '✗'}
             </span>
           </div>
           <div className="flex items-center justify-between text-xs">
