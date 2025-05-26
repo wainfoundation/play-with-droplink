@@ -1,14 +1,18 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useUser } from "@/context/UserContext";
 import { PiAuthButton } from "@/components/auth/PiAuthButton";
+import { EmailLoginForm } from "@/components/auth/EmailLoginForm";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Login = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useUser();
+  const [activeTab, setActiveTab] = useState("email");
   
   useEffect(() => {
     if (isLoggedIn) {
@@ -29,7 +33,28 @@ const Login = () => {
           </div>
           
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-            <PiAuthButton />
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="email">Email</TabsTrigger>
+                <TabsTrigger value="pi">Pi Network</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="email" className="mt-6">
+                <EmailLoginForm />
+              </TabsContent>
+              
+              <TabsContent value="pi" className="mt-6">
+                <div className="space-y-6">
+                  <PiAuthButton />
+                  
+                  <div className="text-center">
+                    <p className="text-sm text-gray-500 leading-relaxed">
+                      Connect with Pi Network to access exclusive features and Pi-based payments
+                    </p>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
             
             <div className="mt-8 text-center">
               <p className="text-gray-600 mb-4">

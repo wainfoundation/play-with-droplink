@@ -3,64 +3,21 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { useUser } from "@/context/UserContext";
+import { PiAuthButton } from "@/components/auth/PiAuthButton";
+import { EmailSignupForm } from "@/components/auth/EmailSignupForm";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Signup = () => {
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
   const navigate = useNavigate();
+  const { isLoggedIn } = useUser();
+  const [activeTab, setActiveTab] = useState("email");
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        navigate('/dashboard');
-      }
-    });
-  }, [navigate]);
-
-  const handleSignup = async () => {
-    try {
-      setIsAuthenticating(true);
-      
-      const timestamp = Date.now();
-      const randomString = Math.random().toString(36).substring(2, 15);
-      const userEmail = `pi_user_${timestamp}_${randomString}@droplink.space`;
-      const userPassword = `secure_${timestamp}_${randomString}`;
-      
-      const { data, error } = await supabase.auth.signUp({
-        email: userEmail,
-        password: userPassword,
-        options: {
-          data: {
-            username: `pi_user_${timestamp}`,
-            pi_uid: `pi_${timestamp}_${randomString}`,
-            display_name: `Pi User ${timestamp.toString().slice(-4)}`
-          }
-        }
-      });
-      
-      if (error) {
-        throw new Error(error.message);
-      }
-      
-      toast({
-        title: "Welcome to Droplink!",
-        description: "Your Pi Network profile is ready! Start building your presence.",
-      });
-      
+    if (isLoggedIn) {
       navigate('/dashboard');
-    } catch (error) {
-      console.error("Signup error:", error);
-      toast({
-        title: "Registration Error",
-        description: "Unable to create Pi Network account. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsAuthenticating(false);
     }
-  };
+  }, [isLoggedIn, navigate]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-indigo-50">
@@ -68,29 +25,39 @@ const Signup = () => {
       <main className="flex-grow flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8 space-y-4">
-            <h1 className="text-4xl font-bold text-primary mb-4">Join Pi Network</h1>
+            <h1 className="text-4xl font-bold text-primary mb-4">Join Droplink</h1>
             <p className="text-gray-600 text-lg leading-relaxed">
-              Create your Droplink profile and start building your Pi Network presence
+              Create your profile and start building your Pi Network presence
             </p>
           </div>
           
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-            <Button 
-              type="button" 
-              onClick={handleSignup}
-              className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg mb-6"
-              disabled={isAuthenticating}
-              size="lg"
-            >
-              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/>
-              </svg>
-              {isAuthenticating ? "Creating Your Profile..." : "Start Building with Pi Network"}
-            </Button>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="email">Email</TabsTrigger>
+                <TabsTrigger value="pi">Pi Network</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="email" className="mt-6">
+                <EmailSignupForm />
+              </TabsContent>
+              
+              <TabsContent value="pi" className="mt-6">
+                <div className="space-y-6">
+                  <PiAuthButton />
+                  
+                  <div className="text-center">
+                    <p className="text-sm text-gray-500 leading-relaxed">
+                      Join the Pi Network community and start monetizing your content
+                    </p>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
             
             <div className="mt-8 text-center">
               <p className="text-gray-600 mb-4">
-                Already part of the Pi Network community?
+                Already part of the community?
               </p>
               <Link 
                 to="/login" 
