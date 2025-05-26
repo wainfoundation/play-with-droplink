@@ -1,87 +1,119 @@
-interface PiLogMetadata {
-  operation?: string;
-  success?: boolean;
-  error?: Error | string;
-  metadata?: Record<string, any>;
-  userAgent?: string;
-  timestamp?: string;
-  piSDKVersion?: string;
-  // Allow any additional properties for custom logging data
-  [key: string]: any;
+
+/**
+ * Pi Network Logger - Centralized logging for Pi SDK operations
+ */
+
+type LogLevel = 'info' | 'warn' | 'error' | 'debug';
+type LogCategory = 'auth' | 'payment' | 'ad' | 'browser' | 'init' | 'general';
+
+interface LogEntry {
+  timestamp: string;
+  level: LogLevel;
+  category: LogCategory;
+  message: string;
+  data?: any;
+  error?: Error;
 }
 
-export class PiLogger {
-  private static formatLog(level: 'info' | 'warn' | 'error', operation: string, data: PiLogMetadata) {
-    const logData = {
+class PiLogger {
+  private logs: LogEntry[] = [];
+  private maxLogs = 1000;
+
+  private createLogEntry(
+    level: LogLevel,
+    category: LogCategory,
+    message: string,
+    data?: any,
+    error?: Error
+  ): LogEntry {
+    return {
       timestamp: new Date().toISOString(),
       level,
-      operation,
-      piSDKVersion: '2.0',
-      userAgent: navigator.userAgent,
-      isPiBrowser: !!window.Pi,
-      ...data
+      category,
+      message,
+      data,
+      error
     };
-
-    return logData;
   }
 
-  static info(operation: string, metadata?: PiLogMetadata) {
-    const logData = this.formatLog('info', operation, { success: true, ...metadata });
-    console.log('[Pi SDK]', operation, logData);
+  private addLog(entry: LogEntry) {
+    this.logs.unshift(entry);
+    if (this.logs.length > this.maxLogs) {
+      this.logs = this.logs.slice(0, this.maxLogs);
+    }
+
+    // Console output with formatting
+    const prefix = `[Pi-${entry.category.toUpperCase()}]`;
+    const timestamp = entry.timestamp.split('T')[1].split('.')[0];
     
-    // In production, you could send to analytics service
-    if (import.meta.env.PROD && logData.success) {
-      // Example: analytics.track('pi_operation_success', logData);
+    switch (entry.level) {
+      case 'error':
+        console.error(`${prefix} ${timestamp}:`, entry.message, entry.data || '', entry.error || '');
+        break;
+      case 'warn':
+        console.warn(`${prefix} ${timestamp}:`, entry.message, entry.data || '');
+        break;
+      case 'debug':
+        console.debug(`${prefix} ${timestamp}:`, entry.message, entry.data || '');
+        break;
+      default:
+        console.log(`${prefix} ${timestamp}:`, entry.message, entry.data || '');
     }
   }
 
-  static warn(operation: string, metadata?: PiLogMetadata) {
-    const logData = this.formatLog('warn', operation, metadata);
-    console.warn('[Pi SDK]', operation, logData);
+  info(message: string, data?: any) {
+    this.addLog(this.createLogEntry('info', 'general', message, data));
   }
 
-  static error(operation: string, error: Error | string, metadata?: PiLogMetadata) {
-    const logData = this.formatLog('error', operation, { 
-      error: error instanceof Error ? error.message : error,
-      stack: error instanceof Error ? error.stack : undefined,
-      ...metadata 
-    });
-    console.error('[Pi SDK]', operation, logData);
-    
-    // In production, you could send to error tracking service
-    if (import.meta.env.PROD) {
-      // Example: errorService.captureException(error, logData);
-    }
+  warn(message: string, data?: any) {
+    this.addLog(this.createLogEntry('warn', 'general', message, data));
   }
 
-  static payment(operation: string, paymentData: any, metadata?: PiLogMetadata) {
-    const sanitizedPaymentData = {
-      ...paymentData,
-      // Remove sensitive data for logging
-      accessToken: paymentData.accessToken ? '[REDACTED]' : undefined,
-      privateKey: '[REDACTED]',
-    };
+  error(message: string, error?: Error, data?: any) {
+    this.addLog(this.createLogEntry('error', 'general', message, data, error));
+  }
 
-    this.info(`payment_${operation}`, {
-      ...metadata,
-      paymentData: sanitizedPaymentData
+  debug(message: string, data?: any) {
+    this.addLog(this.createLogEntry('debug', 'general', message, data));
+  }
+
+  // Category-specific loggers
+  auth(message: string, data?: any, extra?: any) {
+    this.addLog(this.createLogEntry('info', 'auth', message, { ...data, ...extra }));
+  }
+
+  payment(message: string, data?: any) {
+    this.addLog(this.createLogEntry('info', 'payment', message, data));
+  }
+
+  ad(message: string, data?: any) {
+    this.addLog(this.createLogEntry('info', 'ad', message, data));
+  }
+
+  browser(message: string, data?: any) {
+    this.addLog(this.createLogEntry('info', 'browser', message, data));
+  }
+
+  // Get logs for debugging
+  getLogs(category?: LogCategory, level?: LogLevel): LogEntry[] {
+    return this.logs.filter(log => {
+      if (category && log.category !== category) return false;
+      if (level && log.level !== level) return false;
+      return true;
     });
   }
 
-  static auth(operation: string, authData?: any, metadata?: PiLogMetadata) {
-    const sanitizedAuthData = authData ? {
-      uid: authData.uid,
-      username: authData.username,
-      scopes: authData.scopes,
-      // Remove sensitive tokens
-      accessToken: authData.accessToken ? '[REDACTED]' : undefined,
-    } : undefined;
+  // Export logs for debugging
+  exportLogs(): string {
+    return JSON.stringify(this.logs, null, 2);
+  }
 
-    this.info(`auth_${operation}`, {
-      ...metadata,
-      authData: sanitizedAuthData
-    });
+  // Clear logs
+  clearLogs() {
+    this.logs = [];
   }
 }
 
-export default PiLogger;
+// Export singleton instance
+const logger = new PiLogger();
+export default logger;

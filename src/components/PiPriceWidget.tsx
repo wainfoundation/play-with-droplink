@@ -1,96 +1,117 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Pi } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Pi, TrendingUp, TrendingDown } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
-interface PiPrice {
-  usd: number;
-  btc: number;
-  eur: number;
+interface PiPriceData {
+  price: number;
   change24h: number;
+  lastUpdated: string;
 }
 
 const PiPriceWidget = () => {
-  const [price, setPrice] = useState<PiPrice | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [priceData, setPriceData] = useState<PiPriceData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPiPrice = async () => {
       try {
-        setLoading(true);
-        // Fetch Pi price from a public API
-        // Note: This is a placeholder URL - replace with actual Pi price API
-        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pi-network&vs_currencies=usd,eur,btc&include_24hr_change=true');
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch Pi price');
-        }
-        
-        const data = await response.json();
-        
-        // Format the response
-        const piData: PiPrice = {
-          usd: data['pi-network']?.usd || 0,
-          eur: data['pi-network']?.eur || 0,
-          btc: data['pi-network']?.btc || 0,
-          change24h: data['pi-network']?.usd_24h_change || 0
+        setIsLoading(true);
+        // In a real implementation, you would fetch from a Pi price API
+        // For now, we'll simulate the price data
+        const mockPriceData: PiPriceData = {
+          price: 47.84, // Mock price in USD
+          change24h: 2.34, // Mock 24h change percentage
+          lastUpdated: new Date().toISOString()
         };
         
-        setPrice(piData);
-      } catch (error) {
-        console.error("Error fetching Pi price:", error);
-        setError("Could not load Pi price information");
-        // Use fallback data when API fails
-        setPrice({
-          usd: 0.0145,
-          eur: 0.0135,
-          btc: 0.00000041,
-          change24h: 2.5
-        });
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setPriceData(mockPriceData);
+      } catch (err) {
+        setError("Failed to fetch Pi price");
+        console.error("Error fetching Pi price:", err);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
     fetchPiPrice();
     
-    // Refresh price every 5 minutes
+    // Update price every 5 minutes
     const interval = setInterval(fetchPiPrice, 5 * 60 * 1000);
+    
     return () => clearInterval(interval);
   }, []);
 
-  return (
-    <Card className="w-full">
-      <CardContent className="pt-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <Pi className="h-5 w-5 mr-2 text-primary" />
-            <span className="font-medium">Pi Network</span>
-          </div>
-          
-          {loading ? (
-            <Skeleton className="h-6 w-20" />
-          ) : error ? (
-            <span className="text-sm text-destructive">Price unavailable</span>
-          ) : (
-            <div className="text-right">
-              <div className="text-lg font-bold">${price?.usd.toFixed(6)}</div>
-              <div className={`text-xs ${price && price.change24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                {price && price.change24h >= 0 ? '▲' : '▼'} 
-                {price?.change24h.toFixed(2)}%
-              </div>
+  if (isLoading) {
+    return (
+      <Card className="w-full max-w-sm">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <div>
+              <p className="text-sm text-muted-foreground">Loading Pi price...</p>
             </div>
-          )}
-        </div>
-        
-        {!loading && !error && price && (
-          <div className="mt-2 grid grid-cols-2 gap-2 text-xs text-gray-500">
-            <div>BTC: {price.btc.toFixed(8)}</div>
-            <div>EUR: €{price.eur.toFixed(6)}</div>
           </div>
-        )}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error || !priceData) {
+    return (
+      <Card className="w-full max-w-sm border-destructive/20">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <Pi className="h-8 w-8 text-muted-foreground" />
+            <div>
+              <p className="text-sm text-destructive">Price unavailable</p>
+              <p className="text-xs text-muted-foreground">Try again later</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const isPositiveChange = priceData.change24h >= 0;
+
+  return (
+    <Card className="w-full max-w-sm border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full">
+              <Pi className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Pi Network</p>
+              <p className="text-lg font-bold">${priceData.price.toFixed(2)}</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <Badge 
+              variant={isPositiveChange ? "default" : "destructive"} 
+              className="flex items-center gap-1"
+            >
+              {isPositiveChange ? (
+                <TrendingUp className="h-3 w-3" />
+              ) : (
+                <TrendingDown className="h-3 w-3" />
+              )}
+              {isPositiveChange ? "+" : ""}{priceData.change24h.toFixed(2)}%
+            </Badge>
+            <p className="text-xs text-muted-foreground mt-1">24h change</p>
+          </div>
+        </div>
+        <div className="mt-3 pt-3 border-t border-primary/10">
+          <p className="text-xs text-muted-foreground">
+            Last updated: {new Date(priceData.lastUpdated).toLocaleTimeString()}
+          </p>
+        </div>
       </CardContent>
     </Card>
   );
