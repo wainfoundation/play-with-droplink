@@ -35,9 +35,11 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">D</span>
-            </div>
+            <img 
+              src="/lovable-uploads/0d519e46-7a30-4f3d-a07a-17e763eeda19.png" 
+              alt="Droplink Logo" 
+              className="w-8 h-8"
+            />
             <span className="text-xl font-bold text-gray-900">Droplink</span>
           </Link>
 

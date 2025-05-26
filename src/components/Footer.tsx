@@ -7,13 +7,13 @@ const Footer = () => {
     <footer className="bg-muted py-16 px-4 relative overflow-hidden">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
         <div className="space-y-6">
-          {/* Updated Logo to match Header */}
+          {/* Updated Logo to match uploaded image */}
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8zM7.83 14c.37 0 .67.26.74.62.41 2.22 2.28 2.98 3.64 2.87.43-.02.79.32.79.75 0 .4-.32.73-.72.75-2.13.13-4.62-1.09-5.19-4.12-.08-.45.28-.87.74-.87z"/>
-              </svg>
-            </div>
+            <img 
+              src="/lovable-uploads/0d519e46-7a30-4f3d-a07a-17e763eeda19.png" 
+              alt="Droplink Logo" 
+              className="w-8 h-8"
+            />
             <span className="font-poppins font-bold text-2xl text-primary">Droplink</span>
           </div>
           <p className="text-sm">

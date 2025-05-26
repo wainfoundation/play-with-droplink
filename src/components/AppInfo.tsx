@@ -9,11 +9,11 @@ const AppInfo = () => {
         <div className="text-center mb-12">
           {/* App Logo */}
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-2xl flex items-center justify-center shadow-lg">
-              <svg className="w-10 h-10 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8zM7.83 14c.37 0 .67.26.74.62.41 2.22 2.28 2.98 3.64 2.87.43-.02.79.32.79.75 0 .4-.32.73-.72.75-2.13.13-4.62-1.09-5.19-4.12-.08-.45.28-.87.74-.87z"/>
-              </svg>
-            </div>
+            <img 
+              src="/lovable-uploads/aff70a99-a022-4246-8af6-8b376a4b8d07.png" 
+              alt="Droplink Logo" 
+              className="w-16 h-16 rounded-2xl shadow-lg"
+            />
           </div>
           
           <h2 className="text-4xl font-bold mb-4">Droplink</h2>

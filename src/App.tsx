@@ -23,6 +23,11 @@ import About from "./pages/About";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import GDPR from "./pages/GDPR";
+import Blog from "./pages/Blog";
+import Careers from "./pages/Careers";
+import CreatorDirectory from "./pages/CreatorDirectory";
+import Developers from "./pages/Developers";
+import Cookies from "./pages/Cookies";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +54,11 @@ const App = () => (
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/gdpr" element={<GDPR />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/careers" element={<Careers />} />
+              <Route path="/creators" element={<CreatorDirectory />} />
+              <Route path="/developers" element={<Developers />} />
+              <Route path="/cookies" element={<Cookies />} />
               <Route path="/:username" element={<ProfilePage />} />
               <Route path="/:username/store" element={<StorePage />} />
               <Route path="*" element={<NotFound />} />
