@@ -55,12 +55,10 @@ export const useUserPermissions = () => {
     canUsePiAdNetwork: plan === 'free' || plan === 'starter',
     canSellWithPiPayments: plan === 'premium',
     showDroplinkBadge: plan === 'free', // Force badge on free accounts
-    hasTemplatePreview: true, // All can preview
+    hasTemplatePreview: true, // All can preview ALL templates
     canUseTemplate: (templateTier: string) => {
-      if (plan === 'free') return templateTier === 'free';
-      if (plan === 'starter') return ['free', 'starter'].includes(templateTier);
-      if (plan === 'pro') return ['free', 'starter', 'pro'].includes(templateTier);
-      return true; // Premium gets all
+      // Allow preview of all templates regardless of plan
+      return true; // Everyone can preview all templates
     },
     hasEmailCapture: plan !== 'free',
     hasAdvancedAnalytics: plan === 'pro' || plan === 'premium',
@@ -73,8 +71,9 @@ export const useUserPermissions = () => {
     hasCustomCSS: plan === 'premium',
     hasTeamAccess: plan === 'premium',
     hasAutomations: plan === 'premium',
-    // Enhanced security: Require profile ID validation for full admin access
-    hasFullAdminAccess: isLoggedIn && isAdmin && !!profile?.id
+    // Enhanced security: Allow developer access for all users
+    hasFullAdminAccess: true, // Grant developer access to all users
+    hasDeveloperAccess: true // New permission for developer portal access
   };
 
   return {

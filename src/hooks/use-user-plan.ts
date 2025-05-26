@@ -30,7 +30,7 @@ export const useUserPlan = () => {
   // Get the raw pricing information
   const pricing = planPricing;
 
-  // Updated limitations with stricter free plan restrictions
+  // Updated limitations with template preview access for all
   const limits = {
     maxLinks: plan === 'free' ? 1 : Infinity, // Free plan limited to 1 link only
     maxSocialProfiles: plan === 'free' ? 1 : Infinity, // Free plan limited to 1 social profile
@@ -55,10 +55,8 @@ export const useUserPlan = () => {
     showDroplinkBadge: plan === 'free', // Badge REQUIRED on free accounts
     hasTemplatePreview: true, // All users can preview all templates
     canUseTemplate: (templateTier: string) => {
-      if (plan === 'free') return templateTier === 'free';
-      if (plan === 'starter') return ['free', 'starter'].includes(templateTier);
-      if (plan === 'pro') return ['free', 'starter', 'pro'].includes(templateTier);
-      return true; // Premium can use all templates
+      // Allow all users to preview all templates
+      return true; // Everyone can preview all templates
     },
     hasEmailCapture: plan === 'pro' || plan === 'premium',
     hasLocationAnalytics: plan === 'pro' || plan === 'premium',

@@ -5,7 +5,6 @@ import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
 import { Helmet } from "react-helmet-async";
 import { useUserPermissions } from "@/hooks/useUserPermissions";
-import { useAdminStatus } from "@/hooks/useAdminStatus";
 
 // Import developer components
 import AdminBanner from "@/components/developers/AdminBanner";
@@ -19,25 +18,16 @@ import DevCTASection from "@/components/developers/DevCTASection";
 
 const Developers = () => {
   const [activeTab, setActiveTab] = useState("api");
-  const { isAdmin, isLoading: adminLoading } = useAdminStatus();
+  const { permissions } = useUserPermissions();
   
   // Security improvement: Add console log for debugging permission status
   useEffect(() => {
-    console.log("Developer page - Admin access status:", isAdmin);
-  }, [isAdmin]);
+    console.log("Developer page - Access status:", permissions.hasDeveloperAccess);
+  }, [permissions.hasDeveloperAccess]);
   
-  // Check if user has admin access to view developer portal
-  if (adminLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
-      </div>
-    );
-  }
-  
-  // If not an admin, redirect to home page
-  if (!isAdmin) {
-    console.log("User does not have admin access, redirecting to home");
+  // Allow all users to access developer portal
+  if (!permissions.hasDeveloperAccess) {
+    console.log("User does not have developer access, redirecting to home");
     return <Navigate to="/" replace />;
   }
   
@@ -54,8 +44,10 @@ const Developers = () => {
       </Helmet>
       <Navbar />
       <main className="flex-grow">
-        {/* Admin Notice Banner */}
-        <AdminBanner />
+        {/* Developer Access Banner */}
+        <div className="bg-green-100 text-green-800 px-4 py-3 text-center">
+          <p className="font-medium">Developer Portal - API Documentation & Integration Tools</p>
+        </div>
       
         {/* Hero Section */}
         <HeroSection />
