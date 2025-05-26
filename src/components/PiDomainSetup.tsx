@@ -1,11 +1,16 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { UserPlus, Settings, Globe, CheckCircle, ArrowRight } from 'lucide-react';
+import { UserPlus, Settings, Globe, CheckCircle, ArrowRight, Wrench } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import PiDomainVerification from './PiDomainVerification';
+import PiDomainSetupGuide from './PiDomainSetupGuide';
 
 const PiDomainSetup = () => {
+  const [activeTab, setActiveTab] = useState("verify");
+
   const steps = [
     {
       icon: UserPlus,
@@ -15,36 +20,66 @@ const PiDomainSetup = () => {
     },
     {
       icon: Settings,
-      title: 'Go to Domain Settings',
-      description: 'In your dashboard, navigate to Settings → Domains to access the domain connection interface.',
-      detail: 'Found in your dashboard'
+      title: 'Configure DNS Settings',
+      description: 'Add the validation TXT record to your .pi domain DNS settings using your domain provider.',
+      detail: 'One-time setup'
     },
     {
       icon: Globe,
-      title: 'Enter Your .pi Domain',
-      description: 'Input your Pi domain name (without the .pi extension). The system will automatically configure the connection.',
+      title: 'Verify Your Domain',
+      description: 'Use our verification tool to confirm your domain is properly configured and connected.',
       detail: 'Instant validation'
     },
     {
       icon: CheckCircle,
-      title: 'Save & Go Live',
+      title: 'Go Live',
       description: 'Your domain is now connected and ready to use. Share your memorable .pi URL with your audience.',
       detail: 'Live immediately'
     }
   ];
+
+  const handleVerificationComplete = (domain: string) => {
+    console.log('Domain verified:', domain);
+    // You can add additional logic here, like updating user profile
+  };
 
   return (
     <section className="py-24 px-4 bg-muted/30">
       <div className="container mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Connect Your <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">.pi Domain</span> in 4 Steps
+            Connect Your <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">.pi Domain</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            No technical skills needed. Connect your Pi domain to Droplink in minutes and start building your presence in the Pi Network ecosystem.
+            Connect your Pi domain to Droplink and start building your presence in the Pi Network ecosystem.
           </p>
         </div>
 
+        {/* Domain Verification Tabs */}
+        <div className="mb-16">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-4xl mx-auto">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="verify" className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4" />
+                Verify Domain
+              </TabsTrigger>
+              <TabsTrigger value="setup" className="flex items-center gap-2">
+                <Wrench className="h-4 w-4" />
+                Setup Guide
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="verify" className="mt-8">
+              <PiDomainVerification onVerificationComplete={handleVerificationComplete} />
+            </TabsContent>
+            
+            <TabsContent value="setup" className="mt-8">
+              <PiDomainSetupGuide />
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* Steps Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           {steps.map((step, index) => (
             <Card key={index} className="relative p-8 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-2 bg-white/90 backdrop-blur-sm border-primary/20">
