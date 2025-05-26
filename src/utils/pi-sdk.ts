@@ -1,6 +1,7 @@
 /**
  * Pi Network SDK utility functions
  */
+import PiLogger from './pi-logger';
 
 // Types from Pi SDK documentation
 export interface PiAuthResult {

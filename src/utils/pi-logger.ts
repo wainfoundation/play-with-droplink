@@ -1,4 +1,3 @@
-
 interface PiLogMetadata {
   operation?: string;
   success?: boolean;
@@ -7,6 +6,8 @@ interface PiLogMetadata {
   userAgent?: string;
   timestamp?: string;
   piSDKVersion?: string;
+  // Allow any additional properties for custom logging data
+  [key: string]: any;
 }
 
 export class PiLogger {
