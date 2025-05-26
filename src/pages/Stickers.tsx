@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
@@ -8,9 +7,12 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Heart, Flame, Zap, Star, PartyPopper } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Sparkles, Heart, Flame, Zap, Star, PartyPopper, Palette } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import StickerPurchaseModal from "@/components/stickers/StickerPurchaseModal";
+import CustomStickerDialog from "@/components/stickers/CustomStickerDialog";
+import { useCustomStickers } from "@/hooks/useCustomStickers";
 
 interface Sticker {
   id: string;
@@ -50,6 +52,7 @@ const Stickers = () => {
   const [selectedSticker, setSelectedSticker] = useState<Sticker | null>(null);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const { user } = useUser();
+  const { customStickers, loading: customLoading, refreshStickers } = useCustomStickers();
 
   const categories = ["all", "effects", "love", "celebration", "magic", "luxury", "music", "space", "nature", "mystical", "tech"];
 
@@ -134,6 +137,14 @@ const Stickers = () => {
     setSelectedSticker(null);
   };
 
+  const handleCustomStickerCreated = () => {
+    refreshStickers();
+    toast({
+      title: "Success!",
+      description: "Your custom sticker has been created",
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -164,88 +175,207 @@ const Stickers = () => {
             <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Animated Stickers
             </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
               Enhance your profile with beautiful animated stickers and effects. Stand out with unique animations that make your profile shine!
             </p>
+            
+            {user && (
+              <CustomStickerDialog onStickerCreated={handleCustomStickerCreated} />
+            )}
           </div>
 
-          {/* Category Filter */}
-          <div className="flex flex-wrap justify-center gap-2 mb-8">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory(category)}
-                className="capitalize"
-              >
-                {category !== "all" && categoryIcons[category as keyof typeof categoryIcons]}
-                {category}
-              </Button>
-            ))}
-          </div>
+          <Tabs defaultValue="marketplace" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-8">
+              <TabsTrigger value="marketplace" className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4" />
+                Marketplace
+              </TabsTrigger>
+              <TabsTrigger value="custom" className="flex items-center gap-2">
+                <Palette className="h-4 w-4" />
+                Custom Stickers
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Stickers Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {filteredStickers.map((sticker) => (
-              <Card key={sticker.id} className="group hover:shadow-lg transition-shadow">
-                <CardHeader className="p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <Badge variant="secondary" className="text-xs">
-                      {sticker.category}
-                    </Badge>
-                    {isOwned(sticker.id) && (
-                      <Badge variant="default" className="text-xs bg-green-500">
-                        Owned
-                      </Badge>
+            <TabsContent value="marketplace">
+              {/* Category Filter */}
+              <div className="flex flex-wrap justify-center gap-2 mb-8">
+                {categories.map((category) => (
+                  <Button
+                    key={category}
+                    variant={selectedCategory === category ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedCategory(category)}
+                    className="capitalize"
+                  >
+                    {category !== "all" && categoryIcons[category as keyof typeof categoryIcons]}
+                    {category}
+                  </Button>
+                ))}
+              </div>
+
+              {/* Marketplace Stickers Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {filteredStickers.map((sticker) => (
+                  <Card key={sticker.id} className="group hover:shadow-lg transition-shadow">
+                    <CardHeader className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <Badge variant="secondary" className="text-xs">
+                          {sticker.category}
+                        </Badge>
+                        {isOwned(sticker.id) && (
+                          <Badge variant="default" className="text-xs bg-green-500">
+                            Owned
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      {/* Animated Sticker Preview */}
+                      <div className="relative w-full h-20 flex items-center justify-center mb-3">
+                        <img
+                          src={sticker.animation_url}
+                          alt={sticker.name}
+                          className="w-16 h-16 object-contain animate-pulse group-hover:animate-bounce"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      </div>
+                      
+                      <CardTitle className="text-sm font-semibold truncate">
+                        {sticker.name}
+                      </CardTitle>
+                    </CardHeader>
+                    
+                    <CardContent className="p-4 pt-0">
+                      <CardDescription className="text-xs mb-3 line-clamp-2">
+                        {sticker.description}
+                      </CardDescription>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                          <span className="text-lg">π</span>
+                          <span className="font-bold text-primary">{sticker.price_pi}</span>
+                        </div>
+                        
+                        <Button
+                          size="sm"
+                          onClick={() => handlePurchaseClick(sticker)}
+                          disabled={isOwned(sticker.id)}
+                          className="text-xs"
+                        >
+                          {isOwned(sticker.id) ? "Owned" : "Buy"}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {filteredStickers.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-gray-500">No stickers found in this category.</p>
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="custom">
+              {/* Custom Stickers Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {customStickers.map((sticker) => (
+                  <Card key={sticker.id} className="group hover:shadow-lg transition-shadow">
+                    <CardHeader className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <Badge variant="outline" className="text-xs">
+                          Custom
+                        </Badge>
+                        {sticker.user_id === user?.id && (
+                          <Badge variant="default" className="text-xs bg-blue-500">
+                            Your Creation
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      {/* Custom Sticker Preview */}
+                      <div className="relative w-full h-20 flex items-center justify-center mb-3">
+                        <div className="relative">
+                          <img
+                            src={sticker.base_image_url}
+                            alt={sticker.name}
+                            className={`w-16 h-16 object-contain ${
+                              sticker.animation_type === 'pulse' ? 'animate-pulse' :
+                              sticker.animation_type === 'bounce' ? 'animate-bounce' :
+                              sticker.animation_type === 'spin' ? 'animate-spin' : ''
+                            }`}
+                            style={{
+                              filter: sticker.background_effect !== 'none' ? 
+                                `${sticker.background_effect}(1)` : 'none'
+                            }}
+                          />
+                          {sticker.overlay_text && (
+                            <div
+                              className={`absolute inset-0 flex items-center justify-center font-bold pointer-events-none ${
+                                sticker.text_position === 'top' ? 'items-start pt-1' :
+                                sticker.text_position === 'bottom' ? 'items-end pb-1' :
+                                'items-center'
+                              }`}
+                              style={{
+                                color: sticker.text_color,
+                                fontSize: `${Math.min(sticker.text_size / 2, 12)}px`,
+                                textShadow: '1px 1px 2px rgba(0,0,0,0.8)'
+                              }}
+                            >
+                              {sticker.overlay_text}
+                            </div>
+                          )}
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      </div>
+                      
+                      <CardTitle className="text-sm font-semibold truncate">
+                        {sticker.name}
+                      </CardTitle>
+                    </CardHeader>
+                    
+                    <CardContent className="p-4 pt-0">
+                      <CardDescription className="text-xs mb-3 line-clamp-2">
+                        {sticker.description || "Custom created sticker"}
+                      </CardDescription>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                          <span className="text-lg">π</span>
+                          <span className="font-bold text-primary">{sticker.price_pi}</span>
+                        </div>
+                        
+                        {sticker.user_id === user?.id ? (
+                          <Badge variant="secondary" className="text-xs">
+                            Yours
+                          </Badge>
+                        ) : (
+                          <Button size="sm" className="text-xs">
+                            Buy
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {customStickers.length === 0 && (
+                <div className="text-center py-12">
+                  <div className="max-w-md mx-auto">
+                    <Palette className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No Custom Stickers Yet</h3>
+                    <p className="text-gray-500 mb-4">
+                      Create your first custom sticker by uploading an image and adding your personal touch!
+                    </p>
+                    {user && (
+                      <CustomStickerDialog onStickerCreated={handleCustomStickerCreated} />
                     )}
                   </div>
-                  
-                  {/* Animated Sticker Preview */}
-                  <div className="relative w-full h-20 flex items-center justify-center mb-3">
-                    <img
-                      src={sticker.animation_url}
-                      alt={sticker.name}
-                      className="w-16 h-16 object-contain animate-pulse group-hover:animate-bounce"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  </div>
-                  
-                  <CardTitle className="text-sm font-semibold truncate">
-                    {sticker.name}
-                  </CardTitle>
-                </CardHeader>
-                
-                <CardContent className="p-4 pt-0">
-                  <CardDescription className="text-xs mb-3 line-clamp-2">
-                    {sticker.description}
-                  </CardDescription>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <span className="text-lg">π</span>
-                      <span className="font-bold text-primary">{sticker.price_pi}</span>
-                    </div>
-                    
-                    <Button
-                      size="sm"
-                      onClick={() => handlePurchaseClick(sticker)}
-                      disabled={isOwned(sticker.id)}
-                      className="text-xs"
-                    >
-                      {isOwned(sticker.id) ? "Owned" : "Buy"}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {filteredStickers.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">No stickers found in this category.</p>
-            </div>
-          )}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
       <Footer />

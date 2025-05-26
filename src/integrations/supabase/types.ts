@@ -190,6 +190,60 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_stickers: {
+        Row: {
+          animation_type: string | null
+          background_effect: string | null
+          base_image_url: string
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean | null
+          name: string
+          overlay_text: string | null
+          price_pi: number | null
+          text_color: string | null
+          text_position: string | null
+          text_size: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          animation_type?: string | null
+          background_effect?: string | null
+          base_image_url: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          name: string
+          overlay_text?: string | null
+          price_pi?: number | null
+          text_color?: string | null
+          text_position?: string | null
+          text_size?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          animation_type?: string | null
+          background_effect?: string | null
+          base_image_url?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          name?: string
+          overlay_text?: string | null
+          price_pi?: number | null
+          text_color?: string | null
+          text_position?: string | null
+          text_size?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       digital_products: {
         Row: {
           category: string | null
