@@ -87,13 +87,15 @@ export const initPiNetwork = (): boolean => {
   try {
     // Enforce Pi Browser requirement
     if (!isRunningInPiBrowser()) {
-      PiLogger.error('init_failed_not_pi_browser');
-      throw new Error('Pi Browser required for production mode');
+      const error = new Error('Pi Browser required for production mode');
+      PiLogger.error('init_failed_not_pi_browser', error);
+      throw error;
     }
 
     if (!window.Pi) {
-      PiLogger.error('init_failed_no_sdk');
-      throw new Error('Pi SDK not available');
+      const error = new Error('Pi SDK not available');
+      PiLogger.error('init_failed_no_sdk', error);
+      throw error;
     }
 
     // Initialize in production mode only
