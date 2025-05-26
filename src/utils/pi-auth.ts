@@ -49,32 +49,39 @@ export const authenticateWithPi = async (
       throw new Error('Pi SDK not available - must use Pi Browser');
     }
 
-    // Ensure we're in production mode
-    const isProduction = import.meta.env.PROD || import.meta.env.VITE_PI_SANDBOX === 'false';
-    if (!isProduction) {
-      throw new Error('Production mode required for Pi authentication');
-    }
-
+    console.log("Starting Pi authentication...");
     PiLogger.info('auth_start_production', { scopes });
     
     // Call authenticate with scopes and incomplete payment callback
     const authResult = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
+    console.log("Pi authenticate result:", authResult);
     
     if (!authResult || !authResult.accessToken) {
       throw new Error('No access token received from Pi authentication');
     }
 
-    // Validate the access token with Pi API
-    const validatedUser = await validateUserWithPiAPI(authResult.accessToken);
+    // For now, skip API validation in development/testing
+    // In production, you should enable this validation
+    const skipValidation = import.meta.env.DEV;
     
-    // Ensure the user data matches
-    if (validatedUser.uid !== authResult.user.uid) {
-      throw new Error('User validation failed - UID mismatch');
+    if (!skipValidation) {
+      // Validate the access token with Pi API
+      const validatedUser = await validateUserWithPiAPI(authResult.accessToken);
+      
+      // Ensure the user data matches
+      if (validatedUser.uid !== authResult.user.uid) {
+        throw new Error('User validation failed - UID mismatch');
+      }
+      
+      PiLogger.auth('success_production', authResult, { scopes, validated: true });
+    } else {
+      console.log("Skipping API validation in development mode");
+      PiLogger.auth('success_development', authResult, { scopes, validated: false });
     }
 
-    PiLogger.auth('success_production', authResult, { scopes, validated: true });
     return authResult as PiAuthResult;
   } catch (error) {
+    console.error("Pi authentication error:", error);
     PiLogger.error('auth_error_production', error, { scopes });
     throw error;
   }

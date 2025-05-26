@@ -1,4 +1,3 @@
-
 /**
  * Pi Network Utility Functions - Production Mode
  */
@@ -82,12 +81,12 @@ export const isAdNetworkSupported = async (): Promise<boolean> => {
   }
 };
 
-// Initialize Pi SDK - Production Mode Only
+// Initialize Pi SDK - More flexible mode checking
 export const initPiNetwork = (): boolean => {
   try {
     // Enforce Pi Browser requirement
     if (!isRunningInPiBrowser()) {
-      const error = new Error('Pi Browser required for production mode');
+      const error = new Error('Pi Browser required for Pi Network features');
       PiLogger.error('init_failed_not_pi_browser', error);
       throw error;
     }
@@ -98,25 +97,23 @@ export const initPiNetwork = (): boolean => {
       throw error;
     }
 
-    // Initialize in production mode only
-    const isProduction = import.meta.env.PROD || import.meta.env.VITE_PI_SANDBOX === 'false';
-    if (!isProduction) {
-      throw new Error('Production mode required');
-    }
-
+    // Initialize with sandbox false for production-like behavior
+    // but be more flexible about the environment check
     window.Pi.init({ 
       version: "2.0", 
-      sandbox: false // Production mode only
+      sandbox: false
     });
     
+    console.log("Pi SDK initialized successfully");
     PiLogger.info('init_success_production', { 
       sandboxMode: false,
       version: '2.0',
       hostname: window.location.hostname,
-      production: true
+      piAvailable: !!window.Pi
     });
     return true;
   } catch (error) {
+    console.error("Pi SDK initialization error:", error);
     PiLogger.error('init_error_production', error);
     throw error;
   }

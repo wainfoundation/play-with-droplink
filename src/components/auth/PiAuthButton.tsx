@@ -16,21 +16,8 @@ export function PiAuthButton() {
   const { refreshUserData } = useUser();
   const { handleError } = useErrorHandler();
 
-  // Check if we're in production mode and Pi Browser
-  const isProduction = import.meta.env.PROD || import.meta.env.VITE_PI_SANDBOX === 'false';
+  // Check if we're in Pi Browser
   const isPiBrowser = isRunningInPiBrowser();
-
-  // Production mode validation
-  if (!isProduction) {
-    return (
-      <div className="text-center p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-red-600 font-medium">Production Mode Required</p>
-        <p className="text-sm text-red-500 mt-1">
-          Pi Network authentication is only available in production mode.
-        </p>
-      </div>
-    );
-  }
 
   if (!isPiBrowser) {
     return (
@@ -54,13 +41,14 @@ export function PiAuthButton() {
     try {
       setIsAuthenticating(true);
       
-      console.log("Initializing Pi SDK in production mode...");
+      console.log("Initializing Pi SDK...");
       const initialized = initPiNetwork();
       if (!initialized) {
-        throw new Error("Failed to initialize Pi SDK in production mode");
+        throw new Error("Failed to initialize Pi SDK");
       }
+      console.log("Pi SDK initialized successfully");
 
-      console.log("Authenticating with Pi Network using production API...");
+      console.log("Starting Pi authentication...");
       const authResult = await authenticateWithPi(["username", "payments"]);
       if (!authResult) {
         throw new Error("Pi authentication failed - no result returned");
@@ -189,7 +177,7 @@ export function PiAuthButton() {
       </Button>
       
       <div className="text-center text-sm text-green-600 bg-green-50 p-2 rounded">
-        Production mode - real Pi Network transactions with API validation
+        Production mode - Pi Network authentication ready
       </div>
     </div>
   );
