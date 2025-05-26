@@ -95,6 +95,33 @@ export function PiAuthButton() {
         }
       }
       
+      // Check admin status after successful authentication
+      console.log("Checking admin status for user:", authResult.user.username);
+      try {
+        const { data: adminData, error: adminError } = await supabase.functions.invoke("check-admin", {
+          body: { 
+            piUserId: authResult.user.uid,
+            username: authResult.user.username
+          }
+        });
+
+        if (adminError) {
+          console.error("Admin check error:", adminError);
+        } else {
+          console.log("Admin check result:", adminData);
+          if (adminData?.isAdmin) {
+            console.log("User is an admin!");
+            toast({
+              title: "Admin Access Granted",
+              description: `Welcome back, Admin ${authResult.user.username}!`,
+            });
+          }
+        }
+      } catch (adminCheckError) {
+        console.error("Failed to check admin status:", adminCheckError);
+        // Don't fail the entire auth process if admin check fails
+      }
+      
       console.log("Pi auth successful, refreshing user data...");
       await refreshUserData();
       

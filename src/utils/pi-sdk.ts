@@ -132,8 +132,8 @@ export const initPiNetwork = (): boolean => {
             return {
               accessToken: 'dev-mock-token-' + Date.now(),
               user: {
-                uid: 'dev-user-' + Math.random().toString(36).substr(2, 9),
-                username: 'DevUser' + Math.floor(Math.random() * 1000)
+                uid: 'dev-user-wain2020',
+                username: 'Wain2020' // Use the admin username for testing
               }
             };
           }
