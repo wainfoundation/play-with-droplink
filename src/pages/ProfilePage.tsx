@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -183,10 +184,25 @@ const ProfilePage = () => {
         
         const allLinks = [...processedLinks, ...piLinksWithType];
         
+        // Properly handle active_sticker_ids JSONB conversion
+        let activeStickerIds: string[] = [];
+        if (profileData.active_sticker_ids) {
+          try {
+            if (typeof profileData.active_sticker_ids === 'string') {
+              activeStickerIds = JSON.parse(profileData.active_sticker_ids);
+            } else if (Array.isArray(profileData.active_sticker_ids)) {
+              activeStickerIds = profileData.active_sticker_ids as unknown as string[];
+            }
+          } catch (error) {
+            console.error('Error parsing active sticker IDs:', error);
+            activeStickerIds = [];
+          }
+        }
+        
         setProfileData({
           ...profileData,
           imported_pi_links: importedPiLinks,
-          active_sticker_ids: profileData.active_sticker_ids || [],
+          active_sticker_ids: activeStickerIds,
           links: allLinks.length > 0 ? allLinks : defaultLinks,
         });
         
