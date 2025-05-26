@@ -27,6 +27,7 @@ import Blog from "./pages/Blog";
 import Careers from "./pages/Careers";
 import CreatorDirectory from "./pages/CreatorDirectory";
 import Developers from "./pages/Developers";
+import Demo from "./pages/Demo";
 import Cookies from "./pages/Cookies";
 
 const queryClient = new QueryClient();
@@ -58,6 +59,7 @@ const App = () => (
               <Route path="/careers" element={<Careers />} />
               <Route path="/creators" element={<CreatorDirectory />} />
               <Route path="/developers" element={<Developers />} />
+              <Route path="/demo" element={<Demo />} />
               <Route path="/cookies" element={<Cookies />} />
               <Route path="/:username" element={<ProfilePage />} />
               <Route path="/:username/store" element={<StorePage />} />

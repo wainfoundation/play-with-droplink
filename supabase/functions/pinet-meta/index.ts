@@ -111,8 +111,72 @@ Deno.serve(async (req) => {
       }
     };
 
+    // Handle demo page
+    if (pathSegments[0] === 'demo') {
+      metadata = {
+        title: "Droplink Demo - Try Our Link in Bio Tool",
+        description: "See Droplink in action with our interactive demo. Experience how our link in bio tool helps Pi Network creators connect with their audience.",
+        keywords: ["Pi Network", "demo", "link in bio", "profile builder", "droplink"],
+        creator: "Droplink Team",
+        publisher: "Droplink",
+        openGraph: {
+          type: "website",
+          title: "Droplink Demo - Try Our Link in Bio Tool",
+          description: "See Droplink in action with our interactive demo. Experience how our link in bio tool helps Pi Network creators connect with their audience.",
+          images: [{
+            url: "https://droplink.space/demo-preview.png",
+            width: 1200,
+            height: 630,
+            alt: "Droplink Demo Preview"
+          }],
+          locale: "en_US"
+        },
+        twitter: {
+          card: "summary_large_image",
+          title: "Droplink Demo - Try Our Link in Bio Tool",
+          description: "See Droplink in action with our interactive demo. Experience how our link in bio tool helps Pi Network creators connect with their audience.",
+          images: [{
+            url: "https://droplink.space/demo-preview.png",
+            alt: "Droplink Demo Preview"
+          }]
+        }
+      };
+    }
+    
+    // Handle developers page
+    else if (pathSegments[0] === 'developers') {
+      metadata = {
+        title: "Droplink Developer Platform - API Documentation",
+        description: "Access the Droplink.space API to integrate Pi Network payments and user data into your applications. Complete developer documentation and SDKs.",
+        keywords: ["Pi Network", "API", "developer", "documentation", "SDK", "integration"],
+        creator: "Droplink Team",
+        publisher: "Droplink",
+        openGraph: {
+          type: "website",
+          title: "Droplink Developer Platform - API Documentation",
+          description: "Access the Droplink.space API to integrate Pi Network payments and user data into your applications. Complete developer documentation and SDKs.",
+          images: [{
+            url: "https://droplink.space/developer-og.png",
+            width: 1200,
+            height: 630,
+            alt: "Droplink Developer Platform"
+          }],
+          locale: "en_US"
+        },
+        twitter: {
+          card: "summary_large_image",
+          title: "Droplink Developer Platform - API Documentation",
+          description: "Access the Droplink.space API to integrate Pi Network payments and user data into your applications. Complete developer documentation and SDKs.",
+          images: [{
+            url: "https://droplink.space/developer-og.png",
+            alt: "Droplink Developer Platform"
+          }]
+        }
+      };
+    }
+
     // Handle profile pages (/@username or /profile/username)
-    if (pathSegments.length >= 1 && (pathSegments[0].startsWith('@') || pathSegments[0] === 'profile')) {
+    else if (pathSegments.length >= 1 && (pathSegments[0].startsWith('@') || pathSegments[0] === 'profile')) {
       let username = '';
       
       if (pathSegments[0].startsWith('@')) {

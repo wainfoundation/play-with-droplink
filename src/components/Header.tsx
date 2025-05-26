@@ -17,6 +17,7 @@ const Header = ({ showGoToTop = false }: HeaderProps) => {
 
   const navigationLinks = [
     { name: "Home", href: "/" },
+    { name: "Demo", href: "/demo" },
     { name: "Features", href: "/features" },
     { name: "Pricing", href: "/pricing" },
     { name: "Store", href: "/store" },
