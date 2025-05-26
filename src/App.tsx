@@ -31,6 +31,7 @@ import CreatorDirectory from "./pages/CreatorDirectory";
 import Developers from "./pages/Developers";
 import Demo from "./pages/Demo";
 import Cookies from "./pages/Cookies";
+import ValidationKey from "./pages/ValidationKey";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +66,7 @@ const App = () => (
                 <Route path="/developers" element={<Developers />} />
                 <Route path="/demo" element={<Demo />} />
                 <Route path="/cookies" element={<Cookies />} />
+                <Route path="/validation-key.txt" element={<ValidationKey />} />
                 <Route path="/:username" element={<ProfilePage />} />
                 <Route path="/:username/store" element={<StorePage />} />
                 <Route path="*" element={<NotFound />} />
