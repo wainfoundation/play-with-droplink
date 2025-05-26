@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, User, LogOut, Settings, Sparkles } from "lucide-react";
@@ -17,14 +16,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const { user, logout } = useUser();
+  const { user, signOut } = useUser();
 
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
   const handleLogout = async () => {
-    await logout();
+    await signOut();
     setIsOpen(false);
   };
 

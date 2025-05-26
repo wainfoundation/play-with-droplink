@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -10,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { processPayment } from "@/services/piPaymentService";
 import { Helmet } from "react-helmet-async";
 import TipButton from "@/components/tipping/TipButton";
+import ProfileStickers from "@/components/stickers/ProfileStickers";
 
 // Import refactored components
 import ProfileHeader from "@/components/profile/ProfileHeader";
@@ -44,6 +44,7 @@ interface ProfileData {
   imported_pi_bio?: string | null;
   imported_pi_links?: PiLink[] | null;
   pi_profile_last_synced?: string | null;
+  active_sticker_ids?: string[] | null;
   links: Link[];
 }
 
@@ -185,6 +186,7 @@ const ProfilePage = () => {
         setProfileData({
           ...profileData,
           imported_pi_links: importedPiLinks,
+          active_sticker_ids: profileData.active_sticker_ids || [],
           links: allLinks.length > 0 ? allLinks : defaultLinks,
         });
         
