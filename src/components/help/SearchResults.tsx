@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { Clock, User } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { searchArticles, searchFAQs } from "@/data/helpArticles";
+import { searchArticles } from "@/data/helpArticles";
+import { searchFAQs } from "@/data/faqData";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface SearchResultsProps {
