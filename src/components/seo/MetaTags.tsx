@@ -12,11 +12,11 @@ interface MetaTagsProps {
 }
 
 export function MetaTags({
-  title = "Droplink - Pi Network Profile Builder",
-  description = "Create your professional Pi Network profile with Droplink. Build your digital presence, showcase your content, and connect with the Pi community.",
-  keywords = "Pi Network, profile builder, digital presence, blockchain, cryptocurrency, web3",
-  image = "/og-image.png",
-  url = "https://droplink.space",
+  title = "Droplink | Drop All Your Links",
+  description = "Droplink helps Pi Network creators, entrepreneurs, influencers, and developers monetize and manage their digital presence using Pi tips, Pi Ads, and .pi domains.",
+  keywords = "Droplink, Pi Network, link-in-bio, creators, Pi payments, Pi Ads, .pi domains",
+  image = "https://www.droplink.space/assets/droplink-preview.png",
+  url = "https://www.droplink.space/",
   type = "website",
   siteName = "Droplink"
 }: MetaTagsProps) {
