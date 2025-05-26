@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -154,7 +155,8 @@ const ProfilePage = () => {
             if (typeof profileData.imported_pi_links === 'string') {
               importedPiLinks = JSON.parse(profileData.imported_pi_links);
             } else if (Array.isArray(profileData.imported_pi_links)) {
-              importedPiLinks = profileData.imported_pi_links as PiLink[];
+              // Use proper type assertion through 'unknown' first
+              importedPiLinks = profileData.imported_pi_links as unknown as PiLink[];
             }
           } catch (error) {
             console.error('Error parsing imported Pi links:', error);
