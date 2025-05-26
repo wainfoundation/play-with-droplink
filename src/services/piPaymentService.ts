@@ -1,3 +1,4 @@
+
 // Define interfaces for Pi Network authentication
 interface PiAuthResult {
   accessToken: string;
@@ -14,9 +15,9 @@ interface PiPaymentCallbacks {
   onError: (error: Error, payment?: any) => void;
 }
 
-// Get environment variables
-const PI_API_KEY = process.env.NEXT_PUBLIC_PI_API_KEY || import.meta.env.VITE_PI_API_KEY;
-const PI_SANDBOX = process.env.NODE_ENV === 'development';
+// Get environment variables using Vite's import.meta.env
+const PI_API_KEY = import.meta.env.VITE_PI_API_KEY;
+const PI_SANDBOX = import.meta.env.DEV;
 
 // Initialize Pi SDK
 export const initPiNetwork = (): boolean => {
