@@ -1,7 +1,7 @@
 
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { createPiPayment, initPiNetwork, PiPaymentData, PaymentCallbacks } from "@/utils/pi-sdk";
+import { createPiPayment as createPiPaymentSDK, initPiNetwork, PiPaymentData, PaymentCallbacks } from "@/utils/pi-sdk";
 
 // Updated payment service using real Pi SDK
 export const processPayment = async (
@@ -93,13 +93,17 @@ export const processPayment = async (
       },
     };
 
-    await createPiPayment(paymentData, callbacks);
+    await createPiPaymentSDK(paymentData, callbacks);
   } catch (error) {
     console.error("Payment creation failed:", error);
     throw error;
   }
 };
 
+// Export createPiPayment as a named export for compatibility
+export const createPiPayment = processPayment;
+
 export default {
   processPayment,
+  createPiPayment: processPayment,
 };

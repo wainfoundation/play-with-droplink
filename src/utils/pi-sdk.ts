@@ -18,11 +18,41 @@ export interface PiPaymentData {
   metadata?: Record<string, any>;
 }
 
+// Internal Pi payment interface that includes identifier
+interface PiPayment {
+  amount: number;
+  memo: string;
+  metadata?: Record<string, any>;
+  identifier: string;
+}
+
 export interface PaymentCallbacks {
   onReadyForServerApproval: (paymentId: string) => void;
   onReadyForServerCompletion: (paymentId: string, txid: string) => void;
   onCancel: (paymentId: string) => void;
   onError: (error: Error, payment?: any) => void;
+}
+
+// Updated global window type to include Ads
+declare global {
+  interface Window {
+    Pi?: {
+      init: (config: { version: string; sandbox?: boolean }) => void;
+      authenticate: (
+        scopes: string[],
+        onIncompletePaymentFound?: (payment: any) => void
+      ) => Promise<PiAuthResult>;
+      createPayment: (
+        payment: PiPayment,
+        callbacks: PaymentCallbacks
+      ) => Promise<any>;
+      Ads?: {
+        showAd: (adType: "interstitial" | "rewarded") => Promise<any>;
+        isAdReady: (adType: "interstitial" | "rewarded") => Promise<{ ready: boolean; type: string }>;
+        requestAd: (adType: "interstitial" | "rewarded") => Promise<any>;
+      };
+    };
+  }
 }
 
 // Check if running in Pi Browser
@@ -110,7 +140,13 @@ export const createPiPayment = async (
     // Ensure SDK is initialized
     initPiNetwork();
 
-    await window.Pi.createPayment(paymentData, callbacks);
+    // Create the payment object with required identifier
+    const piPayment: PiPayment = {
+      ...paymentData,
+      identifier: `payment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    };
+
+    await window.Pi.createPayment(piPayment, callbacks);
   } catch (error) {
     console.error("Payment creation failed:", error);
     throw error;
@@ -121,6 +157,7 @@ export const createPiPayment = async (
 export const isAdReady = async (adType: "interstitial" | "rewarded"): Promise<boolean> => {
   try {
     if (!window.Pi?.Ads) {
+      console.warn("Pi Ads not available");
       return false;
     }
     

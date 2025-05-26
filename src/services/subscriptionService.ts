@@ -1,6 +1,5 @@
-
 import { supabase } from "@/integrations/supabase/client";
-import { createPiPayment } from "@/services/piPaymentService";
+import { processPayment } from "@/services/piPaymentService";
 
 export type SubscriptionPlan = "starter" | "pro" | "premium" | "free";
 export type BillingCycle = "monthly" | "annual";
@@ -68,7 +67,7 @@ export async function createSubscription(
       throw new Error("User not authenticated");
     }
     
-    await createPiPayment(paymentData, user.data.user);
+    await processPayment(paymentData, user.data.user);
     
     // Create subscription in database
     const { data, error } = await supabase

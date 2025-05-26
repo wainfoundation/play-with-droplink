@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -7,7 +6,7 @@ import PiAdsNetwork from "@/components/PiAdsNetwork";
 import { useUser } from "@/context/UserContext";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { createPiPayment } from "@/services/piPaymentService";
+import { processPayment } from "@/services/piPaymentService";
 import { Helmet } from "react-helmet-async";
 
 // Import refactored components
@@ -208,7 +207,7 @@ const ProfilePage = () => {
         }
       };
       
-      await createPiPayment(paymentData, user);
+      await processPayment(paymentData, user);
       
       toast({
         title: "Sending Tip",
