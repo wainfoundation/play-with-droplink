@@ -70,7 +70,7 @@ const SellerDashboard = () => {
       .from('orders')
       .select(`
         *,
-        digital_products (title, price)
+        digital_products!inner (title, price)
       `)
       .eq('seller_id', user.id)
       .order('created_at', { ascending: false });

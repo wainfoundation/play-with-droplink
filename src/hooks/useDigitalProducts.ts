@@ -18,6 +18,10 @@ export interface DigitalProduct {
   download_count: number;
   created_at: string;
   updated_at: string;
+  file_size?: number;
+  file_type?: string;
+  max_downloads?: number;
+  download_expires_hours?: number;
 }
 
 export interface Order {
@@ -34,6 +38,10 @@ export interface Order {
   download_expires_at?: string;
   created_at: string;
   updated_at: string;
+  download_count?: number;
+  max_downloads?: number;
+  buyer_email?: string;
+  access_token?: string;
   digital_products?: DigitalProduct;
 }
 

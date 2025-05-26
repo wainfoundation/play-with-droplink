@@ -38,7 +38,7 @@ const ProductCard = ({ product, showActions = true, compact = false }: ProductCa
     }
   };
 
-  const formatFileSize = (bytes: number) => {
+  const formatFileSize = (bytes?: number) => {
     if (!bytes) return '';
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
