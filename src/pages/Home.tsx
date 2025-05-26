@@ -1,10 +1,10 @@
-
 import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import PiDomainFeatures from "@/components/PiDomainFeatures";
 import PiDomainSetup from "@/components/PiDomainSetup";
+import PiDomainShowcase from "@/components/PiDomainShowcase";
 import Features from "@/components/Features";
 import PiDomainTestimonials from "@/components/PiDomainTestimonials";
 import HowItWorks from "@/components/HowItWorks";
@@ -42,6 +42,7 @@ const Home = () => {
             {/* Mobile-optimized sections with better spacing */}
             <div className="space-y-8 sm:space-y-12 md:space-y-16">
               <PiDomainFeatures />
+              <PiDomainShowcase />
               <CustomerSuccessStories />
               <PiDomainSetup />
               <HowItWorks />
