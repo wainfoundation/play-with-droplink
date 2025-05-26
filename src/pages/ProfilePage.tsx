@@ -35,6 +35,7 @@ interface ProfileData {
   bio: string | null;
   avatar_url: string | null;
   links: Link[];
+  active_sticker_ids?: string[];
 }
 
 const ProfilePage = () => {
@@ -290,6 +291,7 @@ const ProfilePage = () => {
               displayName={profileData.display_name}
               bio={profileData.bio}
               avatarUrl={profileData.avatar_url}
+              activeStickerIds={profileData.active_sticker_ids || []}
               onShareClick={handleShareProfile}
               onQrCodeClick={() => setShowQRCode(!showQRCode)}
             />
