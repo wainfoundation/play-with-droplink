@@ -16,7 +16,7 @@ export const useUserPlan = () => {
 
   // Admin users get premium privileges
   // Regular users map from the subscription data if available
-  let plan: SubscriptionPlan = 'free'; // Default to free instead of starter
+  let plan: SubscriptionPlan = 'free'; // Default to free
   
   if (isAdmin) {
     plan = 'premium'; // Admin users get premium plan by default
@@ -30,13 +30,13 @@ export const useUserPlan = () => {
   // Get the raw pricing information
   const pricing = planPricing;
 
-  // Enhanced feature limitations for free plan to encourage upgrades
+  // Strict limitations for free plan to encourage upgrades - matching pricing page
   const limits = {
-    maxLinks: plan === 'free' ? 3 : Infinity, // Reduced from unlimited to 3
-    maxSocialProfiles: plan === 'free' ? 2 : Infinity, // Reduced from unlimited to 2
-    maxTemplates: plan === 'free' ? 1 : plan === 'starter' ? 5 : plan === 'pro' ? 15 : Infinity,
+    maxLinks: plan === 'free' ? 1 : Infinity, // Only 1 link for free
+    maxSocialProfiles: plan === 'free' ? 1 : Infinity, // Only 1 social profile for free
+    maxTemplates: plan === 'free' ? 1 : plan === 'starter' ? 5 : plan === 'pro' ? 15 : 100,
     canWithdrawTips: plan !== 'free',
-    hasAnalytics: plan !== 'free',
+    hasAnalytics: plan !== 'free', // Basic analytics only for paid plans
     hasQRCode: plan === 'pro' || plan === 'premium',
     hasAdvancedThemes: plan !== 'free',
     hasCustomDomain: plan !== 'free',
@@ -48,9 +48,9 @@ export const useUserPlan = () => {
     hasWhitelabel: plan === 'premium',
     hasDataExport: plan === 'premium',
     hasPrioritySupport: plan === 'premium',
-    canUsePiAdNetwork: plan === 'free' || plan === 'starter',
+    canUsePiAdNetwork: plan === 'free' || plan === 'starter', // Pi ads for free and starter
     showDroplinkBadge: plan === 'free', // Badge only shown on free accounts
-    hasTemplatePreview: true, // All users can preview templates
+    hasTemplatePreview: true, // All users can preview all templates
     canUseTemplate: (templateTier: string) => {
       if (plan === 'free') return templateTier === 'free';
       if (plan === 'starter') return ['free', 'starter'].includes(templateTier);
@@ -67,7 +67,18 @@ export const useUserPlan = () => {
     hasPasswordProtection: plan === 'pro' || plan === 'premium',
     hasCustomCSS: plan === 'premium',
     hasTeamAccess: plan === 'premium',
-    hasAutomations: plan === 'premium'
+    hasAutomations: plan === 'premium',
+    // Additional features from pricing page
+    hasMultiFactorAuth: plan === 'pro' || plan === 'premium',
+    hasCustomButtonStyles: plan === 'pro' || plan === 'premium',
+    hasSpotlightLinks: plan === 'pro' || plan === 'premium',
+    hasPerformanceAnalytics: plan === 'pro' || plan === 'premium',
+    hasEmailPhoneCollection: plan === 'pro' || plan === 'premium',
+    hasCommunityRewards: plan === 'pro' || plan === 'premium',
+    hasTailoredOnboarding: plan === 'premium',
+    hasHistoricalInsights: plan === 'premium',
+    hasAdvancedPiPayments: plan === 'premium',
+    hasCommunityContributorStatus: plan === 'premium'
   };
 
   return {

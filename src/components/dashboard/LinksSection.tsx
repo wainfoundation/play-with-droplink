@@ -48,7 +48,7 @@ const LinksSection = () => {
   }, [links, isLoading, previousLinkCount]);
 
   const handleAddLinkClick = () => {
-    // Check if user has reached their link limit
+    // Check if user has reached their link limit - free plan only gets 1 link
     if (links.length >= limits.maxLinks && plan === 'free') {
       openUpgradeModal("Adding more than 1 link");
       return;
@@ -108,14 +108,14 @@ const LinksSection = () => {
           <AddLinkButton onClick={handleAddLinkClick} />
         )}
         
-        {/* Upgrade prompt for free users */}
+        {/* Updated upgrade prompt for free users - only 1 link allowed */}
         {plan === 'free' && links.length >= limits.maxLinks && (
           <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg text-center">
             <p className="font-medium text-amber-800 mb-1">
-              Free plan limited to {limits.maxLinks} link
+              Free plan limited to {limits.maxLinks} link only
             </p>
             <p className="text-sm text-amber-700 mb-3">
-              Upgrade to Starter (8π/month) for unlimited links and more features
+              Upgrade to Starter (10π/month) for unlimited links and remove the Droplink badge
             </p>
             <button
               onClick={() => openUpgradeModal("unlimited links")}

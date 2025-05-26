@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Lock, Crown, Star, Eye, Check } from "lucide-react";
+import { Lock, Crown, Star, Eye, Check, Palette } from "lucide-react";
 import { useUserPlan } from "@/hooks/use-user-plan";
 import UpgradeModal from "./UpgradeModal";
 import { useNavigate } from "react-router-dom";
