@@ -74,6 +74,92 @@ export type Database = {
           },
         ]
       }
+      chat_quotas: {
+        Row: {
+          chats_started: number
+          date: string
+          id: string
+          messages_sent: number
+          user_id: string
+        }
+        Insert: {
+          chats_started?: number
+          date?: string
+          id?: string
+          messages_sent?: number
+          user_id: string
+        }
+        Update: {
+          chats_started?: number
+          date?: string
+          id?: string
+          messages_sent?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_quotas_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chats: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          last_message_at: string | null
+          receiver_id: string
+          sender_id: string
+          status: string
+          tip_amount: number
+          unlock_payment_id: string | null
+          unlock_transaction_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          last_message_at?: string | null
+          receiver_id: string
+          sender_id: string
+          status?: string
+          tip_amount?: number
+          unlock_payment_id?: string | null
+          unlock_transaction_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          last_message_at?: string | null
+          receiver_id?: string
+          sender_id?: string
+          status?: string
+          tip_amount?: number
+          unlock_payment_id?: string | null
+          unlock_transaction_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chats_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chats_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_submissions: {
         Row: {
           created_at: string
@@ -444,6 +530,72 @@ export type Database = {
         }
         Relationships: []
       }
+      messages: {
+        Row: {
+          chat_id: string
+          content: string
+          created_at: string
+          id: string
+          is_deleted: boolean
+          is_edited: boolean
+          media_type: string | null
+          media_url: string | null
+          message_type: string
+          sender_id: string
+          tip_amount: number | null
+          tip_payment_id: string | null
+          tip_transaction_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          chat_id: string
+          content: string
+          created_at?: string
+          id?: string
+          is_deleted?: boolean
+          is_edited?: boolean
+          media_type?: string | null
+          media_url?: string | null
+          message_type?: string
+          sender_id: string
+          tip_amount?: number | null
+          tip_payment_id?: string | null
+          tip_transaction_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          chat_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_deleted?: boolean
+          is_edited?: boolean
+          media_type?: string | null
+          media_url?: string | null
+          message_type?: string
+          sender_id?: string
+          tip_amount?: number | null
+          tip_payment_id?: string | null
+          tip_transaction_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           amount: number
@@ -549,6 +701,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      stickers_effects: {
+        Row: {
+          animation_url: string
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          price_pi: number
+          updated_at: string
+        }
+        Insert: {
+          animation_url: string
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          price_pi?: number
+          updated_at?: string
+        }
+        Update: {
+          animation_url?: string
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          price_pi?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       subscriptions: {
         Row: {
@@ -779,6 +967,7 @@ export type Database = {
       }
       user_profiles: {
         Row: {
+          active_sticker_ids: Json | null
           avatar_url: string | null
           bio: string | null
           created_at: string | null
@@ -792,6 +981,7 @@ export type Database = {
           username: string
         }
         Insert: {
+          active_sticker_ids?: Json | null
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
@@ -805,6 +995,7 @@ export type Database = {
           username: string
         }
         Update: {
+          active_sticker_ids?: Json | null
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
@@ -819,11 +1010,71 @@ export type Database = {
         }
         Relationships: []
       }
+      user_stickers: {
+        Row: {
+          id: string
+          pi_payment_id: string | null
+          pi_transaction_id: string | null
+          sticker_id: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          pi_payment_id?: string | null
+          pi_transaction_id?: string | null
+          sticker_id: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          pi_payment_id?: string | null
+          pi_transaction_id?: string | null
+          sticker_id?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_stickers_sticker_id_fkey"
+            columns: ["sticker_id"]
+            isOneToOne: false
+            referencedRelation: "stickers_effects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_stickers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      can_send_message: {
+        Args: { user_id_param: string }
+        Returns: boolean
+      }
+      can_start_chat: {
+        Args: { user_id_param: string }
+        Returns: boolean
+      }
+      get_or_create_daily_quota: {
+        Args: { user_id_param: string }
+        Returns: {
+          chats_started: number
+          date: string
+          id: string
+          messages_sent: number
+          user_id: string
+        }
+      }
       get_total_tips_received: {
         Args: Record<PropertyKey, never> | { user_id_param: string }
         Returns: number
@@ -847,6 +1098,10 @@ export type Database = {
       update_user_pi_domain: {
         Args: { user_id: string; domain_value: string }
         Returns: Json
+      }
+      user_owns_sticker: {
+        Args: { user_id_param: string; sticker_id_param: string }
+        Returns: boolean
       }
     }
     Enums: {
