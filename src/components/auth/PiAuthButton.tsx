@@ -33,21 +33,27 @@ export function PiAuthButton() {
         return;
       }
 
-      console.log("Initializing Pi SDK...");
+      console.log("Initializing Pi SDK following official documentation...");
       const initialized = initPiNetwork();
       if (!initialized) {
         throw new Error("Failed to initialize Pi SDK");
       }
 
-      console.log("Authenticating with Pi Network...");
-      const authResult = await authenticateWithPi(["username", "payments", "wallet_address"]);
+      console.log("Authenticating with Pi Network using official scopes...");
+      // Use official scopes as per documentation
+      const authResult = await authenticateWithPi(["username", "payments"]);
       if (!authResult) {
         throw new Error("Pi authentication failed - no result returned");
       }
 
       console.log("Pi auth result:", authResult);
 
-      // Create a unique email for Pi users
+      // Validate required fields from auth result
+      if (!authResult.user?.uid) {
+        throw new Error("No user ID returned from Pi authentication");
+      }
+
+      // Create a unique email for Pi users following the pattern
       const userEmail = `${authResult.user.uid}@pi-network-user.com`;
       const userPassword = authResult.user.uid;
       
@@ -63,19 +69,21 @@ export function PiAuthButton() {
       if (signInError) {
         console.log("Sign in failed, attempting signup:", signInError.message);
         
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        const signUpData = {
           email: userEmail,
           password: userPassword,
           options: {
             data: {
-              username: authResult.user.username,
+              username: authResult.user.username || `pi_user_${authResult.user.uid.slice(-8)}`,
               pi_uid: authResult.user.uid,
-              display_name: authResult.user.username,
+              display_name: authResult.user.username || `Pi User`,
               auth_method: 'pi_network',
               access_token: authResult.accessToken
             }
           }
-        });
+        };
+        
+        const { data: newSignUpData, error: signUpError } = await supabase.auth.signUp(signUpData);
         
         if (signUpError && !signUpError.message.includes('User already registered')) {
           console.error("Signup error:", signUpError);
@@ -101,7 +109,7 @@ export function PiAuthButton() {
         const { data: adminData, error: adminError } = await supabase.functions.invoke("check-admin", {
           body: { 
             piUserId: authResult.user.uid,
-            username: authResult.user.username
+            username: authResult.user.username || `pi_user_${authResult.user.uid.slice(-8)}`
           }
         });
 
@@ -125,11 +133,15 @@ export function PiAuthButton() {
       console.log("Pi auth successful, refreshing user data...");
       await refreshUserData();
       
+      const welcomeMessage = authResult.user.username 
+        ? `Welcome ${authResult.user.username}!` 
+        : 'Welcome Pi User!';
+      
       toast({
         title: "Welcome to Droplink!",
         description: isTestNet 
-          ? `Pi Network test account connected successfully! Welcome ${authResult.user.username || 'Pi User'}!` 
-          : `Pi Network account connected successfully! Welcome ${authResult.user.username || 'Pi User'}!`,
+          ? `Pi Network test account connected successfully! ${welcomeMessage}` 
+          : `Pi Network account connected successfully! ${welcomeMessage}`,
       });
       
       navigate('/dashboard');

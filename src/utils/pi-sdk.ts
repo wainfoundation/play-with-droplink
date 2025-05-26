@@ -1,6 +1,6 @@
 
 /**
- * Pi Network SDK utility functions
+ * Pi Network SDK utility functions - Updated to match official documentation
  */
 import PiLogger from './pi-logger';
 
@@ -113,35 +113,64 @@ export const isRunningInPiBrowser = (): boolean => {
   }
 };
 
-// Initialize Pi SDK according to documentation
+// Initialize Pi SDK according to official documentation
 export const initPiNetwork = (): boolean => {
   try {
     // In development, simulate successful initialization
     if (import.meta.env.DEV) {
       console.log("Development mode: simulating Pi SDK initialization");
       
-      // Create a mock Pi object for development
+      // Create a mock Pi object for development following official structure
       if (!window.Pi) {
         (window as any).Pi = {
           init: (config: any) => {
             console.log("Mock Pi.init called with:", config);
           },
-          authenticate: async (scopes: string[]) => {
+          authenticate: async (scopes: string[], onIncompletePaymentFound?: (payment: any) => void) => {
             console.log("Mock Pi.authenticate called with scopes:", scopes);
+            
+            // Handle incomplete payments callback if provided
+            if (onIncompletePaymentFound) {
+              // Simulate no incomplete payments found
+              console.log("No incomplete payments found in mock");
+            }
+            
             await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
-            return {
+            
+            // Return auth result with username if requested
+            const authResult: PiAuthResult = {
               accessToken: 'dev-mock-token-' + Date.now(),
               user: {
                 uid: 'dev-user-wain2020',
-                username: 'Wain2020' // Use the admin username for testing
+                username: scopes.includes('username') ? 'Wain2020' : undefined as any
               }
             };
+            
+            // Clean up undefined username if not requested
+            if (!scopes.includes('username')) {
+              delete (authResult.user as any).username;
+            }
+            
+            return authResult;
+          },
+          createPayment: async (paymentData: PiPayment, callbacks: PaymentCallbacks) => {
+            console.log("Mock Pi.createPayment called with:", paymentData);
+            
+            // Simulate payment flow
+            setTimeout(() => {
+              console.log("Simulating payment approval...");
+              callbacks.onReadyForServerApproval(paymentData.identifier);
+            }, 1000);
+            
+            setTimeout(() => {
+              console.log("Simulating payment completion...");
+              callbacks.onReadyForServerCompletion(paymentData.identifier, 'mock-txid-' + Date.now());
+            }, 2000);
+            
+            return { paymentId: paymentData.identifier };
           }
         };
       }
-      
-      window.Pi.init({ version: "2.0", sandbox: true });
-      return true;
     }
 
     if (!window.Pi) {
@@ -149,7 +178,7 @@ export const initPiNetwork = (): boolean => {
       return false;
     }
 
-    // Check if we're in development or production
+    // Initialize according to official documentation
     const isSandbox = import.meta.env.DEV || 
                      window.location.hostname.includes('localhost') || 
                      window.location.hostname.includes('lovableproject.com') ||
@@ -168,37 +197,15 @@ export const initPiNetwork = (): boolean => {
   }
 };
 
-// Check native features list
-export const getNativeFeatures = async (): Promise<Array<NativeFeature>> => {
-  try {
-    if (!window.Pi) {
-      PiLogger.warn('features_check_failed', { reason: 'pi_sdk_not_available' });
-      return [];
-    }
-
-    const features = await window.Pi.nativeFeaturesList();
-    PiLogger.info('features_retrieved', { features, count: features.length });
-    return features;
-  } catch (error) {
-    PiLogger.error('features_error', error);
-    return [];
-  }
+// Callback function for incomplete payments as per documentation
+const onIncompletePaymentFound = (payment: any) => {
+  PiLogger.warn('incomplete_payment_found', { paymentId: payment?.identifier });
+  console.log("Incomplete payment found:", payment);
+  // Developer should implement logic to handle incomplete payments
+  return payment;
 };
 
-// Check if ad network is supported
-export const isAdNetworkSupported = async (): Promise<boolean> => {
-  try {
-    const features = await getNativeFeatures();
-    const supported = features.includes("ad_network");
-    PiLogger.info('ad_network_check', { supported, features });
-    return supported;
-  } catch (error) {
-    PiLogger.error('ad_network_check_error', error);
-    return false;
-  }
-};
-
-// Authenticate user with Pi Network according to documentation
+// Authenticate user with Pi Network following official documentation
 export const authenticateWithPi = async (
   scopes: string[] = ["username", "payments", "wallet_address"]
 ): Promise<PiAuthResult | null> => {
@@ -208,13 +215,9 @@ export const authenticateWithPi = async (
       return null;
     }
 
-    // Handle any incomplete payments as per documentation
-    const onIncompletePaymentFound = (payment: any) => {
-      PiLogger.warn('incomplete_payment_found', { paymentId: payment?.identifier });
-      return null;
-    };
-
     PiLogger.info('auth_start', { scopes });
+    
+    // Call authenticate with scopes and incomplete payment callback as per docs
     const authResult = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
     
     PiLogger.auth('success', authResult, { scopes });
@@ -225,7 +228,7 @@ export const authenticateWithPi = async (
   }
 };
 
-// Create payment using Pi SDK according to documentation
+// Create payment using Pi SDK according to official documentation
 export const createPiPayment = async (
   paymentData: PiPaymentData,
   callbacks: PaymentCallbacks
@@ -238,7 +241,7 @@ export const createPiPayment = async (
     // Ensure SDK is initialized
     initPiNetwork();
 
-    // Create the payment object with required identifier
+    // Create the payment object with required identifier as per docs
     const piPayment: PiPayment = {
       ...paymentData,
       identifier: `payment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
@@ -246,8 +249,8 @@ export const createPiPayment = async (
 
     PiLogger.payment('create_start', piPayment);
 
-    // Wrap callbacks with logging
-    const wrappedCallbacks = {
+    // Wrap callbacks with logging following official callback structure
+    const wrappedCallbacks: PaymentCallbacks = {
       onReadyForServerApproval: (paymentId: string) => {
         PiLogger.payment('server_approval_ready', { paymentId });
         callbacks.onReadyForServerApproval(paymentId);
