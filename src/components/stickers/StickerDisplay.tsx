@@ -1,5 +1,6 @@
 
 import React from "react";
+import AnimatedSticker from "./AnimatedSticker";
 
 interface UserSticker {
   id: string;
@@ -28,11 +29,10 @@ const StickerDisplay = ({ stickers }: StickerDisplayProps) => {
           key={userSticker.id}
           className="relative group"
         >
-          <img
+          <AnimatedSticker
             src={userSticker.stickers_effects.animation_url}
             alt={userSticker.stickers_effects.name}
-            className="w-8 h-8 object-contain animate-pulse hover:animate-bounce cursor-pointer"
-            title={userSticker.stickers_effects.name}
+            className="w-8 h-8 object-contain hover:animate-bounce cursor-pointer"
           />
           <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-secondary/30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity -z-10"></div>
         </div>

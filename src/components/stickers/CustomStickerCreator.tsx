@@ -8,10 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { toast } from "@/hooks/use-toast";
-import { Upload, Palette, Type, Sparkles } from "lucide-react";
+import { Upload, Palette, Type, Sparkles, Link } from "lucide-react";
+import AnimatedSticker from "./AnimatedSticker";
 
 interface CustomStickerCreatorProps {
   onClose: () => void;
@@ -23,6 +25,8 @@ const CustomStickerCreator = ({ onClose, onStickerCreated }: CustomStickerCreato
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [lottieUrl, setLottieUrl] = useState<string>("");
+  const [creationType, setCreationType] = useState<"upload" | "lottie">("upload");
   
   const [stickerData, setStickerData] = useState({
     name: "",
@@ -52,14 +56,21 @@ const CustomStickerCreator = ({ onClose, onStickerCreated }: CustomStickerCreato
       setImageFile(file);
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
+      setLottieUrl("");
     }
   };
 
+  const handleLottieUrlChange = (url: string) => {
+    setLottieUrl(url);
+    setPreviewUrl(url);
+    setImageFile(null);
+  };
+
   const handleCreateSticker = async () => {
-    if (!user || !imageFile) {
+    if (!user || (!imageFile && !lottieUrl)) {
       toast({
         title: "Missing information",
-        description: "Please select an image and fill in the required fields",
+        description: "Please select an image or provide a Lottie URL",
         variant: "destructive",
       });
       return;
@@ -67,20 +78,28 @@ const CustomStickerCreator = ({ onClose, onStickerCreated }: CustomStickerCreato
 
     setLoading(true);
     try {
-      // Upload image to storage
-      const fileExt = imageFile.name.split('.').pop();
-      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from('custom-stickers')
-        .upload(fileName, imageFile);
+      let finalUrl = "";
 
-      if (uploadError) throw uploadError;
+      if (creationType === "upload" && imageFile) {
+        // Upload image to storage
+        const fileExt = imageFile.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('custom-stickers')
+          .upload(fileName, imageFile);
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('custom-stickers')
-        .getPublicUrl(fileName);
+        if (uploadError) throw uploadError;
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('custom-stickers')
+          .getPublicUrl(fileName);
+
+        finalUrl = publicUrl;
+      } else if (creationType === "lottie" && lottieUrl) {
+        finalUrl = lottieUrl;
+      }
 
       // Save custom sticker to database
       const { error: insertError } = await supabase
@@ -89,7 +108,7 @@ const CustomStickerCreator = ({ onClose, onStickerCreated }: CustomStickerCreato
           user_id: user.id,
           name: stickerData.name,
           description: stickerData.description,
-          base_image_url: publicUrl,
+          base_image_url: finalUrl,
           overlay_text: stickerData.overlayText,
           text_color: stickerData.textColor,
           text_size: stickerData.textSize,
@@ -130,63 +149,96 @@ const CustomStickerCreator = ({ onClose, onStickerCreated }: CustomStickerCreato
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Image Upload */}
-        <div className="space-y-2">
-          <Label htmlFor="image">Base Image</Label>
-          <div className="flex items-center gap-4">
-            <Button
-              variant="outline"
-              onClick={() => document.getElementById('image-input')?.click()}
-              className="flex items-center gap-2"
-            >
+        {/* Creation Type Tabs */}
+        <Tabs value={creationType} onValueChange={(value: "upload" | "lottie") => setCreationType(value)}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="upload" className="flex items-center gap-2">
               <Upload className="h-4 w-4" />
-              Choose Image
-            </Button>
-            <input
-              id="image-input"
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
-            {imageFile && <span className="text-sm text-gray-600">{imageFile.name}</span>}
-          </div>
-        </div>
+              Upload Image
+            </TabsTrigger>
+            <TabsTrigger value="lottie" className="flex items-center gap-2">
+              <Link className="h-4 w-4" />
+              Lottie Animation
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="upload" className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="image">Base Image</Label>
+              <div className="flex items-center gap-4">
+                <Button
+                  variant="outline"
+                  onClick={() => document.getElementById('image-input')?.click()}
+                  className="flex items-center gap-2"
+                >
+                  <Upload className="h-4 w-4" />
+                  Choose Image
+                </Button>
+                <input
+                  id="image-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                {imageFile && <span className="text-sm text-gray-600">{imageFile.name}</span>}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="lottie" className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="lottie-url">LottieFiles URL or JSON URL</Label>
+              <Input
+                id="lottie-url"
+                value={lottieUrl}
+                onChange={(e) => handleLottieUrlChange(e.target.value)}
+                placeholder="https://lottiefiles.com/animations/... or https://..."
+              />
+              <p className="text-xs text-gray-500">
+                Paste a LottieFiles animation URL or direct JSON URL
+              </p>
+            </div>
+          </TabsContent>
+        </Tabs>
 
         {/* Preview */}
         {previewUrl && (
           <div className="text-center">
             <Label>Preview</Label>
             <div className="relative inline-block mt-2">
-              <img
-                src={previewUrl}
-                alt="Preview"
-                className={`w-32 h-32 object-cover rounded-lg ${
-                  stickerData.animationType === 'pulse' ? 'animate-pulse' :
-                  stickerData.animationType === 'bounce' ? 'animate-bounce' :
-                  stickerData.animationType === 'spin' ? 'animate-spin' : ''
-                }`}
-                style={{
-                  filter: stickerData.backgroundEffect !== 'none' ? 
-                    `${stickerData.backgroundEffect}(1)` : 'none'
-                }}
-              />
-              {stickerData.overlayText && (
-                <div
-                  className={`absolute inset-0 flex items-center justify-center text-white font-bold pointer-events-none ${
-                    stickerData.textPosition === 'top' ? 'items-start pt-2' :
-                    stickerData.textPosition === 'bottom' ? 'items-end pb-2' :
-                    'items-center'
+              <div className="relative w-32 h-32">
+                <AnimatedSticker
+                  src={previewUrl}
+                  alt="Preview"
+                  isLottie={creationType === "lottie"}
+                  className={`w-32 h-32 object-cover rounded-lg ${
+                    stickerData.animationType === 'pulse' ? 'animate-pulse' :
+                    stickerData.animationType === 'bounce' ? 'animate-bounce' :
+                    stickerData.animationType === 'spin' ? 'animate-spin' : ''
                   }`}
                   style={{
-                    color: stickerData.textColor,
-                    fontSize: `${stickerData.textSize}px`,
-                    textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
+                    filter: stickerData.backgroundEffect !== 'none' ? 
+                      `${stickerData.backgroundEffect}(1)` : 'none'
                   }}
-                >
-                  {stickerData.overlayText}
-                </div>
-              )}
+                />
+                {stickerData.overlayText && (
+                  <div
+                    className={`absolute inset-0 flex items-center justify-center text-white font-bold pointer-events-none ${
+                      stickerData.textPosition === 'top' ? 'items-start pt-2' :
+                      stickerData.textPosition === 'bottom' ? 'items-end pb-2' :
+                      'items-center'
+                    }`}
+                    style={{
+                      color: stickerData.textColor,
+                      fontSize: `${stickerData.textSize}px`,
+                      textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
+                    }}
+                  >
+                    {stickerData.overlayText}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -352,7 +404,7 @@ const CustomStickerCreator = ({ onClose, onStickerCreated }: CustomStickerCreato
           </Button>
           <Button
             onClick={handleCreateSticker}
-            disabled={loading || !imageFile || !stickerData.name}
+            disabled={loading || (!imageFile && !lottieUrl) || !stickerData.name}
           >
             {loading ? "Creating..." : "Create Sticker"}
           </Button>

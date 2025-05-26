@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
@@ -12,6 +13,7 @@ import { Sparkles, Heart, Flame, Zap, Star, PartyPopper, Palette } from "lucide-
 import { Helmet } from "react-helmet-async";
 import StickerPurchaseModal from "@/components/stickers/StickerPurchaseModal";
 import CustomStickerDialog from "@/components/stickers/CustomStickerDialog";
+import AnimatedSticker from "@/components/stickers/AnimatedSticker";
 import { useCustomStickers } from "@/hooks/useCustomStickers";
 
 interface Sticker {
@@ -231,10 +233,10 @@ const Stickers = () => {
                       
                       {/* Animated Sticker Preview */}
                       <div className="relative w-full h-20 flex items-center justify-center mb-3">
-                        <img
+                        <AnimatedSticker
                           src={sticker.animation_url}
                           alt={sticker.name}
-                          className="w-16 h-16 object-contain animate-pulse group-hover:animate-bounce"
+                          className="w-16 h-16 object-contain group-hover:animate-bounce"
                         />
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
                       </div>
@@ -296,7 +298,7 @@ const Stickers = () => {
                       {/* Custom Sticker Preview */}
                       <div className="relative w-full h-20 flex items-center justify-center mb-3">
                         <div className="relative">
-                          <img
+                          <AnimatedSticker
                             src={sticker.base_image_url}
                             alt={sticker.name}
                             className={`w-16 h-16 object-contain ${
@@ -366,7 +368,7 @@ const Stickers = () => {
                     <Palette className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">No Custom Stickers Yet</h3>
                     <p className="text-gray-500 mb-4">
-                      Create your first custom sticker by uploading an image and adding your personal touch!
+                      Create your first custom sticker by uploading an image or adding a LottieFiles animation!
                     </p>
                     {user && (
                       <CustomStickerDialog onStickerCreated={handleCustomStickerCreated} />
