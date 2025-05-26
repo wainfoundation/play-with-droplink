@@ -13,6 +13,7 @@ import PiDashboard from "./pages/PiDashboard";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Pricing from "./pages/Pricing";
+import Features from "./pages/Features";
 import StorePage from "./components/store/StorePage";
 import NotFound from "./pages/NotFound";
 import Templates from "./pages/Templates";
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/pi-dashboard" element={<PiDashboard />} />
               <Route path="/pricing" element={<Pricing />} />
+              <Route path="/features" element={<Features />} />
               <Route path="/templates" element={<Templates />} />
               <Route path="/help" element={<Help />} />
               <Route path="/help/:slug" element={<HelpArticle />} />

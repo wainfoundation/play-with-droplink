@@ -23,6 +23,7 @@ const Navbar = () => {
   };
 
   const navigationLinks = [
+    { name: "Features", href: "/features" },
     { name: "Templates", href: "/templates" },
     { name: "Pricing", href: "/pricing" },
     { name: "Help", href: "/help" },
