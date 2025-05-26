@@ -1,12 +1,12 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Lock, Crown, Star, Eye, Check, Palette } from "lucide-react";
+import { Lock, Crown, Star, Eye, Check, Palette, LogIn } from "lucide-react";
 import { useUserPlan } from "@/hooks/use-user-plan";
 import UpgradeModal from "./UpgradeModal";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "@/context/UserContext";
 
 interface Template {
   id: string;
@@ -74,7 +74,8 @@ interface TemplateSelectorProps {
 }
 
 const TemplateSelector = ({ onTemplateSelect, selectedTemplate }: TemplateSelectorProps) => {
-  const { plan, limits } = useUserPlan();
+  const { plan, limits, isLoggedIn } = useUserPlan();
+  const { user } = useUser();
   const [previewTemplate, setPreviewTemplate] = useState<string | null>(null);
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState<string>('');
@@ -105,6 +106,11 @@ const TemplateSelector = ({ onTemplateSelect, selectedTemplate }: TemplateSelect
   };
 
   const handleTemplateSelect = (template: Template) => {
+    if (!isLoggedIn) {
+      navigate('/login');
+      return;
+    }
+
     if (canUseTemplate(template.tier)) {
       onTemplateSelect(template.id);
     } else {
@@ -127,7 +133,9 @@ const TemplateSelector = ({ onTemplateSelect, selectedTemplate }: TemplateSelect
             Choose Your Template
           </CardTitle>
           <p className="text-muted-foreground">
-            {plan === 'free' 
+            {!isLoggedIn 
+              ? "Sign in to use templates and unlock premium designs!"
+              : plan === 'free' 
               ? `You can preview all templates but only use ${limits.maxTemplates} free template. Upgrade to unlock more!`
               : `You have access to templates based on your ${plan} plan.`
             }
@@ -136,7 +144,7 @@ const TemplateSelector = ({ onTemplateSelect, selectedTemplate }: TemplateSelect
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {templates.map((template) => {
-              const canUse = canUseTemplate(template.tier);
+              const canUse = isLoggedIn && canUseTemplate(template.tier);
               const isSelected = selectedTemplate === template.id;
               
               return (
@@ -160,7 +168,13 @@ const TemplateSelector = ({ onTemplateSelect, selectedTemplate }: TemplateSelect
                       </Badge>
                     </div>
                     
-                    {!canUse && (
+                    {!isLoggedIn && (
+                      <div className="absolute inset-0 bg-black/50 rounded-t-lg flex items-center justify-center">
+                        <LogIn className="w-8 h-8 text-white" />
+                      </div>
+                    )}
+                    
+                    {isLoggedIn && !canUse && (
                       <div className="absolute inset-0 bg-black/50 rounded-t-lg flex items-center justify-center">
                         <Lock className="w-8 h-8 text-white" />
                       </div>
@@ -198,12 +212,16 @@ const TemplateSelector = ({ onTemplateSelect, selectedTemplate }: TemplateSelect
                       
                       <Button
                         onClick={() => handleTemplateSelect(template)}
-                        disabled={!canUse}
                         size="sm"
                         className="flex-1"
                         variant={canUse ? "default" : "secondary"}
                       >
-                        {!canUse ? (
+                        {!isLoggedIn ? (
+                          <>
+                            <LogIn className="w-3 h-3 mr-1" />
+                            Sign In
+                          </>
+                        ) : !canUse ? (
                           <>
                             <Lock className="w-3 h-3 mr-1" />
                             Upgrade
@@ -221,7 +239,30 @@ const TemplateSelector = ({ onTemplateSelect, selectedTemplate }: TemplateSelect
             })}
           </div>
           
-          {plan === 'free' && (
+          {!isLoggedIn && (
+            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-start gap-3">
+                <LogIn className="w-5 h-5 text-blue-600 mt-0.5" />
+                <div>
+                  <h4 className="font-semibold text-blue-800 mb-1">
+                    Sign In Required
+                  </h4>
+                  <p className="text-sm text-blue-700 mb-3">
+                    Create your free account to start using templates and building your Droplink profile.
+                  </p>
+                  <Button 
+                    size="sm"
+                    onClick={() => navigate('/login')}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Sign In Now
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {isLoggedIn && plan === 'free' && (
             <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
               <div className="flex items-start gap-3">
                 <Crown className="w-5 h-5 text-amber-600 mt-0.5" />

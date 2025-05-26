@@ -5,9 +5,11 @@ import { Droplet } from "lucide-react";
 const NavLogo = () => {
   return (
     <Link to="/" className="flex items-center space-x-2">
-      <div className="w-8 h-8 bg-gradient-to-br from-sky-400 to-sky-600 rounded-lg flex items-center justify-center">
-        <Droplet className="w-5 h-5 text-white" />
-      </div>
+      <img 
+        src="/lovable-uploads/fd8498db-0cee-4181-93de-ba692558b37a.png" 
+        alt="Droplink Logo" 
+        className="w-8 h-8"
+      />
       <span className="text-xl font-bold text-sky-500">Droplink</span>
     </Link>
   );

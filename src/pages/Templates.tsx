@@ -1,20 +1,23 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowRight, Star, Zap, Eye, Lock } from "lucide-react";
+import { ArrowRight, Star, Zap, Eye, Lock, LogIn } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
 import { Helmet } from "react-helmet-async";
 import { useUserPlan } from "@/hooks/use-user-plan";
+import { useUser } from "@/context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 const Templates = () => {
   const [activeTab, setActiveTab] = useState("all");
-  const { plan, limits } = useUserPlan();
+  const { plan, limits, isLoggedIn } = useUserPlan();
+  const { user } = useUser();
+  const navigate = useNavigate();
   
   // Generate 100 templates with varied properties
   const generateTemplates = () => {
@@ -90,6 +93,21 @@ const Templates = () => {
     return limits.canUseTemplate(templatePlan);
   };
 
+  const handleUseTemplate = (template: any) => {
+    if (!isLoggedIn) {
+      navigate('/login');
+      return;
+    }
+    
+    if (!canPreviewTemplate(template.plan)) {
+      navigate('/pricing');
+      return;
+    }
+    
+    // Template can be used - redirect to dashboard or template editor
+    navigate('/dashboard');
+  };
+
   const TemplatePreview = ({ template }: { template: any }) => (
     <div className="w-full max-w-sm mx-auto">
       <div 
@@ -129,7 +147,10 @@ const Templates = () => {
               100+ Beautiful Templates
             </h1>
             <p className="text-xl mb-10 max-w-3xl mx-auto">
-              Choose from our extensive collection of professionally designed templates. Preview available based on your plan.
+              {!isLoggedIn 
+                ? "Sign in to use our extensive collection of professionally designed templates."
+                : "Choose from our extensive collection of professionally designed templates. Preview available based on your plan."
+              }
             </p>
             <Tabs defaultValue="all" className="max-w-3xl mx-auto" onValueChange={setActiveTab}>
               <TabsList className="grid grid-cols-3 md:grid-cols-6 mb-8">
@@ -174,6 +195,15 @@ const Templates = () => {
                       {template.popular && <Badge className="bg-primary text-white"><Star className="h-3 w-3 mr-1" /> Popular</Badge>}
                       {template.new && <Badge variant="secondary"><Zap className="h-3 w-3 mr-1" /> New</Badge>}
                     </div>
+                    
+                    {!isLoggedIn && (
+                      <div className="absolute top-3 right-3">
+                        <Badge variant="outline" className="bg-white/90">
+                          <LogIn className="h-3 w-3 mr-1" />
+                          Login Required
+                        </Badge>
+                      </div>
+                    )}
                   </div>
                   <div className="p-5">
                     <div className="flex justify-between items-center mb-3">
@@ -181,7 +211,7 @@ const Templates = () => {
                       {getPlanBadge(template.plan)}
                     </div>
                     <div className="flex justify-between items-center">
-                      {canPreviewTemplate(template.plan) ? (
+                      {isLoggedIn && canPreviewTemplate(template.plan) ? (
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button variant="ghost" size="sm" className="text-primary font-medium hover:underline flex items-center">
@@ -194,12 +224,25 @@ const Templates = () => {
                         </Dialog>
                       ) : (
                         <div className="flex items-center text-muted-foreground text-sm">
-                          <Lock className="mr-1" size={16} />
-                          Upgrade to preview
+                          {!isLoggedIn ? (
+                            <>
+                              <LogIn className="mr-1" size={16} />
+                              Sign in to preview
+                            </>
+                          ) : (
+                            <>
+                              <Lock className="mr-1" size={16} />
+                              Upgrade to preview
+                            </>
+                          )}
                         </div>
                       )}
-                      <Button size="sm" className="bg-gradient-hero hover:scale-105 transition-transform">
-                        Use Template
+                      <Button 
+                        size="sm" 
+                        className="bg-gradient-hero hover:scale-105 transition-transform"
+                        onClick={() => handleUseTemplate(template)}
+                      >
+                        {!isLoggedIn ? 'Sign In to Use' : 'Use Template'}
                       </Button>
                     </div>
                   </div>

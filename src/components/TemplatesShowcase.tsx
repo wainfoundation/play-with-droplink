@@ -1,15 +1,18 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Eye, Star, Zap, Palette, ArrowRight, Lock } from "lucide-react";
+import { Eye, Star, Zap, Palette, ArrowRight, Lock, LogIn } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useUser } from "@/context/UserContext";
+import { useUserPlan } from "@/hooks/use-user-plan";
 
 const TemplatesShowcase = () => {
   const [activeCategory, setActiveCategory] = useState("popular");
+  const { isLoggedIn } = useUser();
+  const { limits } = useUserPlan();
   
   // Generate featured templates with varied properties
   const generateFeaturedTemplates = () => {
@@ -107,6 +110,10 @@ const TemplatesShowcase = () => {
     }
   };
 
+  const canUseTemplate = (templatePlan: string) => {
+    return isLoggedIn && limits.canUseTemplate(templatePlan);
+  };
+
   const TemplatePreview = ({ template }: { template: any }) => (
     <div className="w-full max-w-sm mx-auto">
       <div 
@@ -156,7 +163,10 @@ const TemplatesShowcase = () => {
             </h2>
           </div>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Choose from our collection of professionally designed templates. Preview all templates for free before selecting your perfect design.
+            {!isLoggedIn 
+              ? "Sign in to use our collection of professionally designed templates and start building your profile."
+              : "Choose from our collection of professionally designed templates. Preview all templates for free before selecting your perfect design."
+            }
           </p>
           
           <Tabs defaultValue="popular" className="max-w-2xl mx-auto" onValueChange={setActiveCategory}>
@@ -199,6 +209,15 @@ const TemplatesShowcase = () => {
                 <div className="absolute top-3 right-3">
                   {getPlanBadge(template.plan)}
                 </div>
+                
+                {!isLoggedIn && (
+                  <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
+                    <div className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
+                      <LogIn className="w-4 h-4 inline mr-1" />
+                      <span className="text-sm font-medium">Sign In Required</span>
+                    </div>
+                  </div>
+                )}
               </div>
               
               <CardContent className="p-4">
@@ -224,14 +243,18 @@ const TemplatesShowcase = () => {
                       <TemplatePreview template={template} />
                       <div className="flex gap-2 mt-4">
                         <Button className="flex-1" asChild>
-                          <Link to="/signup">Use This Template</Link>
+                          <Link to={isLoggedIn ? "/dashboard" : "/signup"}>
+                            {isLoggedIn ? "Use This Template" : "Sign Up to Use"}
+                          </Link>
                         </Button>
                       </div>
                     </DialogContent>
                   </Dialog>
                   
                   <Button size="sm" className="flex-1 bg-gradient-to-r from-primary to-secondary hover:scale-105 transition-transform" asChild>
-                    <Link to="/signup">Use Template</Link>
+                    <Link to={isLoggedIn ? "/dashboard" : "/signup"}>
+                      {isLoggedIn ? "Use Template" : "Sign Up"}
+                    </Link>
                   </Button>
                 </div>
               </CardContent>
@@ -270,7 +293,10 @@ const TemplatesShowcase = () => {
           <div className="bg-white/60 backdrop-blur-sm rounded-xl p-8 max-w-2xl mx-auto">
             <h3 className="text-2xl font-bold mb-4 text-gray-900">Explore All Templates</h3>
             <p className="text-gray-600 mb-6">
-              Browse our complete collection of 100+ templates with full preview access. Find the perfect design for your Pi Network profile.
+              {!isLoggedIn 
+                ? "Create your free account to access our complete collection of 100+ templates and start building your Pi Network profile."
+                : "Browse our complete collection of 100+ templates with full preview access. Find the perfect design for your Pi Network profile."
+              }
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild className="bg-gradient-to-r from-primary to-secondary hover:scale-105 transition-transform">
@@ -279,7 +305,9 @@ const TemplatesShowcase = () => {
                 </Link>
               </Button>
               <Button variant="outline" asChild>
-                <Link to="/signup">Start Building Free</Link>
+                <Link to={isLoggedIn ? "/dashboard" : "/signup"}>
+                  {isLoggedIn ? "Start Building" : "Start Building Free"}
+                </Link>
               </Button>
             </div>
           </div>
