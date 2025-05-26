@@ -28,6 +28,11 @@ interface Link {
   type?: "featured" | "social" | "regular";
 }
 
+interface PiLink {
+  title: string;
+  url: string;
+}
+
 interface ProfileData {
   id: string;
   username: string;
@@ -36,7 +41,7 @@ interface ProfileData {
   avatar_url: string | null;
   imported_pi_avatar?: string | null;
   imported_pi_bio?: string | null;
-  imported_pi_links?: Array<{ title: string; url: string }> | null;
+  imported_pi_links?: PiLink[] | null;
   pi_profile_last_synced?: string | null;
   links: Link[];
 }
@@ -120,11 +125,11 @@ const ProfilePage = () => {
             link.url.includes('facebook.com') ||
             link.url.includes('linkedin.com') ||
             link.url.includes('youtube.com') ||
-            link.icon.toLowerCase() === 'instagram' ||
-            link.icon.toLowerCase() === 'twitter' ||
-            link.icon.toLowerCase() === 'facebook' ||
-            link.icon.toLowerCase() === 'linkedin' ||
-            link.icon.toLowerCase() === 'youtube'
+            link.icon?.toLowerCase() === 'instagram' ||
+            link.icon?.toLowerCase() === 'twitter' ||
+            link.icon?.toLowerCase() === 'facebook' ||
+            link.icon?.toLowerCase() === 'linkedin' ||
+            link.icon?.toLowerCase() === 'youtube'
           ) {
             type = "social";
           } 
@@ -141,11 +146,23 @@ const ProfilePage = () => {
         }) : [];
 
         // Add imported Pi links if available - properly handle the JSONB type
-        const importedPiLinks = Array.isArray(profileData.imported_pi_links) 
-          ? profileData.imported_pi_links 
-          : [];
+        let importedPiLinks: PiLink[] = [];
         
-        const piLinksWithType = importedPiLinks.map((link: any, index: number) => ({
+        if (profileData.imported_pi_links) {
+          try {
+            // Handle the case where imported_pi_links might be a string or already an array
+            if (typeof profileData.imported_pi_links === 'string') {
+              importedPiLinks = JSON.parse(profileData.imported_pi_links);
+            } else if (Array.isArray(profileData.imported_pi_links)) {
+              importedPiLinks = profileData.imported_pi_links as PiLink[];
+            }
+          } catch (error) {
+            console.error('Error parsing imported Pi links:', error);
+            importedPiLinks = [];
+          }
+        }
+        
+        const piLinksWithType = importedPiLinks.map((link: PiLink, index: number) => ({
           id: `pi-${index}`,
           title: link.title,
           url: link.url,
@@ -164,6 +181,7 @@ const ProfilePage = () => {
         
         setProfileData({
           ...profileData,
+          imported_pi_links: importedPiLinks,
           links: allLinks.length > 0 ? allLinks : defaultLinks,
         });
         
