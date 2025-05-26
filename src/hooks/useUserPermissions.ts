@@ -34,15 +34,17 @@ export const useUserPermissions = () => {
   
   const username = profile?.username || null;
 
-  // Feature limitations based on plan
+  // Enhanced feature limitations based on plan
   const permissions = {
-    maxLinks: plan === 'free' ? 1 : Infinity,
-    maxSocialProfiles: plan === 'free' ? 1 : Infinity,
+    maxLinks: plan === 'free' ? 3 : Infinity, // Reduced for free
+    maxSocialProfiles: plan === 'free' ? 2 : Infinity, // Reduced for free
+    maxTemplates: plan === 'free' ? 1 : plan === 'starter' ? 5 : plan === 'pro' ? 15 : Infinity,
     canWithdrawTips: plan !== 'free',
     hasAnalytics: plan !== 'free',
     hasQRCode: plan === 'pro' || plan === 'premium',
     hasAdvancedThemes: plan !== 'free',
     hasCustomDomain: plan !== 'free',
+    hasPiDomain: plan !== 'free', // .pi domain restricted to paid plans
     hasLinkAnimations: plan === 'pro' || plan === 'premium',
     hasScheduling: plan === 'pro' || plan === 'premium',
     hasSEOTools: plan === 'pro' || plan === 'premium',
@@ -52,6 +54,25 @@ export const useUserPermissions = () => {
     hasPrioritySupport: plan === 'premium',
     canUsePiAdNetwork: plan === 'free' || plan === 'starter',
     canSellWithPiPayments: plan === 'premium',
+    showDroplinkBadge: plan === 'free', // Force badge on free accounts
+    hasTemplatePreview: true, // All can preview
+    canUseTemplate: (templateTier: string) => {
+      if (plan === 'free') return templateTier === 'free';
+      if (plan === 'starter') return ['free', 'starter'].includes(templateTier);
+      if (plan === 'pro') return ['free', 'starter', 'pro'].includes(templateTier);
+      return true; // Premium gets all
+    },
+    hasEmailCapture: plan !== 'free',
+    hasAdvancedAnalytics: plan === 'pro' || plan === 'premium',
+    hasLocationAnalytics: plan === 'pro' || plan === 'premium',
+    hasBrandingRemoval: plan === 'premium',
+    hasAPIAccess: plan === 'premium',
+    hasMultiLanguage: plan === 'pro' || plan === 'premium',
+    hasAdvancedSEO: plan === 'pro' || plan === 'premium',
+    hasPasswordProtection: plan === 'pro' || plan === 'premium',
+    hasCustomCSS: plan === 'premium',
+    hasTeamAccess: plan === 'premium',
+    hasAutomations: plan === 'premium',
     // Enhanced security: Require profile ID validation for full admin access
     hasFullAdminAccess: isLoggedIn && isAdmin && !!profile?.id
   };
