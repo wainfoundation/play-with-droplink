@@ -24,8 +24,8 @@ export const featuresList: FeatureItem[] = [
   },
   {
     name: "Sell Products with Pi Payments",
-    starter: true,
-    pro: true,
+    starter: false,
+    pro: false,
     premium: true,
     description: "Accept Pi payments for your products"
   },

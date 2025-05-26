@@ -20,9 +20,9 @@ const FeaturesTable = ({ features }: FeaturesTableProps) => {
         <thead>
           <tr className="bg-blue-50">
             <th className="p-4 text-left border-b-2 border-blue-200 w-1/4">Feature</th>
-            <th className="p-4 text-center border-b-2 border-blue-200">Starter<br/><span className="text-sm font-normal">6π/month</span></th>
-            <th className="p-4 text-center border-b-2 border-blue-200 bg-blue-100">Pro<br/><span className="text-sm font-normal">10π/month</span></th>
-            <th className="p-4 text-center border-b-2 border-blue-200">Premium<br/><span className="text-sm font-normal">15π/month</span></th>
+            <th className="p-4 text-center border-b-2 border-blue-200">Starter<br/><span className="text-sm font-normal">10π/month</span></th>
+            <th className="p-4 text-center border-b-2 border-blue-200 bg-blue-100">Pro<br/><span className="text-sm font-normal">15π/month</span></th>
+            <th className="p-4 text-center border-b-2 border-blue-200">Premium<br/><span className="text-sm font-normal">22π/month</span></th>
           </tr>
         </thead>
         <tbody>
