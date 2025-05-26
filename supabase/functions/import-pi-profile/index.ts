@@ -20,8 +20,8 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const url = new URL(req.url);
-    const username = url.searchParams.get('username');
+    // Parse request body to get username
+    const { username } = await req.json();
     
     if (!username) {
       return new Response(

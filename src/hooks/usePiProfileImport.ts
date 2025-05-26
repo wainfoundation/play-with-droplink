@@ -25,12 +25,10 @@ export const usePiProfileImport = () => {
       }
 
       const { data, error } = await supabase.functions.invoke('import-pi-profile', {
-        body: null,
+        body: { username },
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
-        },
-        method: 'GET',
-        query: { username }
+        }
       });
 
       if (error) {

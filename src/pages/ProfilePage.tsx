@@ -34,6 +34,10 @@ interface ProfileData {
   display_name: string | null;
   bio: string | null;
   avatar_url: string | null;
+  imported_pi_avatar?: string | null;
+  imported_pi_bio?: string | null;
+  imported_pi_links?: Array<{ title: string; url: string }> | null;
+  pi_profile_last_synced?: string | null;
   links: Link[];
 }
 
@@ -136,8 +140,11 @@ const ProfilePage = () => {
           return { ...link, type };
         }) : [];
 
-        // Add imported Pi links if available
-        const importedPiLinks = profileData.imported_pi_links || [];
+        // Add imported Pi links if available - properly handle the JSONB type
+        const importedPiLinks = Array.isArray(profileData.imported_pi_links) 
+          ? profileData.imported_pi_links 
+          : [];
+        
         const piLinksWithType = importedPiLinks.map((link: any, index: number) => ({
           id: `pi-${index}`,
           title: link.title,
@@ -248,7 +255,6 @@ const ProfilePage = () => {
     }
   };
 
-  // Update the handleTipClick function to use the new TipButton component
   const handleTipClick = () => {
     if (!user) {
       toast({
