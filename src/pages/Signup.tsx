@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { useUser } from "@/context/UserContext";
 import { PiAuthButton } from "@/components/auth/PiAuthButton";
 import { EmailSignupForm } from "@/components/auth/EmailSignupForm";
+import { PiTestNetBanner } from "@/components/PiTestNetBanner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Signup = () => {
@@ -30,6 +31,8 @@ const Signup = () => {
               Create your profile and start building your Pi Network presence
             </p>
           </div>
+          
+          <PiTestNetBanner />
           
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import { useUser } from "@/context/UserContext";
 import { PiAuthButton } from "@/components/auth/PiAuthButton";
 import { EmailLoginForm } from "@/components/auth/EmailLoginForm";
-import { Button } from "@/components/ui/button";
+import { PiTestNetBanner } from "@/components/PiTestNetBanner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Login = () => {
@@ -31,6 +31,8 @@ const Login = () => {
               Sign in to manage your Droplink profile and connect with the Pi Network community
             </p>
           </div>
+          
+          <PiTestNetBanner />
           
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
