@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -8,6 +9,9 @@ import CategoriesSection from "@/components/help/CategoriesSection";
 import PopularArticlesSection from "@/components/help/PopularArticlesSection";
 import FAQSection from "@/components/help/FAQSection";
 import ContactSupportSection from "@/components/help/ContactSupportSection";
+import SearchResults from "@/components/help/SearchResults";
+import { getFeaturedArticles } from "@/data/helpArticles";
+import { faqData } from "@/data/faqData";
 
 const Help = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -81,55 +85,10 @@ const Help = () => {
     }
   ];
   
-  const popularArticles = [
-    {
-      title: "How to Connect Your Pi Wallet",
-      excerpt: "Learn how to securely connect your Pi Network wallet to your Droplink account.",
-      slug: "connect-pi-wallet",
-      readTime: "3 min"
-    },
-    {
-      title: "Optimizing Your Links for Maximum Engagement",
-      excerpt: "Tips and strategies to increase click-through rates on your Droplink profile.",
-      slug: "optimize-engagement",
-      readTime: "5 min"
-    },
-    {
-      title: "Setting Up Custom Themes",
-      excerpt: "A step-by-step guide to personalizing your Droplink profile with custom themes.",
-      slug: "custom-themes-guide",
-      readTime: "4 min"
-    },
-    {
-      title: "Understanding Analytics Dashboard",
-      excerpt: "Make data-driven decisions by learning how to use our comprehensive analytics.",
-      slug: "analytics-guide",
-      readTime: "6 min"
-    }
-  ];
+  const popularArticles = getFeaturedArticles();
   
-  const faqs = [
-    {
-      question: "What is Droplink?",
-      answer: "Droplink is a link-in-bio platform built specifically for the Pi Network ecosystem. It allows creators to share all their content in one place, sell products or services, and collect Pi cryptocurrency payments or tips."
-    },
-    {
-      question: "How much does Droplink cost?",
-      answer: "Droplink offers three subscription tiers: Starter (6π per month), Pro (10π per month), and Premium (15π per month). Each tier includes different features and capabilities. All plans are billed annually, and we offer a 7-day free trial of Pro features for new users."
-    },
-    {
-      question: "Can I use Droplink without a Pi Network account?",
-      answer: "While you can create a basic Droplink account without Pi Network integration, many of our core features like payments and Pi authentication require a Pi Network account. We recommend connecting your Pi Network account to get the full Droplink experience."
-    },
-    {
-      question: "How do I change my username?",
-      answer: "You can change your username in Account Settings. Note that if you change your username, your profile URL will also change, which could affect existing links you've shared."
-    },
-    {
-      question: "Can I schedule links to appear at specific times?",
-      answer: "Yes, Pro and Premium users can schedule links to appear and disappear at specific dates and times. This is useful for limited-time promotions or time-sensitive content."
-    }
-  ];
+  // Get sample FAQs from the first category
+  const faqs = faqData[0]?.questions.slice(0, 5) || [];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -140,9 +99,19 @@ const Help = () => {
       <Navbar />
       <main className="flex-grow">
         <SearchSection searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-        <CategoriesSection categories={categories} />
-        <PopularArticlesSection popularArticles={popularArticles} />
-        <FAQSection faqs={faqs} />
+        
+        <div className="container mx-auto px-4 py-8">
+          {searchQuery.trim() ? (
+            <SearchResults query={searchQuery} />
+          ) : (
+            <>
+              <CategoriesSection categories={categories} />
+              <PopularArticlesSection popularArticles={popularArticles} />
+              <FAQSection faqs={faqs} />
+            </>
+          )}
+        </div>
+        
         <ContactSupportSection />
         <CTA />
       </main>
