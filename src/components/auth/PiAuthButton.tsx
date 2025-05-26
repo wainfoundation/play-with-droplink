@@ -33,51 +33,81 @@ export function PiAuthButton() {
         return;
       }
 
-      // Initialize Pi SDK
+      console.log("Initializing Pi SDK...");
       const initialized = initPiNetwork();
       if (!initialized) {
         throw new Error("Failed to initialize Pi SDK");
       }
 
-      // Authenticate with Pi Network
-      const authResult = await authenticateWithPi();
+      console.log("Authenticating with Pi Network...");
+      const authResult = await authenticateWithPi(["username", "payments", "wallet_address"]);
       if (!authResult) {
-        throw new Error("Authentication failed");
+        throw new Error("Pi authentication failed - no result returned");
       }
 
-      // Create Supabase account with Pi credentials
+      console.log("Pi auth result:", authResult);
+
+      // Create a unique email for Pi users
       const userEmail = `${authResult.user.uid}@pi-network-user.com`;
       const userPassword = authResult.user.uid;
       
-      const { data, error } = await supabase.auth.signUp({
+      console.log("Attempting Supabase signup/signin...");
+      
+      // Try to sign in first
+      let { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: userEmail,
         password: userPassword,
-        options: {
-          data: {
-            username: authResult.user.username,
-            pi_uid: authResult.user.uid,
-            display_name: authResult.user.username,
-            auth_method: 'pi_network',
-            access_token: authResult.accessToken
-          }
-        }
       });
       
-      if (error && error.message !== 'User already registered') {
-        throw error;
+      // If sign in fails, try to sign up
+      if (signInError) {
+        console.log("Sign in failed, attempting signup:", signInError.message);
+        
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: userEmail,
+          password: userPassword,
+          options: {
+            data: {
+              username: authResult.user.username,
+              pi_uid: authResult.user.uid,
+              display_name: authResult.user.username,
+              auth_method: 'pi_network',
+              access_token: authResult.accessToken
+            }
+          }
+        });
+        
+        if (signUpError && !signUpError.message.includes('User already registered')) {
+          console.error("Signup error:", signUpError);
+          throw signUpError;
+        }
+        
+        // If user already registered, try signing in again
+        if (signUpError?.message.includes('User already registered')) {
+          const { data: retrySignIn, error: retryError } = await supabase.auth.signInWithPassword({
+            email: userEmail,
+            password: userPassword,
+          });
+          
+          if (retryError) {
+            throw retryError;
+          }
+        }
       }
+      
+      console.log("Pi auth successful, refreshing user data...");
+      await refreshUserData();
       
       toast({
         title: "Welcome to Droplink!",
         description: isTestNet 
-          ? "Your Pi Network test account has been connected successfully." 
-          : "Your Pi Network account has been connected successfully.",
+          ? `Pi Network test account connected successfully! Welcome ${authResult.user.username || 'Pi User'}!` 
+          : `Pi Network account connected successfully! Welcome ${authResult.user.username || 'Pi User'}!`,
       });
       
-      await refreshUserData();
       navigate('/dashboard');
     } catch (error: any) {
-      console.error("Pi auth error:", error);
+      console.error("Pi auth error details:", error);
       
       if (error.message?.includes('Email rate limit exceeded')) {
         toast({
@@ -91,8 +121,18 @@ export function PiAuthButton() {
           description: "Account creation is temporarily disabled. Please try again later.",
           variant: "destructive",
         });
+      } else if (error.message?.includes('Invalid login credentials')) {
+        toast({
+          title: "Authentication Error",
+          description: "Please try authenticating with Pi Network again.",
+          variant: "destructive",
+        });
       } else {
-        handleError(error, "Pi Network authentication");
+        toast({
+          title: "Pi Network Authentication Failed",
+          description: error.message || "Could not connect to Pi Network. Please try again.",
+          variant: "destructive",
+        });
       }
     } finally {
       setIsAuthenticating(false);

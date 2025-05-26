@@ -1,3 +1,4 @@
+
 /**
  * Pi Network SDK utility functions
  */
@@ -86,6 +87,12 @@ declare global {
 // Check if running in Pi Browser
 export const isRunningInPiBrowser = (): boolean => {
   try {
+    // In development, we'll simulate Pi browser for testing
+    if (import.meta.env.DEV) {
+      console.log("Development mode: simulating Pi Browser");
+      return true;
+    }
+    
     if (typeof window !== 'undefined' && window.Pi) {
       PiLogger.info('browser_check', { result: 'pi_browser_detected' });
       return true;
@@ -109,6 +116,34 @@ export const isRunningInPiBrowser = (): boolean => {
 // Initialize Pi SDK according to documentation
 export const initPiNetwork = (): boolean => {
   try {
+    // In development, simulate successful initialization
+    if (import.meta.env.DEV) {
+      console.log("Development mode: simulating Pi SDK initialization");
+      
+      // Create a mock Pi object for development
+      if (!window.Pi) {
+        (window as any).Pi = {
+          init: (config: any) => {
+            console.log("Mock Pi.init called with:", config);
+          },
+          authenticate: async (scopes: string[]) => {
+            console.log("Mock Pi.authenticate called with scopes:", scopes);
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
+            return {
+              accessToken: 'dev-mock-token-' + Date.now(),
+              user: {
+                uid: 'dev-user-' + Math.random().toString(36).substr(2, 9),
+                username: 'DevUser' + Math.floor(Math.random() * 1000)
+              }
+            };
+          }
+        };
+      }
+      
+      window.Pi.init({ version: "2.0", sandbox: true });
+      return true;
+    }
+
     if (!window.Pi) {
       PiLogger.warn('init_failed', { reason: 'pi_sdk_not_available' });
       return false;
