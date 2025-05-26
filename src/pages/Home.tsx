@@ -14,6 +14,8 @@ import FAQ from "@/components/FAQ";
 import CommunityLove from "@/components/CommunityLove";
 import TemplatesShowcase from "@/components/TemplatesShowcase";
 import CustomerSuccessStories from "@/components/CustomerSuccessStories";
+import AppInfo from "@/components/AppInfo";
+import GoToTop from "@/components/GoToTop";
 import { Helmet } from "react-helmet-async";
 
 const Home = () => {
@@ -49,12 +51,14 @@ const Home = () => {
               <PiDomainTestimonials />
               <CommunityLove />
               <FAQ />
+              <AppInfo />
             </div>
           </div>
           
           <CTA />
         </main>
         <Footer />
+        <GoToTop />
       </div>
     </>
   );

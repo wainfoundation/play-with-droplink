@@ -3,6 +3,7 @@ import React from 'react';
 import { useUser } from '@/context/UserContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import GoToTop from '@/components/GoToTop';
 import PiNetworkIntegration from '@/components/PiNetworkIntegration';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -183,6 +184,7 @@ const PiDashboard = () => {
       </main>
       
       <Footer />
+      <GoToTop />
     </div>
   );
 };

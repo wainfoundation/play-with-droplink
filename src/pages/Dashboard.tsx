@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import GoToTop from "@/components/GoToTop";
 import { useUser } from "@/context/UserContext";
 import { PiAuthButton } from "@/components/auth/PiAuthButton";
 import LoginPrompt from "@/components/dashboard/LoginPrompt";
@@ -40,6 +41,7 @@ const Dashboard = () => {
           <LoginPrompt handlePiLogin={handlePiLoginWrapper} />
         </main>
         <Footer />
+        <GoToTop />
       </div>
     );
   }
@@ -182,6 +184,7 @@ const Dashboard = () => {
         </Card>
       </main>
       <Footer />
+      <GoToTop />
     </div>
   );
 };

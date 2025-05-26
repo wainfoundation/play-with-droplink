@@ -17,6 +17,7 @@ import StorePage from "./components/store/StorePage";
 import NotFound from "./pages/NotFound";
 import Templates from "./pages/Templates";
 import Help from "./pages/Help";
+import HelpArticle from "./pages/HelpArticle";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import Privacy from "./pages/Privacy";
@@ -42,6 +43,7 @@ const App = () => (
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/templates" element={<Templates />} />
               <Route path="/help" element={<Help />} />
+              <Route path="/help/:slug" element={<HelpArticle />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/about" element={<About />} />
               <Route path="/privacy" element={<Privacy />} />
