@@ -31,8 +31,18 @@ import CreatorDirectory from "./pages/CreatorDirectory";
 import Developers from "./pages/Developers";
 import Demo from "./pages/Demo";
 import Cookies from "./pages/Cookies";
-import ValidationKey from "./pages/ValidationKey";
 import DomainVerification from "./pages/DomainVerification";
+
+// ValidationKey component inline since it's simple
+const ValidationKey = () => {
+  return (
+    <div className="min-h-screen bg-white">
+      <pre className="p-4 font-mono text-sm">
+        7511661aac4538b1832d2c9ba117f6d972b26a54640598d3fbb9824013c7079203f65b02d125be3f418605cfb89ba0e4443e3ec997e3800eb464df0bc5410d2a
+      </pre>
+    </div>
+  );
+};
 
 const queryClient = new QueryClient();
 
