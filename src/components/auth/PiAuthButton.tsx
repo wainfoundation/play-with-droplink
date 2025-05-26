@@ -18,6 +18,9 @@ export function PiAuthButton() {
 
   // Check if we're in Pi Browser
   const isPiBrowser = isRunningInPiBrowser();
+  
+  // Check if we're in production mode (not dev and sandbox is false)
+  const isProduction = !import.meta.env.DEV && import.meta.env.VITE_PI_SANDBOX !== 'true';
 
   if (!isPiBrowser) {
     return (
@@ -171,13 +174,22 @@ export function PiAuthButton() {
               <path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/>
             </svg>
             Continue with Pi Network
-            <Badge variant="default" className="ml-2 text-xs bg-green-600">LIVE</Badge>
+            <Badge variant="default" className={`ml-2 text-xs ${isProduction ? 'bg-green-600' : 'bg-orange-600'}`}>
+              {isProduction ? 'LIVE' : 'TEST'}
+            </Badge>
           </>
         )}
       </Button>
       
-      <div className="text-center text-sm text-green-600 bg-green-50 p-2 rounded">
-        Production mode - Pi Network authentication ready
+      <div className={`text-center text-sm p-2 rounded ${
+        isProduction 
+          ? 'text-green-600 bg-green-50' 
+          : 'text-orange-600 bg-orange-50'
+      }`}>
+        {isProduction 
+          ? 'Production mode - Pi Network authentication ready'
+          : 'Test mode - Pi Network sandbox authentication'
+        }
       </div>
     </div>
   );

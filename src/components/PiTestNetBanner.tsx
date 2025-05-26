@@ -4,8 +4,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { TestTube } from "lucide-react";
 
 export function PiTestNetBanner() {
+  // Check if we're in development mode OR if sandbox is explicitly enabled
   const isTestNet = import.meta.env.DEV || import.meta.env.VITE_PI_SANDBOX === 'true';
   
+  // Don't show banner in production mode
   if (!isTestNet) return null;
 
   return (
