@@ -105,11 +105,11 @@ const Pricing = () => {
   const { toast } = useToast();
   const { handleSubscribe, processingPayment } = usePiPayment();
   
-  // Updated pricing with monthly/annual options
+  // Updated pricing with new monthly/annual options
   const planPricing = {
-    starter: { monthly: 10, annual: 8 },
-    pro: { monthly: 15, annual: 12 },
-    premium: { monthly: 22, annual: 18 }
+    starter: { monthly: 6, annual: 5 },
+    pro: { monthly: 10, annual: 8 },
+    premium: { monthly: 15, annual: 12 }
   };
   
   const starterFeatures = [

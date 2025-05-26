@@ -55,7 +55,7 @@ const FreePlanLimitations = ({ feature, showUpgradeButton = true }: FreePlanLimi
               className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white"
             >
               <Crown className="w-3 h-3 mr-1" />
-              Upgrade Now (Starting 10π/month)
+              Upgrade Now (Starting 6π/month)
             </Button>
             <Button 
               variant="outline"
