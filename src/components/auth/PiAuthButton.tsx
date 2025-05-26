@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -16,30 +15,21 @@ export function PiAuthButton() {
   const { refreshUserData } = useUser();
   const { handleError } = useErrorHandler();
 
-  // Check if we're in test net mode
-  const isTestNet = import.meta.env.DEV || import.meta.env.VITE_PI_SANDBOX === 'true';
+  // Check if we're in production or sandbox mode
+  const isProduction = import.meta.env.PROD || import.meta.env.VITE_PI_SANDBOX === 'false';
   const isPiBrowser = isRunningInPiBrowser();
 
   const handleAuth = async () => {
     try {
       setIsAuthenticating(true);
       
-      if (!isPiBrowser) {
-        toast({
-          title: "Pi Browser Required",
-          description: "Please open this app in Pi Browser to use Pi Network authentication.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      console.log("Initializing Pi SDK following official documentation...");
+      console.log("Initializing Pi SDK in production mode...");
       const initialized = initPiNetwork();
       if (!initialized) {
         throw new Error("Failed to initialize Pi SDK");
       }
 
-      console.log("Authenticating with Pi Network using official scopes...");
+      console.log("Authenticating with Pi Network using production API...");
       // Use official scopes as per documentation
       const authResult = await authenticateWithPi(["username", "payments"]);
       if (!authResult) {
@@ -139,9 +129,9 @@ export function PiAuthButton() {
       
       toast({
         title: "Welcome to Droplink!",
-        description: isTestNet 
-          ? `Pi Network test account connected successfully! ${welcomeMessage}` 
-          : `Pi Network account connected successfully! ${welcomeMessage}`,
+        description: isProduction 
+          ? `Pi Network account connected successfully! ${welcomeMessage}` 
+          : `Pi Network test account connected successfully! ${welcomeMessage}`,
       });
       
       navigate('/dashboard');
@@ -178,28 +168,6 @@ export function PiAuthButton() {
     }
   };
 
-  if (!isPiBrowser) {
-    return (
-      <div className="space-y-6">
-        <Button 
-          onClick={() => window.open('https://minepi.com/download', '_blank')}
-          className="w-full bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300"
-          size="lg"
-          disabled
-        >
-          <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/>
-          </svg>
-          Download Pi Browser to Continue
-        </Button>
-        
-        <div className="text-center text-sm text-gray-600 bg-gray-50 p-2 rounded">
-          Pi Network authentication requires Pi Browser
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       <Button 
@@ -219,16 +187,22 @@ export function PiAuthButton() {
               <path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/>
             </svg>
             Continue with Pi Network
-            {isTestNet && (
+            {!isProduction && (
               <Badge variant="outline" className="ml-2 text-xs">TEST</Badge>
             )}
           </>
         )}
       </Button>
       
-      {isTestNet && (
+      {!isProduction && (
         <div className="text-center text-sm text-orange-600 bg-orange-50 p-2 rounded">
           Running in test mode - all Pi transactions are simulated
+        </div>
+      )}
+      
+      {isProduction && (
+        <div className="text-center text-sm text-green-600 bg-green-50 p-2 rounded">
+          Production mode - real Pi Network transactions
         </div>
       )}
     </div>

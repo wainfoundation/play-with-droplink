@@ -8,12 +8,7 @@ import { NativeFeature } from './pi-types';
 // Check if running in Pi Browser
 export const isRunningInPiBrowser = (): boolean => {
   try {
-    // In development, we'll simulate Pi browser for testing
-    if (import.meta.env.DEV) {
-      console.log("Development mode: simulating Pi Browser");
-      return true;
-    }
-    
+    // Check for Pi Browser specific indicators
     if (typeof window !== 'undefined' && window.Pi) {
       PiLogger.info('browser_check', { result: 'pi_browser_detected' });
       return true;
@@ -26,12 +21,39 @@ export const isRunningInPiBrowser = (): boolean => {
       return true;
     }
     
+    // In development, we'll simulate Pi browser for testing only when specifically enabled
+    if (import.meta.env.DEV && import.meta.env.VITE_PI_SANDBOX === 'true') {
+      console.log("Development mode: simulating Pi Browser (sandbox mode)");
+      return true;
+    }
+    
     PiLogger.info('browser_check', { result: 'not_pi_browser' });
     return false;
   } catch (error) {
     PiLogger.error('browser_check_error', error);
     return false;
   }
+};
+
+// Redirect to Pi Browser if not already in Pi Browser
+export const redirectToPiBrowser = (currentUrl?: string): void => {
+  const url = currentUrl || window.location.href;
+  const piUrl = `https://minepi.com/browser/open?url=${encodeURIComponent(url)}`;
+  window.location.href = piUrl;
+};
+
+// Auto-detect and redirect if not in Pi Browser
+export const autoDetectAndRedirect = (): boolean => {
+  const isPiBrowser = isRunningInPiBrowser();
+  
+  if (!isPiBrowser) {
+    console.log("Not running in Pi Browser, redirecting...");
+    PiLogger.info('auto_redirect', { reason: 'not_pi_browser' });
+    redirectToPiBrowser();
+    return false;
+  }
+  
+  return true;
 };
 
 // Get native features available in Pi Browser
@@ -42,9 +64,9 @@ export const getNativeFeatures = async (): Promise<NativeFeature[]> => {
       return [];
     }
 
-    // In development mode, return mock features
-    if (import.meta.env.DEV) {
-      console.log("Mock native features returned");
+    // In development mode with sandbox, return mock features
+    if (import.meta.env.DEV && import.meta.env.VITE_PI_SANDBOX === 'true') {
+      console.log("Mock native features returned (sandbox mode)");
       return ["inline_media", "request_permission", "ad_network"];
     }
 
@@ -73,9 +95,11 @@ export const isAdNetworkSupported = async (): Promise<boolean> => {
 // Initialize Pi SDK according to official documentation
 export const initPiNetwork = (): boolean => {
   try {
-    // In development, simulate successful initialization
-    if (import.meta.env.DEV) {
-      console.log("Development mode: simulating Pi SDK initialization");
+    // Check if we're in production mode
+    const isProduction = import.meta.env.PROD || import.meta.env.VITE_PI_SANDBOX === 'false';
+    
+    if (!isProduction && import.meta.env.DEV && import.meta.env.VITE_PI_SANDBOX === 'true') {
+      console.log("Development sandbox mode: simulating Pi SDK initialization");
       
       // Create a mock Pi object for development following official structure
       if (!window.Pi) {
@@ -163,16 +187,18 @@ export const initPiNetwork = (): boolean => {
     }
 
     // Initialize according to official documentation
-    const isSandbox = import.meta.env.DEV || 
-                     window.location.hostname.includes('localhost') || 
-                     window.location.hostname.includes('lovableproject.com') ||
-                     import.meta.env.VITE_PI_SANDBOX === 'true';
+    const isSandbox = import.meta.env.VITE_PI_SANDBOX === 'true';
     
-    window.Pi.init({ version: "2.0", sandbox: isSandbox });
+    window.Pi.init({ 
+      version: "2.0", 
+      sandbox: isSandbox
+    });
+    
     PiLogger.info('init_success', { 
       sandboxMode: isSandbox,
       version: '2.0',
-      hostname: window.location.hostname
+      hostname: window.location.hostname,
+      production: isProduction
     });
     return true;
   } catch (error) {

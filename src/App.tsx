@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { UserProvider } from "@/context/UserContext";
+import PiBrowserGuard from "@/components/PiBrowserGuard";
 import Home from "./pages/Home";
 import ProfilePage from "./pages/ProfilePage";
 import Dashboard from "./pages/Dashboard";
@@ -38,36 +38,38 @@ const App = () => (
     <HelmetProvider>
       <UserProvider>
         <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/pi-dashboard" element={<PiDashboard />} />
-              <Route path="/pricing" element={<Pricing />} />
-              <Route path="/features" element={<Features />} />
-              <Route path="/templates" element={<Templates />} />
-              <Route path="/help" element={<Help />} />
-              <Route path="/help/:slug" element={<HelpArticle />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/gdpr" element={<GDPR />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/careers" element={<Careers />} />
-              <Route path="/creators" element={<CreatorDirectory />} />
-              <Route path="/developers" element={<Developers />} />
-              <Route path="/demo" element={<Demo />} />
-              <Route path="/cookies" element={<Cookies />} />
-              <Route path="/:username" element={<ProfilePage />} />
-              <Route path="/:username/store" element={<StorePage />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
+          <PiBrowserGuard>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/pi-dashboard" element={<PiDashboard />} />
+                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/features" element={<Features />} />
+                <Route path="/templates" element={<Templates />} />
+                <Route path="/help" element={<Help />} />
+                <Route path="/help/:slug" element={<HelpArticle />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/gdpr" element={<GDPR />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/careers" element={<Careers />} />
+                <Route path="/creators" element={<CreatorDirectory />} />
+                <Route path="/developers" element={<Developers />} />
+                <Route path="/demo" element={<Demo />} />
+                <Route path="/cookies" element={<Cookies />} />
+                <Route path="/:username" element={<ProfilePage />} />
+                <Route path="/:username/store" element={<StorePage />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </PiBrowserGuard>
         </TooltipProvider>
       </UserProvider>
     </HelmetProvider>
