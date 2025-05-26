@@ -6,7 +6,7 @@ import PlanPreviewDemo from "@/components/PlanPreviewDemo";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { ArrowRight, Check, MousePointer, BarChart4, Zap, Crown, Shield, Star } from "lucide-react";
+import { ArrowRight, Check, MousePointer, BarChart4, Zap, Crown, Shield, Star, Lock, Palette, Calendar, QrCode, Settings, Eye, Users } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 
 const Demo = () => {
@@ -20,7 +20,21 @@ const Demo = () => {
       icon: <Star className="w-4 h-4" />,
       color: 'bg-gray-500 hover:bg-gray-600',
       price: '0π',
-      features: ['1 Link Only', 'Basic Profile', 'Pi Ads Shown', 'Droplink Badge']
+      templates: 3,
+      links: 1,
+      features: [
+        '1 Link Only', 
+        'Basic Profile', 
+        'Pi Ads Shown', 
+        'Droplink Badge',
+        '3 Basic Templates'
+      ],
+      limitations: [
+        'No Analytics',
+        'No QR Codes', 
+        'No Custom Themes',
+        'Ads displayed'
+      ]
     },
     {
       id: 'starter' as const, 
@@ -28,7 +42,22 @@ const Demo = () => {
       icon: <Zap className="w-4 h-4" />,
       color: 'bg-blue-500 hover:bg-blue-600',
       price: '8π',
-      features: ['Unlimited Links', 'No Ads', 'QR Codes', 'Basic Analytics', 'Email Support']
+      templates: 20,
+      links: 999,
+      features: [
+        'Unlimited Links', 
+        'No Ads', 
+        'QR Codes', 
+        'Basic Analytics', 
+        'Email Support',
+        '20+ Templates',
+        'Custom Button Styles'
+      ],
+      limitations: [
+        'No Link Scheduling',
+        'No SEO Tools',
+        'No Email Capture'
+      ]
     },
     {
       id: 'pro' as const,
@@ -36,7 +65,23 @@ const Demo = () => {
       icon: <Crown className="w-4 h-4" />,
       color: 'bg-purple-500 hover:bg-purple-600',
       price: '12π',
-      features: ['Everything in Starter', 'Advanced Analytics', 'SEO Tools', 'Link Scheduling', 'Custom Themes']
+      templates: 50,
+      links: 999,
+      features: [
+        'Everything in Starter', 
+        'Advanced Analytics', 
+        'SEO Tools', 
+        'Link Scheduling', 
+        'Custom Themes',
+        '50+ Premium Templates',
+        'Email/Phone Collection',
+        'Location Analytics'
+      ],
+      limitations: [
+        'No Custom CSS',
+        'No API Access',
+        'Basic Support'
+      ]
     },
     {
       id: 'premium' as const,
@@ -44,9 +89,24 @@ const Demo = () => {
       icon: <Shield className="w-4 h-4" />,
       color: 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600',
       price: '18π',
-      features: ['Everything in Pro', 'Sell Products with Pi', 'Priority Support', 'Custom CSS', 'API Access']
+      templates: 100,
+      links: 999,
+      features: [
+        'Everything in Pro', 
+        'Sell Products with Pi', 
+        'Priority Support', 
+        'Custom CSS', 
+        'API Access',
+        '100+ Exclusive Templates',
+        'White-label Option',
+        'Historical Analytics',
+        'Team Access'
+      ],
+      limitations: []
     }
   ];
+
+  const currentPlan = plans.find(p => p.id === selectedPlan);
 
   return (
     <>
@@ -86,27 +146,47 @@ const Demo = () => {
             ))}
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             {/* Plan Details */}
             <div className="flex flex-col space-y-6 order-2 lg:order-1">
               <div>
                 <h2 className="text-3xl font-bold mb-2">
-                  {plans.find(p => p.id === selectedPlan)?.name} Plan
+                  {currentPlan?.name} Plan
                 </h2>
                 <p className="text-2xl font-bold text-primary mb-4">
-                  {plans.find(p => p.id === selectedPlan)?.price}/month
+                  {currentPlan?.price}/month
                 </p>
                 <p className="text-lg text-muted-foreground mb-6">
                   {selectedPlan === 'free' && 'Perfect for getting started with basic link sharing'}
-                  {selectedPlan === 'starter' && 'Great for creators who want unlimited links and no ads'}
-                  {selectedPlan === 'pro' && 'Ideal for serious creators who need advanced features'}
-                  {selectedPlan === 'premium' && 'Best for businesses wanting to sell products with Pi'}
+                  {selectedPlan === 'starter' && 'Great for creators who want unlimited links and professional features'}
+                  {selectedPlan === 'pro' && 'Ideal for serious creators who need advanced analytics and customization'}
+                  {selectedPlan === 'premium' && 'Best for businesses wanting to sell products and get full customization'}
                 </p>
+              </div>
+              
+              {/* Template & Link Count */}
+              <div className="grid grid-cols-2 gap-4 p-4 bg-blue-50 rounded-lg">
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-2 mb-1">
+                    <Palette className="w-4 h-4 text-primary" />
+                    <span className="font-semibold">Templates</span>
+                  </div>
+                  <p className="text-2xl font-bold text-primary">{currentPlan?.templates}+</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-2 mb-1">
+                    <Eye className="w-4 h-4 text-primary" />
+                    <span className="font-semibold">Links</span>
+                  </div>
+                  <p className="text-2xl font-bold text-primary">
+                    {currentPlan?.links === 999 ? '∞' : currentPlan?.links}
+                  </p>
+                </div>
               </div>
               
               <div className="space-y-4 mt-4">
                 <h3 className="text-xl font-bold">What's included:</h3>
-                {plans.find(p => p.id === selectedPlan)?.features.map((feature, index) => (
+                {currentPlan?.features.map((feature, index) => (
                   <div key={index} className="flex items-start gap-4">
                     <div className="bg-green-100 rounded-full p-2 flex-shrink-0">
                       <Check size={16} className="text-green-600" />
@@ -117,6 +197,23 @@ const Demo = () => {
                   </div>
                 ))}
               </div>
+
+              {/* Limitations */}
+              {currentPlan?.limitations && currentPlan.limitations.length > 0 && (
+                <div className="space-y-4 mt-4">
+                  <h3 className="text-xl font-bold text-gray-600">Limitations:</h3>
+                  {currentPlan.limitations.map((limitation, index) => (
+                    <div key={index} className="flex items-start gap-4">
+                      <div className="bg-gray-100 rounded-full p-2 flex-shrink-0">
+                        <Lock size={16} className="text-gray-500" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-600">{limitation}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
               
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
@@ -125,15 +222,56 @@ const Demo = () => {
                 </h4>
                 <p className="text-sm text-blue-700">
                   This live preview shows exactly how your demo.pi profile will appear to visitors. 
-                  {selectedPlan === 'free' && ' Notice the Pi ads and single link limitation with the free plan.'}
-                  {selectedPlan !== 'free' && ' See the professional appearance without restrictions.'}
+                  {selectedPlan === 'free' && ' Notice the Pi ads, single link limitation, and basic template selection.'}
+                  {selectedPlan === 'starter' && ' See unlimited links, no ads, and access to 20+ templates.'}
+                  {selectedPlan === 'pro' && ' Experience advanced features like analytics preview and 50+ premium templates.'}
+                  {selectedPlan === 'premium' && ' Enjoy full customization with 100+ templates and all features unlocked.'}
                 </p>
+              </div>
+
+              {/* Feature Comparison */}
+              <div className="bg-white border border-gray-200 rounded-lg p-4">
+                <h4 className="font-semibold text-gray-900 mb-3">Quick Feature Comparison:</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <BarChart4 className={`w-4 h-4 ${
+                      ['starter', 'pro', 'premium'].includes(selectedPlan) ? 'text-green-500' : 'text-gray-300'
+                    }`} />
+                    <span className={['starter', 'pro', 'premium'].includes(selectedPlan) ? 'text-gray-900' : 'text-gray-400'}>
+                      Analytics
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <QrCode className={`w-4 h-4 ${
+                      ['starter', 'pro', 'premium'].includes(selectedPlan) ? 'text-green-500' : 'text-gray-300'
+                    }`} />
+                    <span className={['starter', 'pro', 'premium'].includes(selectedPlan) ? 'text-gray-900' : 'text-gray-400'}>
+                      QR Codes
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar className={`w-4 h-4 ${
+                      ['pro', 'premium'].includes(selectedPlan) ? 'text-green-500' : 'text-gray-300'
+                    }`} />
+                    <span className={['pro', 'premium'].includes(selectedPlan) ? 'text-gray-900' : 'text-gray-400'}>
+                      Scheduling
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Settings className={`w-4 h-4 ${
+                      selectedPlan === 'premium' ? 'text-green-500' : 'text-gray-300'
+                    }`} />
+                    <span className={selectedPlan === 'premium' ? 'text-gray-900' : 'text-gray-400'}>
+                      Custom CSS
+                    </span>
+                  </div>
+                </div>
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4 pt-6">
                 <Button asChild size="lg" className="bg-gradient-to-r from-primary to-secondary hover:scale-105 transition-transform duration-200">
                   <Link to="/pricing" className="flex items-center gap-2">
-                    Get {plans.find(p => p.id === selectedPlan)?.name} Plan <ArrowRight size={16} />
+                    Get {currentPlan?.name} Plan <ArrowRight size={16} />
                   </Link>
                 </Button>
                 {isLoggedIn && profile ? (
