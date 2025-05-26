@@ -2,7 +2,7 @@
 import React from 'react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Lock, Crown, Zap, AlertTriangle } from "lucide-react";
+import { Lock, Crown, Zap, AlertTriangle, Ban, Wifi } from "lucide-react";
 import { useUserPlan } from "@/hooks/use-user-plan";
 import { useNavigate } from "react-router-dom";
 
@@ -20,13 +20,16 @@ const FreePlanLimitations = ({ feature, showUpgradeButton = true }: FreePlanLimi
   }
 
   const limitationMessages = [
-    "Limited to 1 basic template only",
-    "Droplink badge required (upgrade to remove)",
-    "No .pi domain connection",
-    "No custom themes or animations", 
-    "No QR code generation",
-    "Community support only",
-    "Basic analytics only"
+    "⚠️ Only 1 link allowed (upgrade for unlimited)",
+    "🎨 Limited to 1 basic template only",
+    "🏷️ Droplink badge required (cannot be removed)",
+    "🚫 No .pi domain integration available",
+    "📊 No analytics or performance insights",
+    "💰 Cannot withdraw Pi tips (view only)",
+    "🎯 No custom themes or animations", 
+    "📱 No QR code generation",
+    "🎪 Pi Ad Network displays (helps support free users)",
+    "💬 Community support only"
   ];
 
   return (
@@ -39,11 +42,25 @@ const FreePlanLimitations = ({ feature, showUpgradeButton = true }: FreePlanLimi
             <p className="font-medium text-amber-800 mb-2">
               {feature ? `${feature} requires a paid plan` : "Free Plan Limitations"}
             </p>
-            <ul className="text-sm text-amber-700 space-y-1">
+            <div className="text-sm text-amber-700 space-y-1 mb-3">
               {limitationMessages.map((message, index) => (
-                <li key={index}>• {message}</li>
+                <div key={index} className="flex items-start gap-1">
+                  <span className="text-xs">•</span>
+                  <span>{message}</span>
+                </div>
               ))}
-            </ul>
+            </div>
+            
+            {/* Special callout for Pi domain restriction */}
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Ban className="w-4 h-4 text-red-600" />
+                <span className="font-semibold text-red-800">Pi Domain Integration Blocked</span>
+              </div>
+              <p className="text-sm text-red-700">
+                Free accounts cannot connect .pi domains. Upgrade to Starter (10π/month) to unlock Pi Network integration.
+              </p>
+            </div>
           </div>
         </div>
         
@@ -55,7 +72,7 @@ const FreePlanLimitations = ({ feature, showUpgradeButton = true }: FreePlanLimi
               className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white"
             >
               <Crown className="w-3 h-3 mr-1" />
-              Upgrade Now (Starting 6π/month)
+              Upgrade Now (Starting 10π/month)
             </Button>
             <Button 
               variant="outline"

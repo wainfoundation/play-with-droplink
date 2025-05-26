@@ -30,18 +30,18 @@ export const useUserPlan = () => {
   // Get the raw pricing information
   const pricing = planPricing;
 
-  // Updated limitations based on the pricing image
+  // Updated limitations with stricter free plan restrictions
   const limits = {
-    maxLinks: Infinity, // All plans get unlimited links now
-    maxSocialProfiles: Infinity, // All plans get unlimited social profiles
+    maxLinks: plan === 'free' ? 1 : Infinity, // Free plan limited to 1 link only
+    maxSocialProfiles: plan === 'free' ? 1 : Infinity, // Free plan limited to 1 social profile
     maxTemplates: plan === 'free' ? 1 : plan === 'starter' ? 20 : plan === 'pro' ? 50 : 100,
-    canWithdrawTips: true, // All plans can receive Pi tips
-    hasAnalytics: true, // All plans have basic analytics
+    canWithdrawTips: plan !== 'free', // Only paid plans can withdraw tips
+    hasAnalytics: plan !== 'free', // Only paid plans have analytics
     hasAdvancedAnalytics: plan === 'pro' || plan === 'premium',
     hasQRCode: plan === 'starter' || plan === 'pro' || plan === 'premium',
     hasAdvancedThemes: plan === 'starter' || plan === 'pro' || plan === 'premium',
     hasCustomDomain: plan !== 'free',
-    hasPiDomain: plan !== 'free', // .pi domain only for paid plans
+    hasPiDomain: plan !== 'free', // .pi domain only for paid plans - FREE CANNOT INTEGRATE
     hasLinkAnimations: plan === 'starter' || plan === 'pro' || plan === 'premium',
     hasScheduling: plan === 'pro' || plan === 'premium',
     hasSEOTools: plan === 'pro' || plan === 'premium',
@@ -52,7 +52,7 @@ export const useUserPlan = () => {
     hasEmailSupport: plan === 'starter' || plan === 'pro' || plan === 'premium',
     hasCommunitySupport: true, // All plans have community support
     canUsePiAdNetwork: plan === 'free' || plan === 'starter', // Pi ads for free and starter
-    showDroplinkBadge: plan === 'free', // Badge only shown on free accounts
+    showDroplinkBadge: plan === 'free', // Badge REQUIRED on free accounts
     hasTemplatePreview: true, // All users can preview all templates
     canUseTemplate: (templateTier: string) => {
       if (plan === 'free') return templateTier === 'free';

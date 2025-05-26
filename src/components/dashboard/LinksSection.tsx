@@ -49,7 +49,15 @@ const LinksSection = () => {
   }, [links, isLoading, previousLinkCount]);
 
   const handleAddLinkClick = () => {
-    // All plans now get unlimited links based on the new pricing
+    // Check if user has reached their link limit (free plan = 1 link only)
+    if (plan === 'free' && links.length >= limits.maxLinks) {
+      openUpgradeModal({
+        feature: "Additional Links",
+        description: "Free accounts are limited to 1 link only. Upgrade to Starter (10π/month) for unlimited links."
+      });
+      return;
+    }
+    
     setIsAddingLink(true);
   };
 

@@ -24,35 +24,37 @@ const SubscriptionManagement = ({
       name: "Free",
       price: 0,
       features: [
-        "Unlimited links",
-        "Pi Tip button", 
-        "Basic analytics",
-        "1 template",
-        "Community support"
+        "1 link only",
+        "Pi Tip button (view only)", 
+        "1 basic template",
+        "Droplink badge (required)",
+        "Pi Ad Network displays",
+        "Community support only"
       ],
       limitations: [
-        "No .pi domain",
+        "No .pi domain integration",
+        "No analytics",
+        "Cannot withdraw tips",
         "No custom themes",
         "No QR codes",
-        "Droplink badge required",
-        "Limited template access"
+        "Cannot remove badge"
       ],
       icon: Star,
       color: "gray",
-      description: "Get started with essential features"
+      description: "Basic features with significant limitations"
     },
     {
       name: "Starter",
       price: planPricing.starter.monthly,
       features: [
-        "Everything in Free",
-        "Custom themes",
-        "Link animations",
-        "QR codes",
-        "20+ templates",
-        "Email support",
+        "Everything in Free (unlimited)",
+        "Unlimited links & social profiles",
+        "Custom themes & animations",
+        "QR codes & .pi domain",
+        "Basic analytics",
         "Remove Droplink badge",
-        ".pi domain support"
+        "20+ templates",
+        "Email support"
       ],
       icon: Zap,
       color: "blue",
@@ -63,12 +65,12 @@ const SubscriptionManagement = ({
       price: planPricing.pro.monthly,
       features: [
         "Everything in Starter",
-        "Email capture",
         "Advanced analytics",
-        "Group access",
+        "Email capture & SEO tools",
+        "Group access & scheduling",
         "50+ templates",
-        "SEO tools",
-        "Priority support"
+        "Priority support",
+        "Performance insights"
       ],
       icon: Crown,
       color: "purple",
@@ -79,13 +81,12 @@ const SubscriptionManagement = ({
       price: planPricing.premium.monthly,
       features: [
         "Everything in Pro",
-        "Digital store",
+        "Digital store & Pi payments",
         "Booking system",
         "100+ templates",
-        "Priority support",
-        "Whitelabel",
-        "Advanced automations",
-        "API access"
+        "4-hour priority support",
+        "Whitelabel & API access",
+        "Advanced automations"
       ],
       icon: Crown,
       color: "gold",

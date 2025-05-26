@@ -114,17 +114,17 @@ const Features = () => {
     {
       name: "Free",
       price: "0π",
-      features: ["Unlimited links", "Pi Tip button", "Basic analytics", "1 template", "Community support"]
+      features: ["1 link only", "Pi Tip button", "1 template", "Droplink badge", "Community support"]
     },
     {
       name: "Starter",
       price: "10π/month",
-      features: ["Custom themes", "Link animations", "QR codes", "20+ templates", "Email support"]
+      features: ["Unlimited links", "Custom themes", "QR codes", "20+ templates", ".pi domain"]
     },
     {
       name: "Pro", 
       price: "15π/month",
-      features: ["Email capture", "Advanced analytics", "Group access", "50+ templates", "SEO tools"],
+      features: ["Advanced analytics", "Email capture", "Group access", "50+ templates", "SEO tools"],
       isPopular: true
     },
     {
