@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { processPayment } from "@/services/piPaymentService";
 import { Helmet } from "react-helmet-async";
+import TipButton from "@/components/tipping/TipButton";
 
 // Import refactored components
 import ProfileHeader from "@/components/profile/ProfileHeader";
@@ -227,6 +228,7 @@ const ProfilePage = () => {
     }
   };
 
+  // Update the handleTipClick function to use the new TipButton component
   const handleTipClick = () => {
     if (!user) {
       toast({
@@ -301,6 +303,18 @@ const ProfilePage = () => {
             {showAds && (
               <div className="w-full mb-6">
                 <PiAdsNetwork placementId="profile-page" />
+              </div>
+            )}
+            
+            {/* Add tip button before links */}
+            {profileData.id && (
+              <div className="mb-6">
+                <TipButton
+                  recipientId={profileData.id}
+                  recipientUsername={profileData.username}
+                  className="w-full"
+                  size="lg"
+                />
               </div>
             )}
             

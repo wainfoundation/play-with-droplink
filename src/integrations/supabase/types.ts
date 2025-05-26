@@ -628,6 +628,63 @@ export type Database = {
         }
         Relationships: []
       }
+      tips: {
+        Row: {
+          amount: number
+          completed_at: string | null
+          created_at: string
+          from_user_id: string
+          id: string
+          memo: string | null
+          metadata: Json | null
+          pi_payment_id: string | null
+          pi_transaction_id: string | null
+          status: string
+          to_user_id: string
+        }
+        Insert: {
+          amount: number
+          completed_at?: string | null
+          created_at?: string
+          from_user_id: string
+          id?: string
+          memo?: string | null
+          metadata?: Json | null
+          pi_payment_id?: string | null
+          pi_transaction_id?: string | null
+          status?: string
+          to_user_id: string
+        }
+        Update: {
+          amount?: number
+          completed_at?: string | null
+          created_at?: string
+          from_user_id?: string
+          id?: string
+          memo?: string | null
+          metadata?: Json | null
+          pi_payment_id?: string | null
+          pi_transaction_id?: string | null
+          status?: string
+          to_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tips_from_user_id_fkey"
+            columns: ["from_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tips_to_user_id_fkey"
+            columns: ["to_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_consents: {
         Row: {
           auth_consent: boolean | null
@@ -729,6 +786,7 @@ export type Database = {
           display_name: string | null
           id: string
           pi_domain: string | null
+          pi_wallet_address: string | null
           theme: Json | null
           updated_at: string | null
           username: string
@@ -741,6 +799,7 @@ export type Database = {
           display_name?: string | null
           id: string
           pi_domain?: string | null
+          pi_wallet_address?: string | null
           theme?: Json | null
           updated_at?: string | null
           username: string
@@ -753,6 +812,7 @@ export type Database = {
           display_name?: string | null
           id?: string
           pi_domain?: string | null
+          pi_wallet_address?: string | null
           theme?: Json | null
           updated_at?: string | null
           username?: string
@@ -766,6 +826,14 @@ export type Database = {
     Functions: {
       get_total_tips_received: {
         Args: Record<PropertyKey, never> | { user_id_param: string }
+        Returns: number
+      }
+      get_user_tips_received: {
+        Args: { user_id_param: string }
+        Returns: number
+      }
+      get_user_tips_sent: {
+        Args: { user_id_param: string }
         Returns: number
       }
       update_user_custom_domain: {
