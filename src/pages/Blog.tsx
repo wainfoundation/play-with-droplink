@@ -1,8 +1,8 @@
-
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
+import CommunityLove from "@/components/CommunityLove";
 
 const Blog = () => {
   const blogPosts = [
@@ -14,7 +14,8 @@ const Blog = () => {
       date: "May 15, 2025",
       category: "Tips & Tricks",
       image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      slug: "maximize-droplink-profile"
+      slug: "maximize-droplink-profile",
+      readTime: "5 min read"
     },
     {
       id: 2,
@@ -24,7 +25,8 @@ const Blog = () => {
       date: "May 10, 2025",
       category: "Tutorials",
       image: "https://images.unsplash.com/photo-1616077168712-fc6c79cd8133?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      slug: "pi-network-integration-guide"
+      slug: "pi-network-integration-guide",
+      readTime: "7 min read"
     },
     {
       id: 3,
@@ -34,7 +36,8 @@ const Blog = () => {
       date: "May 5, 2025",
       category: "Success Stories",
       image: "https://images.unsplash.com/photo-1555421689-d68471e189f2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      slug: "creators-tripled-audience"
+      slug: "creators-tripled-audience",
+      readTime: "6 min read"
     },
     {
       id: 4,
@@ -44,7 +47,8 @@ const Blog = () => {
       date: "April 28, 2025",
       category: "Product Updates",
       image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      slug: "new-analytics-features"
+      slug: "new-analytics-features",
+      readTime: "4 min read"
     },
     {
       id: 5,
@@ -54,7 +58,8 @@ const Blog = () => {
       date: "April 20, 2025",
       category: "Insights",
       image: "https://images.unsplash.com/photo-1633613286991-611fe299c4be?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      slug: "future-creator-economy-pi"
+      slug: "future-creator-economy-pi",
+      readTime: "8 min read"
     },
     {
       id: 6,
@@ -64,7 +69,8 @@ const Blog = () => {
       date: "April 15, 2025",
       category: "Design",
       image: "https://images.unsplash.com/photo-1618004912476-29818d81ae2e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      slug: "custom-themes-brand-identity"
+      slug: "custom-themes-brand-identity",
+      readTime: "6 min read"
     }
   ];
 
@@ -142,17 +148,28 @@ const Blog = () => {
                   <div className="p-6">
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-xs font-semibold text-primary">{post.category}</span>
-                      <span className="text-xs text-gray-500">{post.date}</span>
+                      <span className="text-xs text-gray-500">{post.readTime}</span>
                     </div>
                     <Link to={`/blog/${post.slug}`}>
                       <h3 className="text-xl font-bold mb-2 hover:text-primary transition-colors">{post.title}</h3>
                     </Link>
                     <p className="text-gray-600 mb-4">{post.excerpt}</p>
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 rounded-full bg-gradient-hero flex items-center justify-center mr-3">
-                        <span className="text-white text-xs font-bold">{post.author.split(' ').map(n => n[0]).join('')}</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-gradient-hero flex items-center justify-center mr-3">
+                          <span className="text-white text-xs font-bold">{post.author.split(' ').map(n => n[0]).join('')}</span>
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium">{post.author}</span>
+                          <p className="text-xs text-gray-500">{post.date}</p>
+                        </div>
                       </div>
-                      <span className="text-sm font-medium">{post.author}</span>
+                      <Link 
+                        to={`/blog/${post.slug}`}
+                        className="text-primary text-sm font-semibold hover:underline"
+                      >
+                        Read More →
+                      </Link>
                     </div>
                   </div>
                 </article>
@@ -184,6 +201,8 @@ const Blog = () => {
             </div>
           </div>
         </div>
+        
+        <CommunityLove />
         <CTA />
       </main>
       <Footer />

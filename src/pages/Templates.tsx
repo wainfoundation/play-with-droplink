@@ -10,11 +10,11 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
 import { Helmet } from "react-helmet-async";
-import { useUserPermissions } from "@/hooks/useUserPermissions";
+import { useUserPlan } from "@/hooks/use-user-plan";
 
 const Templates = () => {
   const [activeTab, setActiveTab] = useState("all");
-  const { plan, permissions } = useUserPermissions();
+  const { plan, limits } = useUserPlan();
   
   // Generate 100 templates with varied properties
   const generateTemplates = () => {
@@ -87,11 +87,7 @@ const Templates = () => {
   };
 
   const canPreviewTemplate = (templatePlan: string) => {
-    const planHierarchy = { starter: 1, pro: 2, premium: 3 };
-    const userPlanLevel = planHierarchy[plan as keyof typeof planHierarchy] || 0;
-    const templatePlanLevel = planHierarchy[templatePlan as keyof typeof planHierarchy] || 1;
-    
-    return userPlanLevel >= templatePlanLevel;
+    return limits.canUseTemplate(templatePlan);
   };
 
   const TemplatePreview = ({ template }: { template: any }) => (
@@ -228,8 +224,8 @@ const Templates = () => {
             <div className="grid md:grid-cols-3 gap-8">
               <div className="bg-card rounded-xl p-6 shadow-sm border border-blue-100">
                 <h3 className="text-2xl font-semibold mb-4">Starter</h3>
-                <p className="text-lg mb-2">6π/month</p>
-                <p className="mb-6 text-muted-foreground">Access to 30+ basic templates with preview</p>
+                <p className="text-lg mb-2">10π/month</p>
+                <p className="mb-6 text-muted-foreground">Access to 20+ basic templates with preview</p>
                 <ul className="space-y-2 mb-8">
                   <li className="flex items-center">
                     <svg className="text-primary mr-2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -252,8 +248,8 @@ const Templates = () => {
               <div className="bg-card rounded-xl p-6 shadow-lg border-primary border-2 transform scale-[1.02]">
                 <div className="bg-primary text-white text-sm font-semibold py-1 px-3 rounded-full w-fit mx-auto -mt-10 mb-4">Most Popular</div>
                 <h3 className="text-2xl font-semibold mb-4">Pro</h3>
-                <p className="text-lg mb-2">10π/month</p>
-                <p className="mb-6 text-muted-foreground">Access to 70+ templates with full preview</p>
+                <p className="text-lg mb-2">15π/month</p>
+                <p className="mb-6 text-muted-foreground">Access to 50+ templates with full preview</p>
                 <ul className="space-y-2 mb-8">
                   <li className="flex items-center">
                     <svg className="text-primary mr-2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -275,7 +271,7 @@ const Templates = () => {
               
               <div className="bg-card rounded-xl p-6 shadow-sm border border-blue-100">
                 <h3 className="text-2xl font-semibold mb-4">Premium</h3>
-                <p className="text-lg mb-2">15π/month</p>
+                <p className="text-lg mb-2">22π/month</p>
                 <p className="mb-6 text-muted-foreground">Access to all 100+ templates with full customization</p>
                 <ul className="space-y-2 mb-8">
                   <li className="flex items-center">
