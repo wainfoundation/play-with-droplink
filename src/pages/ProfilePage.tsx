@@ -136,10 +136,25 @@ const ProfilePage = () => {
           { id: 'default-1', title: "Tip in Pi", url: "#tip-in-pi", icon: "💰", clicks: 0 },
         ];
         
-        // Ensure active_sticker_ids is always an array
-        const activeStickerIds = Array.isArray(profileData.active_sticker_ids) 
-          ? profileData.active_sticker_ids 
-          : [];
+        // Ensure active_sticker_ids is always a string array, handling Json type from Supabase
+        let activeStickerIds: string[] = [];
+        if (profileData.active_sticker_ids) {
+          if (Array.isArray(profileData.active_sticker_ids)) {
+            // If it's already an array, filter to ensure all items are strings
+            activeStickerIds = profileData.active_sticker_ids.filter((id): id is string => typeof id === 'string');
+          } else if (typeof profileData.active_sticker_ids === 'string') {
+            // If it's a JSON string, try to parse it
+            try {
+              const parsed = JSON.parse(profileData.active_sticker_ids);
+              if (Array.isArray(parsed)) {
+                activeStickerIds = parsed.filter((id): id is string => typeof id === 'string');
+              }
+            } catch {
+              // If parsing fails, leave as empty array
+              activeStickerIds = [];
+            }
+          }
+        }
         
         setProfileData({
           ...profileData,
