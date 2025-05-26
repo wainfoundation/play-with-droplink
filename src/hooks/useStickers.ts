@@ -42,7 +42,14 @@ export const useStickers = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setStickers(data || []);
+      
+      // Type cast the data to ensure proper typing
+      const typedStickers = (data || []).map(sticker => ({
+        ...sticker,
+        category: sticker.category as 'sticker' | 'profile_effect' | 'animation'
+      }));
+      
+      setStickers(typedStickers);
     } catch (error) {
       console.error('Error fetching stickers:', error);
       toast({
@@ -67,7 +74,17 @@ export const useStickers = () => {
         .eq('user_id', user.id);
 
       if (error) throw error;
-      setUserStickers(data || []);
+      
+      // Type cast the data to ensure proper typing
+      const typedUserStickers = (data || []).map(userSticker => ({
+        ...userSticker,
+        sticker: {
+          ...userSticker.sticker,
+          category: userSticker.sticker.category as 'sticker' | 'profile_effect' | 'animation'
+        }
+      }));
+      
+      setUserStickers(typedUserStickers);
     } catch (error) {
       console.error('Error fetching user stickers:', error);
     }

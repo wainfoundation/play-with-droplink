@@ -31,7 +31,14 @@ const ActiveStickers = ({ activeStickerIds, className = "" }: ActiveStickersProp
           .in('id', activeStickerIds);
 
         if (error) throw error;
-        setStickers(data || []);
+        
+        // Type cast the data to ensure proper typing
+        const typedStickers = (data || []).map(sticker => ({
+          ...sticker,
+          category: sticker.category as 'sticker' | 'profile_effect' | 'animation'
+        }));
+        
+        setStickers(typedStickers);
       } catch (error) {
         console.error('Error fetching active stickers:', error);
       }

@@ -35,7 +35,7 @@ interface ProfileData {
   bio: string | null;
   avatar_url: string | null;
   links: Link[];
-  active_sticker_ids?: string[];
+  active_sticker_ids: string[];
 }
 
 const ProfilePage = () => {
@@ -136,8 +136,14 @@ const ProfilePage = () => {
           { id: 'default-1', title: "Tip in Pi", url: "#tip-in-pi", icon: "💰", clicks: 0 },
         ];
         
+        // Ensure active_sticker_ids is always an array
+        const activeStickerIds = Array.isArray(profileData.active_sticker_ids) 
+          ? profileData.active_sticker_ids 
+          : [];
+        
         setProfileData({
           ...profileData,
+          active_sticker_ids: activeStickerIds,
           links: processedLinks && processedLinks.length > 0 ? processedLinks : defaultLinks,
         });
         
@@ -291,7 +297,7 @@ const ProfilePage = () => {
               displayName={profileData.display_name}
               bio={profileData.bio}
               avatarUrl={profileData.avatar_url}
-              activeStickerIds={profileData.active_sticker_ids || []}
+              activeStickerIds={profileData.active_sticker_ids}
               onShareClick={handleShareProfile}
               onQrCodeClick={() => setShowQRCode(!showQRCode)}
             />

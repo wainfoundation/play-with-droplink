@@ -1,3 +1,4 @@
+
 import {
   BrowserRouter as Router,
   Route,
@@ -6,23 +7,25 @@ import {
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { UserProvider } from "@/context/UserContext";
-import HomePage from "@/pages/HomePage";
+import HomePage from "@/pages/Home";
 import ProfilePage from "@/pages/ProfilePage";
-import LoginPage from "@/pages/LoginPage";
-import SignupPage from "@/pages/SignupPage";
-import PricingPage from "@/pages/PricingPage";
-import DevelopersPage from "@/pages/DevelopersPage";
-import NotFoundPage from "@/pages/NotFoundPage";
-import { QueryClient } from "@tanstack/react-query";
+import LoginPage from "@/pages/Login";
+import SignupPage from "@/pages/Signup";
+import PricingPage from "@/pages/Pricing";
+import DevelopersPage from "@/pages/Developers";
+import NotFoundPage from "@/pages/NotFound";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HelmetProvider } from "react-helmet-async";
 import StickersCatalog from "@/pages/StickersCatalog";
 import MyStickers from "@/pages/MyStickers";
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
     <HelmetProvider>
       <UserProvider>
-        <QueryClient>
+        <QueryClientProvider client={queryClient}>
           <Toaster />
           <TooltipProvider>
             <Router>
@@ -39,7 +42,7 @@ function App() {
               </Routes>
             </Router>
           </TooltipProvider>
-        </QueryClient>
+        </QueryClientProvider>
       </UserProvider>
     </HelmetProvider>
   );
