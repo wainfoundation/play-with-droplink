@@ -771,6 +771,50 @@ export type Database = {
           },
         ]
       }
+      pi_profile_imports: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          import_status: string
+          links_count: number | null
+          pi_username: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          import_status?: string
+          links_count?: number | null
+          pi_username: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          import_status?: string
+          links_count?: number | null
+          pi_username?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pi_profile_imports_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_categories: {
         Row: {
           created_at: string | null
@@ -1112,7 +1156,11 @@ export type Database = {
           custom_domain: string | null
           display_name: string | null
           id: string
+          imported_pi_avatar: string | null
+          imported_pi_bio: string | null
+          imported_pi_links: Json | null
           pi_domain: string | null
+          pi_profile_last_synced: string | null
           pi_wallet_address: string | null
           theme: Json | null
           updated_at: string | null
@@ -1126,7 +1174,11 @@ export type Database = {
           custom_domain?: string | null
           display_name?: string | null
           id: string
+          imported_pi_avatar?: string | null
+          imported_pi_bio?: string | null
+          imported_pi_links?: Json | null
           pi_domain?: string | null
+          pi_profile_last_synced?: string | null
           pi_wallet_address?: string | null
           theme?: Json | null
           updated_at?: string | null
@@ -1140,7 +1192,11 @@ export type Database = {
           custom_domain?: string | null
           display_name?: string | null
           id?: string
+          imported_pi_avatar?: string | null
+          imported_pi_bio?: string | null
+          imported_pi_links?: Json | null
           pi_domain?: string | null
+          pi_profile_last_synced?: string | null
           pi_wallet_address?: string | null
           theme?: Json | null
           updated_at?: string | null

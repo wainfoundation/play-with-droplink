@@ -60,10 +60,16 @@ const ProfilePage = () => {
           return;
         }
         
-        // Fetch profile data
+        // Fetch profile data including imported Pi data
         const { data: profileData, error: profileError } = await supabase
           .from('user_profiles')
-          .select('*')
+          .select(`
+            *,
+            imported_pi_avatar,
+            imported_pi_bio,
+            imported_pi_links,
+            pi_profile_last_synced
+          `)
           .eq('username', username)
           .maybeSingle();
         
@@ -129,15 +135,29 @@ const ProfilePage = () => {
           
           return { ...link, type };
         }) : [];
+
+        // Add imported Pi links if available
+        const importedPiLinks = profileData.imported_pi_links || [];
+        const piLinksWithType = importedPiLinks.map((link: any, index: number) => ({
+          id: `pi-${index}`,
+          title: link.title,
+          url: link.url,
+          icon: "π",
+          clicks: 0,
+          type: "regular" as const,
+          isPiImported: true
+        }));
         
         // Default links if none found
         const defaultLinks = [
           { id: 'default-1', title: "Tip in Pi", url: "#tip-in-pi", icon: "💰", clicks: 0 },
         ];
         
+        const allLinks = [...processedLinks, ...piLinksWithType];
+        
         setProfileData({
           ...profileData,
-          links: processedLinks && processedLinks.length > 0 ? processedLinks : defaultLinks,
+          links: allLinks.length > 0 ? allLinks : defaultLinks,
         });
         
         setLoading(false);
@@ -269,14 +289,20 @@ const ProfilePage = () => {
 
   const profileUrl = `https://droplink.space/@${profileData.username}`;
   
+  // Use imported Pi avatar if available, otherwise fallback to regular avatar
+  const displayAvatar = profileData.imported_pi_avatar || profileData.avatar_url;
+  
+  // Use imported Pi bio if available, otherwise fallback to regular bio
+  const displayBio = profileData.imported_pi_bio || profileData.bio || "Digital creator & Pi pioneer";
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
         <title>{profileData.display_name || `@${profileData.username}`} | Droplink</title>
-        <meta name="description" content={profileData.bio || `Check out ${profileData.username}'s profile on Droplink`} />
+        <meta name="description" content={displayBio} />
         <meta property="og:title" content={`${profileData.display_name || `@${profileData.username}`} | Droplink`} />
-        <meta property="og:description" content={profileData.bio || `Check out ${profileData.username}'s profile on Droplink`} />
-        <meta property="og:image" content={profileData.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${profileData.username}`} />
+        <meta property="og:description" content={displayBio} />
+        <meta property="og:image" content={displayAvatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${profileData.username}`} />
         <meta property="og:url" content={profileUrl} />
         <meta property="og:type" content="profile" />
       </Helmet>
@@ -288,11 +314,21 @@ const ProfilePage = () => {
             <ProfileHeader 
               username={profileData.username}
               displayName={profileData.display_name}
-              bio={profileData.bio}
-              avatarUrl={profileData.avatar_url}
+              bio={displayBio}
+              avatarUrl={displayAvatar}
               onShareClick={handleShareProfile}
               onQrCodeClick={() => setShowQRCode(!showQRCode)}
             />
+            
+            {/* Pi Network Verification Badge */}
+            {(profileData.imported_pi_avatar || profileData.imported_pi_bio || (profileData.imported_pi_links && profileData.imported_pi_links.length > 0)) && (
+              <div className="flex justify-center mb-4">
+                <div className="flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
+                  <span className="text-lg">π</span>
+                  <span>Pi Network Verified</span>
+                </div>
+              </div>
+            )}
             
             <ProfileQrCode 
               url={profileUrl}
@@ -325,7 +361,7 @@ const ProfilePage = () => {
               onTipClick={handleTipClick}
             />
             
-            {/* Display recent tips if available - fix the prop name to match the component */}
+            {/* Display recent tips if available */}
             {profileData.id && (
               <div className="mt-6">
                 <RecentTips userId={profileData.id} />

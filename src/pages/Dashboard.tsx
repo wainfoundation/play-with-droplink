@@ -8,11 +8,13 @@ import { useUser } from "@/context/UserContext";
 import { PiAuthButton } from "@/components/auth/PiAuthButton";
 import LoginPrompt from "@/components/dashboard/LoginPrompt";
 import PiNetworkIntegration from "@/components/PiNetworkIntegration";
+import PiProfileImport from "@/components/profile/PiProfileImport";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { usePiAuth } from "@/hooks/usePiAuth";
-import { Pi, TrendingUp, Users, Link as LinkIcon } from "lucide-react";
+import { Pi, TrendingUp, Users, Link as LinkIcon, Download } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -110,78 +112,121 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* Pi Network Integration */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Pi className="h-5 w-5" />
-                Pi Network Integration
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <PiNetworkIntegration showTitle={false} compact={true} />
-              <div className="mt-4">
-                <Button asChild className="w-full">
-                  <Link to="/pi-dashboard">
-                    View Full Pi Dashboard
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Main Dashboard Tabs */}
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="pi-network">Pi Network</TabsTrigger>
+            <TabsTrigger value="pi-import">Import Profile</TabsTrigger>
+          </TabsList>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button variant="outline" className="w-full justify-start">
-                <LinkIcon className="h-4 w-4 mr-2" />
-                Add New Link
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Users className="h-4 w-4 mr-2" />
-                View Profile Analytics
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Pi className="h-4 w-4 mr-2" />
-                Setup Pi Payments
-              </Button>
-              <Button variant="outline" className="w-full justify-start" asChild>
-                <Link to="/templates">
-                  <TrendingUp className="h-4 w-4 mr-2" />
-                  Browse Templates
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[
-                { action: "New profile view", detail: "Someone viewed your profile", time: "2 minutes ago" },
-                { action: "Link clicked", detail: "Instagram link was clicked", time: "1 hour ago" },
-                { action: "Pi payment received", detail: "Received 5π from a supporter", time: "3 hours ago" },
-                { action: "Profile updated", detail: "You updated your bio", time: "1 day ago" },
-              ].map((activity, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                  <div>
-                    <p className="font-medium">{activity.action}</p>
-                    <p className="text-sm text-muted-foreground">{activity.detail}</p>
+          <TabsContent value="overview" className="space-y-6">
+            {/* Pi Network Integration */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Pi className="h-5 w-5" />
+                    Pi Network Integration
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <PiNetworkIntegration showTitle={false} compact={true} />
+                  <div className="mt-4">
+                    <Button asChild className="w-full">
+                      <Link to="/pi-dashboard">
+                        View Full Pi Dashboard
+                      </Link>
+                    </Button>
                   </div>
-                  <p className="text-sm text-muted-foreground">{activity.time}</p>
-                </div>
-              ))}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Quick Actions</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button variant="outline" className="w-full justify-start">
+                    <LinkIcon className="h-4 w-4 mr-2" />
+                    Add New Link
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
+                    <Users className="h-4 w-4 mr-2" />
+                    View Profile Analytics
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
+                    <Pi className="h-4 w-4 mr-2" />
+                    Setup Pi Payments
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start" asChild>
+                    <Link to="/templates">
+                      <TrendingUp className="h-4 w-4 mr-2" />
+                      Browse Templates
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Recent Activity */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Activity</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {[
+                    { action: "New profile view", detail: "Someone viewed your profile", time: "2 minutes ago" },
+                    { action: "Link clicked", detail: "Instagram link was clicked", time: "1 hour ago" },
+                    { action: "Pi payment received", detail: "Received 5π from a supporter", time: "3 hours ago" },
+                    { action: "Profile updated", detail: "You updated your bio", time: "1 day ago" },
+                  ].map((activity, index) => (
+                    <div key={index} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                      <div>
+                        <p className="font-medium">{activity.action}</p>
+                        <p className="text-sm text-muted-foreground">{activity.detail}</p>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{activity.time}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="pi-network">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Pi className="h-5 w-5" />
+                  Pi Network Dashboard
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <PiNetworkIntegration showTitle={false} compact={false} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="pi-import">
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Download className="h-5 w-5" />
+                    Import from Pi Network Profile
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Automatically import your Pi Network profile data to enhance your Droplink presence
+                  </p>
+                </CardHeader>
+              </Card>
+              
+              <PiProfileImport />
+            </div>
+          </TabsContent>
+        </Tabs>
       </main>
       <Footer />
       <GoToTop />
