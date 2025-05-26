@@ -3,12 +3,12 @@
  * Pi Network SDK utility functions
  */
 
-// Types
+// Types from Pi SDK documentation
 export interface PiAuthResult {
   accessToken: string;
   user: {
     uid: string;
-    username: string; // Making username required to match the expected type
+    username: string;
   };
 }
 
@@ -18,31 +18,29 @@ export interface PiPaymentData {
   metadata?: Record<string, any>;
 }
 
+export interface PaymentCallbacks {
+  onReadyForServerApproval: (paymentId: string) => void;
+  onReadyForServerCompletion: (paymentId: string, txid: string) => void;
+  onCancel: (paymentId: string) => void;
+  onError: (error: Error, payment?: any) => void;
+}
+
 // Check if running in Pi Browser
 export const isRunningInPiBrowser = (): boolean => {
   try {
-    // Enhanced detection for Pi Browser environment
-    if (typeof window !== 'undefined') {
-      // Check for Pi SDK availability
-      if (window.Pi) {
-        console.log("Pi SDK detected - running in Pi Browser");
-        return true;
-      }
-      
-      // Check for Pi Browser specific user agent strings
-      const userAgent = navigator.userAgent.toLowerCase();
-      if (userAgent.includes('pibrowser') || userAgent.includes('pi network') || userAgent.includes('pi-browser')) {
-        console.log("Pi Browser detected via user agent");
-        return true;
-      }
-      
-      // Check for Pi-specific objects or properties
-      if (typeof window['PiNetwork'] !== 'undefined' || typeof window['piNetwork'] !== 'undefined') {
-        console.log("Pi-specific objects detected");
-        return true;
-      }
+    if (typeof window !== 'undefined' && window.Pi) {
+      console.log("Pi SDK detected - running in Pi Browser");
+      return true;
     }
-    console.log("Not running in Pi Browser - SDK and user agent checks failed");
+    
+    // Check for Pi Browser specific user agent strings
+    const userAgent = navigator.userAgent.toLowerCase();
+    if (userAgent.includes('pibrowser') || userAgent.includes('pi network') || userAgent.includes('pi-browser')) {
+      console.log("Pi Browser detected via user agent");
+      return true;
+    }
+    
+    console.log("Not running in Pi Browser");
     return false;
   } catch (error) {
     console.error("Error checking Pi Browser environment:", error);
@@ -50,58 +48,102 @@ export const isRunningInPiBrowser = (): boolean => {
   }
 };
 
-// Initialize Pi SDK with environment detection
+// Initialize Pi SDK according to documentation
 export const initPiNetwork = (): boolean => {
   try {
-    if (isRunningInPiBrowser()) {
-      // Check if we're in development or production
-      const isSandbox = import.meta.env.DEV || 
-                         window.location.hostname.includes('localhost') || 
-                         window.location.hostname.includes('lovableproject.com');
-      
-      window.Pi.init({ version: "2.0", sandbox: isSandbox });
-      console.log("Pi SDK initialized with sandbox mode:", isSandbox);
-      return true;
+    if (!window.Pi) {
+      console.warn("Pi SDK not available. This app works best in Pi Browser.");
+      return false;
     }
-    console.warn("Pi SDK not available. This app works best in Pi Browser.");
-    return false;
+
+    // Check if we're in development or production
+    const isSandbox = import.meta.env.DEV || 
+                     window.location.hostname.includes('localhost') || 
+                     window.location.hostname.includes('lovableproject.com') ||
+                     import.meta.env.VITE_PI_SANDBOX === 'true';
+    
+    window.Pi.init({ version: "2.0", sandbox: isSandbox });
+    console.log("Pi SDK initialized with sandbox mode:", isSandbox);
+    return true;
   } catch (error) {
     console.error("Failed to initialize Pi SDK:", error);
     return false;
   }
 };
 
-// Authenticate user with Pi Network
+// Authenticate user with Pi Network according to documentation
 export const authenticateWithPi = async (
   scopes: string[] = ["username", "payments", "wallet_address"]
 ): Promise<PiAuthResult | null> => {
   try {
-    if (!isRunningInPiBrowser()) {
+    if (!window.Pi) {
       console.error("Pi SDK not initialized or not available");
       return null;
     }
 
-    // Handle any incomplete payments
+    // Handle any incomplete payments as per documentation
     const onIncompletePaymentFound = (payment: any) => {
       console.log("Incomplete payment found:", payment);
-      // Handle incomplete payment
+      // This should be handled by sending to server for completion
       return null;
     };
 
-    // Get authentication result and ensure username is never undefined
     const authResult = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
-    
-    // Ensure the username is always a string, never undefined
-    if (!authResult.user.username) {
-      console.warn("Pi auth returned undefined username, using empty string instead");
-      authResult.user.username = ""; // Provide a default empty string if no username
+    console.log("Pi authentication successful:", authResult);
+    return authResult as PiAuthResult;
+  } catch (error) {
+    console.error("Pi authentication failed:", error);
+    return null;
+  }
+};
+
+// Create payment using Pi SDK according to documentation
+export const createPiPayment = async (
+  paymentData: PiPaymentData,
+  callbacks: PaymentCallbacks
+): Promise<void> => {
+  try {
+    if (!window.Pi) {
+      throw new Error("Pi SDK not initialized or not available");
+    }
+
+    // Ensure SDK is initialized
+    initPiNetwork();
+
+    await window.Pi.createPayment(paymentData, callbacks);
+  } catch (error) {
+    console.error("Payment creation failed:", error);
+    throw error;
+  }
+};
+
+// Check if ads are ready
+export const isAdReady = async (adType: "interstitial" | "rewarded"): Promise<boolean> => {
+  try {
+    if (!window.Pi?.Ads) {
+      return false;
     }
     
-    console.log("Authentication successful:", authResult);
-    return authResult as PiAuthResult; // Explicitly cast to our interface
+    const response = await window.Pi.Ads.isAdReady(adType);
+    return response.ready;
   } catch (error) {
-    console.error("Authentication failed:", error);
-    return null;
+    console.error("Error checking ad readiness:", error);
+    return false;
+  }
+};
+
+// Show ads according to documentation
+export const showAd = async (adType: "interstitial" | "rewarded") => {
+  try {
+    if (!window.Pi?.Ads) {
+      throw new Error("Pi Ads not available");
+    }
+    
+    const response = await window.Pi.Ads.showAd(adType);
+    return response;
+  } catch (error) {
+    console.error("Error showing ad:", error);
+    throw error;
   }
 };
 
@@ -109,4 +151,7 @@ export default {
   isRunningInPiBrowser,
   initPiNetwork,
   authenticateWithPi,
+  createPiPayment,
+  isAdReady,
+  showAd,
 };

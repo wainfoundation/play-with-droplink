@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Pi, Heart } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { createPiPayment } from "@/services/piPaymentService";
+import { processPayment } from "@/services/piPaymentService";
 import { useUser } from "@/context/UserContext";
 import { isRunningInPiBrowser } from "@/utils/pi-sdk";
 
@@ -56,12 +56,7 @@ const DonationButton = ({
         }
       };
 
-      await createPiPayment(paymentData, user);
-      
-      toast({
-        title: "Donation Sent!",
-        description: `You've sent ${suggestedAmount} Pi to ${recipientName}`,
-      });
+      await processPayment(paymentData, user);
     } catch (error) {
       console.error("Donation error:", error);
       toast({
