@@ -87,12 +87,12 @@ export const initPiNetwork = (): boolean => {
   try {
     // Enforce Pi Browser requirement
     if (!isRunningInPiBrowser()) {
-      PiLogger.error('init_failed', { reason: 'not_pi_browser' });
+      PiLogger.error('init_failed_not_pi_browser');
       throw new Error('Pi Browser required for production mode');
     }
 
     if (!window.Pi) {
-      PiLogger.error('init_failed', { reason: 'pi_sdk_not_available' });
+      PiLogger.error('init_failed_no_sdk');
       throw new Error('Pi SDK not available');
     }
 
@@ -145,7 +145,7 @@ export const openUrlInSystemBrowser = async (url: string): Promise<void> => {
     PiLogger.info('system_browser_open', { url });
     await window.Pi.openUrlInSystemBrowser(url);
   } catch (error) {
-    PiLogger.error('system_browser_error', error, { url });
+    PiLogger.error('system_browser_error', error);
     throw error;
   }
 };
