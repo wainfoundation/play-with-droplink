@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { UserProvider } from "@/context/UserContext";
 import Home from "./pages/Home";
-import Profile from "./pages/Profile";
+import ProfilePage from "./pages/ProfilePage";
 import Dashboard from "./pages/Dashboard";
 import PiDashboard from "./pages/PiDashboard";
 import Login from "./pages/Login";
@@ -17,7 +17,6 @@ import StorePage from "./components/store/StorePage";
 import NotFound from "./pages/NotFound";
 import Templates from "./pages/Templates";
 import Help from "./pages/Help";
-import HelpArticle from "./pages/HelpArticle";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import Privacy from "./pages/Privacy";
@@ -43,13 +42,12 @@ const App = () => (
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/templates" element={<Templates />} />
               <Route path="/help" element={<Help />} />
-              <Route path="/help/:slug" element={<HelpArticle />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/about" element={<About />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/gdpr" element={<GDPR />} />
-              <Route path="/:username" element={<Profile />} />
+              <Route path="/:username" element={<ProfilePage />} />
               <Route path="/:username/store" element={<StorePage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -24,12 +24,20 @@ const Dashboard = () => {
     }
   }, [isLoggedIn, navigate]);
 
+  const handlePiLoginWrapper = async () => {
+    try {
+      await handlePiLogin();
+    } catch (error) {
+      console.error("Pi login error:", error);
+    }
+  };
+
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-indigo-50">
         <Navbar />
         <main className="flex-grow flex items-center justify-center py-12 px-4">
-          <LoginPrompt handlePiLogin={handlePiLogin} />
+          <LoginPrompt handlePiLogin={handlePiLoginWrapper} />
         </main>
         <Footer />
       </div>
