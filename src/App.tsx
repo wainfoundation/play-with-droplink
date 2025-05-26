@@ -1,13 +1,12 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { UserProvider } from "@/context/UserContext";
 import { FeedbackWidget } from "@/components/feedback/FeedbackWidget";
-import NetworkStatus from "@/components/network/NetworkStatus";
-import SecurityHeaders from "@/components/security/SecurityHeaders";
-import ErrorBoundary from "@/components/ui/error-boundary";
-import CookieConsent from "@/components/privacy/CookieConsent";
+import { NetworkStatus } from "@/components/network/NetworkStatus";
+import { SecurityHeaders } from "@/components/security/SecurityHeaders";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { CookieConsent } from "@/components/privacy/CookieConsent";
 import AdminStatusProvider from "@/components/admin/AdminStatusProvider";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 
