@@ -7,30 +7,30 @@ import { Globe, ArrowRight, CheckCircle, ExternalLink, Smartphone } from 'lucide
 
 const PiDomainShowcase = () => {
   return (
-    <section className="py-32 px-4 bg-gradient-to-br from-primary/5 via-white to-secondary/5 relative overflow-hidden">
+    <section className="py-20 px-4 bg-gradient-to-br from-primary/5 via-white to-secondary/5 relative overflow-hidden">
       <div className="absolute -top-20 -right-20 w-96 h-96 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-3xl"></div>
       <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-gradient-to-br from-secondary/20 to-primary/20 rounded-full blur-3xl"></div>
       
       <div className="container mx-auto relative z-10">
-        <div className="text-center mb-20">
-          <h2 className="text-5xl md:text-6xl font-bold mb-8 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             Your .pi Domain in Action
           </h2>
-          <p className="text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             See how your Pi Network domain transforms into a powerful business hub with Droplink
           </p>
         </div>
 
         {/* Demo Showcase Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
           {/* Before */}
-          <Card className="p-10 text-center bg-gray-50 border-2 border-gray-200">
-            <div className="bg-gray-200 text-gray-500 rounded-full p-6 w-20 h-20 mx-auto mb-8 flex items-center justify-center">
-              <Globe size={40} />
+          <Card className="p-8 text-center bg-gray-50 border-2 border-gray-200">
+            <div className="bg-gray-200 text-gray-500 rounded-full p-4 w-16 h-16 mx-auto mb-6 flex items-center justify-center">
+              <Globe size={32} />
             </div>
-            <h3 className="text-2xl font-bold mb-6 text-gray-600">Before Droplink</h3>
-            <div className="space-y-4 text-lg">
-              <div className="bg-white rounded-lg p-4 border">
+            <h3 className="text-xl font-bold mb-4 text-gray-600">Before Droplink</h3>
+            <div className="space-y-3 text-base">
+              <div className="bg-white rounded-lg p-3 border">
                 <span className="font-mono text-gray-500">yourname.pi</span>
                 <p className="text-sm text-gray-400 mt-2">Domain not connected</p>
               </div>
@@ -42,19 +42,19 @@ const PiDomainShowcase = () => {
 
           {/* Arrow */}
           <div className="flex items-center justify-center">
-            <div className="bg-gradient-to-r from-primary to-secondary rounded-full p-6 shadow-lg">
-              <ArrowRight size={40} className="text-white" />
+            <div className="bg-gradient-to-r from-primary to-secondary rounded-full p-4 shadow-lg">
+              <ArrowRight size={32} className="text-white" />
             </div>
           </div>
 
           {/* After */}
-          <Card className="p-10 text-center bg-gradient-to-br from-primary/10 to-secondary/10 border-2 border-primary/30">
-            <div className="bg-gradient-to-r from-primary to-secondary text-white rounded-full p-6 w-20 h-20 mx-auto mb-8 flex items-center justify-center">
-              <CheckCircle size={40} />
+          <Card className="p-8 text-center bg-gradient-to-br from-primary/10 to-secondary/10 border-2 border-primary/30">
+            <div className="bg-gradient-to-r from-primary to-secondary text-white rounded-full p-4 w-16 h-16 mx-auto mb-6 flex items-center justify-center">
+              <CheckCircle size={32} />
             </div>
-            <h3 className="text-2xl font-bold mb-6 text-primary">With Droplink</h3>
-            <div className="space-y-4 text-lg">
-              <div className="bg-white rounded-lg p-4 border-2 border-primary/20">
+            <h3 className="text-xl font-bold mb-4 text-primary">With Droplink</h3>
+            <div className="space-y-3 text-base">
+              <div className="bg-white rounded-lg p-3 border-2 border-primary/20">
                 <span className="font-mono text-primary font-bold">yourname.pi</span>
                 <p className="text-sm text-primary mt-2">✓ Fully connected</p>
               </div>
@@ -66,10 +66,10 @@ const PiDomainShowcase = () => {
         </div>
 
         {/* Live Example Showcase */}
-        <div className="bg-white rounded-3xl p-12 shadow-2xl border border-primary/20 mb-20">
-          <h3 className="text-4xl font-bold mb-12 text-center">Live Example</h3>
+        <div className="bg-white rounded-3xl p-10 shadow-2xl border border-primary/20 mb-16">
+          <h3 className="text-2xl font-bold mb-10 text-center">Live Example</h3>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Mobile Preview */}
             <div className="flex justify-center">
               <div className="relative">
@@ -99,7 +99,7 @@ const PiDomainShowcase = () => {
                         <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full mx-auto mb-4 flex items-center justify-center text-white text-xl font-bold">
                           PD
                         </div>
-                        <h4 className="text-xl font-bold mb-2">Pi Developer</h4>
+                        <h4 className="text-lg font-bold mb-2">Pi Developer</h4>
                         <p className="text-sm text-gray-600 mb-4">Building the future of Pi Network</p>
                       </div>
                       
@@ -119,41 +119,41 @@ const PiDomainShowcase = () => {
                 </div>
                 
                 {/* Floating indicators */}
-                <div className="absolute -right-8 top-20 bg-primary text-white rounded-full px-4 py-2 text-sm font-medium shadow-lg">
+                <div className="absolute -right-8 top-20 bg-primary text-white rounded-full px-3 py-1 text-sm font-medium shadow-lg">
                   Your .pi domain!
                 </div>
               </div>
             </div>
             
             {/* Features List */}
-            <div className="space-y-8">
-              <div className="flex items-start gap-6">
-                <div className="bg-primary/10 text-primary rounded-xl p-4 flex-shrink-0">
-                  <Globe size={32} />
+            <div className="space-y-6">
+              <div className="flex items-start gap-4">
+                <div className="bg-primary/10 text-primary rounded-xl p-3 flex-shrink-0">
+                  <Globe size={24} />
                 </div>
                 <div>
-                  <h4 className="text-2xl font-bold mb-3">Custom .pi Domain</h4>
-                  <p className="text-xl text-muted-foreground">Your memorable Pi Network address that redirects to your Droplink profile</p>
+                  <h4 className="text-lg font-bold mb-2">Custom .pi Domain</h4>
+                  <p className="text-base text-muted-foreground">Your memorable Pi Network address that redirects to your Droplink profile</p>
                 </div>
               </div>
               
-              <div className="flex items-start gap-6">
-                <div className="bg-secondary/10 text-secondary rounded-xl p-4 flex-shrink-0">
-                  <Smartphone size={32} />
+              <div className="flex items-start gap-4">
+                <div className="bg-secondary/10 text-secondary rounded-xl p-3 flex-shrink-0">
+                  <Smartphone size={24} />
                 </div>
                 <div>
-                  <h4 className="text-2xl font-bold mb-3">Mobile Optimized</h4>
-                  <p className="text-xl text-muted-foreground">Perfect viewing experience in Pi Browser and all mobile devices</p>
+                  <h4 className="text-lg font-bold mb-2">Mobile Optimized</h4>
+                  <p className="text-base text-muted-foreground">Perfect viewing experience in Pi Browser and all mobile devices</p>
                 </div>
               </div>
               
-              <div className="flex items-start gap-6">
-                <div className="bg-primary/10 text-primary rounded-xl p-4 flex-shrink-0">
-                  <ExternalLink size={32} />
+              <div className="flex items-start gap-4">
+                <div className="bg-primary/10 text-primary rounded-xl p-3 flex-shrink-0">
+                  <ExternalLink size={24} />
                 </div>
                 <div>
-                  <h4 className="text-2xl font-bold mb-3">Instant Redirect</h4>
-                  <p className="text-xl text-muted-foreground">Seamless connection from your .pi domain to your professional profile</p>
+                  <h4 className="text-lg font-bold mb-2">Instant Redirect</h4>
+                  <p className="text-base text-muted-foreground">Seamless connection from your .pi domain to your professional profile</p>
                 </div>
               </div>
             </div>
@@ -162,15 +162,15 @@ const PiDomainShowcase = () => {
 
         {/* CTA Section */}
         <div className="text-center">
-          <h3 className="text-4xl font-bold mb-8">Ready to Connect Your .pi Domain?</h3>
-          <p className="text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto">
+          <h3 className="text-2xl font-bold mb-6">Ready to Connect Your .pi Domain?</h3>
+          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
             Join thousands of Pi Network pioneers who have already connected their domains to Droplink
           </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Button asChild size="lg" className="bg-gradient-to-r from-primary to-secondary hover:scale-105 transition-transform text-xl px-12 py-6">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild size="lg" className="bg-gradient-to-r from-primary to-secondary hover:scale-105 transition-transform text-base px-8 py-3">
               <Link to="/signup">Connect Your Domain Now</Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors text-xl px-12 py-6">
+            <Button asChild variant="outline" size="lg" className="border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors text-base px-8 py-3">
               <Link to="/demo">Try Live Demo</Link>
             </Button>
           </div>
