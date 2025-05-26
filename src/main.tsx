@@ -10,9 +10,12 @@ import PiLogger from './utils/pi-logger'
 
 const Root = () => {
   const [showSplash, setShowSplash] = useState(true);
+  const [isReady, setIsReady] = useState(false);
   
   const handleSplashComplete = () => {
+    // Use a state update that's more React-friendly
     setShowSplash(false);
+    setIsReady(true);
   };
 
   useEffect(() => {
@@ -30,9 +33,9 @@ const Root = () => {
       <HelmetProvider>
         {showSplash ? (
           <SplashScreen onComplete={handleSplashComplete} />
-        ) : (
+        ) : isReady ? (
           <App />
-        )}
+        ) : null}
       </HelmetProvider>
     </React.StrictMode>
   );

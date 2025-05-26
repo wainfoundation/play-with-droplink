@@ -1,146 +1,67 @@
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { playSound, sounds } from '@/utils/sounds';
-import { Progress } from "@/components/ui/progress";
+import React, { useEffect, useState } from 'react';
 
-export interface SplashScreenProps {
+interface SplashScreenProps {
   onComplete: () => void;
 }
 
-const SplashScreen = ({ onComplete }: SplashScreenProps) => {
-  const [progress, setProgress] = useState(0);
-  const [isExiting, setIsExiting] = useState(false);
+const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
+  const [isVisible, setIsVisible] = useState(true);
+  const [isMounted, setIsMounted] = useState(true);
 
   useEffect(() => {
-    // Total loading time in milliseconds - slightly longer for smoother animation
-    const totalLoadTime = 2800;
-    // Update interval in milliseconds - more frequent updates for smoother progress
-    const updateInterval = 16; // ~60fps
-    // Calculate the number of updates needed
-    const totalUpdates = totalLoadTime / updateInterval;
-    // Calculate progress increment per update
-    const progressIncrement = 100 / totalUpdates;
-    
-    // Start progress animation with easing
-    const interval = setInterval(() => {
-      setProgress((prevProgress) => {
-        // Apply slight easing to make progress more natural
-        const remaining = 100 - prevProgress;
-        const increment = Math.min(progressIncrement * (0.5 + (remaining / 100)), remaining);
-        
-        if (prevProgress >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        return Math.min(prevProgress + increment, 100);
-      });
-    }, updateInterval);
-    
-    // Complete the loading after the total time
+    // Ensure the component stays mounted during the entire splash duration
     const timer = setTimeout(() => {
-      // Play sound when loading completes
-      playSound(sounds.loadingComplete, 0.4);
-      
-      // Set exiting state first for smooth transition
-      setIsExiting(true);
-      
-      // Small delay after sound before transitioning
-      setTimeout(() => {
-        onComplete();
-      }, 500);
-    }, totalLoadTime);
+      if (isMounted) {
+        setIsVisible(false);
+        // Add a small delay before calling onComplete to ensure smooth transition
+        setTimeout(() => {
+          if (isMounted) {
+            onComplete();
+          }
+        }, 100);
+      }
+    }, 2000); // Show splash for 2 seconds
 
     return () => {
       clearTimeout(timer);
-      clearInterval(interval);
+      setIsMounted(false);
     };
-  }, [onComplete]);
+  }, [onComplete, isMounted]);
+
+  // Don't render anything if not visible (prevents DOM manipulation issues)
+  if (!isVisible) {
+    return null;
+  }
 
   return (
-    <AnimatePresence>
-      {!isExiting && (
-        <motion.div
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-primary to-secondary"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
-            className="text-center"
-          >
-            {/* Logo */}
-            <motion.div
-              className="mx-auto mb-6 h-24 w-24 rounded-xl bg-white p-4 shadow-lg"
-              initial={{ scale: 0.8, rotate: -5 }}
-              animate={{ 
-                scale: [0.8, 1.05, 1],
-                rotate: [-5, 2, 0] 
-              }}
-              transition={{ 
-                delay: 0.3, 
-                duration: 0.8, 
-                ease: "easeOut",
-                times: [0, 0.7, 1] 
-              }}
-            >
-              <img 
-                src="/lovable-uploads/1dc40f50-2eba-46b0-a495-962b97bfaf8d.png" 
-                alt="Droplink Logo" 
-                className="h-full w-full" 
-              />
-            </motion.div>
-            
-            {/* App Name */}
-            <motion.h1 
-              className="mb-2 font-poppins text-4xl font-bold text-white"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.5, ease: "easeOut" }}
-            >
-              Droplink
-            </motion.h1>
-            
-            {/* Company Name */}
-            <motion.p 
-              className="text-sm text-white/80"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.5, ease: "easeOut" }}
-            >
-              by MRWAIN ORGANIZATION
-            </motion.p>
-            
-            {/* Progress Percentage */}
-            <motion.p
-              className="mt-6 text-white/90 font-medium"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-            >
-              {Math.round(progress)}%
-            </motion.p>
-            
-            {/* Progress Bar */}
-            <motion.div 
-              className="mt-2 w-64 md:w-80"
-              initial={{ opacity: 0, width: "60%" }}
-              animate={{ opacity: 1, width: "100%" }}
-              transition={{ delay: 0.7, duration: 0.6 }}
-            >
-              <Progress 
-                value={progress} 
-                className="h-2 overflow-hidden" 
-              />
-            </motion.div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <div className="fixed inset-0 bg-gradient-to-br from-blue-600 via-purple-600 to-cyan-500 flex items-center justify-center z-50">
+      <div className="text-center space-y-8 px-4">
+        <div className="relative">
+          <img 
+            src="/lovable-uploads/2c117775-cd88-4aec-819b-0723e4f0dbe5.png" 
+            alt="Droplink Logo" 
+            className="w-24 h-24 mx-auto animate-pulse"
+          />
+        </div>
+        
+        <div className="space-y-4">
+          <h1 className="text-4xl font-bold text-white">
+            Droplink
+          </h1>
+          <p className="text-xl text-blue-100">
+            Drop All Your Links
+          </p>
+          <p className="text-lg text-blue-200">
+            Pi Network Integration
+          </p>
+        </div>
+        
+        <div className="flex justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+        </div>
+      </div>
+    </div>
   );
 };
 
