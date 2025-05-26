@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -24,6 +23,12 @@ export interface DigitalProduct {
   download_expires_hours?: number;
 }
 
+// Partial product info for order history
+export interface OrderProductInfo {
+  title: string;
+  price: number;
+}
+
 export interface Order {
   id: string;
   buyer_id: string;
@@ -42,7 +47,7 @@ export interface Order {
   max_downloads?: number;
   buyer_email?: string;
   access_token?: string;
-  digital_products?: DigitalProduct;
+  digital_products?: OrderProductInfo; // Use partial interface for orders
 }
 
 export function useDigitalProducts() {
