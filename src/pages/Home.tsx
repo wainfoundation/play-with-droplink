@@ -13,6 +13,7 @@ import CTA from "@/components/CTA";
 import FAQ from "@/components/FAQ";
 import CommunityLove from "@/components/CommunityLove";
 import TemplatesShowcase from "@/components/TemplatesShowcase";
+import CustomerSuccessStories from "@/components/CustomerSuccessStories";
 import { Helmet } from "react-helmet-async";
 
 const Home = () => {
@@ -39,6 +40,7 @@ const Home = () => {
             {/* Mobile-optimized sections with better spacing */}
             <div className="space-y-8 sm:space-y-12 md:space-y-16">
               <PiDomainFeatures />
+              <CustomerSuccessStories />
               <PiDomainSetup />
               <HowItWorks />
               <DemoSection />
