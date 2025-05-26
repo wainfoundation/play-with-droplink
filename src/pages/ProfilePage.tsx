@@ -70,7 +70,7 @@ const ProfilePage = () => {
           return;
         }
         
-        // Fetch profile data including imported Pi data
+        // Fetch profile data including imported Pi data and active stickers
         const { data: profileData, error: profileError } = await supabase
           .from('user_profiles')
           .select(`
@@ -78,7 +78,8 @@ const ProfilePage = () => {
             imported_pi_avatar,
             imported_pi_bio,
             imported_pi_links,
-            pi_profile_last_synced
+            pi_profile_last_synced,
+            active_sticker_ids
           `)
           .eq('username', username)
           .maybeSingle();
@@ -321,6 +322,9 @@ const ProfilePage = () => {
   // Use imported Pi bio if available, otherwise fallback to regular bio
   const displayBio = profileData.imported_pi_bio || profileData.bio || "Digital creator & Pi pioneer";
   
+  // Check if this is the user's own profile
+  const isOwnProfile = user?.id === profileData.id;
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
@@ -344,6 +348,13 @@ const ProfilePage = () => {
               avatarUrl={displayAvatar}
               onShareClick={handleShareProfile}
               onQrCodeClick={() => setShowQRCode(!showQRCode)}
+            />
+            
+            {/* Profile Stickers */}
+            <ProfileStickers
+              userId={profileData.id}
+              activeStickers={profileData.active_sticker_ids || []}
+              isOwnProfile={isOwnProfile}
             />
             
             {/* Pi Network Verification Badge */}
