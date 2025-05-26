@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
+import { validatePasswordSecurity } from "@/services/passwordSecurityService";
+import { PasswordStrengthMeter } from "./PasswordStrengthMeter";
+import { PasswordSecurityInfo, PasswordSecuritySuccess } from "./PasswordSecurityInfo";
 
 export function EmailSignupForm() {
   const [email, setEmail] = useState("");
@@ -15,9 +18,38 @@ export function EmailSignupForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [username, setUsername] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [passwordValidation, setPasswordValidation] = useState<{
+    isValid: boolean;
+    message?: string;
+    isCompromised?: boolean;
+  } | null>(null);
+  const [isCheckingPassword, setIsCheckingPassword] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { refreshUserData } = useUser();
+
+  // Validate password in real-time with debouncing
+  useEffect(() => {
+    if (!password) {
+      setPasswordValidation(null);
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      setIsCheckingPassword(true);
+      try {
+        const validation = await validatePasswordSecurity(password);
+        setPasswordValidation(validation);
+      } catch (error) {
+        console.error("Password validation error:", error);
+        setPasswordValidation({ isValid: true }); // Allow password if validation fails
+      } finally {
+        setIsCheckingPassword(false);
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [password]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,10 +76,20 @@ export function EmailSignupForm() {
         return;
       }
 
-      if (password.length < 6) {
+      // Check password security validation
+      if (passwordValidation && !passwordValidation.isValid) {
         toast({
           title: "Signup Failed",
-          description: "Password must be at least 6 characters long",
+          description: passwordValidation.message || "Please choose a stronger password",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (password.length < 8) {
+        toast({
+          title: "Signup Failed",
+          description: "Password must be at least 8 characters long",
           variant: "destructive",
         });
         return;
@@ -96,6 +138,8 @@ export function EmailSignupForm() {
     }
   };
 
+  const isPasswordSecure = passwordValidation?.isValid && !passwordValidation?.isCompromised;
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
@@ -132,6 +176,34 @@ export function EmailSignupForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+        
+        {/* Password strength meter */}
+        <PasswordStrengthMeter password={password} />
+        
+        {/* Password security info */}
+        {password && (
+          <>
+            {isCheckingPassword && (
+              <PasswordSecurityInfo isChecking={true} showInfo={false} />
+            )}
+            
+            {!isCheckingPassword && passwordValidation && (
+              <>
+                {passwordValidation.isCompromised ? (
+                  <PasswordSecurityInfo isCompromised={true} showInfo={false} />
+                ) : passwordValidation.isValid ? (
+                  <PasswordSecuritySuccess />
+                ) : (
+                  <PasswordSecurityInfo showInfo={false} />
+                )}
+              </>
+            )}
+            
+            {!passwordValidation && !isCheckingPassword && (
+              <PasswordSecurityInfo showInfo={true} />
+            )}
+          </>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -149,7 +221,7 @@ export function EmailSignupForm() {
       <Button 
         type="submit" 
         className="w-full bg-gradient-hero hover:bg-secondary" 
-        disabled={isSubmitting}
+        disabled={isSubmitting || isCheckingPassword || (passwordValidation && !passwordValidation.isValid)}
       >
         {isSubmitting ? "Creating Account..." : "Create Account"}
       </Button>
