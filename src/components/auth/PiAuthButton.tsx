@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -15,9 +16,39 @@ export function PiAuthButton() {
   const { refreshUserData } = useUser();
   const { handleError } = useErrorHandler();
 
-  // Check if we're in production or sandbox mode
+  // Check if we're in production mode and Pi Browser
   const isProduction = import.meta.env.PROD || import.meta.env.VITE_PI_SANDBOX === 'false';
   const isPiBrowser = isRunningInPiBrowser();
+
+  // Production mode validation
+  if (!isProduction) {
+    return (
+      <div className="text-center p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p className="text-red-600 font-medium">Production Mode Required</p>
+        <p className="text-sm text-red-500 mt-1">
+          Pi Network authentication is only available in production mode.
+        </p>
+      </div>
+    );
+  }
+
+  if (!isPiBrowser) {
+    return (
+      <div className="text-center p-4 bg-orange-50 border border-orange-200 rounded-lg">
+        <p className="text-orange-600 font-medium">Pi Browser Required</p>
+        <p className="text-sm text-orange-500 mt-1">
+          This app must be accessed through Pi Browser for authentication.
+        </p>
+        <Button 
+          onClick={() => window.location.href = `https://minepi.com/browser/open?url=${encodeURIComponent(window.location.href)}`}
+          className="mt-3"
+          variant="outline"
+        >
+          Open in Pi Browser
+        </Button>
+      </div>
+    );
+  }
 
   const handleAuth = async () => {
     try {
@@ -26,11 +57,10 @@ export function PiAuthButton() {
       console.log("Initializing Pi SDK in production mode...");
       const initialized = initPiNetwork();
       if (!initialized) {
-        throw new Error("Failed to initialize Pi SDK");
+        throw new Error("Failed to initialize Pi SDK in production mode");
       }
 
       console.log("Authenticating with Pi Network using production API...");
-      // Use official scopes as per documentation
       const authResult = await authenticateWithPi(["username", "payments"]);
       if (!authResult) {
         throw new Error("Pi authentication failed - no result returned");
@@ -43,14 +73,14 @@ export function PiAuthButton() {
         throw new Error("No user ID returned from Pi authentication");
       }
 
-      // Create a unique email for Pi users following the pattern
+      // Create a unique email for Pi users
       const userEmail = `${authResult.user.uid}@pi-network-user.com`;
       const userPassword = authResult.user.uid;
       
-      console.log("Attempting Supabase signup/signin...");
+      console.log("Attempting Supabase authentication...");
       
       // Try to sign in first
-      let { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+      let { error: signInError } = await supabase.auth.signInWithPassword({
         email: userEmail,
         password: userPassword,
       });
@@ -59,7 +89,7 @@ export function PiAuthButton() {
       if (signInError) {
         console.log("Sign in failed, attempting signup:", signInError.message);
         
-        const signUpData = {
+        const { error: signUpError } = await supabase.auth.signUp({
           email: userEmail,
           password: userPassword,
           options: {
@@ -71,18 +101,15 @@ export function PiAuthButton() {
               access_token: authResult.accessToken
             }
           }
-        };
-        
-        const { data: newSignUpData, error: signUpError } = await supabase.auth.signUp(signUpData);
+        });
         
         if (signUpError && !signUpError.message.includes('User already registered')) {
-          console.error("Signup error:", signUpError);
           throw signUpError;
         }
         
         // If user already registered, try signing in again
         if (signUpError?.message.includes('User already registered')) {
-          const { data: retrySignIn, error: retryError } = await supabase.auth.signInWithPassword({
+          const { error: retryError } = await supabase.auth.signInWithPassword({
             email: userEmail,
             password: userPassword,
           });
@@ -93,34 +120,25 @@ export function PiAuthButton() {
         }
       }
       
-      // Check admin status after successful authentication
-      console.log("Checking admin status for user:", authResult.user.username);
+      // Check admin status
       try {
-        const { data: adminData, error: adminError } = await supabase.functions.invoke("check-admin", {
+        const { data: adminData } = await supabase.functions.invoke("check-admin", {
           body: { 
             piUserId: authResult.user.uid,
             username: authResult.user.username || `pi_user_${authResult.user.uid.slice(-8)}`
           }
         });
 
-        if (adminError) {
-          console.error("Admin check error:", adminError);
-        } else {
-          console.log("Admin check result:", adminData);
-          if (adminData?.isAdmin) {
-            console.log("User is an admin!");
-            toast({
-              title: "Admin Access Granted",
-              description: `Welcome back, Admin ${authResult.user.username}!`,
-            });
-          }
+        if (adminData?.isAdmin) {
+          toast({
+            title: "Admin Access Granted",
+            description: `Welcome back, Admin ${authResult.user.username}!`,
+          });
         }
       } catch (adminCheckError) {
         console.error("Failed to check admin status:", adminCheckError);
-        // Don't fail the entire auth process if admin check fails
       }
       
-      console.log("Pi auth successful, refreshing user data...");
       await refreshUserData();
       
       const welcomeMessage = authResult.user.username 
@@ -129,40 +147,18 @@ export function PiAuthButton() {
       
       toast({
         title: "Welcome to Droplink!",
-        description: isProduction 
-          ? `Pi Network account connected successfully! ${welcomeMessage}` 
-          : `Pi Network test account connected successfully! ${welcomeMessage}`,
+        description: `Pi Network account connected successfully! ${welcomeMessage}`,
       });
       
       navigate('/dashboard');
     } catch (error: any) {
       console.error("Pi auth error details:", error);
       
-      if (error.message?.includes('Email rate limit exceeded')) {
-        toast({
-          title: "Rate Limit Exceeded",
-          description: "Too many signup attempts. Please try again later.",
-          variant: "destructive",
-        });
-      } else if (error.message?.includes('Signups not allowed')) {
-        toast({
-          title: "Signups Temporarily Disabled",
-          description: "Account creation is temporarily disabled. Please try again later.",
-          variant: "destructive",
-        });
-      } else if (error.message?.includes('Invalid login credentials')) {
-        toast({
-          title: "Authentication Error",
-          description: "Please try authenticating with Pi Network again.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Pi Network Authentication Failed",
-          description: error.message || "Could not connect to Pi Network. Please try again.",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Pi Network Authentication Failed",
+        description: error.message || "Could not connect to Pi Network. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsAuthenticating(false);
     }
@@ -187,24 +183,14 @@ export function PiAuthButton() {
               <path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/>
             </svg>
             Continue with Pi Network
-            {!isProduction && (
-              <Badge variant="outline" className="ml-2 text-xs">TEST</Badge>
-            )}
+            <Badge variant="default" className="ml-2 text-xs bg-green-600">LIVE</Badge>
           </>
         )}
       </Button>
       
-      {!isProduction && (
-        <div className="text-center text-sm text-orange-600 bg-orange-50 p-2 rounded">
-          Running in test mode - all Pi transactions are simulated
-        </div>
-      )}
-      
-      {isProduction && (
-        <div className="text-center text-sm text-green-600 bg-green-50 p-2 rounded">
-          Production mode - real Pi Network transactions
-        </div>
-      )}
+      <div className="text-center text-sm text-green-600 bg-green-50 p-2 rounded">
+        Production mode - real Pi Network transactions with API validation
+      </div>
     </div>
   );
 }

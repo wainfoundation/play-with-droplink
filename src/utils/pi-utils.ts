@@ -1,14 +1,14 @@
 
 /**
- * Pi Network Utility Functions
+ * Pi Network Utility Functions - Production Mode
  */
 import PiLogger from './pi-logger';
 import { NativeFeature } from './pi-types';
 
-// Check if running in Pi Browser
+// Check if running in Pi Browser - Production Mode
 export const isRunningInPiBrowser = (): boolean => {
   try {
-    // Check for Pi Browser specific indicators
+    // In production, we must be in actual Pi Browser
     if (typeof window !== 'undefined' && window.Pi) {
       PiLogger.info('browser_check', { result: 'pi_browser_detected' });
       return true;
@@ -18,12 +18,6 @@ export const isRunningInPiBrowser = (): boolean => {
     const userAgent = navigator.userAgent.toLowerCase();
     if (userAgent.includes('pibrowser') || userAgent.includes('pi network') || userAgent.includes('pi-browser')) {
       PiLogger.info('browser_check', { result: 'pi_browser_via_useragent' });
-      return true;
-    }
-    
-    // In development, we'll simulate Pi browser for testing only when specifically enabled
-    if (import.meta.env.DEV && import.meta.env.VITE_PI_SANDBOX === 'true') {
-      console.log("Development mode: simulating Pi Browser (sandbox mode)");
       return true;
     }
     
@@ -39,6 +33,8 @@ export const isRunningInPiBrowser = (): boolean => {
 export const redirectToPiBrowser = (currentUrl?: string): void => {
   const url = currentUrl || window.location.href;
   const piUrl = `https://minepi.com/browser/open?url=${encodeURIComponent(url)}`;
+  
+  PiLogger.info('redirect_to_pi_browser', { originalUrl: url, piUrl });
   window.location.href = piUrl;
 };
 
@@ -64,12 +60,6 @@ export const getNativeFeatures = async (): Promise<NativeFeature[]> => {
       return [];
     }
 
-    // In development mode with sandbox, return mock features
-    if (import.meta.env.DEV && import.meta.env.VITE_PI_SANDBOX === 'true') {
-      console.log("Mock native features returned (sandbox mode)");
-      return ["inline_media", "request_permission", "ad_network"];
-    }
-
     const features = await window.Pi.nativeFeaturesList();
     PiLogger.info('native_features_retrieved', { features });
     return features;
@@ -92,118 +82,41 @@ export const isAdNetworkSupported = async (): Promise<boolean> => {
   }
 };
 
-// Initialize Pi SDK according to official documentation
+// Initialize Pi SDK - Production Mode Only
 export const initPiNetwork = (): boolean => {
   try {
-    // Check if we're in production mode
-    const isProduction = import.meta.env.PROD || import.meta.env.VITE_PI_SANDBOX === 'false';
-    
-    if (!isProduction && import.meta.env.DEV && import.meta.env.VITE_PI_SANDBOX === 'true') {
-      console.log("Development sandbox mode: simulating Pi SDK initialization");
-      
-      // Create a mock Pi object for development following official structure
-      if (!window.Pi) {
-        (window as any).Pi = {
-          init: (config: any) => {
-            console.log("Mock Pi.init called with:", config);
-          },
-          authenticate: async (scopes: string[], onIncompletePaymentFound?: (payment: any) => void) => {
-            console.log("Mock Pi.authenticate called with scopes:", scopes);
-            
-            // Handle incomplete payments callback if provided
-            if (onIncompletePaymentFound) {
-              // Simulate no incomplete payments found
-              console.log("No incomplete payments found in mock");
-            }
-            
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
-            
-            // Return auth result with username if requested
-            const authResult = {
-              accessToken: 'dev-mock-token-' + Date.now(),
-              user: {
-                uid: 'dev-user-wain2020',
-                username: scopes.includes('username') ? 'Wain2020' : undefined as any
-              }
-            };
-            
-            // Clean up undefined username if not requested
-            if (!scopes.includes('username')) {
-              delete (authResult.user as any).username;
-            }
-            
-            return authResult;
-          },
-          createPayment: async (paymentData: any, callbacks: any) => {
-            console.log("Mock Pi.createPayment called with:", paymentData);
-            
-            // Simulate payment flow
-            setTimeout(() => {
-              console.log("Simulating payment approval...");
-              callbacks.onReadyForServerApproval(paymentData.identifier);
-            }, 1000);
-            
-            setTimeout(() => {
-              console.log("Simulating payment completion...");
-              callbacks.onReadyForServerCompletion(paymentData.identifier, 'mock-txid-' + Date.now());
-            }, 2000);
-            
-            return { paymentId: paymentData.identifier };
-          },
-          nativeFeaturesList: async () => {
-            console.log("Mock Pi.nativeFeaturesList called");
-            return ["inline_media", "request_permission", "ad_network"];
-          },
-          openShareDialog: (title: string, message: string) => {
-            console.log("Mock Pi.openShareDialog called:", title, message);
-          },
-          openUrlInSystemBrowser: async (url: string) => {
-            console.log("Mock Pi.openUrlInSystemBrowser called:", url);
-          },
-          Ads: {
-            showAd: async (adType: any) => {
-              console.log("Mock Pi.Ads.showAd called:", adType);
-              if (adType === "rewarded") {
-                return { type: "rewarded", result: "AD_REWARDED", adId: "mock-ad-" + Date.now() };
-              }
-              return { type: "interstitial", result: "AD_CLOSED" };
-            },
-            isAdReady: async (adType: any) => {
-              console.log("Mock Pi.Ads.isAdReady called:", adType);
-              return { type: adType, ready: true };
-            },
-            requestAd: async (adType: any) => {
-              console.log("Mock Pi.Ads.requestAd called:", adType);
-              return { type: adType, result: "AD_LOADED" };
-            }
-          }
-        };
-      }
+    // Enforce Pi Browser requirement
+    if (!isRunningInPiBrowser()) {
+      PiLogger.error('init_failed', { reason: 'not_pi_browser' });
+      throw new Error('Pi Browser required for production mode');
     }
 
     if (!window.Pi) {
-      PiLogger.warn('init_failed', { reason: 'pi_sdk_not_available' });
-      return false;
+      PiLogger.error('init_failed', { reason: 'pi_sdk_not_available' });
+      throw new Error('Pi SDK not available');
     }
 
-    // Initialize according to official documentation
-    const isSandbox = import.meta.env.VITE_PI_SANDBOX === 'true';
-    
+    // Initialize in production mode only
+    const isProduction = import.meta.env.PROD || import.meta.env.VITE_PI_SANDBOX === 'false';
+    if (!isProduction) {
+      throw new Error('Production mode required');
+    }
+
     window.Pi.init({ 
       version: "2.0", 
-      sandbox: isSandbox
+      sandbox: false // Production mode only
     });
     
-    PiLogger.info('init_success', { 
-      sandboxMode: isSandbox,
+    PiLogger.info('init_success_production', { 
+      sandboxMode: false,
       version: '2.0',
       hostname: window.location.hostname,
-      production: isProduction
+      production: true
     });
     return true;
   } catch (error) {
-    PiLogger.error('init_error', error);
-    return false;
+    PiLogger.error('init_error_production', error);
+    throw error;
   }
 };
 
