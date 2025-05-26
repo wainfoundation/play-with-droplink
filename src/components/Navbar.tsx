@@ -30,17 +30,20 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+    <nav className="bg-white/90 backdrop-blur-md border-b border-primary/20 sticky top-0 z-50 shadow-lg shadow-primary/5">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <img 
-              src="/lovable-uploads/0d519e46-7a30-4f3d-a07a-17e763eeda19.png" 
-              alt="Droplink Logo" 
-              className="w-8 h-8"
-            />
-            <span className="text-xl font-bold text-gray-900">Droplink</span>
+          <Link to="/" className="flex items-center space-x-3 group">
+            <div className="relative">
+              <img 
+                src="/lovable-uploads/1dc40f50-2eba-46b0-a495-962b97bfaf8d.png" 
+                alt="Droplink Logo" 
+                className="w-10 h-10 transition-transform duration-300 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </div>
+            <span className="text-2xl font-bold hero-title">Droplink</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -49,7 +52,7 @@ const Navbar = () => {
               <Link
                 key={link.name}
                 to={link.href}
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className="nav-link text-gray-700 hover:text-primary transition-colors font-medium"
               >
                 {link.name}
               </Link>
@@ -61,32 +64,32 @@ const Navbar = () => {
             {isLoggedIn ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <User className="h-4 w-4" />
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full border-2 border-primary/20 hover:border-primary/40 transition-colors">
+                    <User className="h-5 w-5 text-primary" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuContent className="w-56 glass-morphism" align="end" forceMount>
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">{user?.email}</p>
+                      <p className="font-medium text-primary">{user?.email}</p>
                     </div>
                   </div>
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator className="bg-primary/20" />
                   <DropdownMenuItem asChild>
-                    <Link to="/dashboard" className="cursor-pointer">
-                      <Settings className="mr-2 h-4 w-4" />
+                    <Link to="/dashboard" className="cursor-pointer hover:bg-primary/10">
+                      <Settings className="mr-2 h-4 w-4 text-primary" />
                       Dashboard
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/pi-dashboard" className="cursor-pointer">
-                      <Pi className="mr-2 h-4 w-4" />
+                    <Link to="/pi-dashboard" className="cursor-pointer hover:bg-primary/10">
+                      <Pi className="mr-2 h-4 w-4 text-primary" />
                       Pi Dashboard
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator className="bg-primary/20" />
                   <DropdownMenuItem
-                    className="cursor-pointer"
+                    className="cursor-pointer hover:bg-destructive/10 text-destructive"
                     onSelect={handleSignOut}
                   >
                     <LogOut className="mr-2 h-4 w-4" />
@@ -96,10 +99,10 @@ const Navbar = () => {
               </DropdownMenu>
             ) : (
               <div className="flex items-center space-x-4">
-                <Button variant="ghost" asChild>
+                <Button variant="ghost" asChild className="hover:bg-primary/10 hover:text-primary">
                   <Link to="/login">Login</Link>
                 </Button>
-                <Button asChild>
+                <Button asChild className="cta-button">
                   <Link to="/signup">Sign Up</Link>
                 </Button>
               </div>
@@ -108,13 +111,13 @@ const Navbar = () => {
             {/* Mobile menu button */}
             <Button
               variant="ghost"
-              className="md:hidden"
+              className="md:hidden hover:bg-primary/10"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? (
-                <X className="h-6 w-6" />
+                <X className="h-6 w-6 text-primary" />
               ) : (
-                <Menu className="h-6 w-6" />
+                <Menu className="h-6 w-6 text-primary" />
               )}
             </Button>
           </div>
@@ -122,13 +125,13 @@ const Navbar = () => {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 py-4">
+          <div className="md:hidden border-t border-primary/20 py-4 glass-morphism">
             <div className="flex flex-col space-y-4">
               {navigationLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.href}
-                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                  className="text-gray-700 hover:text-primary transition-colors font-medium px-2 py-1 rounded hover:bg-primary/10"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.name}
@@ -138,14 +141,14 @@ const Navbar = () => {
                 <>
                   <Link
                     to="/dashboard"
-                    className="text-gray-600 hover:text-gray-900 transition-colors"
+                    className="text-gray-700 hover:text-primary transition-colors font-medium px-2 py-1 rounded hover:bg-primary/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Dashboard
                   </Link>
                   <Link
                     to="/pi-dashboard"
-                    className="text-gray-600 hover:text-gray-900 transition-colors"
+                    className="text-gray-700 hover:text-primary transition-colors font-medium px-2 py-1 rounded hover:bg-primary/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Pi Dashboard

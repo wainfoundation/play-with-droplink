@@ -33,7 +33,7 @@ const GoToTop = () => {
   return (
     <Button
       onClick={scrollToTop}
-      className="fixed bottom-6 right-6 z-50 rounded-full w-12 h-12 shadow-lg hover:shadow-xl transition-all duration-300"
+      className="fixed bottom-6 right-6 z-50 rounded-full w-14 h-14 cta-button shadow-2xl hover:shadow-primary/40 transition-all duration-300 hover:scale-110"
       size="icon"
     >
       <ArrowUp className="h-6 w-6" />
