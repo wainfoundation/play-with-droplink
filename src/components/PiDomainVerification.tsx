@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle, AlertCircle, Globe, Copy } from "lucide-react";
+import { CheckCircle, AlertCircle, Globe } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface PiDomainVerificationProps {
@@ -17,7 +17,7 @@ const PiDomainVerification = ({ onVerificationComplete }: PiDomainVerificationPr
   const [verificationStatus, setVerificationStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Get validation key from environment
+  // Get validation key from environment (but don't display it)
   const validationKey = import.meta.env.VITE_VALIDATION_KEY;
 
   const handleVerifyDomain = async () => {
@@ -42,20 +42,17 @@ const PiDomainVerification = ({ onVerificationComplete }: PiDomainVerificationPr
       }
 
       // Simulate domain verification process
-      // In a real implementation, this would check DNS records or make API calls
       console.log('Verifying domain:', cleanDomain);
-      console.log('Using validation key:', validationKey);
 
       // Check if validation key is available
       if (!validationKey) {
-        throw new Error('Validation key not configured. Please check your environment settings.');
+        throw new Error('Validation configuration not found. Please contact support.');
       }
 
       // Simulate verification delay
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       // For demo purposes, we'll consider verification successful
-      // In production, you would make actual API calls to verify domain ownership
       const verificationResult = await verifyDomainOwnership(cleanDomain, validationKey);
       
       if (verificationResult.success) {
@@ -89,15 +86,7 @@ const PiDomainVerification = ({ onVerificationComplete }: PiDomainVerificationPr
 
   const verifyDomainOwnership = async (domain: string, validationKey: string) => {
     try {
-      // This is where you would implement actual domain verification
-      // For example, checking DNS TXT records or making API calls to Pi Network
-      
-      // Example verification logic:
-      // 1. Check if domain exists in Pi Network
-      // 2. Verify DNS records contain validation key
-      // 3. Confirm domain ownership with Pi Network API
-      
-      console.log(`Verifying ownership of ${domain}.pi with key: ${validationKey.substring(0, 10)}...`);
+      console.log(`Verifying ownership of ${domain}.pi`);
       
       // Simulate API call
       const response = await fetch('/api/verify-pi-domain', {
@@ -128,16 +117,6 @@ const PiDomainVerification = ({ onVerificationComplete }: PiDomainVerificationPr
     }
   };
 
-  const copyValidationKey = () => {
-    if (validationKey) {
-      navigator.clipboard.writeText(validationKey);
-      toast({
-        title: "Copied",
-        description: "Validation key copied to clipboard",
-      });
-    }
-  };
-
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
@@ -147,31 +126,11 @@ const PiDomainVerification = ({ onVerificationComplete }: PiDomainVerificationPr
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Validation Key Display */}
-        <div className="bg-muted/50 p-4 rounded-lg">
-          <h4 className="font-medium mb-2">Your Validation Key:</h4>
-          <div className="flex items-center gap-2">
-            <code className="bg-background p-2 rounded text-sm flex-1 font-mono text-xs break-all">
-              {validationKey || 'Not configured'}
-            </code>
-            {validationKey && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={copyValidationKey}
-                className="flex-shrink-0"
-              >
-                <Copy className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-        </div>
-
         {/* Instructions */}
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Before verifying, ensure your .pi domain's DNS settings include a TXT record with your validation key.
+            To verify your .pi domain, ensure your domain's DNS settings include the required TXT record.
             Contact your Pi domain provider if you need help setting up DNS records.
           </AlertDescription>
         </Alert>
@@ -198,7 +157,7 @@ const PiDomainVerification = ({ onVerificationComplete }: PiDomainVerificationPr
         {/* Verification Button */}
         <Button 
           onClick={handleVerifyDomain}
-          disabled={isVerifying || !validationKey}
+          disabled={isVerifying}
           className="w-full"
         >
           {isVerifying ? (
@@ -232,9 +191,9 @@ const PiDomainVerification = ({ onVerificationComplete }: PiDomainVerificationPr
 
         {/* Troubleshooting */}
         <div className="text-sm text-muted-foreground space-y-2">
-          <h4 className="font-medium text-foreground">Troubleshooting:</h4>
+          <h4 className="font-medium text-foreground">Need Help?</h4>
           <ul className="list-disc list-inside space-y-1">
-            <li>Ensure your .pi domain DNS has a TXT record with the validation key</li>
+            <li>Ensure your .pi domain DNS has the required TXT record</li>
             <li>Wait 24-48 hours for DNS changes to propagate</li>
             <li>Check that your domain is properly registered with Pi Network</li>
             <li>Contact support if verification continues to fail</li>

@@ -74,6 +74,129 @@ export type Database = {
           },
         ]
       }
+      blog_posts: {
+        Row: {
+          author_avatar: string | null
+          author_name: string
+          category: string
+          content: string
+          created_at: string
+          excerpt: string | null
+          featured_image: string | null
+          id: string
+          is_featured: boolean
+          is_published: boolean
+          published_at: string | null
+          read_time: string | null
+          slug: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+          views_count: number | null
+        }
+        Insert: {
+          author_avatar?: string | null
+          author_name: string
+          category: string
+          content: string
+          created_at?: string
+          excerpt?: string | null
+          featured_image?: string | null
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          published_at?: string | null
+          read_time?: string | null
+          slug: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          views_count?: number | null
+        }
+        Update: {
+          author_avatar?: string | null
+          author_name?: string
+          category?: string
+          content?: string
+          created_at?: string
+          excerpt?: string | null
+          featured_image?: string | null
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          published_at?: string | null
+          read_time?: string | null
+          slug?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          views_count?: number | null
+        }
+        Relationships: []
+      }
+      career_applications: {
+        Row: {
+          additional_info: string | null
+          applicant_email: string
+          applicant_name: string
+          application_status: string
+          availability_date: string | null
+          cover_letter: string | null
+          created_at: string
+          id: string
+          linkedin_url: string | null
+          location: string | null
+          phone_number: string | null
+          portfolio_url: string | null
+          position_title: string
+          remote_preference: string | null
+          resume_url: string | null
+          salary_expectation: string | null
+          updated_at: string
+          years_experience: number | null
+        }
+        Insert: {
+          additional_info?: string | null
+          applicant_email: string
+          applicant_name: string
+          application_status?: string
+          availability_date?: string | null
+          cover_letter?: string | null
+          created_at?: string
+          id?: string
+          linkedin_url?: string | null
+          location?: string | null
+          phone_number?: string | null
+          portfolio_url?: string | null
+          position_title: string
+          remote_preference?: string | null
+          resume_url?: string | null
+          salary_expectation?: string | null
+          updated_at?: string
+          years_experience?: number | null
+        }
+        Update: {
+          additional_info?: string | null
+          applicant_email?: string
+          applicant_name?: string
+          application_status?: string
+          availability_date?: string | null
+          cover_letter?: string | null
+          created_at?: string
+          id?: string
+          linkedin_url?: string | null
+          location?: string | null
+          phone_number?: string | null
+          portfolio_url?: string | null
+          position_title?: string
+          remote_preference?: string | null
+          resume_url?: string | null
+          salary_expectation?: string | null
+          updated_at?: string
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
       chat_quotas: {
         Row: {
           chats_started: number

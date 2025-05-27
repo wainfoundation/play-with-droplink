@@ -3,23 +3,10 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Globe, Settings, CheckCircle, Copy, ExternalLink } from "lucide-react";
+import { Globe, Settings, CheckCircle, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
 
 const PiDomainSetupGuide = () => {
-  const validationKey = import.meta.env.VITE_VALIDATION_KEY;
-
-  const copyValidationKey = () => {
-    if (validationKey) {
-      navigator.clipboard.writeText(validationKey);
-      toast({
-        title: "Copied",
-        description: "Validation key copied to clipboard",
-      });
-    }
-  };
-
   const steps = [
     {
       number: 1,
@@ -30,8 +17,8 @@ const PiDomainSetupGuide = () => {
     {
       number: 2,
       title: "Add DNS TXT Record",
-      description: "Add a TXT record to your domain's DNS settings with the validation key below.",
-      action: "Copy Validation Key"
+      description: "Add a TXT record to your domain's DNS settings with the validation key provided by Droplink support.",
+      action: "Contact Support for Key"
     },
     {
       number: 3,
@@ -57,34 +44,22 @@ const PiDomainSetupGuide = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Validation Key Section */}
+          {/* DNS Setup Instructions */}
           <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
             <h3 className="font-semibold mb-2 flex items-center gap-2">
               <Globe className="h-4 w-4" />
-              Your Validation Key
+              DNS Configuration Required
             </h3>
             <p className="text-sm text-muted-foreground mb-3">
-              Add this TXT record to your .pi domain's DNS settings:
+              To connect your .pi domain to Droplink, you'll need to add a TXT record to your domain's DNS settings.
             </p>
             <div className="bg-background p-3 rounded border">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex-1">
-                  <p className="text-xs font-medium mb-1">Record Type: TXT</p>
-                  <p className="text-xs font-medium mb-1">Name: @ (or your domain)</p>
-                  <p className="text-xs font-medium mb-2">Value:</p>
-                  <code className="text-xs bg-muted p-2 rounded block break-all font-mono">
-                    droplink-verification={validationKey}
-                  </code>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={copyValidationKey}
-                  className="flex-shrink-0"
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
-              </div>
+              <p className="text-xs font-medium mb-1">Record Type: TXT</p>
+              <p className="text-xs font-medium mb-1">Name: @ (or your domain)</p>
+              <p className="text-xs font-medium mb-2">Value: [Provided by Droplink Support]</p>
+              <p className="text-xs text-muted-foreground">
+                Contact our support team to receive your unique validation key.
+              </p>
             </div>
           </div>
 
