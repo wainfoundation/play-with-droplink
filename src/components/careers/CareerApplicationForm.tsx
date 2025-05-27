@@ -68,12 +68,27 @@ const CareerApplicationForm = ({ position }: CareerApplicationFormProps) => {
   const onSubmit = async (data: ApplicationFormData) => {
     setIsSubmitting(true);
     try {
+      // Prepare the data for insertion, ensuring all required fields are present
+      const insertData = {
+        position_title: data.position_title,
+        applicant_name: data.applicant_name,
+        applicant_email: data.applicant_email,
+        phone_number: data.phone_number || null,
+        location: data.location || null,
+        linkedin_url: data.linkedin_url || null,
+        portfolio_url: data.portfolio_url || null,
+        resume_url: data.resume_url || null,
+        cover_letter: data.cover_letter,
+        years_experience: data.years_experience,
+        salary_expectation: data.salary_expectation || null,
+        availability_date: data.availability_date ? new Date(data.availability_date).toISOString().split('T')[0] : null,
+        remote_preference: data.remote_preference,
+        additional_info: data.additional_info || null,
+      };
+
       const { error } = await supabase
         .from('career_applications')
-        .insert([{
-          ...data,
-          availability_date: data.availability_date ? new Date(data.availability_date).toISOString().split('T')[0] : null,
-        }]);
+        .insert(insertData);
 
       if (error) throw error;
 
