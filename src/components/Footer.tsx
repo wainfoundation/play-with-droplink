@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Mail, HelpCircle, FileText, Users, Shield, Cookie, Link as LinkIcon } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Mail, HelpCircle, FileText, Users, Shield, Cookie, Link as LinkIcon, Activity } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -39,6 +39,9 @@ const Footer = () => {
             <li><Link to="/blog" className="text-sm hover:text-primary transition-colors">Blog</Link></li>
             <li><Link to="/careers" className="text-sm hover:text-primary transition-colors">Careers</Link></li>
             <li><Link to="/contact" className="text-sm hover:text-primary transition-colors">Contact</Link></li>
+            <li><Link to="/status" className="text-sm hover:text-primary transition-colors flex items-center gap-2">
+              <Activity size={16} /> System Status
+            </Link></li>
           </ul>
         </div>
 

@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -32,6 +33,7 @@ import Demo from "./pages/Demo";
 import Cookies from "./pages/Cookies";
 import DomainVerification from "./pages/DomainVerification";
 import Stickers from "./pages/Stickers";
+import SystemStatus from "./pages/SystemStatus";
 
 // ValidationKey component inline since it's simple
 const ValidationKey = () => {
@@ -80,6 +82,7 @@ const App = () => (
                 <Route path="/cookies" element={<Cookies />} />
                 <Route path="/validation-key.txt" element={<ValidationKey />} />
                 <Route path="/verify-domain" element={<DomainVerification />} />
+                <Route path="/status" element={<SystemStatus />} />
                 <Route path="/:username" element={<ProfilePage />} />
                 <Route path="/:username/store" element={<StorePage />} />
                 <Route path="*" element={<NotFound />} />
