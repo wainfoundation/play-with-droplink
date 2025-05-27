@@ -1,128 +1,118 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Zap, Crown, Shield, Star } from "lucide-react";
-import PlanPreviewDemo from "@/components/PlanPreviewDemo";
-import { useUser } from "@/context/UserContext";
+import { Play, ArrowRight, Users, Globe, Zap } from "lucide-react";
 
 const DemoSection = () => {
-  const { isLoggedIn, profile } = useUser();
-  const [selectedPlan, setSelectedPlan] = useState<'free' | 'starter' | 'pro' | 'premium'>('starter');
-
-  const plans = [
-    {
-      id: 'free' as const,
-      name: 'Free',
-      icon: <Star className="w-4 h-4" />,
-      color: 'bg-gray-500 hover:bg-gray-600',
-      features: ['1 Link', 'Pi Ads', 'Basic Profile']
-    },
-    {
-      id: 'starter' as const, 
-      name: 'Starter',
-      icon: <Zap className="w-4 h-4" />,
-      color: 'bg-blue-500 hover:bg-blue-600',
-      features: ['Unlimited Links', 'No Ads', 'QR Codes']
-    },
-    {
-      id: 'pro' as const,
-      name: 'Pro', 
-      icon: <Crown className="w-4 h-4" />,
-      color: 'bg-purple-500 hover:bg-purple-600',
-      features: ['Advanced Analytics', 'SEO Tools', 'Scheduling']
-    },
-    {
-      id: 'premium' as const,
-      name: 'Premium',
-      icon: <Shield className="w-4 h-4" />,
-      color: 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600',
-      features: ['Sell Products', 'Priority Support', 'Custom CSS']
-    }
-  ];
-
   return (
-    <section className="py-16 px-4 bg-muted/50 relative overflow-hidden">
-      <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-secondary/10 to-primary/10 rounded-full blur-3xl"></div>
+    <section className="py-16 md:py-24 px-4 bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden">
+      {/* Enhanced background effects matching hero */}
+      <div className="absolute -top-40 -right-40 w-80 h-80 md:w-96 md:h-96 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute -bottom-40 -left-40 w-80 h-80 md:w-96 md:h-96 bg-gradient-to-br from-secondary/10 to-primary/10 rounded-full blur-3xl animate-pulse" />
       
-      <div className="container mx-auto relative z-10">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Preview Your Profile on Different Plans
+      <div className="container mx-auto max-w-6xl relative z-10">
+        <div className="text-center space-y-6 md:space-y-8 mb-12 md:mb-16">
+          {/* Enhanced heading with hero-style design */}
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+            <span className="bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
+              See Droplink in Action
+            </span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            See exactly what your demo.pi profile will look like with each subscription plan. Try before you subscribe!
+          
+          {/* Enhanced description with hero-style sizing */}
+          <p className="text-lg md:text-xl lg:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+            Watch how creators are transforming their{" "}
+            <span className="font-semibold text-primary">Pi domains</span>{" "}
+            into powerful{" "}
+            <span className="font-semibold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              business hubs
+            </span>
           </p>
+
+          {/* Feature highlights matching hero design */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-3xl mx-auto my-8 md:my-12">
+            <div className="text-center p-3 md:p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/20">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+                <Users className="h-5 w-5 md:h-6 md:w-6 text-white" />
+              </div>
+              <p className="text-sm md:text-base font-semibold text-gray-900">Live Profiles</p>
+            </div>
+            
+            <div className="text-center p-3 md:p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/20">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+                <Globe className="h-5 w-5 md:h-6 md:w-6 text-white" />
+              </div>
+              <p className="text-sm md:text-base font-semibold text-gray-900">Pi Integration</p>
+            </div>
+            
+            <div className="text-center p-3 md:p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/20">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+                <Zap className="h-5 w-5 md:h-6 md:w-6 text-white" />
+              </div>
+              <p className="text-sm md:text-base font-semibold text-gray-900">Real Results</p>
+            </div>
+          </div>
         </div>
 
-        {/* Plan Selector */}
-        <div className="flex flex-wrap justify-center gap-3 mb-8">
-          {plans.map((plan) => (
-            <Button
-              key={plan.id}
-              onClick={() => setSelectedPlan(plan.id)}
-              className={`${
-                selectedPlan === plan.id 
-                  ? plan.color 
-                  : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
-              } px-4 py-2 rounded-lg transition-all duration-200`}
-              variant={selectedPlan === plan.id ? 'default' : 'outline'}
-            >
-              {plan.icon}
-              <span className="ml-2 font-medium">{plan.name}</span>
-            </Button>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Plan Features */}
-          <div className="flex flex-col space-y-6 order-2 lg:order-1">
-            <div>
-              <h3 className="text-2xl font-bold mb-4">
-                {plans.find(p => p.id === selectedPlan)?.name} Plan Features
-              </h3>
-              <div className="space-y-3">
-                {plans.find(p => p.id === selectedPlan)?.features.map((feature, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full"></div>
-                    <span className="text-muted-foreground">{feature}</span>
-                  </div>
-                ))}
+        {/* Enhanced demo video section */}
+        <div className="relative max-w-4xl mx-auto">
+          <div className="relative aspect-video bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20" />
+            
+            {/* Demo video placeholder with enhanced styling */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center space-y-6">
+                <div className="w-20 h-20 md:w-24 md:h-24 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto border border-white/30 hover:scale-110 transition-transform duration-300 cursor-pointer group">
+                  <Play className="h-8 w-8 md:h-10 md:w-10 text-white ml-1 group-hover:scale-110 transition-transform" />
+                </div>
+                <div>
+                  <h3 className="text-xl md:text-2xl font-bold text-white mb-2">
+                    3 Minutes Demo
+                  </h3>
+                  <p className="text-white/80 text-sm md:text-base">
+                    See how easy it is to set up your Pi domain with Droplink
+                  </p>
+                </div>
               </div>
             </div>
             
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-semibold text-blue-900 mb-2">Live Preview</h4>
-              <p className="text-sm text-blue-700">
-                This is how your demo.pi profile will appear to visitors with the {plans.find(p => p.id === selectedPlan)?.name} plan. 
-                {selectedPlan === 'free' && ' Notice the ads and link limitations.'}
-                {selectedPlan !== 'free' && ' See the professional look without restrictions.'}
-              </p>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Button asChild className="bg-gradient-to-r from-primary to-secondary hover:scale-105 transition-transform duration-200">
-                <Link to="/pricing" className="flex items-center gap-2">
-                  Choose {plans.find(p => p.id === selectedPlan)?.name} Plan <ArrowRight size={16} />
-                </Link>
-              </Button>
-              {isLoggedIn && profile ? (
-                <Button asChild variant="outline" className="hover:bg-muted/50 transition-colors">
-                  <Link to={`/${profile.username}`}>View Your Profile</Link>
-                </Button>
-              ) : (
-                <Button asChild variant="outline" className="hover:bg-muted/50 transition-colors">
-                  <Link to="/signup">Create Your Own</Link>
-                </Button>
-              )}
-            </div>
+            {/* Floating elements for visual interest */}
+            <div className="absolute top-4 left-4 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+            <div className="absolute top-4 left-10 w-3 h-3 bg-yellow-500 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
+            <div className="absolute top-4 left-16 w-3 h-3 bg-green-500 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
           </div>
           
-          {/* Demo Preview */}
-          <div className="w-full flex justify-center order-1 lg:order-2">
-            <div className="transform hover:-rotate-1 transition-all duration-300 hover:scale-105">
-              <PlanPreviewDemo selectedPlan={selectedPlan} />
+          {/* Enhanced CTA buttons matching hero style */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8 md:mt-12">
+            <Button asChild size="lg" className="w-full sm:w-auto bg-gradient-hero hover:bg-secondary transform transition hover:scale-105 duration-200 text-lg px-8 py-4">
+              <Link to="/demo" className="flex items-center gap-2">
+                Try Interactive Demo <ArrowRight size={20} />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="w-full sm:w-auto hover:bg-blue-50 transition-colors text-lg px-8 py-4">
+              <Link to="/signup">Start Building Free</Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* Stats section with enhanced styling */}
+        <div className="mt-16 md:mt-20 text-center">
+          <p className="text-sm md:text-base text-gray-500 mb-6">
+            Join thousands of Pi creators already using Droplink
+          </p>
+          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-12 opacity-60">
+            <div className="text-center">
+              <div className="text-2xl md:text-3xl font-bold text-primary">2,000+</div>
+              <div className="text-xs md:text-sm text-gray-600">Active Creators</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl md:text-3xl font-bold text-primary">50,000+</div>
+              <div className="text-xs md:text-sm text-gray-600">Links Created</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl md:text-3xl font-bold text-primary">100π+</div>
+              <div className="text-xs md:text-sm text-gray-600">Earned by Creators</div>
             </div>
           </div>
         </div>
