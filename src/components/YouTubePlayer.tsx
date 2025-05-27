@@ -1,6 +1,7 @@
 
 import React from "react";
 import { Play, Volume2 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface YouTubePlayerProps {
   videoId?: string;
@@ -13,22 +14,24 @@ const YouTubePlayer = ({
   title = "Droplink - Transform Your Pi Domain",
   description = "See how Droplink helps you monetize your Pi Network presence"
 }: YouTubePlayerProps) => {
+  const isMobile = useIsMobile();
+
   return (
-    <section className="py-16 px-4 bg-gradient-to-br from-primary/5 via-secondary/5 to-primary/10">
+    <section className="py-8 md:py-16 px-2 md:px-4 bg-gradient-to-br from-primary/5 via-secondary/5 to-primary/10">
       <div className="container mx-auto max-w-6xl">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+        <div className="text-center mb-6 md:mb-12">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 md:mb-4">
             See Droplink in Action
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto px-2">
             Watch how creators are transforming their Pi domains into powerful business hubs
           </p>
         </div>
         
         <div className="max-w-4xl mx-auto">
-          <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden">
-            {/* Video Container */}
-            <div className="relative aspect-video bg-gray-900">
+          <div className="relative bg-white rounded-xl md:rounded-2xl shadow-xl overflow-hidden">
+            {/* Video Container - Optimized for mobile */}
+            <div className={`relative ${isMobile ? 'aspect-video w-full' : 'aspect-video'} bg-gray-900`}>
               <iframe 
                 width="100%" 
                 height="100%" 
@@ -42,43 +45,44 @@ const YouTubePlayer = ({
               />
               
               {/* Overlay for branding */}
-              <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-sm rounded-lg px-3 py-2">
-                <div className="flex items-center gap-2 text-white text-sm font-medium">
-                  <Play className="h-4 w-4" />
+              <div className="absolute top-2 md:top-4 left-2 md:left-4 bg-black/50 backdrop-blur-sm rounded-lg px-2 md:px-3 py-1 md:py-2">
+                <div className="flex items-center gap-1 md:gap-2 text-white text-xs md:text-sm font-medium">
+                  <Play className="h-3 w-3 md:h-4 md:w-4" />
                   Droplink Demo
                 </div>
               </div>
             </div>
             
-            {/* Video Info */}
-            <div className="p-6">
-              <h3 className="text-xl font-bold mb-2">{title}</h3>
-              <p className="text-gray-600 mb-4">{description}</p>
+            {/* Video Info - Compact on mobile */}
+            <div className="p-3 md:p-6">
+              <h3 className="text-lg md:text-xl font-bold mb-1 md:mb-2">{title}</h3>
+              <p className="text-sm md:text-base text-gray-600 mb-2 md:mb-4">{description}</p>
               
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 text-sm text-gray-500">
+                <div className="flex items-center gap-2 md:gap-4 text-xs md:text-sm text-gray-500">
                   <div className="flex items-center gap-1">
-                    <Volume2 className="h-4 w-4" />
-                    Turn on sound for best experience
+                    <Volume2 className="h-3 w-3 md:h-4 md:w-4" />
+                    <span className="hidden sm:inline">Turn on sound for best experience</span>
+                    <span className="sm:hidden">Sound recommended</span>
                   </div>
                 </div>
-                <div className="text-sm text-primary font-medium">
+                <div className="text-xs md:text-sm text-primary font-medium">
                   Powered by Pi Network
                 </div>
               </div>
             </div>
           </div>
           
-          {/* Call to Action */}
-          <div className="text-center mt-8">
-            <p className="text-gray-600 mb-4">
+          {/* Call to Action - Mobile optimized */}
+          <div className="text-center mt-6 md:mt-8">
+            <p className="text-sm md:text-base text-gray-600 mb-3 md:mb-4 px-2">
               Ready to transform your Pi domain like this?
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg transition-all">
+            <div className="flex flex-col gap-3 md:flex-row md:gap-4 justify-center px-4 md:px-0">
+              <button className="bg-gradient-to-r from-primary to-secondary text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-medium hover:shadow-lg transition-all text-sm md:text-base">
                 Start Building Free
               </button>
-              <button className="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-all">
+              <button className="border border-gray-300 text-gray-700 px-4 md:px-6 py-2 md:py-3 rounded-lg font-medium hover:bg-gray-50 transition-all text-sm md:text-base">
                 Watch More Demos
               </button>
             </div>
