@@ -3,6 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Play, ArrowRight, Users, Globe, Zap } from "lucide-react";
+import YouTubePlayer from "./YouTubePlayer";
 
 const DemoSection = () => {
   return (
@@ -65,46 +66,8 @@ const DemoSection = () => {
           </div>
         </div>
 
-        {/* Enhanced demo video section */}
-        <div className="relative max-w-4xl mx-auto">
-          <div className="relative aspect-video bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl overflow-hidden shadow-2xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20" />
-            
-            {/* Demo video placeholder with enhanced styling */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center space-y-6">
-                <div className="w-20 h-20 md:w-24 md:h-24 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto border border-white/30 hover:scale-110 transition-transform duration-300 cursor-pointer group">
-                  <Play className="h-8 w-8 md:h-10 md:w-10 text-white ml-1 group-hover:scale-110 transition-transform" />
-                </div>
-                <div>
-                  <h3 className="text-xl md:text-2xl font-bold text-white mb-2">
-                    3 Minutes Demo
-                  </h3>
-                  <p className="text-white/80 text-sm md:text-base">
-                    See how easy it is to set up your Pi domain with Droplink
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            {/* Floating elements for visual interest */}
-            <div className="absolute top-4 left-4 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
-            <div className="absolute top-4 left-10 w-3 h-3 bg-yellow-500 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
-            <div className="absolute top-4 left-16 w-3 h-3 bg-green-500 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
-          </div>
-          
-          {/* Enhanced CTA buttons matching hero style */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8 md:mt-12">
-            <Button asChild size="lg" className="w-full sm:w-auto bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary transform transition hover:scale-105 duration-200 text-lg px-8 py-4">
-              <Link to="/demo" className="flex items-center gap-2">
-                Try Interactive Demo <ArrowRight size={20} />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="w-full sm:w-auto hover:bg-blue-50 transition-colors text-lg px-8 py-4">
-              <Link to="/signup">Start Building Free</Link>
-            </Button>
-          </div>
-        </div>
+        {/* YouTube Player Component */}
+        <YouTubePlayer />
 
         {/* Stats section with enhanced styling */}
         <div className="mt-16 md:mt-20 text-center">
