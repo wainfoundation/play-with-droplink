@@ -13,41 +13,51 @@ const DemoSection = () => {
       
       <div className="container mx-auto max-w-6xl relative z-10">
         <div className="text-center space-y-6 md:space-y-8 mb-12 md:mb-16">
-          {/* Enhanced heading with hero-style design */}
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-            <span className="bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
-              See Droplink in Action
+          {/* ENHANCED HERO-STYLE HEADING */}
+          <h2 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight tracking-tight">
+            <span className="block mb-2 md:mb-4">
+              <span className="bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
+                See Droplink
+              </span>
+            </span>
+            <span className="block">
+              <span className="text-gray-900">in </span>
+              <span className="bg-gradient-to-r from-secondary via-purple-600 to-primary bg-clip-text text-transparent animate-pulse">
+                Action
+              </span>
             </span>
           </h2>
           
-          {/* Enhanced description with hero-style sizing */}
-          <p className="text-lg md:text-xl lg:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+          {/* ENHANCED HERO-STYLE DESCRIPTION */}
+          <p className="text-xl md:text-2xl lg:text-3xl xl:text-4xl text-gray-600 max-w-5xl mx-auto leading-relaxed font-medium">
             Watch how creators are transforming their{" "}
-            <span className="font-semibold text-primary">Pi domains</span>{" "}
-            into powerful{" "}
-            <span className="font-semibold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              business hubs
+            <span className="font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+              .pi domains
+            </span>{" "}
+            into{" "}
+            <span className="font-bold bg-gradient-to-r from-secondary via-purple-600 to-primary bg-clip-text text-transparent">
+              powerful business hubs
             </span>
           </p>
 
           {/* Feature highlights matching hero design */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-3xl mx-auto my-8 md:my-12">
             <div className="text-center p-3 md:p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/20">
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
                 <Users className="h-5 w-5 md:h-6 md:w-6 text-white" />
               </div>
               <p className="text-sm md:text-base font-semibold text-gray-900">Live Profiles</p>
             </div>
             
             <div className="text-center p-3 md:p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/20">
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
                 <Globe className="h-5 w-5 md:h-6 md:w-6 text-white" />
               </div>
               <p className="text-sm md:text-base font-semibold text-gray-900">Pi Integration</p>
             </div>
             
             <div className="text-center p-3 md:p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/20">
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
                 <Zap className="h-5 w-5 md:h-6 md:w-6 text-white" />
               </div>
               <p className="text-sm md:text-base font-semibold text-gray-900">Real Results</p>
@@ -85,7 +95,7 @@ const DemoSection = () => {
           
           {/* Enhanced CTA buttons matching hero style */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8 md:mt-12">
-            <Button asChild size="lg" className="w-full sm:w-auto bg-gradient-hero hover:bg-secondary transform transition hover:scale-105 duration-200 text-lg px-8 py-4">
+            <Button asChild size="lg" className="w-full sm:w-auto bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary transform transition hover:scale-105 duration-200 text-lg px-8 py-4">
               <Link to="/demo" className="flex items-center gap-2">
                 Try Interactive Demo <ArrowRight size={20} />
               </Link>
