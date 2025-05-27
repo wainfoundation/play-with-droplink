@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -143,7 +142,7 @@ const Privacy = () => {
                 <li>The right to withdraw consent</li>
               </ul>
               <p>
-                To exercise these rights, please contact us at <a href="mailto:privacy@droplink.io" className="text-primary hover:underline">privacy@droplink.io</a>.
+                To exercise these rights, please contact us at <a href="mailto:support@droplink.space" className="text-primary hover:underline">support@droplink.space</a>.
               </p>
               
               <h2 className="text-2xl font-bold mt-8 mb-4">7. Security</h2>
@@ -182,7 +181,7 @@ const Privacy = () => {
                 us at:
               </p>
               <p>
-                <a href="mailto:privacy@droplink.io" className="text-primary hover:underline">privacy@droplink.io</a><br />
+                <a href="mailto:support@droplink.space" className="text-primary hover:underline">support@droplink.space</a><br />
                 Droplink Inc.<br />
                 1234 Privacy Lane<br />
                 San Francisco, CA 94105<br />
@@ -194,7 +193,7 @@ const Privacy = () => {
                 <p>
                   For more information about how we protect your data, please see our 
                   <Link to="/help/data-security" className="text-primary hover:underline mx-1">Data Security Guide</Link> 
-                  or contact us at <a href="mailto:privacy@droplink.io" className="text-primary hover:underline">privacy@droplink.io</a>.
+                  or contact us at <a href="mailto:support@droplink.space" className="text-primary hover:underline">support@droplink.space</a>.
                 </p>
               </div>
             </div>

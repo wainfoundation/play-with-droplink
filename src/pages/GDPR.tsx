@@ -68,7 +68,7 @@ const GDPR = () => {
                 If you have any questions about this policy or our data practices, please contact us at:
               </p>
               <p>
-                <a href="mailto:privacy@droplink.io" className="text-primary hover:underline">privacy@droplink.io</a><br />
+                <a href="mailto:support@droplink.space" className="text-primary hover:underline">support@droplink.space</a><br />
                 Droplink Inc.<br />
                 1234 Privacy Lane<br />
                 San Francisco, CA 94105<br />
@@ -184,7 +184,7 @@ const GDPR = () => {
               
               <h2 className="text-2xl font-bold mt-8 mb-4">7. Exercising Your Rights</h2>
               <p>
-                To exercise any of your rights regarding your personal data, please submit a request through our data subject request form below or contact us at <a href="mailto:privacy@droplink.io" className="text-primary hover:underline">privacy@droplink.io</a>.
+                To exercise any of your rights regarding your personal data, please submit a request through our data subject request form below or contact us at <a href="mailto:support@droplink.space" className="text-primary hover:underline">support@droplink.space</a>.
               </p>
               <p>
                 We will respond to your request within 30 days. In some cases, we may need to verify your identity before processing your request.
@@ -304,12 +304,12 @@ const GDPR = () => {
               <h2 className="text-2xl font-bold mt-8 mb-4">11. Data Protection Officer</h2>
               <p>
                 We have appointed a Data Protection Officer (DPO) responsible for overseeing our data protection strategy and implementation. 
-                You can contact our DPO at <a href="mailto:dpo@droplink.io" className="text-primary hover:underline">dpo@droplink.io</a>.
+                You can contact our DPO at <a href="mailto:support@droplink.space" className="text-primary hover:underline">support@droplink.space</a>.
               </p>
               
               <h2 className="text-2xl font-bold mt-8 mb-4">12. Complaints</h2>
               <p>
-                If you have concerns about how we process your personal data, please contact us at <a href="mailto:privacy@droplink.io" className="text-primary hover:underline">privacy@droplink.io</a>. 
+                If you have concerns about how we process your personal data, please contact us at <a href="mailto:support@droplink.space" className="text-primary hover:underline">support@droplink.space</a>. 
                 You also have the right to lodge a complaint with a supervisory authority in the EU member state where you reside, work, or where an alleged infringement of the GDPR has occurred.
               </p>
               

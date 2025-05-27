@@ -149,7 +149,7 @@ const Terms = () => {
               
               <h2 className="text-2xl font-bold mt-8 mb-4">10. Contact Information</h2>
               <p>
-                If you have any questions about these Terms, please contact us at <a href="mailto:legal@droplink.space" className="text-primary hover:underline">legal@droplink.space</a>.
+                If you have any questions about these Terms, please contact us at <a href="mailto:support@droplink.space" className="text-primary hover:underline">support@droplink.space</a>.
               </p>
               
               <div className="mt-12 p-4 border border-muted rounded-lg">

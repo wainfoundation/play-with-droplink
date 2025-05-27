@@ -301,7 +301,7 @@ const Cookies = () => {
                 If you have any questions about our use of cookies or this Cookie Policy, please contact us at:
               </p>
               <p>
-                <a href="mailto:privacy@droplink.io" className="text-primary hover:underline">privacy@droplink.io</a><br />
+                <a href="mailto:support@droplink.space" className="text-primary hover:underline">support@droplink.space</a><br />
                 Droplink Inc.<br />
                 1234 Privacy Lane<br />
                 San Francisco, CA 94105<br />
