@@ -18,7 +18,7 @@ Droplink is a Pi Network-powered creator platform built on a `.pi` domain, integ
 - ✅ Pricing Plans: Free, Starter (10π), Pro (15π), Premium (22π)
 - ✅ Enable profile creation, links, social icons
 - ✅ Tip feature (User A → B tipping via Pi Wallet)
-- ✅ Sell digital products (like Ko-fi)
+- ✅ Sell digital products (inspired by Ko-fi)
 - ✅ Supabase for database and file storage
 - ✅ n8n automation integration
 - ✅ Auto-import links from `profiles.pinet.com/@username`
