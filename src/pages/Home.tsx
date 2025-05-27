@@ -17,7 +17,6 @@ import TemplatesShowcase from "@/components/TemplatesShowcase";
 import CustomerSuccessStories from "@/components/CustomerSuccessStories";
 import AppInfo from "@/components/AppInfo";
 import GoToTop from "@/components/GoToTop";
-import YouTubePlayer from "@/components/YouTubePlayer";
 import { Helmet } from "react-helmet-async";
 
 const Home = () => {
@@ -46,7 +45,6 @@ const Home = () => {
               <PiDomainFeatures />
               <PiDomainShowcase />
               <CustomerSuccessStories />
-              <YouTubePlayer />
               <PiDomainSetup />
               <HowItWorks />
               <DemoSection />
