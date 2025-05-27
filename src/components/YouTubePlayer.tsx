@@ -30,22 +30,20 @@ const YouTubePlayer = ({
         
         <div className="max-w-4xl mx-auto">
           <div className="relative bg-white rounded-xl md:rounded-2xl shadow-xl overflow-hidden">
-            {/* Video Container - Optimized for mobile */}
-            <div className={`relative ${isMobile ? 'aspect-video w-full' : 'aspect-video'} bg-gray-900`}>
+            {/* Video Container - Responsive 16:9 aspect ratio */}
+            <div className="relative w-full" style={{ paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}>
               <iframe 
-                width="100%" 
-                height="100%" 
-                src="https://www.youtube-nocookie.com/embed/1sv5cf9ygZs?si=rATq0V5J1SH_iNpE" 
+                src="https://www.youtube-nocookie.com/embed/1sv5cf9ygZs?si=rATq0V5J1SH_iNpE&controls=1" 
                 title="YouTube video player" 
                 frameBorder="0" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                 referrerPolicy="strict-origin-when-cross-origin" 
                 allowFullScreen
-                className="absolute inset-0 w-full h-full"
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
               />
               
               {/* Overlay for branding */}
-              <div className="absolute top-2 md:top-4 left-2 md:left-4 bg-black/50 backdrop-blur-sm rounded-lg px-2 md:px-3 py-1 md:py-2">
+              <div className="absolute top-2 md:top-4 left-2 md:left-4 bg-black/50 backdrop-blur-sm rounded-lg px-2 md:px-3 py-1 md:py-2 z-10">
                 <div className="flex items-center gap-1 md:gap-2 text-white text-xs md:text-sm font-medium">
                   <Play className="h-3 w-3 md:h-4 md:w-4" />
                   Droplink Demo
