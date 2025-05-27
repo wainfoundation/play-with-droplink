@@ -29,12 +29,16 @@ const YouTubePlayer = ({
           <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden">
             {/* Video Container */}
             <div className="relative aspect-video bg-gray-900">
-              <iframe
-                src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&showinfo=0`}
-                title={title}
-                className="absolute inset-0 w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              <iframe 
+                width="100%" 
+                height="100%" 
+                src="https://www.youtube-nocookie.com/embed/1sv5cf9ygZs?si=rATq0V5J1SH_iNpE&controls=0" 
+                title="YouTube video player" 
+                frameBorder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                referrerPolicy="strict-origin-when-cross-origin" 
                 allowFullScreen
+                className="absolute inset-0 w-full h-full"
               />
               
               {/* Overlay for branding */}
