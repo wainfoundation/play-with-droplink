@@ -1,9 +1,9 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
+import CareerApplicationForm from "@/components/careers/CareerApplicationForm";
 
 const Careers = () => {
   const departments = [
@@ -175,7 +175,9 @@ const Careers = () => {
                             <span>{position.type}</span>
                           </div>
                         </div>
-                        <Button className="mt-4 md:mt-0">View Role</Button>
+                        <div className="mt-4 md:mt-0">
+                          <CareerApplicationForm position={position} />
+                        </div>
                       </div>
                     </div>
                   ))}
