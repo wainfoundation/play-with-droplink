@@ -29,7 +29,7 @@ const YouTubePlayer = ({
         </div>
         
         <div className="max-w-4xl mx-auto">
-          <div className="relative bg-white rounded-xl md:rounded-2xl shadow-xl overflow-hidden">
+          <div className={`relative ${isMobile ? '' : 'bg-white rounded-xl md:rounded-2xl shadow-xl'} overflow-hidden`}>
             {/* Video Container - Responsive 16:9 aspect ratio */}
             <div className="relative w-full" style={{ paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}>
               <iframe 
@@ -51,24 +51,25 @@ const YouTubePlayer = ({
               </div>
             </div>
             
-            {/* Video Info - Compact on mobile */}
-            <div className="p-3 md:p-6">
-              <h3 className="text-lg md:text-xl font-bold mb-1 md:mb-2">{title}</h3>
-              <p className="text-sm md:text-base text-gray-600 mb-2 md:mb-4">{description}</p>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 md:gap-4 text-xs md:text-sm text-gray-500">
-                  <div className="flex items-center gap-1">
-                    <Volume2 className="h-3 w-3 md:h-4 md:w-4" />
-                    <span className="hidden sm:inline">Turn on sound for best experience</span>
-                    <span className="sm:hidden">Sound recommended</span>
+            {/* Video Info - Hidden on mobile for full-screen experience */}
+            {!isMobile && (
+              <div className="p-3 md:p-6">
+                <h3 className="text-lg md:text-xl font-bold mb-1 md:mb-2">{title}</h3>
+                <p className="text-sm md:text-base text-gray-600 mb-2 md:mb-4">{description}</p>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 md:gap-4 text-xs md:text-sm text-gray-500">
+                    <div className="flex items-center gap-1">
+                      <Volume2 className="h-3 w-3 md:h-4 md:w-4" />
+                      <span>Turn on sound for best experience</span>
+                    </div>
+                  </div>
+                  <div className="text-xs md:text-sm text-primary font-medium">
+                    Powered by Pi Network
                   </div>
                 </div>
-                <div className="text-xs md:text-sm text-primary font-medium">
-                  Powered by Pi Network
-                </div>
               </div>
-            </div>
+            )}
           </div>
           
           {/* Call to Action - Mobile optimized */}
