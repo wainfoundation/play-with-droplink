@@ -9,7 +9,7 @@ interface YouTubePlayerProps {
 }
 
 const YouTubePlayer = ({ 
-  videoId = "dQw4w9WgXcQ", // Default video ID (placeholder)
+  videoId = "1sv5cf9ygZs", // Updated with your video ID
   title = "Droplink - Transform Your Pi Domain",
   description = "See how Droplink helps you monetize your Pi Network presence"
 }: YouTubePlayerProps) => {
