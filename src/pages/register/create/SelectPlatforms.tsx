@@ -38,6 +38,16 @@ const SelectPlatforms = () => {
     navigate("/register/create/add-links");
   };
 
+  const getPreviewData = () => {
+    return {
+      title: "Your Name",
+      bio: "🚀 Pi Network Creator | 💎 Building the future | 🌟 Join my journey",
+      username: "username",
+      selectedPlatforms: selectedPlatforms,
+      selectedTemplate: "modern"
+    };
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
       <Helmet>
@@ -105,7 +115,7 @@ const SelectPlatforms = () => {
 
           {/* Live Preview Section */}
           <div className="flex justify-center">
-            <DemoPreview />
+            <DemoPreview profileData={getPreviewData()} />
           </div>
         </div>
       </div>

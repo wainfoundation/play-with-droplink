@@ -4,7 +4,99 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Share, ExternalLink, Star } from "lucide-react";
 
-const DemoPreview = () => {
+interface DemoPreviewProps {
+  profileData?: {
+    title?: string;
+    bio?: string;
+    avatar?: string;
+    username?: string;
+    selectedPlatforms?: string[];
+    links?: Array<{ platform: string; url: string; }>;
+    selectedTemplate?: string;
+  };
+}
+
+const DemoPreview = ({ profileData }: DemoPreviewProps) => {
+  const displayName = profileData?.title || "Your Name";
+  const displayBio = profileData?.bio || "🚀 Pi Network Creator | 💎 Building the future | 🌟 Join my journey";
+  const displayUsername = profileData?.username || "username";
+  const avatarUrl = profileData?.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${displayName}`;
+
+  // Get template colors based on selection
+  const getTemplateGradient = () => {
+    switch (profileData?.selectedTemplate) {
+      case "modern":
+        return "from-blue-50 to-indigo-100";
+      case "minimal":
+        return "from-gray-50 to-gray-100";
+      case "creative":
+        return "from-purple-50 to-pink-100";
+      case "business":
+        return "from-slate-50 to-blue-100";
+      case "social":
+        return "from-pink-50 to-orange-100";
+      case "portfolio":
+        return "from-green-50 to-teal-100";
+      default:
+        return "from-blue-50 to-indigo-100";
+    }
+  };
+
+  // Generate links based on user's platform selections and URLs
+  const generateLinks = () => {
+    const defaultLinks = [
+      { id: "main", title: "🎯 My Main Link", icon: "🎯" },
+      { id: "tip", title: "💰 Tip me in Pi", icon: "💰", special: true }
+    ];
+
+    const platformLinks = profileData?.links?.map((link, index) => ({
+      id: `platform-${index}`,
+      title: getPlatformTitle(link.platform),
+      icon: getPlatformIcon(link.platform),
+      url: link.url
+    })) || [];
+
+    return [...defaultLinks, ...platformLinks];
+  };
+
+  const getPlatformTitle = (platform: string) => {
+    const titles = {
+      youtube: "📺 YouTube Channel",
+      instagram: "📷 Instagram",
+      tiktok: "🎵 TikTok",
+      twitter: "🐦 Twitter",
+      website: "🌐 Website",
+      whatsapp: "💬 WhatsApp",
+      facebook: "📘 Facebook",
+      spotify: "🎧 Spotify",
+      linkedin: "💼 LinkedIn",
+      discord: "🎮 Discord",
+      twitch: "🎮 Twitch",
+      telegram: "✈️ Telegram"
+    };
+    return titles[platform as keyof typeof titles] || `🔗 ${platform}`;
+  };
+
+  const getPlatformIcon = (platform: string) => {
+    const icons = {
+      youtube: "📺",
+      instagram: "📷", 
+      tiktok: "🎵",
+      twitter: "🐦",
+      website: "🌐",
+      whatsapp: "💬",
+      facebook: "📘",
+      spotify: "🎧",
+      linkedin: "💼",
+      discord: "🎮",
+      twitch: "🎮",
+      telegram: "✈️"
+    };
+    return icons[platform as keyof typeof icons] || "🔗";
+  };
+
+  const links = generateLinks();
+
   return (
     <div className="w-full max-w-sm mx-auto">
       {/* Mobile phone frame */}
@@ -20,89 +112,80 @@ const DemoPreview = () => {
           </div>
           
           {/* Profile content */}
-          <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-[500px]">
+          <div className={`p-6 bg-gradient-to-br ${getTemplateGradient()} min-h-[500px]`}>
             {/* Profile header */}
             <div className="text-center mb-6">
               <div className="relative inline-block mb-4">
-                <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                  JD
+                <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                  <img 
+                    src={avatarUrl}
+                    alt="Profile" 
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
                   <div className="w-2 h-2 bg-white rounded-full"></div>
                 </div>
               </div>
               
-              <h1 className="text-xl font-bold text-gray-900 mb-1">John Doe</h1>
-              <p className="text-gray-600 text-sm mb-2">@johndoe</p>
-              <p className="text-gray-700 text-sm leading-relaxed">
-                🚀 Pi Network Creator | 💎 Building the future | 🌟 Join my journey
+              <h1 className="text-xl font-bold text-gray-900 mb-1">{displayName}</h1>
+              <p className="text-gray-600 text-sm mb-2">@{displayUsername}</p>
+              <p className="text-gray-700 text-sm leading-relaxed px-2">
+                {displayBio}
               </p>
               
               <div className="flex justify-center gap-4 mt-4">
                 <Badge variant="secondary" className="text-xs">
                   <Star className="w-3 h-3 mr-1" />
-                  Pro Member
+                  Live Preview
                 </Badge>
               </div>
             </div>
             
             {/* Links */}
             <div className="space-y-3 mb-6">
-              <Button 
-                className="w-full bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-white rounded-xl py-3 h-auto shadow-md"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span className="font-medium">🎯 My Pi Network App</span>
-                  <ExternalLink className="w-4 h-4" />
-                </div>
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                className="w-full border-2 border-gray-200 hover:bg-gray-50 rounded-xl py-3 h-auto"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span className="font-medium text-gray-700">📱 Download My App</span>
-                  <ExternalLink className="w-4 h-4" />
-                </div>
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                className="w-full border-2 border-gray-200 hover:bg-gray-50 rounded-xl py-3 h-auto"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span className="font-medium text-gray-700">🎥 YouTube Channel</span>
-                  <ExternalLink className="w-4 h-4" />
-                </div>
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                className="w-full border-2 border-orange-200 bg-orange-50 hover:bg-orange-100 rounded-xl py-3 h-auto"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span className="font-medium text-orange-700">💰 Tip me in Pi</span>
-                  <Heart className="w-4 h-4 text-orange-500" />
-                </div>
-              </Button>
+              {links.slice(0, 4).map((link, index) => (
+                <Button 
+                  key={link.id}
+                  className={`w-full rounded-xl py-3 h-auto shadow-md transition-all ${
+                    link.special 
+                      ? "border-2 border-orange-200 bg-orange-50 hover:bg-orange-100 text-orange-700" 
+                      : index === 0 
+                        ? "bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-white"
+                        : "bg-white border border-gray-200 hover:bg-gray-50 text-gray-700"
+                  }`}
+                  variant={link.special || index > 0 ? "outline" : "default"}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="font-medium">{link.title}</span>
+                    {link.special ? (
+                      <Heart className="w-4 h-4" />
+                    ) : (
+                      <ExternalLink className="w-4 h-4" />
+                    )}
+                  </div>
+                </Button>
+              ))}
             </div>
             
-            {/* Social links */}
-            <div className="flex justify-center gap-3">
-              <Button size="sm" variant="outline" className="w-10 h-10 p-0 rounded-full">
-                <span className="text-blue-600">𝕏</span>
-              </Button>
-              <Button size="sm" variant="outline" className="w-10 h-10 p-0 rounded-full">
-                <span className="text-pink-600">📷</span>
-              </Button>
-              <Button size="sm" variant="outline" className="w-10 h-10 p-0 rounded-full">
-                <span className="text-blue-600">💼</span>
-              </Button>
-            </div>
+            {/* Social links preview */}
+            {profileData?.selectedPlatforms && profileData.selectedPlatforms.length > 0 && (
+              <div className="flex justify-center gap-3 mb-4">
+                {profileData.selectedPlatforms.slice(0, 3).map((platform, index) => (
+                  <Button key={platform} size="sm" variant="outline" className="w-10 h-10 p-0 rounded-full">
+                    <span className="text-sm">{getPlatformIcon(platform)}</span>
+                  </Button>
+                ))}
+                {profileData.selectedPlatforms.length > 3 && (
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-xs text-gray-500">
+                    +{profileData.selectedPlatforms.length - 3}
+                  </div>
+                )}
+              </div>
+            )}
             
             {/* Share button */}
-            <div className="mt-6 text-center">
+            <div className="text-center">
               <Button size="sm" variant="ghost" className="text-gray-500 hover:text-gray-700">
                 <Share className="w-4 h-4 mr-2" />
                 Share Profile

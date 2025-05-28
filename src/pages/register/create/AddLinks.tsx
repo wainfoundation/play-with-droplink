@@ -38,6 +38,22 @@ const AddLinks = () => {
 
   const filledLinksCount = Object.values(links).filter(link => link.trim() !== "").length;
 
+  const getPreviewData = () => {
+    // Convert links object to array format for preview
+    const linksArray = Object.entries(links)
+      .filter(([_, url]) => url.trim() !== "")
+      .map(([platform, url]) => ({ platform, url }));
+
+    return {
+      title: "Your Name",
+      bio: "🚀 Pi Network Creator | 💎 Building the future | 🌟 Join my journey",
+      username: "username",
+      selectedPlatforms: Object.keys(links).filter(key => links[key as keyof typeof links].trim() !== ""),
+      links: linksArray,
+      selectedTemplate: "modern"
+    };
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
       <Helmet>
@@ -113,7 +129,7 @@ const AddLinks = () => {
 
           {/* Live Preview Section */}
           <div className="flex justify-center">
-            <DemoPreview />
+            <DemoPreview profileData={getPreviewData()} />
           </div>
         </div>
       </div>

@@ -45,6 +45,21 @@ const NameImageBio = () => {
     setProfileData(prev => ({ ...prev, bio: randomBio }));
   };
 
+  const getPreviewData = () => {
+    return {
+      title: profileData.title || "Your Name",
+      bio: profileData.bio || "🚀 Pi Network Creator | 💎 Building the future | 🌟 Join my journey",
+      username: "username",
+      avatar: profileData.avatar,
+      selectedTemplate: "modern",
+      selectedPlatforms: ["youtube", "instagram", "twitter"],
+      links: [
+        { platform: "youtube", url: "https://youtube.com/@username" },
+        { platform: "instagram", url: "https://instagram.com/username" }
+      ]
+    };
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
       <Helmet>
@@ -145,7 +160,7 @@ const NameImageBio = () => {
 
           {/* Live Preview Section */}
           <div className="flex justify-center">
-            <DemoPreview />
+            <DemoPreview profileData={getPreviewData()} />
           </div>
         </div>
       </div>
