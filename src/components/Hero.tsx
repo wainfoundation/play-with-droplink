@@ -73,7 +73,7 @@ const Hero = () => {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="w-full sm:w-auto hover:bg-blue-50 transition-colors text-lg px-8 py-4">
-                  <Link to={`/profile/${profile.username}`}>View Your Profile</Link>
+                  <Link to={`/${profile.username}`}>View Your Profile</Link>
                 </Button>
               </>
             ) : (
@@ -84,7 +84,7 @@ const Hero = () => {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="w-full sm:w-auto hover:bg-blue-50 transition-colors text-lg px-8 py-4">
-                  <Link to="/login">Sign In</Link>
+                  <Link to="/demo">Try Demo</Link>
                 </Button>
               </>
             )}

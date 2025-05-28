@@ -11,7 +11,7 @@ import { Helmet } from "react-helmet-async";
 const SignupPage = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useUser();
-  
+
   useEffect(() => {
     if (isLoggedIn) {
       navigate('/dashboard');
@@ -30,7 +30,7 @@ const SignupPage = () => {
           <div className="text-center mb-8 space-y-4">
             <h1 className="text-4xl font-bold text-primary mb-4">Join Droplink</h1>
             <p className="text-gray-600 text-lg leading-relaxed">
-              Create your Pi Network profile and start building your digital presence
+              Connect your Pi Network wallet to start building your digital presence
             </p>
           </div>
           
@@ -42,15 +42,18 @@ const SignupPage = () => {
               
               <div className="text-center">
                 <p className="text-sm text-gray-500 leading-relaxed">
-                  Connect with Pi Network to get started with exclusive features
+                  Join the Pi Network community and start monetizing your content
                 </p>
               </div>
             </div>
           </div>
           
-          <div className="mt-8 text-center">
+          <div className="mt-8 text-center space-y-3">
             <p className="text-sm text-gray-500 leading-relaxed">
-              Already have an account? <a href="/login" className="text-primary hover:underline">Sign in</a>
+              ✓ Custom profile page • ✓ Pi Network integration • ✓ Analytics dashboard
+            </p>
+            <p className="text-xs text-gray-400">
+              Start free • Upgrade anytime • Built for Pi Network
             </p>
           </div>
         </div>
