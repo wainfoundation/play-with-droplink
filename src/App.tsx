@@ -35,6 +35,16 @@ import DomainVerification from "./pages/DomainVerification";
 import Stickers from "./pages/Stickers";
 import SystemStatus from "./pages/SystemStatus";
 
+// Onboarding workflow pages
+import UserInfo from "./pages/auth/UserInfo";
+import YourInformation from "./pages/register/YourInformation";
+import SelectCategories from "./pages/register/SelectCategories";
+import SelectTemplate from "./pages/register/create/SelectTemplate";
+import SelectPlatforms from "./pages/register/create/SelectPlatforms";
+import AddLinks from "./pages/register/create/AddLinks";
+import NameImageBio from "./pages/register/create/NameImageBio";
+import Complete from "./pages/register/create/Complete";
+
 // ValidationKey component inline since it's simple
 const ValidationKey = () => {
   return (
@@ -83,6 +93,17 @@ const App = () => (
                 <Route path="/validation-key.txt" element={<ValidationKey />} />
                 <Route path="/verify-domain" element={<DomainVerification />} />
                 <Route path="/status" element={<SystemStatus />} />
+                
+                {/* Onboarding workflow routes */}
+                <Route path="/auth/userinfo" element={<UserInfo />} />
+                <Route path="/register/your-information" element={<YourInformation />} />
+                <Route path="/register/select-categories" element={<SelectCategories />} />
+                <Route path="/register/create/select-template" element={<SelectTemplate />} />
+                <Route path="/register/create/select-platforms" element={<SelectPlatforms />} />
+                <Route path="/register/create/add-links" element={<AddLinks />} />
+                <Route path="/register/create/name-image-bio" element={<NameImageBio />} />
+                <Route path="/register/create/complete" element={<Complete />} />
+                
                 <Route path="/:username" element={<ProfilePage />} />
                 <Route path="/:username/store" element={<StorePage />} />
                 <Route path="*" element={<NotFound />} />
