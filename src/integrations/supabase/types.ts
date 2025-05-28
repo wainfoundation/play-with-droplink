@@ -1144,6 +1144,7 @@ export type Database = {
           id: string
           is_active: boolean
           is_free: boolean
+          is_premium: boolean | null
           name: string
           preview_image_url: string | null
           template_data: Json | null
@@ -1156,6 +1157,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_free?: boolean
+          is_premium?: boolean | null
           name: string
           preview_image_url?: string | null
           template_data?: Json | null
@@ -1168,6 +1170,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_free?: boolean
+          is_premium?: boolean | null
           name?: string
           preview_image_url?: string | null
           template_data?: Json | null
@@ -1268,6 +1271,56 @@ export type Database = {
         }
         Relationships: []
       }
+      user_features: {
+        Row: {
+          can_capture_emails: boolean | null
+          can_customize_css: boolean | null
+          can_remove_ads: boolean | null
+          can_schedule: boolean | null
+          can_sell: boolean | null
+          can_use_analytics: boolean | null
+          can_use_pi_domain: boolean | null
+          id: string
+          max_links: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          can_capture_emails?: boolean | null
+          can_customize_css?: boolean | null
+          can_remove_ads?: boolean | null
+          can_schedule?: boolean | null
+          can_sell?: boolean | null
+          can_use_analytics?: boolean | null
+          can_use_pi_domain?: boolean | null
+          id?: string
+          max_links?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          can_capture_emails?: boolean | null
+          can_customize_css?: boolean | null
+          can_remove_ads?: boolean | null
+          can_schedule?: boolean | null
+          can_sell?: boolean | null
+          can_use_analytics?: boolean | null
+          can_use_pi_domain?: boolean | null
+          id?: string
+          max_links?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_features_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_metadata: {
         Row: {
           created_at: string
@@ -1324,11 +1377,47 @@ export type Database = {
           },
         ]
       }
+      user_platforms: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          platform: Database["public"]["Enums"]["platform_type"]
+          url: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          platform: Database["public"]["Enums"]["platform_type"]
+          url?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          platform?: Database["public"]["Enums"]["platform_type"]
+          url?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_platforms_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_profiles: {
         Row: {
           active_sticker_ids: Json | null
           avatar_url: string | null
           bio: string | null
+          consent_updates: boolean | null
           created_at: string | null
           custom_domain: string | null
           display_name: string | null
@@ -1336,10 +1425,18 @@ export type Database = {
           imported_pi_avatar: string | null
           imported_pi_bio: string | null
           imported_pi_links: Json | null
+          intent: Database["public"]["Enums"]["user_intent"] | null
+          onboarding_completed: boolean | null
+          onboarding_step: Database["public"]["Enums"]["onboarding_step"] | null
           pi_domain: string | null
           pi_profile_last_synced: string | null
+          pi_profile_url: string | null
           pi_wallet_address: string | null
+          plan: Database["public"]["Enums"]["user_plan"] | null
+          profile_title: string | null
+          template_id: string | null
           theme: Json | null
+          total_clicks: number | null
           updated_at: string | null
           username: string
         }
@@ -1347,6 +1444,7 @@ export type Database = {
           active_sticker_ids?: Json | null
           avatar_url?: string | null
           bio?: string | null
+          consent_updates?: boolean | null
           created_at?: string | null
           custom_domain?: string | null
           display_name?: string | null
@@ -1354,10 +1452,20 @@ export type Database = {
           imported_pi_avatar?: string | null
           imported_pi_bio?: string | null
           imported_pi_links?: Json | null
+          intent?: Database["public"]["Enums"]["user_intent"] | null
+          onboarding_completed?: boolean | null
+          onboarding_step?:
+            | Database["public"]["Enums"]["onboarding_step"]
+            | null
           pi_domain?: string | null
           pi_profile_last_synced?: string | null
+          pi_profile_url?: string | null
           pi_wallet_address?: string | null
+          plan?: Database["public"]["Enums"]["user_plan"] | null
+          profile_title?: string | null
+          template_id?: string | null
           theme?: Json | null
+          total_clicks?: number | null
           updated_at?: string | null
           username: string
         }
@@ -1365,6 +1473,7 @@ export type Database = {
           active_sticker_ids?: Json | null
           avatar_url?: string | null
           bio?: string | null
+          consent_updates?: boolean | null
           created_at?: string | null
           custom_domain?: string | null
           display_name?: string | null
@@ -1372,10 +1481,20 @@ export type Database = {
           imported_pi_avatar?: string | null
           imported_pi_bio?: string | null
           imported_pi_links?: Json | null
+          intent?: Database["public"]["Enums"]["user_intent"] | null
+          onboarding_completed?: boolean | null
+          onboarding_step?:
+            | Database["public"]["Enums"]["onboarding_step"]
+            | null
           pi_domain?: string | null
           pi_profile_last_synced?: string | null
+          pi_profile_url?: string | null
           pi_wallet_address?: string | null
+          plan?: Database["public"]["Enums"]["user_plan"] | null
+          profile_title?: string | null
+          template_id?: string | null
           theme?: Json | null
+          total_clicks?: number | null
           updated_at?: string | null
           username?: string
         }
@@ -1440,6 +1559,13 @@ export type Database = {
         Args: { user_id_param: string }
         Returns: boolean
       }
+      create_user_features: {
+        Args: {
+          user_id: string
+          plan: Database["public"]["Enums"]["user_plan"]
+        }
+        Returns: undefined
+      }
       generate_download_token: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -1478,13 +1604,45 @@ export type Database = {
         Args: { user_id: string; domain_value: string }
         Returns: Json
       }
+      update_user_plan: {
+        Args: {
+          user_id: string
+          new_plan: Database["public"]["Enums"]["user_plan"]
+        }
+        Returns: undefined
+      }
       user_owns_sticker: {
         Args: { user_id_param: string; sticker_id_param: string }
         Returns: boolean
       }
     }
     Enums: {
-      [_ in never]: never
+      onboarding_step:
+        | "userinfo"
+        | "intent"
+        | "plan"
+        | "template"
+        | "platforms"
+        | "links"
+        | "profile"
+        | "complete"
+      platform_type:
+        | "youtube"
+        | "tiktok"
+        | "instagram"
+        | "whatsapp"
+        | "facebook"
+        | "spotify"
+        | "website"
+        | "twitter"
+        | "linkedin"
+        | "discord"
+        | "twitch"
+        | "snapchat"
+        | "pinterest"
+        | "other"
+      user_intent: "creator" | "business" | "personal"
+      user_plan: "free" | "basic" | "pro" | "premium"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1599,6 +1757,35 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      onboarding_step: [
+        "userinfo",
+        "intent",
+        "plan",
+        "template",
+        "platforms",
+        "links",
+        "profile",
+        "complete",
+      ],
+      platform_type: [
+        "youtube",
+        "tiktok",
+        "instagram",
+        "whatsapp",
+        "facebook",
+        "spotify",
+        "website",
+        "twitter",
+        "linkedin",
+        "discord",
+        "twitch",
+        "snapchat",
+        "pinterest",
+        "other",
+      ],
+      user_intent: ["creator", "business", "personal"],
+      user_plan: ["free", "basic", "pro", "premium"],
+    },
   },
 } as const
