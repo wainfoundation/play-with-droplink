@@ -1,12 +1,13 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { UserProvider } from '@/context/UserContext';
 import ProfilePage from '@/pages/ProfilePage';
 import Dashboard from '@/pages/Dashboard';
 import ProfileSetupWizard from '@/components/profile/ProfileSetupWizard';
-import Auth from '@/pages/Auth';
+import Home from '@/pages/Home';
 import NotFound from '@/pages/NotFound';
 import AuthUserInfo from "@/pages/AuthUserInfo";
 import RegisterIntent from "@/pages/RegisterIntent";
@@ -27,11 +28,11 @@ function App() {
         <Toaster />
         <Router>
           <Routes>
-            <Route path="/" element={<Auth />} />
-            <Route path="/auth" element={<Auth />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/auth" element={<Home />} />
             <Route path="/profile/:username" element={<ProfilePage />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/profile-setup" element={<ProfileSetupWizard />} />
+            <Route path="/profile-setup" element={<ProfileSetupWizard onComplete={() => {}} />} />
             <Route path="*" element={<NotFound />} />
             
             {/* Onboarding Routes */}

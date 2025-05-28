@@ -16,6 +16,7 @@ interface UserContextType {
   isAdmin: boolean;
   setIsAdmin: (value: boolean) => void;
   refreshUserData: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (data: any) => Promise<void>;
   cancelSubscription: () => Promise<boolean>;
@@ -53,6 +54,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     isAdmin,
     setIsAdmin,
     refreshUserData,
+    refreshProfile,
     signOut,
     updateProfile,
     cancelSubscription
