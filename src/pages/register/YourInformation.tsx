@@ -15,28 +15,29 @@ const YourInformation = () => {
     {
       id: "creator",
       title: "Creator",
-      description: "Monetize audience & build community",
-      icon: <User className="w-6 h-6" />,
-      color: "from-purple-500 to-pink-500"
+      description: "Content creation, social media, personal brand",
+      icon: "🎨",
+      examples: ["Influencer", "YouTuber", "Artist", "Blogger"]
     },
     {
       id: "business", 
       title: "Business",
-      description: "Reach more customers & sell products",
-      icon: <Building className="w-6 h-6" />,
-      color: "from-blue-500 to-cyan-500"
+      description: "Professional services, company, startup",
+      icon: "💼",
+      examples: ["Company", "Startup", "Service Provider", "Consultant"]
     },
     {
       id: "personal",
       title: "Personal", 
-      description: "Share links with friends & family",
-      icon: <Heart className="w-6 h-6" />,
-      color: "from-green-500 to-emerald-500"
+      description: "Personal use, networking, sharing links",
+      icon: "👤",
+      examples: ["Personal Use", "Networking", "Resume", "Portfolio"]
     }
   ];
 
   const handleContinue = () => {
     if (selectedIntent) {
+      // Navigate to plan selection page instead of template selection
       navigate("/register/select-categories");
     }
   };
