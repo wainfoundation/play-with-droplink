@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Eye, MousePointer, TrendingUp } from "lucide-react";
 import { useAnalyticsData } from "@/hooks/useAnalyticsData";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { ErrorMessage } from "@/components/ui/error-message";
 
 interface OverviewStatsProps {
   pageViews?: number;
@@ -17,16 +16,11 @@ const OverviewStats = ({
   conversionRate: propConversionRate 
 }: OverviewStatsProps) => {
   const { 
-    pageViews: dataPageViews, 
-    linkClicks: dataLinkClicks, 
-    conversionRate: dataConversionRate, 
+    pageViews, 
+    linkClicks, 
+    conversionRate, 
     isLoading 
   } = useAnalyticsData();
-
-  // Use real data if available, otherwise fall back to props
-  const pageViews = dataPageViews ?? propPageViews ?? 0;
-  const linkClicks = dataLinkClicks ?? propLinkClicks ?? 0;
-  const conversionRate = dataConversionRate ?? propConversionRate ?? 0;
 
   if (isLoading) {
     return (

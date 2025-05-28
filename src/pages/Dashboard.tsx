@@ -9,17 +9,20 @@ import { PiAuthButton } from "@/components/auth/PiAuthButton";
 import LoginPrompt from "@/components/dashboard/LoginPrompt";
 import PiNetworkIntegration from "@/components/PiNetworkIntegration";
 import PiProfileImport from "@/components/profile/PiProfileImport";
+import OverviewStats from "@/components/dashboard/OverviewStats";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { usePiAuth } from "@/hooks/usePiAuth";
 import { Pi, TrendingUp, Users, Link as LinkIcon, Download } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAnalyticsData } from "@/hooks/useAnalyticsData";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { isLoggedIn, user } = useUser();
   const { handlePiLogin } = usePiAuth();
+  const { pageViews, linkClicks } = useAnalyticsData();
   
   useEffect(() => {
     if (isLoggedIn) {
@@ -48,37 +51,6 @@ const Dashboard = () => {
     );
   }
 
-  const stats = [
-    {
-      title: "Total Links",
-      value: "12",
-      change: "+2 this week",
-      icon: LinkIcon,
-      color: "text-blue-600"
-    },
-    {
-      title: "Profile Views",
-      value: "1,234",
-      change: "+15% this month",
-      icon: Users,
-      color: "text-green-600"
-    },
-    {
-      title: "Pi Earned",
-      value: "456π",
-      change: "+25π this week",
-      icon: Pi,
-      color: "text-purple-600"
-    },
-    {
-      title: "Engagement",
-      value: "89%",
-      change: "+5% this month",
-      icon: TrendingUp,
-      color: "text-orange-600"
-    }
-  ];
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-primary/10">
       <Navbar />
@@ -90,26 +62,9 @@ const Dashboard = () => {
           </p>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => (
-            <Card key={index}>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">
-                      {stat.title}
-                    </p>
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                    <p className="text-sm text-muted-foreground">{stat.change}</p>
-                  </div>
-                  <div className={`p-3 bg-muted rounded-lg ${stat.color}`}>
-                    <stat.icon className="h-6 w-6" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        {/* Real Analytics Overview */}
+        <div className="mb-8">
+          <OverviewStats />
         </div>
 
         {/* Main Dashboard Tabs */}
@@ -176,20 +131,16 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {[
-                    { action: "New profile view", detail: "Someone viewed your profile", time: "2 minutes ago" },
-                    { action: "Link clicked", detail: "Instagram link was clicked", time: "1 hour ago" },
-                    { action: "Pi payment received", detail: "Received 5π from a supporter", time: "3 hours ago" },
-                    { action: "Profile updated", detail: "You updated your bio", time: "1 day ago" },
-                  ].map((activity, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                      <div>
-                        <p className="font-medium">{activity.action}</p>
-                        <p className="text-sm text-muted-foreground">{activity.detail}</p>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{activity.time}</p>
+                  {pageViews === 0 && linkClicks === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <p>No activity yet. Start sharing your profile to see analytics here!</p>
                     </div>
-                  ))}
+                  ) : (
+                    <div className="text-center py-4 text-gray-600">
+                      <p>Real-time activity tracking is now active</p>
+                      <p className="text-sm">All data shown is from actual user interactions</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

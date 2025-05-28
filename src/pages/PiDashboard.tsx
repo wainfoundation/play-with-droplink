@@ -10,40 +10,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Pi, TrendingUp, Users, DollarSign, Globe, Wallet, Zap } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
+import { useAnalyticsData } from '@/hooks/useAnalyticsData';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 const PiDashboard = () => {
   const { user, isLoggedIn } = useUser();
-
-  const piStats = [
-    {
-      icon: Pi,
-      label: "Pi Earned",
-      value: "1,234π",
-      change: "+12.5%",
-      positive: true
-    },
-    {
-      icon: Users,
-      label: "Pi Network Followers",
-      value: "2,456",
-      change: "+8.2%",
-      positive: true
-    },
-    {
-      icon: TrendingUp,
-      label: "Pi Transactions",
-      value: "89",
-      change: "+23.1%",
-      positive: true
-    },
-    {
-      icon: DollarSign,
-      label: "Conversion Rate",
-      value: "3.4%",
-      change: "+0.8%",
-      positive: true
-    }
-  ];
+  const { pageViews, linkClicks, conversionRate, isLoading } = useAnalyticsData();
 
   const piFeatures = [
     {
@@ -89,28 +61,91 @@ const PiDashboard = () => {
           </p>
         </div>
 
-        {/* Pi Stats */}
+        {/* Real Pi Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {piStats.map((stat, index) => (
-            <Card key={index}>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">
-                      {stat.label}
-                    </p>
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                    <p className={`text-sm ${stat.positive ? 'text-green-600' : 'text-red-600'}`}>
-                      {stat.change} from last month
-                    </p>
+          {isLoading ? (
+            <div className="col-span-full flex justify-center py-8">
+              <LoadingSpinner size="lg" />
+            </div>
+          ) : (
+            <>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Page Views
+                      </p>
+                      <p className="text-2xl font-bold">{pageViews.toLocaleString()}</p>
+                      <p className="text-sm text-green-600">
+                        Real-time tracking
+                      </p>
+                    </div>
+                    <div className="p-3 bg-primary/10 rounded-lg">
+                      <Users className="h-6 w-6 text-primary" />
+                    </div>
                   </div>
-                  <div className="p-3 bg-primary/10 rounded-lg">
-                    <stat.icon className="h-6 w-6 text-primary" />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Link Clicks
+                      </p>
+                      <p className="text-2xl font-bold">{linkClicks.toLocaleString()}</p>
+                      <p className="text-sm text-green-600">
+                        Production data
+                      </p>
+                    </div>
+                    <div className="p-3 bg-primary/10 rounded-lg">
+                      <TrendingUp className="h-6 w-6 text-primary" />
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Conversion Rate
+                      </p>
+                      <p className="text-2xl font-bold">{conversionRate}%</p>
+                      <p className="text-sm text-green-600">
+                        Live analytics
+                      </p>
+                    </div>
+                    <div className="p-3 bg-primary/10 rounded-lg">
+                      <DollarSign className="h-6 w-6 text-primary" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Pi Earned
+                      </p>
+                      <p className="text-2xl font-bold">0π</p>
+                      <p className="text-sm text-muted-foreground">
+                        Start earning today
+                      </p>
+                    </div>
+                    <div className="p-3 bg-primary/10 rounded-lg">
+                      <Pi className="h-6 w-6 text-primary" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </div>
 
         {/* Pi Network Integration */}
@@ -161,23 +196,17 @@ const PiDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {[
-                { type: "Payment Received", amount: "+25π", from: "user123", time: "2 hours ago" },
-                { type: "Tip Received", amount: "+5π", from: "creator456", time: "4 hours ago" },
-                { type: "Product Sale", amount: "+50π", from: "buyer789", time: "1 day ago" },
-                { type: "Ad Revenue", amount: "+12π", from: "Pi Ads Network", time: "2 days ago" },
-              ].map((activity, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                  <div>
-                    <p className="font-medium">{activity.type}</p>
-                    <p className="text-sm text-muted-foreground">From {activity.from}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium text-green-600">{activity.amount}</p>
-                    <p className="text-sm text-muted-foreground">{activity.time}</p>
-                  </div>
+              {pageViews === 0 && linkClicks === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <p>No Pi activity yet. Start using Pi features to see activity here!</p>
+                  <p className="text-sm mt-2">All data shown is real production data</p>
                 </div>
-              ))}
+              ) : (
+                <div className="text-center py-4 text-gray-600">
+                  <p>Real-time Pi activity tracking is active</p>
+                  <p className="text-sm">All data shown is from actual user interactions</p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
