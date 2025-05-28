@@ -830,6 +830,42 @@ export type Database = {
           },
         ]
       }
+      newsletter_subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          is_active: boolean
+          metadata: Json | null
+          source: string
+          subscribed_at: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          is_active?: boolean
+          metadata?: Json | null
+          source?: string
+          subscribed_at?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          is_active?: boolean
+          metadata?: Json | null
+          source?: string
+          subscribed_at?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           access_token: string | null
@@ -1242,6 +1278,7 @@ export type Database = {
           consented_at: string | null
           created_at: string | null
           id: string
+          newsletter_consent: boolean | null
           updated_at: string | null
           user_id: string
           username_consent: boolean | null
@@ -1253,6 +1290,7 @@ export type Database = {
           consented_at?: string | null
           created_at?: string | null
           id?: string
+          newsletter_consent?: boolean | null
           updated_at?: string | null
           user_id: string
           username_consent?: boolean | null
@@ -1264,6 +1302,7 @@ export type Database = {
           consented_at?: string | null
           created_at?: string | null
           id?: string
+          newsletter_consent?: boolean | null
           updated_at?: string | null
           user_id?: string
           username_consent?: boolean | null
