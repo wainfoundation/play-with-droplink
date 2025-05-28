@@ -20,6 +20,13 @@ import RegisterComplete from "@/pages/RegisterComplete";
 import AdminDashboard from "@/pages/AdminDashboard";
 import LoginPage from "@/pages/LoginPage";
 import SignupPage from "@/pages/SignupPage";
+import Features from "@/pages/Features";
+import Pricing from "@/pages/Pricing";
+import Demo from "@/pages/Demo";
+import Templates from "@/pages/Templates";
+import Help from "@/pages/Help";
+import Store from "@/pages/Store";
+import Groups from "@/pages/Groups";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +40,13 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
+            <Route path="/features" element={<Features />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/demo" element={<Demo />} />
+            <Route path="/templates" element={<Templates />} />
+            <Route path="/help" element={<Help />} />
+            <Route path="/store" element={<Store />} />
+            <Route path="/groups" element={<Groups />} />
             <Route path="/profile/:username" element={<ProfilePage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile-setup" element={<ProfileSetupWizard onComplete={() => {}} />} />
