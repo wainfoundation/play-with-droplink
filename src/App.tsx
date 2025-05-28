@@ -18,6 +18,8 @@ import RegisterLinks from "@/pages/RegisterLinks";
 import RegisterProfile from "@/pages/RegisterProfile";
 import RegisterComplete from "@/pages/RegisterComplete";
 import AdminDashboard from "@/pages/AdminDashboard";
+import LoginPage from "@/pages/LoginPage";
+import SignupPage from "@/pages/SignupPage";
 
 const queryClient = new QueryClient();
 
@@ -29,11 +31,11 @@ function App() {
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/auth" element={<Home />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
             <Route path="/profile/:username" element={<ProfilePage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile-setup" element={<ProfileSetupWizard onComplete={() => {}} />} />
-            <Route path="*" element={<NotFound />} />
             
             {/* Onboarding Routes */}
             <Route path="/auth/userinfo" element={<AuthUserInfo />} />
@@ -47,6 +49,9 @@ function App() {
             
             {/* Admin Dashboard */}
             <Route path="/admin" element={<AdminDashboard />} />
+            
+            {/* Catch all route */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
       </UserProvider>
