@@ -27,7 +27,7 @@ export async function trackEvent(
         .single();
 
       if (link) {
-        // Insert analytics record
+        // Insert analytics record for link click
         const { error: analyticsError } = await supabase
           .from('analytics')
           .insert({
@@ -35,7 +35,8 @@ export async function trackEvent(
             link_id: event.link_id,
             link_click: true,
             user_agent: event.user_agent || navigator.userAgent,
-            referrer: event.referrer || document.referrer
+            referrer: event.referrer || document.referrer,
+            ip_address: null // Will be handled by backend if needed
           });
 
         if (analyticsError) throw analyticsError;
@@ -57,7 +58,8 @@ export async function trackEvent(
           user_id: userId,
           page_view: true,
           user_agent: event.user_agent || navigator.userAgent,
-          referrer: event.referrer || document.referrer
+          referrer: event.referrer || document.referrer,
+          ip_address: null // Will be handled by backend if needed
         });
       
       if (error) throw error;
@@ -88,4 +90,27 @@ export async function trackLinkClick(userId: string, linkId: string): Promise<bo
     link_click: true,
     link_id: linkId
   });
+}
+
+/**
+ * Track anonymous page view (for non-logged-in users viewing profiles)
+ */
+export async function trackAnonymousPageView(profileUserId: string, path: string): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('analytics')
+      .insert({
+        user_id: profileUserId,
+        page_view: true,
+        user_agent: navigator.userAgent,
+        referrer: document.referrer,
+        ip_address: null
+      });
+    
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error("Error tracking anonymous page view:", error);
+    return false;
+  }
 }

@@ -1,91 +1,52 @@
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useUser } from "@/context/UserContext";
-import { toast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { processPayment } from "@/services/piPaymentService";
+import { useState } from 'react';
+import { trackAnonymousPageView, trackLinkClick } from '@/services/analyticsService';
+import { usePiTipping } from '@/hooks/usePiTipping';
+import { toast } from '@/hooks/use-toast';
 
-interface Link {
-  id: string;
-  title: string;
-  url: string;
-  icon: string;
-  clicks: number;
-  type?: "featured" | "social" | "regular";
-}
-
-export const useProfileActions = (profileId?: string) => {
+export const useProfileActions = (profileUserId?: string) => {
   const [processingTip, setProcessingTip] = useState(false);
-  const { user } = useUser();
-  const navigate = useNavigate();
+  const { sendTip } = usePiTipping();
 
-  const handleLinkClick = async (link: Link) => {
-    if (profileId) {
-      try {
-        // Update click count
-        await supabase
-          .from('links')
-          .update({ clicks: link.clicks + 1 })
-          .eq('id', link.id)
-          .select();
-        
-        // Register analytics
-        await supabase
-          .from('analytics')
-          .insert({
-            user_id: profileId,
-            link_id: link.id,
-            link_click: true,
-            referrer: document.referrer,
-            user_agent: navigator.userAgent,
-          })
-          .select();
-          
-        // Open the URL
-        window.open(link.url, '_blank');
-      } catch (err) {
-        console.error("Failed to register link click:", err);
+  const handleLinkClick = async (linkId: string, url: string) => {
+    try {
+      // Track the link click
+      if (profileUserId) {
+        await trackLinkClick(profileUserId, linkId);
+      }
+      
+      // Open the link
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      } else {
+        window.open(`https://${url}`, '_blank', 'noopener,noreferrer');
+      }
+    } catch (error) {
+      console.error('Error tracking link click:', error);
+      // Still open the link even if tracking fails
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      } else {
+        window.open(`https://${url}`, '_blank', 'noopener,noreferrer');
       }
     }
   };
 
-  const handleTipSubmit = async (amount: number, message: string, username?: string) => {
-    if (!user) {
-      toast({
-        title: "Login Required",
-        description: "Please log in to send a tip",
-        variant: "destructive",
-      });
-      navigate('/login');
-      return;
-    }
+  const handleTipSubmit = async (amount: number, message: string, username: string) => {
+    if (!profileUserId) return;
     
     setProcessingTip(true);
-    
     try {
-      const paymentData = {
-        amount: amount,
-        memo: message || `Tip to @${username}`,
-        metadata: {
-          recipientId: profileId,
-          type: 'tip',
-          message: message
-        }
-      };
-      
-      await processPayment(paymentData, user);
-      
+      await sendTip(profileUserId, amount, message);
       toast({
-        title: "Sending Tip",
-        description: "Follow the Pi payment flow to complete your tip",
+        title: "Tip Sent!",
+        description: `Successfully sent ${amount}π to @${username}`,
       });
-      
     } catch (error) {
-      console.error("Tip error:", error);
+      console.error('Error sending tip:', error);
       toast({
-        title: "Tip failed",
-        description: "There was an error processing your tip",
+        title: "Tip Failed",
+        description: "There was an error sending your tip. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -94,17 +55,44 @@ export const useProfileActions = (profileId?: string) => {
   };
 
   const handleShareProfile = (username: string) => {
+    const profileUrl = `${window.location.origin}/@${username}`;
+    
     if (navigator.share) {
       navigator.share({
-        title: `@${username}'s Profile`,
-        url: window.location.href,
-      }).catch(err => console.error('Error sharing:', err));
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast({
-        title: "Link Copied",
-        description: "Profile URL copied to clipboard",
+        title: `Check out @${username} on Droplink`,
+        text: `View @${username}'s profile on Droplink`,
+        url: profileUrl,
+      }).catch(err => {
+        console.log('Error sharing:', err);
+        fallbackShare(profileUrl);
       });
+    } else {
+      fallbackShare(profileUrl);
+    }
+  };
+
+  const fallbackShare = (url: string) => {
+    navigator.clipboard.writeText(url).then(() => {
+      toast({
+        title: "Link Copied!",
+        description: "Profile link has been copied to your clipboard.",
+      });
+    }).catch(() => {
+      toast({
+        title: "Share Link",
+        description: url,
+      });
+    });
+  };
+
+  // Track page view when profile is loaded
+  const trackPageView = async (path: string) => {
+    if (profileUserId) {
+      try {
+        await trackAnonymousPageView(profileUserId, path);
+      } catch (error) {
+        console.error('Error tracking page view:', error);
+      }
     }
   };
 
@@ -112,6 +100,7 @@ export const useProfileActions = (profileId?: string) => {
     processingTip,
     handleLinkClick,
     handleTipSubmit,
-    handleShareProfile
+    handleShareProfile,
+    trackPageView
   };
 };

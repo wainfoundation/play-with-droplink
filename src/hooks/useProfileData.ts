@@ -78,17 +78,18 @@ export const useProfileData = (username: string | undefined) => {
           console.error("Failed to fetch links:", linksError);
         }
         
-        // Register page view in analytics
-        if (profileData.id) {
-          await supabase
-            .from('analytics')
-            .insert({
-              user_id: profileData.id,
-              page_view: true,
-              referrer: document.referrer,
-              user_agent: navigator.userAgent,
-            })
-            .select();
+        // Track page view for this profile visit
+        const { error: analyticsError } = await supabase
+          .from('analytics')
+          .insert({
+            user_id: profileData.id,
+            page_view: true,
+            referrer: document.referrer,
+            user_agent: navigator.userAgent,
+          });
+        
+        if (analyticsError) {
+          console.error("Failed to track page view:", analyticsError);
         }
         
         // Process links to categorize them
