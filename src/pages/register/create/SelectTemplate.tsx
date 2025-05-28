@@ -83,10 +83,23 @@ const SelectTemplate = () => {
 
   const handleContinue = () => {
     if (selectedTemplate) {
-      const queryParam = userPlan === 'free' ? '?freeEntryPoint=ON_SIGNUP' : 
-                        userPlan === 'starter' ? '?basicEntryPoint=ON_SIGNUP' :
-                        userPlan === 'pro' ? '?proEntryPoint=ON_SIGNUP' :
-                        '?premiumEntryPoint=ON_SIGNUP';
+      let queryParam = '';
+      switch (userPlan) {
+        case 'free':
+          queryParam = '?freeEntryPoint=ON_SIGNUP';
+          break;
+        case 'starter':
+          queryParam = '?basicEntryPoint=ON_SIGNUP';
+          break;
+        case 'pro':
+          queryParam = '?proEntryPoint=ON_SIGNUP';
+          break;
+        case 'premium':
+          queryParam = '?premiumEntryPoint=ON_SIGNUP';
+          break;
+        default:
+          queryParam = '?freeEntryPoint=ON_SIGNUP';
+      }
       navigate(`/register/create/select-platforms${queryParam}`);
     }
   };
