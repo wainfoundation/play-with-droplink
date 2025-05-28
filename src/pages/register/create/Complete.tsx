@@ -49,7 +49,7 @@ const Complete = () => {
           .from('user_profiles')
           .update({
             onboarding_completed: true,
-            onboarding_step: 'completed',
+            onboarding_step: 'complete',
             updated_at: new Date().toISOString()
           })
           .eq('id', user.id);

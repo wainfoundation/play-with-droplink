@@ -33,7 +33,19 @@ export const useOnboardingProgress = () => {
       if (error) throw error;
       
       if (data && data.length > 0) {
-        setProgress(data[0]);
+        const progressData = data[0];
+        setProgress({
+          current_step: progressData.current_step,
+          selected_intent: progressData.selected_intent,
+          selected_plan: progressData.selected_plan,
+          selected_template: progressData.selected_template,
+          completed_steps: Array.isArray(progressData.completed_steps) ? progressData.completed_steps : [],
+          platform_selections: Array.isArray(progressData.platform_selections) ? progressData.platform_selections : [],
+          links_data: progressData.links_data || {},
+          profile_data: progressData.profile_data || {},
+          is_completed: progressData.is_completed,
+          completed_at: progressData.completed_at
+        });
       }
     } catch (error) {
       console.error('Error fetching onboarding progress:', error);

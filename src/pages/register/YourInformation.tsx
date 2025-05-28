@@ -145,29 +145,6 @@ const YourInformation = () => {
       </div>
     </div>
   );
-
-  // Generate preview data based on selected intent
-  function getPreviewData() {
-    const intentData = {
-      creator: {
-        title: "Creative Pro",
-        bio: "🎨 Content Creator | 📱 Digital Artist | 🌟 Follow my creative journey",
-        username: "creativeuser"
-      },
-      business: {
-        title: "Business Name",
-        bio: "💼 Professional Services | 🚀 Growing Business | 📈 Let's connect",
-        username: "mybusiness"
-      },
-      personal: {
-        title: "Your Name",
-        bio: "😊 Sharing my interests | 🌟 Personal links | 💬 Let's be friends",
-        username: "yourname"
-      }
-    };
-
-    return selectedIntent ? intentData[selectedIntent as keyof typeof intentData] : undefined;
-  }
 };
 
 export default YourInformation;
