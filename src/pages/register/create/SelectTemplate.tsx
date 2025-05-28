@@ -207,7 +207,7 @@ const SelectTemplate = () => {
                 </h4>
                 <p className="text-sm text-amber-800 mb-3">
                   You have access to {currentPlanLimits.maxTemplates} basic templates with the Free plan. 
-                  Upgrade to unlock {userPlan === 'starter' ? '33+' : userPlan === 'pro' ? '66+' : '99+'} premium templates and advanced customization!
+                  Upgrade to unlock premium templates and advanced customization!
                 </p>
                 <Button 
                   onClick={handleUpgrade}
