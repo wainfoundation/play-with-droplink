@@ -39,10 +39,18 @@ export const useOnboardingProgress = () => {
           selected_intent: progressData.selected_intent,
           selected_plan: progressData.selected_plan,
           selected_template: progressData.selected_template,
-          completed_steps: Array.isArray(progressData.completed_steps) ? progressData.completed_steps : [],
-          platform_selections: Array.isArray(progressData.platform_selections) ? progressData.platform_selections : [],
-          links_data: progressData.links_data || {},
-          profile_data: progressData.profile_data || {},
+          completed_steps: Array.isArray(progressData.completed_steps) 
+            ? (progressData.completed_steps as string[])
+            : [],
+          platform_selections: Array.isArray(progressData.platform_selections) 
+            ? (progressData.platform_selections as string[])
+            : [],
+          links_data: (typeof progressData.links_data === 'object' && progressData.links_data !== null)
+            ? (progressData.links_data as Record<string, any>)
+            : {},
+          profile_data: (typeof progressData.profile_data === 'object' && progressData.profile_data !== null)
+            ? (progressData.profile_data as Record<string, any>)
+            : {},
           is_completed: progressData.is_completed,
           completed_at: progressData.completed_at
         });
