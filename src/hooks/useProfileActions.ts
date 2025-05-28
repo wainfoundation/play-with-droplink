@@ -48,11 +48,21 @@ export const useProfileActions = (profileUserId?: string) => {
     
     setProcessingTip(true);
     try {
-      await sendTip(profileUserId, amount, message);
-      toast({
-        title: "Tip Sent!",
-        description: `Successfully sent ${amount}π to @${username}`,
-      });
+      const tipData = {
+        recipientId: profileUserId,
+        recipientUsername: username,
+        amount,
+        message
+      };
+      
+      const success = await sendTip(tipData);
+      
+      if (success) {
+        toast({
+          title: "Tip Sent!",
+          description: `Successfully sent ${amount}π to @${username}`,
+        });
+      }
     } catch (error) {
       console.error('Error sending tip:', error);
       toast({
