@@ -1,16 +1,15 @@
-
 import React from "react";
-import LinksSection from "./LinksSection";
-import ShopSection from "./ShopSection";
-import PiTipsSection from "./PiTipsSection";
-import AudienceSection from "./AudienceSection";
-import AnalyticsSection from "./AnalyticsSection";
-import ToolsSection from "./ToolsSection";
-import SocialPlannerSection from "./SocialPlannerSection";
-import InstagramReplySection from "./InstagramReplySection";
-import LinkShortenerSection from "./LinkShortenerSection";
-import TeamAccessSection from "./TeamAccessSection";
-import LockedFeatureCard from "./LockedFeatureCard";
+import MyDroplinkSection from "@/components/dashboard/MyDroplinkSection";
+import ShopSection from "@/components/dashboard/ShopSection";
+import PiTipsSection from "@/components/dashboard/PiTipsSection";
+import AudienceSection from "@/components/dashboard/AudienceSection";
+import ToolsSection from "@/components/dashboard/ToolsSection";
+import LockedFeatureCard from "@/components/dashboard/LockedFeatureCard";
+import TeamAccessSection from "@/components/dashboard/TeamAccessSection";
+import SocialPlannerSection from "@/components/dashboard/SocialPlannerSection";
+import InstagramReplySection from "@/components/dashboard/InstagramReplySection";
+import LinkShortenerSection from "@/components/dashboard/LinkShortenerSection";
+import DomainSettingsSection from "./DomainSettingsSection";
 
 interface DashboardMainProps {
   activeSection: string;
@@ -18,7 +17,7 @@ interface DashboardMainProps {
   limits: any;
   profile: any;
   hasFeatureAccess: (feature: string) => boolean;
-  onFeatureClick: (section: string, requiredFeatures: string[]) => boolean;
+  onFeatureClick: (feature: string, requiredFeatures: string[]) => boolean;
 }
 
 const DashboardMain = ({ 
@@ -26,192 +25,125 @@ const DashboardMain = ({
   plan, 
   limits, 
   profile, 
-  hasFeatureAccess,
+  hasFeatureAccess, 
   onFeatureClick 
 }: DashboardMainProps) => {
   const renderSection = () => {
     switch (activeSection) {
       case "my-droplink":
-        return <LinksSection />;
-        
+        return <MyDroplinkSection profile={profile} limits={limits} />;
       case "my-shop":
-        if (!hasFeatureAccess("product_sales")) {
-          return (
-            <LockedFeatureCard
-              title="My Shop"
-              description="Sell digital products and accept Pi payments"
-              requiredPlan="Pro"
-              features={[
-                "Sell digital products",
-                "Accept Pi payments",
-                "Sales dashboard",
-                "Order management",
-                "Customer analytics"
-              ]}
-            />
-          );
-        }
-        return <ShopSection />;
-        
+        return hasFeatureAccess('product_sales') ? (
+          <ShopSection />
+        ) : (
+          <LockedFeatureCard 
+            title="My Shop"
+            description="Sell digital products and earn Pi"
+            requiredPlan="Pro"
+            onUpgrade={() => onFeatureClick('product_sales', ['product_sales'])}
+          />
+        );
       case "earn-pi-tips":
-        if (!hasFeatureAccess("pi_tips")) {
-          return (
-            <LockedFeatureCard
-              title="Earn with Pi Tips"
-              description="Receive Pi cryptocurrency tips from your audience"
-              requiredPlan="Starter"
-              features={[
-                "Receive Pi tips",
-                "Tips dashboard",
-                "Withdrawal options",
-                "Tips analytics",
-                "Custom tip amounts"
-              ]}
-            />
-          );
-        }
-        return <PiTipsSection />;
-        
+        return hasFeatureAccess('pi_tips') ? (
+          <PiTipsSection />
+        ) : (
+          <LockedFeatureCard 
+            title="Pi Tips"
+            description="Earn Pi through tips from your audience"
+            requiredPlan="Starter"
+            onUpgrade={() => onFeatureClick('pi_tips', ['pi_tips'])}
+          />
+        );
       case "audience":
-        if (!hasFeatureAccess("analytics")) {
-          return (
-            <LockedFeatureCard
-              title="Audience"
-              description="Understand your audience with detailed insights"
-              requiredPlan="Starter"
-              features={[
-                "Audience demographics",
-                "Visitor analytics",
-                "Growth tracking",
-                "Engagement metrics",
-                "Real-time insights"
-              ]}
-            />
-          );
-        }
-        return <AudienceSection />;
-        
+        return hasFeatureAccess('analytics') ? (
+          <AudienceSection />
+        ) : (
+          <LockedFeatureCard 
+            title="Audience"
+            description="Understand your audience with detailed insights"
+            requiredPlan="Starter"
+            onUpgrade={() => onFeatureClick('analytics', ['analytics'])}
+          />
+        );
       case "analytics":
-        if (!hasFeatureAccess("analytics")) {
-          return (
-            <LockedFeatureCard
-              title="Analytics"
-              description="Track your performance with detailed analytics"
-              requiredPlan="Starter"
-              features={[
-                "Click tracking",
-                "Performance metrics",
-                "Growth analytics",
-                "Export data",
-                "Custom reports"
-              ]}
-            />
-          );
-        }
-        return <AnalyticsSection subscription={{ plan }} />;
-        
+        return hasFeatureAccess('analytics') ? (
+          <div>Analytics Dashboard Coming Soon</div>
+        ) : (
+          <LockedFeatureCard 
+            title="Analytics"
+            description="Track clicks, views, and performance metrics"
+            requiredPlan="Starter"
+            onUpgrade={() => onFeatureClick('analytics', ['analytics'])}
+          />
+        );
       case "tools":
-        if (!hasFeatureAccess("seo_tools") && !hasFeatureAccess("scheduling")) {
-          return (
-            <LockedFeatureCard
-              title="Tools"
-              description="Advanced tools for SEO, scheduling, and optimization"
-              requiredPlan="Pro"
-              features={[
-                "SEO optimization",
-                "Link scheduling",
-                "Spotlight links",
-                "Custom animations",
-                "Advanced settings"
-              ]}
-            />
-          );
-        }
-        return <ToolsSection />;
-        
+        return hasFeatureAccess('seo_tools') ? (
+          <ToolsSection />
+        ) : (
+          <LockedFeatureCard 
+            title="Tools"
+            description="SEO settings, scheduling, and advanced features"
+            requiredPlan="Pro"
+            onUpgrade={() => onFeatureClick('seo_tools', ['seo_tools'])}
+          />
+        );
+      case "domain-settings":
+        return <DomainSettingsSection 
+          profile={profile} 
+          hasFeatureAccess={hasFeatureAccess}
+          onFeatureClick={onFeatureClick}
+        />;
       case "social-planner":
-        if (!hasFeatureAccess("social_planner")) {
-          return (
-            <LockedFeatureCard
-              title="Social Planner"
-              description="Plan and schedule your social media content"
-              requiredPlan="Premium"
-              features={[
-                "Content calendar",
-                "Multi-platform posting",
-                "Content templates",
-                "Analytics integration",
-                "Team collaboration"
-              ]}
-            />
-          );
-        }
-        return <SocialPlannerSection />;
-        
+        return hasFeatureAccess('social_planner') ? (
+          <SocialPlannerSection />
+        ) : (
+          <LockedFeatureCard 
+            title="Social Planner"
+            description="Plan and schedule your social media content"
+            requiredPlan="Premium"
+            onUpgrade={() => onFeatureClick('social_planner', ['social_planner'])}
+          />
+        );
       case "instagram-reply":
-        if (!hasFeatureAccess("instagram_reply")) {
-          return (
-            <LockedFeatureCard
-              title="Instagram Auto-Reply"
-              description="Automated Instagram responses and engagement"
-              requiredPlan="Premium"
-              features={[
-                "Auto-reply messages",
-                "Comment management",
-                "DM automation",
-                "Engagement analytics",
-                "Custom triggers"
-              ]}
-            />
-          );
-        }
-        return <InstagramReplySection />;
-        
+        return hasFeatureAccess('instagram_reply') ? (
+          <InstagramReplySection />
+        ) : (
+          <LockedFeatureCard 
+            title="Instagram Auto-Reply"
+            description="Automated Instagram responses and engagement"
+            requiredPlan="Premium"
+            onUpgrade={() => onFeatureClick('instagram_reply', ['instagram_reply'])}
+          />
+        );
       case "link-shortener":
-        if (!hasFeatureAccess("link_shortener")) {
-          return (
-            <LockedFeatureCard
-              title="Link Shortener"
-              description="Create branded short links with analytics"
-              requiredPlan="Pro"
-              features={[
-                "Branded short links",
-                "Click analytics",
-                "Custom domains",
-                "QR codes",
-                "Link management"
-              ]}
-            />
-          );
-        }
-        return <LinkShortenerSection />;
-        
+        return hasFeatureAccess('link_shortener') ? (
+          <LinkShortenerSection />
+        ) : (
+          <LockedFeatureCard 
+            title="Link Shortener"
+            description="Create branded short links with analytics"
+            requiredPlan="Pro"
+            onUpgrade={() => onFeatureClick('link_shortener', ['link_shortener'])}
+          />
+        );
       case "team-access":
-        if (!hasFeatureAccess("team_access")) {
-          return (
-            <LockedFeatureCard
-              title="Team Access"
-              description="Collaborate with your team on your Droplink"
-              requiredPlan="Premium"
-              features={[
-                "Team member management",
-                "Role-based permissions",
-                "Collaboration tools",
-                "Activity tracking",
-                "Shared analytics"
-              ]}
-            />
-          );
-        }
-        return <TeamAccessSection />;
-        
+        return hasFeatureAccess('team_access') ? (
+          <TeamAccessSection />
+        ) : (
+          <LockedFeatureCard 
+            title="Team Access"
+            description="Collaborate with your team on your Droplink"
+            requiredPlan="Premium"
+            onUpgrade={() => onFeatureClick('team_access', ['team_access'])}
+          />
+        );
       default:
-        return <LinksSection />;
+        return <MyDroplinkSection profile={profile} limits={limits} />;
     }
   };
 
   return (
-    <div className="flex-1 p-6">
+    <div className="p-6">
       {renderSection()}
     </div>
   );

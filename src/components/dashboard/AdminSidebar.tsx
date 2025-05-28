@@ -1,4 +1,3 @@
-
 import React from "react";
 import { cn } from "@/lib/utils";
 import { 
@@ -12,7 +11,8 @@ import {
   MessageSquare,
   Scissors,
   Lock,
-  Crown
+  Crown,
+  Globe
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
