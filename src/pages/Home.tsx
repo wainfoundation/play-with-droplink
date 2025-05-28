@@ -17,6 +17,7 @@ import TemplatesShowcase from "@/components/TemplatesShowcase";
 import CustomerSuccessStories from "@/components/CustomerSuccessStories";
 import AppInfo from "@/components/AppInfo";
 import GoToTop from "@/components/GoToTop";
+import WorkflowShowcase from "@/components/WorkflowShowcase";
 import { Helmet } from "react-helmet-async";
 
 const Home = () => {
@@ -45,6 +46,7 @@ const Home = () => {
               <PiDomainFeatures />
               <PiDomainShowcase />
               <CustomerSuccessStories />
+              <WorkflowShowcase />
               <PiDomainSetup />
               <HowItWorks />
               <DemoSection />
