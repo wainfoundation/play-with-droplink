@@ -8,10 +8,22 @@ interface LockedFeatureCardProps {
   title: string;
   description: string;
   requiredPlan: string;
-  features: string[];
+  features?: string[];
+  onUpgrade?: () => void;
 }
 
-const LockedFeatureCard = ({ title, description, requiredPlan, features }: LockedFeatureCardProps) => {
+const LockedFeatureCard = ({ 
+  title, 
+  description, 
+  requiredPlan, 
+  features = [
+    "Enhanced functionality",
+    "Advanced features",
+    "Priority support",
+    "Detailed analytics"
+  ],
+  onUpgrade 
+}: LockedFeatureCardProps) => {
   return (
     <div className="max-w-2xl mx-auto">
       <Card className="border-2 border-dashed border-gray-300 bg-gray-50/50">
@@ -47,7 +59,7 @@ const LockedFeatureCard = ({ title, description, requiredPlan, features }: Locke
             
             <div className="flex gap-3 justify-center">
               <Button
-                onClick={() => window.location.href = '/pricing'}
+                onClick={onUpgrade || (() => window.location.href = '/pricing')}
                 className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
               >
                 <Crown className="w-4 h-4 mr-2" />
