@@ -91,8 +91,8 @@ const YourInformation = () => {
                 }`}
               >
                 <div className="flex items-center space-x-4">
-                  <div className={`p-3 rounded-lg bg-gradient-to-r ${intent.color} text-white`}>
-                    {intent.icon}
+                  <div className="p-3 rounded-lg bg-gradient-to-r from-primary/20 to-blue-500/20">
+                    <span className="text-2xl">{intent.icon}</span>
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg">{intent.title}</h3>

@@ -16,7 +16,7 @@ import AddLinks from "./pages/register/create/AddLinks";
 import NameImageBio from "./pages/register/create/NameImageBio";
 import Complete from "./pages/register/create/Complete";
 import Auth from "./pages/Auth";
-import UserInfo from "./pages/UserInfo";
+import UserInfo from "./pages/auth/UserInfo";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
 import Pricing from "./pages/Pricing";
