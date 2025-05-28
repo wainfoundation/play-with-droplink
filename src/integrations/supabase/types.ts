@@ -866,6 +866,57 @@ export type Database = {
         }
         Relationships: []
       }
+      onboarding_progress: {
+        Row: {
+          completed_at: string | null
+          completed_steps: Json | null
+          created_at: string | null
+          current_step: string
+          id: string
+          is_completed: boolean | null
+          links_data: Json | null
+          platform_selections: Json | null
+          profile_data: Json | null
+          selected_intent: string | null
+          selected_plan: string | null
+          selected_template: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_steps?: Json | null
+          created_at?: string | null
+          current_step?: string
+          id?: string
+          is_completed?: boolean | null
+          links_data?: Json | null
+          platform_selections?: Json | null
+          profile_data?: Json | null
+          selected_intent?: string | null
+          selected_plan?: string | null
+          selected_template?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_steps?: Json | null
+          created_at?: string | null
+          current_step?: string
+          id?: string
+          is_completed?: boolean | null
+          links_data?: Json | null
+          platform_selections?: Json | null
+          profile_data?: Json | null
+          selected_intent?: string | null
+          selected_plan?: string | null
+          selected_template?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           access_token: string | null
@@ -1277,8 +1328,11 @@ export type Database = {
           consented: boolean
           consented_at: string | null
           created_at: string | null
+          data_usage_consent: boolean | null
           id: string
+          marketing_consent: boolean | null
           newsletter_consent: boolean | null
+          pi_integration_consent: boolean | null
           updated_at: string | null
           user_id: string
           username_consent: boolean | null
@@ -1289,8 +1343,11 @@ export type Database = {
           consented?: boolean
           consented_at?: string | null
           created_at?: string | null
+          data_usage_consent?: boolean | null
           id?: string
+          marketing_consent?: boolean | null
           newsletter_consent?: boolean | null
+          pi_integration_consent?: boolean | null
           updated_at?: string | null
           user_id: string
           username_consent?: boolean | null
@@ -1301,8 +1358,11 @@ export type Database = {
           consented?: boolean
           consented_at?: string | null
           created_at?: string | null
+          data_usage_consent?: boolean | null
           id?: string
+          marketing_consent?: boolean | null
           newsletter_consent?: boolean | null
+          pi_integration_consent?: boolean | null
           updated_at?: string | null
           user_id?: string
           username_consent?: boolean | null
@@ -1415,6 +1475,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_platform_selections: {
+        Row: {
+          created_at: string | null
+          id: string
+          platform: string
+          selected_during_onboarding: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          platform: string
+          selected_during_onboarding?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          platform?: string
+          selected_during_onboarding?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       user_platforms: {
         Row: {
@@ -1609,6 +1696,21 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_onboarding_progress: {
+        Args: { user_id_param: string }
+        Returns: {
+          current_step: string
+          selected_intent: string
+          selected_plan: string
+          selected_template: string
+          completed_steps: Json
+          platform_selections: Json
+          links_data: Json
+          profile_data: Json
+          is_completed: boolean
+          completed_at: string
+        }[]
+      }
       get_or_create_daily_quota: {
         Args: { user_id_param: string }
         Returns: {
@@ -1630,6 +1732,10 @@ export type Database = {
       get_user_tips_sent: {
         Args: { user_id_param: string }
         Returns: number
+      }
+      update_onboarding_progress: {
+        Args: { user_id_param: string; step_name: string; step_data?: Json }
+        Returns: undefined
       }
       update_user_custom_domain: {
         Args: { user_id: string; domain_value: string }

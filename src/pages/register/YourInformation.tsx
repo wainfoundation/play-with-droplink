@@ -6,10 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, Building, Heart } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import DemoPreview from "@/components/DemoPreview";
+import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
+import { toast } from "@/hooks/use-toast";
 
 const YourInformation = () => {
   const navigate = useNavigate();
   const [selectedIntent, setSelectedIntent] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { updateProgress } = useOnboardingProgress();
 
   const intents = [
     {
@@ -35,9 +39,27 @@ const YourInformation = () => {
     }
   ];
 
-  const handleContinue = () => {
-    if (selectedIntent) {
-      navigate("/register/select-categories");
+  const handleContinue = async () => {
+    if (!selectedIntent) return;
+    
+    setIsLoading(true);
+    
+    try {
+      const success = await updateProgress('your-information', {
+        intent: selectedIntent
+      });
+
+      if (success) {
+        navigate("/register/select-categories");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save your selection. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -108,10 +130,10 @@ const YourInformation = () => {
             
             <Button 
               onClick={handleContinue}
-              disabled={!selectedIntent}
+              disabled={!selectedIntent || isLoading}
               className="w-full mt-6 bg-gradient-to-r from-primary to-blue-600"
             >
-              Continue
+              {isLoading ? "Saving..." : "Continue"}
             </Button>
           </CardContent>
         </Card>
@@ -123,6 +145,29 @@ const YourInformation = () => {
       </div>
     </div>
   );
+
+  // Generate preview data based on selected intent
+  function getPreviewData() {
+    const intentData = {
+      creator: {
+        title: "Creative Pro",
+        bio: "🎨 Content Creator | 📱 Digital Artist | 🌟 Follow my creative journey",
+        username: "creativeuser"
+      },
+      business: {
+        title: "Business Name",
+        bio: "💼 Professional Services | 🚀 Growing Business | 📈 Let's connect",
+        username: "mybusiness"
+      },
+      personal: {
+        title: "Your Name",
+        bio: "😊 Sharing my interests | 🌟 Personal links | 💬 Let's be friends",
+        username: "yourname"
+      }
+    };
+
+    return selectedIntent ? intentData[selectedIntent as keyof typeof intentData] : undefined;
+  }
 };
 
 export default YourInformation;

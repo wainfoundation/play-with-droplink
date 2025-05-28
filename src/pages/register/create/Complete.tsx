@@ -1,14 +1,20 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, ExternalLink, Star, Zap, Crown, Shield } from "lucide-react";
 import { Helmet } from "react-helmet-async";
+import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
+import { useUser } from "@/context/UserContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const Complete = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { updateProgress } = useOnboardingProgress();
+  const { user, profile } = useUser();
+  const [isInitializing, setIsInitializing] = useState(true);
   
   const plan = searchParams.get("freeEntryPoint") ? "Free" :
               searchParams.get("basicEntryPoint") ? "Starter" :
@@ -28,13 +34,58 @@ const Complete = () => {
     "Premium": "from-yellow-500 to-orange-500"
   };
 
+  useEffect(() => {
+    const completeOnboarding = async () => {
+      if (!user?.id) return;
+      
+      try {
+        // Mark onboarding as complete
+        await updateProgress('complete', {
+          completed_at: new Date().toISOString()
+        });
+
+        // Update user profile to mark onboarding as completed
+        await supabase
+          .from('user_profiles')
+          .update({
+            onboarding_completed: true,
+            onboarding_step: 'completed',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id);
+
+        setIsInitializing(false);
+      } catch (error) {
+        console.error('Error completing onboarding:', error);
+        setIsInitializing(false);
+      }
+    };
+
+    completeOnboarding();
+  }, [user?.id, updateProgress]);
+
   const handleContinueBuilding = () => {
     navigate("/dashboard");
   };
 
   const handleViewProfile = () => {
-    navigate("/@username"); // Replace with actual username
+    if (profile?.username) {
+      navigate(`/@${profile.username}`);
+    } else {
+      navigate("/@username");
+    }
   };
+
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Finalizing your setup...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
@@ -61,7 +112,9 @@ const Complete = () => {
               </h3>
               <div className="flex items-center justify-between bg-white rounded-lg p-4 shadow-sm">
                 <div>
-                  <p className="font-medium">droplink.space/@username</p>
+                  <p className="font-medium">
+                    droplink.space/@{profile?.username || "username"}
+                  </p>
                   <p className="text-sm text-gray-500">Your public profile URL</p>
                 </div>
                 <Button variant="outline" size="sm" onClick={handleViewProfile}>
