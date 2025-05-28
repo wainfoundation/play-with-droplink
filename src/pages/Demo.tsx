@@ -1,7 +1,6 @@
 
 import React from "react";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Play, ArrowRight, Users, DollarSign, Globe } from "lucide-react";
@@ -86,8 +85,6 @@ const Demo = () => {
           </div>
         </section>
       </main>
-      
-      <Footer />
     </div>
   );
 };

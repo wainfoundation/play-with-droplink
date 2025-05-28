@@ -1,7 +1,6 @@
 
 import React from "react";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Check, ArrowRight, Star, Zap, Users, Globe, DollarSign, Palette } from "lucide-react";
@@ -125,8 +124,6 @@ const Features = () => {
           </div>
         </section>
       </main>
-      
-      <Footer />
     </div>
   );
 };

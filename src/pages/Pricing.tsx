@@ -1,7 +1,6 @@
 
 import React from "react";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Check, Star, Zap } from "lucide-react";
@@ -171,8 +170,6 @@ const Pricing = () => {
           </div>
         </section>
       </main>
-      
-      <Footer />
     </div>
   );
 };
