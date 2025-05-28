@@ -64,7 +64,8 @@ const Complete = () => {
     completeOnboarding();
   }, [user?.id, updateProgress]);
 
-  const handleContinueBuilding = () => {
+  const handleContinueToAdmin = () => {
+    // Navigate directly to the admin dashboard
     navigate("/admin");
   };
 
@@ -100,10 +101,29 @@ const Complete = () => {
               <CheckCircle className="w-10 h-10 text-white" />
             </div>
             <CardTitle className="text-3xl mb-2">🎉 You're All Set!</CardTitle>
-            <p className="text-gray-600 text-lg">Your Droplink profile is ready to share with the world</p>
+            <p className="text-gray-600 text-lg">Your Droplink profile is ready to manage from your admin dashboard</p>
           </CardHeader>
           
           <CardContent className="space-y-6">
+            {/* Admin Dashboard Preview Card */}
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6 border border-green-200">
+              <h3 className="font-semibold mb-3 flex items-center gap-2">
+                <Crown className="w-5 h-5 text-primary" />
+                Admin Dashboard Ready
+              </h3>
+              <div className="bg-white rounded-lg p-4 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Droplink Admin Panel</p>
+                    <p className="text-sm text-gray-500">Manage links, analytics, and more</p>
+                  </div>
+                  <Button onClick={handleContinueToAdmin} className="bg-gradient-to-r from-primary to-secondary">
+                    Open Dashboard
+                  </Button>
+                </div>
+              </div>
+            </div>
+            
             {/* Profile Preview Card */}
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
               <h3 className="font-semibold mb-3 flex items-center gap-2">
@@ -142,15 +162,15 @@ const Complete = () => {
 
             {/* Next Steps */}
             <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="font-semibold mb-4">🚀 What's Next?</h3>
+              <h3 className="font-semibold mb-4">🚀 What's Next in Your Dashboard?</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white text-sm font-bold">1</span>
                   </div>
                   <div>
-                    <p className="font-medium">Customize Your Profile</p>
-                    <p className="text-sm text-gray-600">Add more links, change themes, upload a better photo</p>
+                    <p className="font-medium">Add More Links</p>
+                    <p className="text-sm text-gray-600">Customize your link collection in "My Droplink"</p>
                   </div>
                 </div>
                 
@@ -159,8 +179,8 @@ const Complete = () => {
                     <span className="text-white text-sm font-bold">2</span>
                   </div>
                   <div>
-                    <p className="font-medium">Share Your Profile</p>
-                    <p className="text-sm text-gray-600">Start sharing your link on social media and bio sections</p>
+                    <p className="font-medium">View Analytics</p>
+                    <p className="text-sm text-gray-600">Track your profile performance and clicks</p>
                   </div>
                 </div>
                 
@@ -169,8 +189,8 @@ const Complete = () => {
                     <span className="text-white text-sm font-bold">3</span>
                   </div>
                   <div>
-                    <p className="font-medium">Connect Pi Network</p>
-                    <p className="text-sm text-gray-600">Enable Pi tips and get your .pi domain</p>
+                    <p className="font-medium">Enable Pi Features</p>
+                    <p className="text-sm text-gray-600">Set up Pi tips and explore earning options</p>
                   </div>
                 </div>
                 
@@ -179,8 +199,8 @@ const Complete = () => {
                     <span className="text-white text-sm font-bold">4</span>
                   </div>
                   <div>
-                    <p className="font-medium">Check Analytics</p>
-                    <p className="text-sm text-gray-600">Track clicks and optimize your profile performance</p>
+                    <p className="font-medium">Explore Tools</p>
+                    <p className="text-sm text-gray-600">Use SEO tools and advanced features</p>
                   </div>
                 </div>
               </div>
@@ -188,7 +208,7 @@ const Complete = () => {
             
             <div className="flex flex-col sm:flex-row gap-4">
               <Button 
-                onClick={handleContinueBuilding} 
+                onClick={handleContinueToAdmin} 
                 className="flex-1 bg-gradient-to-r from-primary to-blue-600 text-lg py-3"
                 size="lg"
               >
@@ -206,7 +226,7 @@ const Complete = () => {
             
             <div className="text-center pt-4 border-t">
               <p className="text-sm text-gray-500 mb-2">
-                Welcome to the Pi Network creator community! 🎉
+                Welcome to your Droplink Admin Dashboard! 🎉
               </p>
               <p className="text-xs text-gray-400">
                 Need help? Visit our help center or contact support anytime.

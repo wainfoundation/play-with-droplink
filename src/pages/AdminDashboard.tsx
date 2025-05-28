@@ -6,35 +6,54 @@ import { useUserPlan } from "@/hooks/use-user-plan";
 import { useFeatureGate } from "@/hooks/useFeatureGate";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminSidebar from "@/components/dashboard/AdminSidebar";
 import DashboardMain from "@/components/dashboard/DashboardMain";
 import MobilePreview from "@/components/dashboard/MobilePreview";
 import PlanStatusHeader from "@/components/dashboard/PlanStatusHeader";
 import PlanUpgradeModal from "@/components/dashboard/PlanUpgradeModal";
 import { Helmet } from "react-helmet-async";
+import { toast } from "@/hooks/use-toast";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { isLoggedIn, user, profile } = useUser();
   const { plan, limits } = useUserPlan();
-  const { hasFeatureAccess, getRequiredPlan, checkFeatureAccess } = useFeatureGate();
+  const { hasFeatureAccess, getRequiredPlan } = useFeatureGate();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgradeFeature, setUpgradeFeature] = useState("");
   const [activeSection, setActiveSection] = useState("my-droplink");
 
   useEffect(() => {
+    // Check if user is logged in
     if (!isLoggedIn) {
+      console.log("User not logged in, redirecting to login");
       navigate("/login");
       return;
     }
 
-    if (!profile?.onboarding_completed) {
+    // Check if profile exists and onboarding is completed
+    if (!profile) {
+      console.log("Profile not found");
+      return; // Wait for profile to load
+    }
+
+    if (!profile.onboarding_completed) {
+      console.log("Onboarding not completed, redirecting to onboarding");
+      toast({
+        title: "Complete Your Setup",
+        description: "Please complete your profile setup first.",
+      });
       navigate("/register/your-information");
       return;
+    }
+
+    // Welcome message for completed users
+    if (profile.onboarding_completed) {
+      console.log("User authenticated and onboarding completed, showing dashboard");
+      toast({
+        title: "Welcome to Your Dashboard!",
+        description: `Welcome back, ${profile.display_name || profile.username}! Manage your Droplink profile here.`,
+      });
     }
   }, [isLoggedIn, profile, navigate]);
 
@@ -53,8 +72,16 @@ const AdminDashboard = () => {
     return true;
   };
 
+  // Show loading state while checking authentication and profile
   if (!isLoggedIn || !profile) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
