@@ -27,6 +27,8 @@ import Templates from "@/pages/Templates";
 import Help from "@/pages/Help";
 import Store from "@/pages/Store";
 import Groups from "@/pages/Groups";
+import Stickers from "@/pages/Stickers";
+import About from "@/pages/About";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +42,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
+            <Route path="/about" element={<About />} />
             <Route path="/features" element={<Features />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/demo" element={<Demo />} />
@@ -47,6 +50,7 @@ function App() {
             <Route path="/help" element={<Help />} />
             <Route path="/store" element={<Store />} />
             <Route path="/groups" element={<Groups />} />
+            <Route path="/stickers" element={<Stickers />} />
             <Route path="/profile/:username" element={<ProfilePage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile-setup" element={<ProfileSetupWizard onComplete={() => {}} />} />
