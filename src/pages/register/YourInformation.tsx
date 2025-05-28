@@ -15,29 +15,28 @@ const YourInformation = () => {
     {
       id: "creator",
       title: "Creator",
-      description: "Content creation, social media, personal brand",
-      icon: "🎨",
-      examples: ["Influencer", "YouTuber", "Artist", "Blogger"]
+      description: "Monetize audience & build community",
+      icon: <User className="w-6 h-6" />,
+      color: "from-purple-500 to-pink-500"
     },
     {
       id: "business", 
       title: "Business",
-      description: "Professional services, company, startup",
-      icon: "💼",
-      examples: ["Company", "Startup", "Service Provider", "Consultant"]
+      description: "Reach more customers & sell products",
+      icon: <Building className="w-6 h-6" />,
+      color: "from-blue-500 to-cyan-500"
     },
     {
       id: "personal",
       title: "Personal", 
-      description: "Personal use, networking, sharing links",
-      icon: "👤",
-      examples: ["Personal Use", "Networking", "Resume", "Portfolio"]
+      description: "Share links with friends & family",
+      icon: <Heart className="w-6 h-6" />,
+      color: "from-green-500 to-emerald-500"
     }
   ];
 
   const handleContinue = () => {
     if (selectedIntent) {
-      // Navigate to plan selection page instead of template selection
       navigate("/register/select-categories");
     }
   };
@@ -91,8 +90,8 @@ const YourInformation = () => {
                 }`}
               >
                 <div className="flex items-center space-x-4">
-                  <div className="p-3 rounded-lg bg-gradient-to-r from-primary/20 to-blue-500/20">
-                    <span className="text-2xl">{intent.icon}</span>
+                  <div className={`p-3 rounded-lg bg-gradient-to-r ${intent.color} text-white`}>
+                    {intent.icon}
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg">{intent.title}</h3>

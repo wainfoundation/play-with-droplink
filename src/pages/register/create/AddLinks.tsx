@@ -54,11 +54,7 @@ const AddLinks = () => {
   };
 
   const handleContinue = () => {
-    const queryParam = userPlan === 'free' ? '?freeEntryPoint=ON_SIGNUP' : 
-                      userPlan === 'starter' ? '?basicEntryPoint=ON_SIGNUP' :
-                      userPlan === 'pro' ? '?proEntryPoint=ON_SIGNUP' :
-                      '?premiumEntryPoint=ON_SIGNUP';
-    navigate(`/register/create/name-image-bio${queryParam}`);
+    navigate("/register/create/name-image-bio?freeEntryPoint=ON_SIGNUP");
   };
 
   const filledLinksCount = Object.values(links).filter(link => link.trim() !== "").length;
@@ -169,7 +165,7 @@ const AddLinks = () => {
                 </div>
               )}
               
-              {/* Pi Network Integration */}
+              {/* Pi Network Integration - Disabled for Free */}
               <div className="border-t pt-4 mt-6">
                 <div className={`rounded-lg p-4 ${
                   currentPlanLimits.canUsePiDomain ? 'bg-purple-50' : 'bg-gray-50'
