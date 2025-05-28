@@ -65,7 +65,7 @@ const Complete = () => {
   }, [user?.id, updateProgress]);
 
   const handleContinueBuilding = () => {
-    navigate("/dashboard");
+    navigate("/admin");
   };
 
   const handleViewProfile = () => {
@@ -192,7 +192,7 @@ const Complete = () => {
                 className="flex-1 bg-gradient-to-r from-primary to-blue-600 text-lg py-3"
                 size="lg"
               >
-                Go to Dashboard
+                Go to Admin Dashboard
               </Button>
               <Button 
                 variant="outline" 

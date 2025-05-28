@@ -10,6 +10,7 @@ import PiBrowserGuard from "@/components/PiBrowserGuard";
 import Home from "./pages/Home";
 import ProfilePage from "./pages/ProfilePage";
 import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import PiDashboard from "./pages/PiDashboard";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -72,6 +73,7 @@ const App = () => (
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/pi-dashboard" element={<PiDashboard />} />
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/features" element={<Features />} />
