@@ -71,8 +71,13 @@ const UserInfo = () => {
         description: "Your information has been saved successfully",
       });
 
-      // Navigate to next step
-      navigate("/register/your-information");
+      // Navigate to next step with username in URL state
+      navigate("/register/your-information", { 
+        state: { 
+          username: username.trim(),
+          fromUserInfo: true 
+        } 
+      });
       
     } catch (error) {
       console.error('Error updating user info:', error);
@@ -129,7 +134,7 @@ const UserInfo = () => {
                     htmlFor="newsletter-consent"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    Receive news and updates from Droplink
+                    By continuing, you agree to receive offers, news and updates from Droplink
                   </Label>
                   <p className="text-xs text-muted-foreground">
                     Get the latest features, tips, and exclusive offers delivered to your inbox.
@@ -139,7 +144,7 @@ const UserInfo = () => {
 
               {newsletterConsent && (
                 <div className="space-y-2 ml-6">
-                  <Label htmlFor="email">Email address</Label>
+                  <Label htmlFor="email">Your email here to receive news and updates</Label>
                   <Input
                     id="email"
                     type="email"

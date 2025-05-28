@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +13,8 @@ interface DemoPreviewProps {
     links?: Array<{ platform: string; url: string; }>;
     selectedTemplate?: string;
   };
+  // Add username prop for onboarding flow
+  username?: string;
 }
 
 type LinkItem = {
@@ -24,10 +25,11 @@ type LinkItem = {
   url?: string;
 };
 
-const DemoPreview = ({ profileData }: DemoPreviewProps) => {
+const DemoPreview = ({ profileData, username }: DemoPreviewProps) => {
   const displayName = profileData?.title || "Your Name";
   const displayBio = profileData?.bio || "🚀 Pi Network Creator | 💎 Building the future | 🌟 Join my journey";
-  const displayUsername = profileData?.username || "username";
+  // Use username prop first, then profileData username, then fallback
+  const displayUsername = username || profileData?.username || "username";
   const avatarUrl = profileData?.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${displayName}`;
 
   // Get template colors based on selection
@@ -87,7 +89,7 @@ const DemoPreview = ({ profileData }: DemoPreviewProps) => {
 
   const getPlatformIcon = (platform: string) => {
     const icons = {
-      youtube: "📺",
+      youtube: "📺", 
       instagram: "📷", 
       tiktok: "🎵",
       twitter: "🐦",
