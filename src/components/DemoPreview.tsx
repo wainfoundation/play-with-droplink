@@ -16,6 +16,14 @@ interface DemoPreviewProps {
   };
 }
 
+type LinkItem = {
+  id: string;
+  title: string;
+  icon: string;
+  special?: boolean;
+  url?: string;
+};
+
 const DemoPreview = ({ profileData }: DemoPreviewProps) => {
   const displayName = profileData?.title || "Your Name";
   const displayBio = profileData?.bio || "🚀 Pi Network Creator | 💎 Building the future | 🌟 Join my journey";
@@ -43,13 +51,13 @@ const DemoPreview = ({ profileData }: DemoPreviewProps) => {
   };
 
   // Generate links based on user's platform selections and URLs
-  const generateLinks = () => {
-    const defaultLinks = [
+  const generateLinks = (): LinkItem[] => {
+    const defaultLinks: LinkItem[] = [
       { id: "main", title: "🎯 My Main Link", icon: "🎯" },
       { id: "tip", title: "💰 Tip me in Pi", icon: "💰", special: true }
     ];
 
-    const platformLinks = profileData?.links?.map((link, index) => ({
+    const platformLinks: LinkItem[] = profileData?.links?.map((link, index) => ({
       id: `platform-${index}`,
       title: getPlatformTitle(link.platform),
       icon: getPlatformIcon(link.platform),
