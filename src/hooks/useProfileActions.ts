@@ -4,18 +4,28 @@ import { trackAnonymousPageView, trackLinkClick } from '@/services/analyticsServ
 import { usePiTipping } from '@/hooks/usePiTipping';
 import { toast } from '@/hooks/use-toast';
 
+interface Link {
+  id: string;
+  title: string;
+  url: string;
+  icon: string;
+  clicks: number;
+  type?: "featured" | "social" | "regular";
+}
+
 export const useProfileActions = (profileUserId?: string) => {
   const [processingTip, setProcessingTip] = useState(false);
   const { sendTip } = usePiTipping();
 
-  const handleLinkClick = async (linkId: string, url: string) => {
+  const handleLinkClick = async (link: Link) => {
     try {
       // Track the link click
       if (profileUserId) {
-        await trackLinkClick(profileUserId, linkId);
+        await trackLinkClick(profileUserId, link.id);
       }
       
       // Open the link
+      const url = link.url;
       if (url.startsWith('http://') || url.startsWith('https://')) {
         window.open(url, '_blank', 'noopener,noreferrer');
       } else {
@@ -24,6 +34,7 @@ export const useProfileActions = (profileUserId?: string) => {
     } catch (error) {
       console.error('Error tracking link click:', error);
       // Still open the link even if tracking fails
+      const url = link.url;
       if (url.startsWith('http://') || url.startsWith('https://')) {
         window.open(url, '_blank', 'noopener,noreferrer');
       } else {
