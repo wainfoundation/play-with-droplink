@@ -2,7 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Users, Globe, Zap, DollarSign } from "lucide-react";
+import { ArrowRight, Users, Globe, Zap, DollarSign, Play } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 
 const Hero = () => {
@@ -62,6 +62,34 @@ const Hero = () => {
               <p className="text-sm md:text-base font-semibold text-gray-900">100+ Templates</p>
             </div>
           </div>
+
+          {/* Video Demo Section */}
+          <div className="my-12 md:my-16">
+            <div className="max-w-4xl mx-auto">
+              <div className="relative bg-white rounded-xl md:rounded-2xl shadow-xl overflow-hidden">
+                {/* Video Container - Responsive 16:9 aspect ratio */}
+                <div className="relative w-full" style={{ paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}>
+                  <iframe 
+                    src="https://www.youtube-nocookie.com/embed/1sv5cf9ygZs?si=rATq0V5J1SH_iNpE&controls=1" 
+                    title="Droplink Demo - Transform Your Pi Domain" 
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    referrerPolicy="strict-origin-when-cross-origin" 
+                    allowFullScreen
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                  />
+                  
+                  {/* Overlay for branding */}
+                  <div className="absolute top-2 md:top-4 left-2 md:left-4 bg-black/50 backdrop-blur-sm rounded-lg px-2 md:px-3 py-1 md:py-2 z-10">
+                    <div className="flex items-center gap-1 md:gap-2 text-white text-xs md:text-sm font-medium">
+                      <Play className="h-3 w-3 md:h-4 md:w-4" />
+                      Droplink Demo
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           
           {/* Enhanced CTA buttons with mobile optimization */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4 md:pt-6">
@@ -73,7 +101,7 @@ const Hero = () => {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="w-full sm:w-auto hover:bg-blue-50 transition-colors text-lg px-8 py-4">
-                  <Link to={`/${profile.username}`}>View Your Profile</Link>
+                  <Link to={`/@${profile.username}`}>View Your Profile</Link>
                 </Button>
               </>
             ) : (
