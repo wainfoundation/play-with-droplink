@@ -60,7 +60,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Sora:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -72,12 +72,12 @@
                         primary: '#00BFFF',
                         secondary: '#0099CC',
                         background: '#FAFBFF',
-                        foreground: '#002B5C'
+                        foreground: '#002B5C',
+                        muted: '#F8FAFC'
                     },
                     fontFamily: {
                         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-                        display: ['Sora', 'Inter', 'system-ui', 'sans-serif'],
-                        mono: ['Space Grotesk', 'ui-monospace', 'monospace'],
+                        poppins: ['Poppins', 'Inter', 'system-ui', 'sans-serif'],
                     },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
@@ -112,7 +112,7 @@
             background: linear-gradient(135deg, rgba(0, 191, 255, 0.1) 0%, rgba(250, 251, 255, 1) 50%, rgba(0, 153, 204, 0.1) 100%);
         }
         .gradient-feature {
-            background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, rgba(250, 204, 21, 0.1) 100%);
+            background: linear-gradient(135deg, rgba(0, 191, 255, 0.05) 0%, rgba(250, 251, 255, 1) 50%, rgba(0, 153, 204, 0.05) 100%);
         }
         .hover-lift {
             transition: all 0.3s ease;
@@ -130,7 +130,7 @@
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center gap-3">
                     <img src="/lovable-uploads/2c117775-cd88-4aec-819b-0723e4f0dbe5.png" alt="Droplink" class="w-8 h-8">
-                    <span class="font-display font-bold text-xl text-foreground">Droplink</span>
+                    <span class="font-poppins font-bold text-xl text-foreground">Droplink</span>
                 </div>
                 
                 <div class="hidden md:flex items-center space-x-8">
@@ -154,19 +154,19 @@
     <!-- Splash Hero Section -->
     <section class="gradient-hero min-h-screen flex items-center justify-center px-4 py-20 relative overflow-hidden">
         <!-- Background Elements -->
-        <div class="absolute -top-40 -right-40 w-80 h-80 md:w-96 md:h-96 bg-gradient-to-br from-purple-600/20 to-yellow-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute -top-40 -right-40 w-80 h-80 md:w-96 md:h-96 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-3xl animate-pulse"></div>
         <div class="absolute -bottom-40 -left-40 w-80 h-80 md:w-96 md:h-96 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-3xl animate-pulse"></div>
         
         <div class="container mx-auto relative z-10">
             <div class="text-center max-w-6xl mx-auto space-y-8 animate-fade-in">
                 <!-- Splash Header -->
                 <div class="space-y-6">
-                    <div class="bg-gradient-to-r from-purple-600/10 to-yellow-400/10 border border-purple-200 rounded-full px-6 py-2 inline-block mb-4">
-                        <span class="text-sm font-medium text-purple-700">🎉 Join 50,000+ Pi Network Creators</span>
+                    <div class="bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-full px-6 py-2 inline-block mb-4">
+                        <span class="text-sm font-medium text-primary">🎉 Join 50,000+ Pi Network Creators Worldwide</span>
                     </div>
                     
-                    <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight">
-                        <span class="bg-gradient-to-r from-purple-600 via-primary to-yellow-400 bg-clip-text text-transparent animate-bounce-gentle">
+                    <h1 class="text-5xl md:text-7xl lg:text-8xl font-poppins font-bold leading-tight">
+                        <span class="bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent animate-bounce-gentle">
                             Drop All Your Links
                         </span>
                         <br>
@@ -174,7 +174,7 @@
                     </h1>
                     
                     <p class="text-xl md:text-2xl lg:text-3xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-                        Create your personalized link-in-bio page powered by <strong>Pi Network</strong>. 
+                        Create your personalized link-in-bio page powered by <strong class="text-primary">Pi Network</strong>. 
                         Accept Pi payments, sell digital products, and connect your .pi domain.
                         <br>
                         <span class="text-primary font-semibold">Share: droplink.space/@yourusername</span>
@@ -183,32 +183,32 @@
                 
                 <!-- CTA Buttons -->
                 <div class="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8">
-                    <a href="/" class="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-yellow-400 text-white text-xl px-12 py-5 rounded-xl font-bold hover:opacity-90 transition-all transform hover:scale-105 duration-200 text-center shadow-2xl hover-lift">
+                    <a href="/" class="w-full sm:w-auto bg-gradient-to-r from-primary to-secondary text-white text-xl px-12 py-5 rounded-xl font-bold hover:opacity-90 transition-all transform hover:scale-105 duration-200 text-center shadow-2xl hover-lift">
                         🚀 Start Free with Pi
                         <div class="text-sm font-normal opacity-90">No credit card required</div>
                     </a>
                     <a href="#video" class="w-full sm:w-auto border-2 border-gray-300 text-gray-700 text-xl px-12 py-5 rounded-xl font-bold hover:border-primary hover:text-primary transition-all text-center hover-lift">
-                        Watch Demo Video
+                        📺 Watch Demo Video
                     </a>
                 </div>
                 
-                <!-- Social Proof -->
+                <!-- Global Social Proof -->
                 <div class="pt-12">
                     <p class="text-lg text-gray-500 mb-6">
                         Trusted by creators worldwide in the Pi Network ecosystem
                     </p>
-                    <div class="flex flex-wrap justify-center items-center gap-6 opacity-80">
-                        <div class="text-base font-bold text-gray-600 bg-white/60 px-6 py-3 rounded-full shadow-lg">
+                    <div class="flex flex-wrap justify-center items-center gap-4 opacity-80">
+                        <div class="text-sm font-bold text-gray-600 bg-white/60 px-4 py-2 rounded-full shadow-lg">
                             🌟 50,000+ Creators
                         </div>
-                        <div class="text-base font-bold text-gray-600 bg-white/60 px-6 py-3 rounded-full shadow-lg">
+                        <div class="text-sm font-bold text-gray-600 bg-white/60 px-4 py-2 rounded-full shadow-lg">
                             🔗 500,000+ Links Created
                         </div>
-                        <div class="text-base font-bold text-gray-600 bg-white/60 px-6 py-3 rounded-full shadow-lg">
+                        <div class="text-sm font-bold text-gray-600 bg-white/60 px-4 py-2 rounded-full shadow-lg">
                             💰 10,000π+ Processed
                         </div>
-                        <div class="text-base font-bold text-gray-600 bg-white/60 px-6 py-3 rounded-full shadow-lg">
-                            🌍 150+ Countries
+                        <div class="text-sm font-bold text-gray-600 bg-white/60 px-4 py-2 rounded-full shadow-lg">
+                            🌍 200+ Countries
                         </div>
                     </div>
                 </div>
@@ -217,46 +217,53 @@
     </section>
 
     <!-- YouTube Video Section -->
-    <section id="video" class="py-24 px-4 bg-gradient-to-br from-primary/5 via-secondary/5 to-primary/10">
+    <section id="video" class="py-24 px-4 bg-white">
         <div class="container mx-auto max-w-6xl">
             <div class="text-center mb-12 animate-slide-up">
-                <h2 class="text-4xl md:text-5xl font-bold mb-6">See Droplink in Action</h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                <h2 class="text-4xl md:text-5xl font-poppins font-bold mb-6 text-gray-900">See Droplink in Action</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                     Watch how creators are transforming their Pi domains into powerful business hubs
                 </p>
             </div>
             
             <div class="max-w-4xl mx-auto animate-slide-up">
-                <div class="bg-white rounded-2xl shadow-2xl overflow-hidden hover-lift">
+                <div class="bg-white rounded-3xl shadow-2xl overflow-hidden hover-lift border border-gray-100">
                     <!-- Video Container - Responsive 16:9 aspect ratio -->
-                    <div class="relative w-full" style="paddingBottom: 56.25%; height: 0;">
+                    <div class="relative w-full bg-black rounded-t-3xl" style="padding-bottom: 56.25%; height: 0;">
                         <iframe 
-                            src="https://www.youtube-nocookie.com/embed/1sv5cf9ygZs?si=rATq0V5J1SH_iNpE&controls=1" 
-                            title="Droplink Demo - Transform Your Pi Domain" 
-                            frameBorder="0" 
+                            width="560" 
+                            height="315" 
+                            src="https://www.youtube-nocookie.com/embed/1sv5cf9ygZs?si=NqukzSH4DD_8M4JP" 
+                            title="YouTube video player" 
+                            frameborder="0" 
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            referrerPolicy="strict-origin-when-cross-origin" 
-                            allowFullScreen
-                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+                            referrerpolicy="strict-origin-when-cross-origin" 
+                            allowfullscreen
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 1.5rem 1.5rem 0 0;"
                             loading="lazy">
                         </iframe>
                     </div>
                     
                     <!-- Video Info -->
-                    <div class="p-6">
-                        <h3 class="text-2xl font-bold mb-2">Transform Your Pi Domain with Droplink</h3>
-                        <p class="text-gray-600 mb-4">
-                            See real creators showcase how they've built their Pi-powered businesses using Droplink's features
+                    <div class="p-8 bg-gradient-to-br from-primary/5 to-secondary/5">
+                        <h3 class="text-2xl font-poppins font-bold mb-3 text-gray-900">Transform Your Pi Domain with Droplink</h3>
+                        <p class="text-gray-600 mb-6 text-lg leading-relaxed">
+                            See real creators showcase how they've built their Pi-powered businesses using Droplink's features. 
+                            From link management to monetization, this demo covers everything you need to know.
                         </p>
                         
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                             <div class="flex items-center gap-4 text-sm text-gray-500">
-                                <div class="flex items-center gap-1">
-                                    <span>🔊</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-lg">🔊</span>
                                     <span>Turn on sound for best experience</span>
                                 </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-lg">⏱️</span>
+                                    <span>5 min overview</span>
+                                </div>
                             </div>
-                            <div class="text-sm text-primary font-medium">
+                            <div class="text-sm text-primary font-medium bg-primary/10 px-3 py-1 rounded-full">
                                 Powered by Pi Network
                             </div>
                         </div>
@@ -264,17 +271,164 @@
                 </div>
                 
                 <!-- Call to Action -->
-                <div class="text-center mt-8">
-                    <p class="text-lg text-gray-600 mb-4">
+                <div class="text-center mt-12">
+                    <p class="text-xl text-gray-600 mb-6">
                         Ready to transform your Pi domain like this?
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                        <a href="/" class="bg-gradient-to-r from-primary to-secondary text-white px-8 py-3 rounded-lg font-medium hover:shadow-lg transition-all">
-                            Start Building Free
+                        <a href="/" class="bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg transition-all transform hover:scale-105">
+                            🚀 Start Building Free
                         </a>
-                        <a href="#profiles" class="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg font-medium hover:bg-gray-50 transition-all">
-                            View Live Profiles
+                        <a href="#profiles" class="border-2 border-primary text-primary px-8 py-4 rounded-xl font-semibold hover:bg-primary hover:text-white transition-all">
+                            👀 View Live Profiles
                         </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Global Pioneers Section -->
+    <section class="py-24 px-4 gradient-feature">
+        <div class="container mx-auto">
+            <div class="text-center mb-16 animate-slide-up">
+                <h2 class="text-4xl md:text-5xl font-poppins font-bold text-gray-900 mb-6">Pi Network Global Community</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                    Join pioneers from around the world who are building the future of creator economy with Pi
+                </p>
+            </div>
+            
+            <div class="bg-white rounded-3xl p-8 md:p-12 shadow-xl animate-slide-up border border-gray-100">
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 mb-8">
+                    <!-- Top Pi Network Countries -->
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇺🇸</div>
+                        <p class="text-sm font-semibold text-gray-900">United States</p>
+                        <p class="text-xs text-primary">5,000+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇵🇭</div>
+                        <p class="text-sm font-semibold text-gray-900">Philippines</p>
+                        <p class="text-xs text-primary">12,000+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇮🇳</div>
+                        <p class="text-sm font-semibold text-gray-900">India</p>
+                        <p class="text-xs text-primary">8,000+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇳🇬</div>
+                        <p class="text-sm font-semibold text-gray-900">Nigeria</p>
+                        <p class="text-xs text-primary">6,000+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇧🇷</div>
+                        <p class="text-sm font-semibold text-gray-900">Brazil</p>
+                        <p class="text-xs text-primary">4,500+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇮🇩</div>
+                        <p class="text-sm font-semibold text-gray-900">Indonesia</p>
+                        <p class="text-xs text-primary">3,800+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇹🇷</div>
+                        <p class="text-sm font-semibold text-gray-900">Turkey</p>
+                        <p class="text-xs text-primary">3,200+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇻🇳</div>
+                        <p class="text-sm font-semibold text-gray-900">Vietnam</p>
+                        <p class="text-xs text-primary">2,900+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇲🇽</div>
+                        <p class="text-sm font-semibold text-gray-900">Mexico</p>
+                        <p class="text-xs text-primary">2,700+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇪🇬</div>
+                        <p class="text-sm font-semibold text-gray-900">Egypt</p>
+                        <p class="text-xs text-primary">2,400+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇹🇭</div>
+                        <p class="text-sm font-semibold text-gray-900">Thailand</p>
+                        <p class="text-xs text-primary">2,100+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇵🇰</div>
+                        <p class="text-sm font-semibold text-gray-900">Pakistan</p>
+                        <p class="text-xs text-primary">1,900+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇰🇪</div>
+                        <p class="text-sm font-semibold text-gray-900">Kenya</p>
+                        <p class="text-xs text-primary">1,700+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇲🇾</div>
+                        <p class="text-sm font-semibold text-gray-900">Malaysia</p>
+                        <p class="text-xs text-primary">1,500+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇸🇬</div>
+                        <p class="text-sm font-semibold text-gray-900">Singapore</p>
+                        <p class="text-xs text-primary">1,300+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇿🇦</div>
+                        <p class="text-sm font-semibold text-gray-900">South Africa</p>
+                        <p class="text-xs text-primary">1,200+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇦🇷</div>
+                        <p class="text-sm font-semibold text-gray-900">Argentina</p>
+                        <p class="text-xs text-primary">1,100+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇨🇴</div>
+                        <p class="text-sm font-semibold text-gray-900">Colombia</p>
+                        <p class="text-xs text-primary">950+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇦🇺</div>
+                        <p class="text-sm font-semibold text-gray-900">Australia</p>
+                        <p class="text-xs text-primary">800+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇨🇦</div>
+                        <p class="text-sm font-semibold text-gray-900">Canada</p>
+                        <p class="text-xs text-primary">750+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇬🇧</div>
+                        <p class="text-sm font-semibold text-gray-900">United Kingdom</p>
+                        <p class="text-xs text-primary">700+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇩🇪</div>
+                        <p class="text-sm font-semibold text-gray-900">Germany</p>
+                        <p class="text-xs text-primary">650+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇫🇷</div>
+                        <p class="text-sm font-semibold text-gray-900">France</p>
+                        <p class="text-xs text-primary">600+ Creators</p>
+                    </div>
+                    <div class="text-center group hover:scale-105 transition-transform">
+                        <div class="text-4xl mb-2">🇮🇹</div>
+                        <p class="text-sm font-semibold text-gray-900">Italy</p>
+                        <p class="text-xs text-primary">550+ Creators</p>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <p class="text-lg font-medium text-gray-700 mb-4">
+                        "Droplink is connecting Pi Network creators globally, enabling the next generation of digital entrepreneurs."
+                    </p>
+                    <div class="bg-gradient-to-r from-primary/10 to-secondary/10 backdrop-blur-sm rounded-xl px-6 py-3 inline-block border border-primary/20">
+                        <span class="font-mono text-primary font-semibold">Share: droplink.space/@yourusername</span>
                     </div>
                 </div>
             </div>
@@ -285,7 +439,7 @@
     <section id="success" class="py-24 px-4 bg-white">
         <div class="container mx-auto">
             <div class="text-center mb-16 animate-slide-up">
-                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Creator Success Stories</h2>
+                <h2 class="text-4xl md:text-5xl font-poppins font-bold text-gray-900 mb-6">Creator Success Stories</h2>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto">
                     Real creators sharing how Droplink transformed their Pi Network journey
                 </p>
@@ -293,13 +447,13 @@
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
                 <!-- Success Story 1 -->
-                <div class="bg-gradient-to-br from-purple-50 to-blue-50 p-8 rounded-3xl shadow-lg hover-lift animate-slide-up">
+                <div class="bg-gradient-to-br from-primary/5 to-secondary/5 p-8 rounded-3xl shadow-lg hover-lift animate-slide-up border border-primary/10">
                     <div class="flex items-center mb-6">
-                        <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-500 rounded-full flex items-center justify-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center">
                             <span class="text-white font-bold">MG</span>
                         </div>
                         <div class="ml-4">
-                            <h4 class="font-bold text-gray-900">@meowgirl</h4>
+                            <h4 class="font-semibold text-gray-900">@meowgirl</h4>
                             <p class="text-sm text-gray-600">Digital Artist & Pi Creator</p>
                         </div>
                     </div>
@@ -314,13 +468,13 @@
                 </div>
 
                 <!-- Success Story 2 -->
-                <div class="bg-gradient-to-br from-yellow-50 to-orange-50 p-8 rounded-3xl shadow-lg hover-lift animate-slide-up" style="animation-delay: 0.1s;">
+                <div class="bg-gradient-to-br from-primary/5 to-secondary/5 p-8 rounded-3xl shadow-lg hover-lift animate-slide-up border border-primary/10" style="animation-delay: 0.1s;">
                     <div class="flex items-center mb-6">
-                        <div class="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center">
                             <span class="text-white font-bold">TL</span>
                         </div>
                         <div class="ml-4">
-                            <h4 class="font-bold text-gray-900">TechLead</h4>
+                            <h4 class="font-semibold text-gray-900">TechLead</h4>
                             <p class="text-sm text-gray-600">Pi Developer & Educator</p>
                         </div>
                     </div>
@@ -335,13 +489,13 @@
                 </div>
 
                 <!-- Success Story 3 -->
-                <div class="bg-gradient-to-br from-green-50 to-teal-50 p-8 rounded-3xl shadow-lg hover-lift animate-slide-up" style="animation-delay: 0.2s;">
+                <div class="bg-gradient-to-br from-primary/5 to-secondary/5 p-8 rounded-3xl shadow-lg hover-lift animate-slide-up border border-primary/10" style="animation-delay: 0.2s;">
                     <div class="flex items-center mb-6">
-                        <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center">
                             <span class="text-white font-bold">CM</span>
                         </div>
                         <div class="ml-4">
-                            <h4 class="font-bold text-gray-900">CryptoMaven</h4>
+                            <h4 class="font-semibold text-gray-900">CryptoMaven</h4>
                             <p class="text-sm text-gray-600">Pi Network Influencer</p>
                         </div>
                     </div>
@@ -355,56 +509,14 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Global Pioneers Section -->
-            <div class="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-3xl p-8 md:p-12 animate-slide-up">
-                <div class="text-center mb-12">
-                    <h3 class="text-3xl md:text-4xl font-bold mb-4">Pi Network Global Pioneers</h3>
-                    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                        Join pioneers from around the world who are building the future of creator economy with Pi
-                    </p>
-                </div>
-                
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-primary">🇺🇸</div>
-                        <p class="text-sm font-medium mt-2">United States</p>
-                        <p class="text-xs text-gray-600">5,000+ Creators</p>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-primary">🇵🇭</div>
-                        <p class="text-sm font-medium mt-2">Philippines</p>
-                        <p class="text-xs text-gray-600">12,000+ Creators</p>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-primary">🇮🇳</div>
-                        <p class="text-sm font-medium mt-2">India</p>
-                        <p class="text-xs text-gray-600">8,000+ Creators</p>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-primary">🇳🇬</div>
-                        <p class="text-sm font-medium mt-2">Nigeria</p>
-                        <p class="text-xs text-gray-600">6,000+ Creators</p>
-                    </div>
-                </div>
-
-                <div class="text-center">
-                    <p class="text-lg font-medium text-gray-700 mb-4">
-                        "Droplink is connecting Pi Network creators globally, enabling the next generation of digital entrepreneurs."
-                    </p>
-                    <div class="bg-white/60 backdrop-blur-sm rounded-lg px-6 py-3 inline-block">
-                        <span class="font-mono text-primary">Share: droplink.space/@yourusername</span>
-                    </div>
-                </div>
-            </div>
         </div>
     </section>
 
-    <!-- Comprehensive Features Section -->
+    <!-- Features Section -->
     <section id="features" class="py-24 px-4 gradient-feature">
         <div class="container mx-auto">
             <div class="text-center mb-20 animate-slide-up">
-                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Why Choose Droplink?</h2>
+                <h2 class="text-4xl md:text-5xl font-poppins font-bold text-gray-900 mb-6">Why Choose Droplink?</h2>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto">
                     The most comprehensive link-in-bio platform built specifically for the Pi Network ecosystem
                 </p>
@@ -413,80 +525,80 @@
             <!-- Main Features Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 mb-16">
                 <!-- Pi-Powered -->
-                <div class="bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-xl hover-lift text-center border border-white/20 animate-slide-up">
+                <div class="bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-xl hover-lift text-center border border-primary/10 animate-slide-up">
                     <div class="w-20 h-20 bg-gradient-to-r from-primary to-secondary rounded-3xl flex items-center justify-center mx-auto mb-6 animate-float">
                         <span class="text-white font-bold text-3xl">π</span>
                     </div>
-                    <h3 class="text-2xl font-bold mb-4 text-gray-900">Pi-Powered Platform</h3>
+                    <h3 class="text-2xl font-poppins font-bold mb-4 text-gray-900">Pi-Powered Platform</h3>
                     <p class="text-gray-600 text-lg leading-relaxed mb-6">
                         Native Pi Network integration for seamless payments, tips, and monetization within the Pi ecosystem.
                     </p>
                     <ul class="text-left space-y-2 text-gray-700">
                         <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Pi Wallet Integration
+                            <span class="text-primary">✓</span> Pi Wallet Integration
                         </li>
                         <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Instant Pi Tips & Donations
+                            <span class="text-primary">✓</span> Instant Pi Tips & Donations
                         </li>
                         <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Pi AdNetwork Support
+                            <span class="text-primary">✓</span> Pi AdNetwork Support
                         </li>
                         <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> .pi Domain Ready
+                            <span class="text-primary">✓</span> .pi Domain Ready
                         </li>
                     </ul>
                 </div>
                 
                 <!-- Premium Templates -->
-                <div class="bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-xl hover-lift text-center border border-white/20 animate-slide-up" style="animation-delay: 0.1s;">
-                    <div class="w-20 h-20 bg-gradient-to-r from-purple-600 to-pink-500 rounded-3xl flex items-center justify-center mx-auto mb-6 animate-float" style="animation-delay: 1s;">
+                <div class="bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-xl hover-lift text-center border border-primary/10 animate-slide-up" style="animation-delay: 0.1s;">
+                    <div class="w-20 h-20 bg-gradient-to-r from-primary to-secondary rounded-3xl flex items-center justify-center mx-auto mb-6 animate-float" style="animation-delay: 1s;">
                         <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold mb-4 text-gray-900">Premium Templates & Design</h3>
+                    <h3 class="text-2xl font-poppins font-bold mb-4 text-gray-900">Premium Templates & Design</h3>
                     <p class="text-gray-600 text-lg leading-relaxed mb-6">
                         Professional templates designed for creators, businesses, and personal brands with full customization.
                     </p>
                     <ul class="text-left space-y-2 text-gray-700">
                         <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> 100+ Designer Templates
+                            <span class="text-primary">✓</span> 100+ Designer Templates
                         </li>
                         <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Mobile Optimized
+                            <span class="text-primary">✓</span> Mobile Optimized
                         </li>
                         <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Custom Branding & CSS
+                            <span class="text-primary">✓</span> Custom Branding & CSS
                         </li>
                         <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Dark/Light Mode
+                            <span class="text-primary">✓</span> Dark/Light Mode
                         </li>
                     </ul>
                 </div>
                 
                 <!-- Monetization Tools -->
-                <div class="bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-xl hover-lift text-center border border-white/20 animate-slide-up" style="animation-delay: 0.2s;">
-                    <div class="w-20 h-20 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-3xl flex items-center justify-center mx-auto mb-6 animate-float" style="animation-delay: 2s;">
+                <div class="bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-xl hover-lift text-center border border-primary/10 animate-slide-up" style="animation-delay: 0.2s;">
+                    <div class="w-20 h-20 bg-gradient-to-r from-primary to-secondary rounded-3xl flex items-center justify-center mx-auto mb-6 animate-float" style="animation-delay: 2s;">
                         <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold mb-4 text-gray-900">Monetization & Business Tools</h3>
+                    <h3 class="text-2xl font-poppins font-bold mb-4 text-gray-900">Monetization & Business Tools</h3>
                     <p class="text-gray-600 text-lg leading-relaxed mb-6">
                         Complete suite of tools to monetize your audience and grow your Pi-powered business.
                     </p>
                     <ul class="text-left space-y-2 text-gray-700">
                         <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Digital Product Sales
+                            <span class="text-primary">✓</span> Digital Product Sales
                         </li>
                         <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Advanced Analytics
+                            <span class="text-primary">✓</span> Advanced Analytics
                         </li>
                         <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Revenue Dashboard
+                            <span class="text-primary">✓</span> Revenue Dashboard
                         </li>
                         <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Customer Management
+                            <span class="text-primary">✓</span> Customer Management
                         </li>
                     </ul>
                 </div>
@@ -496,22 +608,22 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div class="bg-white/80 p-6 rounded-2xl shadow-lg hover-lift animate-slide-up">
                     <div class="text-2xl mb-3">🔗</div>
-                    <h4 class="font-bold mb-2">Unlimited Links</h4>
+                    <h4 class="font-semibold mb-2">Unlimited Links</h4>
                     <p class="text-sm text-gray-600">Add unlimited social links, websites, and custom URLs</p>
                 </div>
                 <div class="bg-white/80 p-6 rounded-2xl shadow-lg hover-lift animate-slide-up" style="animation-delay: 0.1s;">
                     <div class="text-2xl mb-3">📊</div>
-                    <h4 class="font-bold mb-2">Real-time Analytics</h4>
+                    <h4 class="font-semibold mb-2">Real-time Analytics</h4>
                     <p class="text-sm text-gray-600">Track clicks, views, earnings, and audience demographics</p>
                 </div>
                 <div class="bg-white/80 p-6 rounded-2xl shadow-lg hover-lift animate-slide-up" style="animation-delay: 0.2s;">
                     <div class="text-2xl mb-3">🛡️</div>
-                    <h4 class="font-bold mb-2">Link Protection</h4>
+                    <h4 class="font-semibold mb-2">Link Protection</h4>
                     <p class="text-sm text-gray-600">Password protect links, schedule publishing, geo-targeting</p>
                 </div>
                 <div class="bg-white/80 p-6 rounded-2xl shadow-lg hover-lift animate-slide-up" style="animation-delay: 0.3s;">
                     <div class="text-2xl mb-3">🎨</div>
-                    <h4 class="font-bold mb-2">Custom QR Codes</h4>
+                    <h4 class="font-semibold mb-2">Custom QR Codes</h4>
                     <p class="text-sm text-gray-600">Generate branded QR codes for offline marketing</p>
                 </div>
             </div>
@@ -522,7 +634,7 @@
     <section id="profiles" class="py-24 px-4 bg-gray-50">
         <div class="container mx-auto">
             <div class="text-center mb-16 animate-slide-up">
-                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Live Droplink Profiles</h2>
+                <h2 class="text-4xl md:text-5xl font-poppins font-bold text-gray-900 mb-6">Live Droplink Profiles</h2>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
                     Explore real profiles from our amazing community of Pi Network creators
                 </p>
@@ -534,7 +646,7 @@
             <div class="max-w-4xl mx-auto animate-slide-up">
                 <div class="bg-white rounded-3xl shadow-2xl p-8 hover-lift">
                     <div class="text-center mb-8">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Featured Creator Profile</h3>
+                        <h3 class="text-2xl font-poppins font-bold text-gray-900 mb-2">Featured Creator Profile</h3>
                         <p class="text-gray-600">Example: droplink.space/@meowgirl</p>
                         <div class="bg-green-100 text-green-700 px-4 py-2 rounded-lg inline-block mt-2">
                             <span class="font-medium">🔴 Live Profile</span>
@@ -578,7 +690,7 @@
     <section id="pricing" class="py-24 px-4 gradient-hero">
         <div class="container mx-auto">
             <div class="text-center mb-20 animate-slide-up">
-                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Choose Your Plan</h2>
+                <h2 class="text-4xl md:text-5xl font-poppins font-bold text-gray-900 mb-6">Choose Your Plan</h2>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto">
                     Start free and unlock premium features with Pi Network payments
                 </p>
@@ -588,29 +700,29 @@
                 <!-- Free Plan -->
                 <div class="bg-white rounded-3xl p-8 shadow-xl hover-lift border-2 border-gray-100">
                     <div class="text-center mb-8">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Free</h3>
+                        <h3 class="text-2xl font-poppins font-bold text-gray-900 mb-2">Free</h3>
                         <div class="text-4xl font-bold text-gray-900 mb-4">0π</div>
                         <p class="text-gray-600">Perfect for getting started</p>
                     </div>
                     <ul class="space-y-3 mb-8">
                         <li class="flex items-center gap-3">
-                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-primary text-xl">✓</span>
                             <span>5 Links</span>
                         </li>
                         <li class="flex items-center gap-3">
-                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-primary text-xl">✓</span>
                             <span>1 Free Template</span>
                         </li>
                         <li class="flex items-center gap-3">
-                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-primary text-xl">✓</span>
                             <span>Basic Analytics</span>
                         </li>
                         <li class="flex items-center gap-3">
-                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-primary text-xl">✓</span>
                             <span>Pi Tips</span>
                         </li>
                         <li class="flex items-center gap-3">
-                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-primary text-xl">✓</span>
                             <span>QR Code</span>
                         </li>
                     </ul>
@@ -622,29 +734,29 @@
                 <!-- Starter Plan -->
                 <div class="bg-white rounded-3xl p-8 shadow-xl hover-lift border-2 border-primary/20">
                     <div class="text-center mb-8">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Starter</h3>
+                        <h3 class="text-2xl font-poppins font-bold text-gray-900 mb-2">Starter</h3>
                         <div class="text-4xl font-bold text-primary mb-4">10π</div>
                         <p class="text-gray-600">For growing creators</p>
                     </div>
                     <ul class="space-y-3 mb-8">
                         <li class="flex items-center gap-3">
-                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-primary text-xl">✓</span>
                             <span>Unlimited Links</span>
                         </li>
                         <li class="flex items-center gap-3">
-                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-primary text-xl">✓</span>
                             <span>25+ Templates</span>
                         </li>
                         <li class="flex items-center gap-3">
-                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-primary text-xl">✓</span>
                             <span>Advanced Analytics</span>
                         </li>
                         <li class="flex items-center gap-3">
-                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-primary text-xl">✓</span>
                             <span>Custom QR Codes</span>
                         </li>
                         <li class="flex items-center gap-3">
-                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-primary text-xl">✓</span>
                             <span>Link Scheduling</span>
                         </li>
                     </ul>
@@ -654,12 +766,12 @@
                 </div>
                 
                 <!-- Pro Plan -->
-                <div class="bg-gradient-to-br from-purple-600 to-primary rounded-3xl p-8 shadow-2xl hover-lift border-2 border-purple-500 relative overflow-hidden">
+                <div class="bg-gradient-to-br from-primary to-secondary rounded-3xl p-8 shadow-2xl hover-lift border-2 border-primary relative overflow-hidden">
                     <div class="absolute top-4 right-4 bg-yellow-400 text-black px-3 py-1 rounded-full text-sm font-bold">
                         POPULAR
                     </div>
                     <div class="text-center mb-8">
-                        <h3 class="text-2xl font-bold text-white mb-2">Pro</h3>
+                        <h3 class="text-2xl font-poppins font-bold text-white mb-2">Pro</h3>
                         <div class="text-4xl font-bold text-white mb-4">15π</div>
                         <p class="text-white/90">For serious creators</p>
                     </div>
@@ -685,7 +797,7 @@
                             <span>Email Marketing</span>
                         </li>
                     </ul>
-                    <button class="w-full bg-white text-purple-600 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+                    <button class="w-full bg-white text-primary py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors">
                         Upgrade with Pi
                     </button>
                 </div>
@@ -693,33 +805,33 @@
                 <!-- Premium Plan -->
                 <div class="bg-white rounded-3xl p-8 shadow-xl hover-lift border-2 border-yellow-400">
                     <div class="text-center mb-8">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Premium</h3>
-                        <div class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-yellow-400 bg-clip-text text-transparent mb-4">22π</div>
+                        <h3 class="text-2xl font-poppins font-bold text-gray-900 mb-2">Premium</h3>
+                        <div class="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">22π</div>
                         <p class="text-gray-600">For businesses & influencers</p>
                     </div>
                     <ul class="space-y-3 mb-8">
                         <li class="flex items-center gap-3">
-                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-primary text-xl">✓</span>
                             <span>Everything in Pro</span>
                         </li>
                         <li class="flex items-center gap-3">
-                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-primary text-xl">✓</span>
                             <span>100+ Premium Templates</span>
                         </li>
                         <li class="flex items-center gap-3">
-                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-primary text-xl">✓</span>
                             <span>Custom CSS & Branding</span>
                         </li>
                         <li class="flex items-center gap-3">
-                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-primary text-xl">✓</span>
                             <span>Priority Support</span>
                         </li>
                         <li class="flex items-center gap-3">
-                            <span class="text-green-500 text-xl">✓</span>
+                            <span class="text-primary text-xl">✓</span>
                             <span>White Label Option</span>
                         </li>
                     </ul>
-                    <button class="w-full bg-gradient-to-r from-purple-600 to-yellow-400 text-white py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                    <button class="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
                         Upgrade with Pi
                     </button>
                 </div>
@@ -727,8 +839,8 @@
             
             <!-- .pi Domain Note -->
             <div class="mt-16 text-center animate-slide-up">
-                <div class="bg-white/90 backdrop-blur-sm rounded-2xl p-8 max-w-4xl mx-auto shadow-lg border border-white/20">
-                    <h3 class="text-2xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-2">
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl p-8 max-w-4xl mx-auto shadow-lg border border-primary/20">
+                    <h3 class="text-2xl font-poppins font-bold text-gray-900 mb-4 flex items-center justify-center gap-2">
                         <span class="text-primary">🌐</span>
                         .pi Domain Integration - Coming Soon!
                     </h3>
@@ -753,24 +865,24 @@
     <section class="py-24 px-4 bg-gray-50">
         <div class="container mx-auto text-center">
             <div class="animate-slide-up">
-                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-12">Join the Pi Creator Revolution</h2>
+                <h2 class="text-4xl md:text-5xl font-poppins font-bold text-gray-900 mb-12">Join the Pi Creator Revolution</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
                     <div class="bg-white rounded-2xl p-8 shadow-lg hover-lift">
                         <div class="text-5xl mb-4">🚀</div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">Launch in Minutes</h3>
+                        <h3 class="text-xl font-poppins font-bold text-gray-900 mb-2">Launch in Minutes</h3>
                         <p class="text-gray-600">Get your professional link-in-bio live in under 5 minutes with our easy setup wizard</p>
                     </div>
                     
                     <div class="bg-white rounded-2xl p-8 shadow-lg hover-lift">
                         <div class="text-5xl mb-4">💎</div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">Premium Quality</h3>
+                        <h3 class="text-xl font-poppins font-bold text-gray-900 mb-2">Premium Quality</h3>
                         <p class="text-gray-600">Professional templates and features that make you stand out from the competition</p>
                     </div>
                     
                     <div class="bg-white rounded-2xl p-8 shadow-lg hover-lift">
                         <div class="text-5xl mb-4">🌍</div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">Pi-Native</h3>
+                        <h3 class="text-xl font-poppins font-bold text-gray-900 mb-2">Pi-Native</h3>
                         <p class="text-gray-600">Built specifically for the Pi Network ecosystem and growing community worldwide</p>
                     </div>
                 </div>
@@ -782,7 +894,7 @@
                     </p>
                     
                     <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                        <a href="/" class="bg-gradient-to-r from-purple-600 to-yellow-400 text-white text-xl px-12 py-5 rounded-xl font-bold hover:opacity-90 transition-all transform hover:scale-105 duration-200 shadow-2xl">
+                        <a href="/" class="bg-gradient-to-r from-primary to-secondary text-white text-xl px-12 py-5 rounded-xl font-bold hover:opacity-90 transition-all transform hover:scale-105 duration-200 shadow-2xl">
                             🎯 Create Your Droplink Now
                         </a>
                         <a href="https://droplink.space/@meowgirl" target="_blank" class="border-2 border-gray-300 text-gray-700 text-xl px-12 py-5 rounded-xl font-bold hover:border-primary hover:text-primary transition-all">
@@ -805,7 +917,7 @@
                 <div class="md:col-span-2">
                     <div class="flex items-center gap-3 mb-6">
                         <img src="/lovable-uploads/2c117775-cd88-4aec-819b-0723e4f0dbe5.png" alt="Droplink" class="w-10 h-10">
-                        <span class="font-display font-bold text-2xl">Droplink</span>
+                        <span class="font-poppins font-bold text-2xl">Droplink</span>
                     </div>
                     <p class="text-gray-300 mb-6 text-lg leading-relaxed">
                         The ultimate link-in-bio platform for Pi Network creators. Monetize your audience, 
@@ -832,7 +944,7 @@
                 </div>
                 
                 <div>
-                    <h4 class="font-bold text-xl mb-6">Product</h4>
+                    <h4 class="font-poppins font-bold text-xl mb-6">Product</h4>
                     <ul class="space-y-3 text-gray-300">
                         <li><a href="#features" class="hover:text-white transition-colors text-lg">Features</a></li>
                         <li><a href="#pricing" class="hover:text-white transition-colors text-lg">Pricing</a></li>
@@ -843,7 +955,7 @@
                 </div>
                 
                 <div>
-                    <h4 class="font-bold text-xl mb-6">Support & Community</h4>
+                    <h4 class="font-poppins font-bold text-xl mb-6">Support & Community</h4>
                     <ul class="space-y-3 text-gray-300">
                         <li><a href="/" class="hover:text-white transition-colors text-lg">Help Center</a></li>
                         <li><a href="/" class="hover:text-white transition-colors text-lg">Contact Support</a></li>
