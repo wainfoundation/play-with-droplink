@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Activity } from "lucide-react";
 
 const DesktopNavigation = () => {
   const location = useLocation();
@@ -16,6 +16,7 @@ const DesktopNavigation = () => {
     { name: "Stickers", path: "/stickers" },
     { name: "Pricing", path: "/pricing" },
     { name: "Help", path: "/help" },
+    { name: "Status", path: "/status", icon: Activity },
   ];
 
   return (
@@ -31,6 +32,7 @@ const DesktopNavigation = () => {
           }`}
         >
           {item.name === "Stickers" && <Sparkles className="w-4 h-4 inline mr-1" />}
+          {item.name === "Status" && <Activity className="w-4 h-4 inline mr-1" />}
           {item.name}
         </Link>
       ))}

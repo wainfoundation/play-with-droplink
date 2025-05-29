@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Activity } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 
 interface MobileNavigationProps {
@@ -28,6 +28,7 @@ const MobileNavigation = ({ isOpen, onClose }: MobileNavigationProps) => {
     { name: "Stickers", path: "/stickers" },
     { name: "Pricing", path: "/pricing" },
     { name: "Help", path: "/help" },
+    { name: "Status", path: "/status", icon: Activity },
   ];
 
   if (!isOpen) return null;
@@ -47,6 +48,7 @@ const MobileNavigation = ({ isOpen, onClose }: MobileNavigationProps) => {
             onClick={onClose}
           >
             {item.name === "Stickers" && <Sparkles className="w-4 h-4 inline mr-1" />}
+            {item.name === "Status" && <Activity className="w-4 h-4 inline mr-1" />}
             {item.name}
           </Link>
         ))}

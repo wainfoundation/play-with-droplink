@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,11 +8,10 @@ import { HelmetProvider } from 'react-helmet-async';
 import { UserProvider } from "@/context/UserContext";
 import { AdminStatusProvider } from "@/components/admin/AdminStatusProvider";
 import { SecurityHeaders } from "@/components/security/SecurityHeaders";
-import EnhancedSessionManager from "@/components/security/EnhancedSessionManager";
+import { EnhancedSessionManager } from "@/components/security/EnhancedSessionManager";
 import { CookieConsent } from "@/components/privacy/CookieConsent";
 import { NetworkStatus } from "@/components/network/NetworkStatus";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
-import Index from "./pages/Index";
 import Home from "./pages/Home";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
@@ -83,8 +83,7 @@ const App = () => {
                   <EnhancedSessionManager />
                   <div className="min-h-screen bg-background font-sans antialiased">
                     <Routes>
-                      <Route path="/" element={<Index />} />
-                      <Route path="/home" element={<Home />} />
+                      <Route path="/" element={<Home />} />
                       <Route path="/login-page" element={<LoginPage />} />
                       <Route path="/signup-page" element={<SignupPage />} />
                       <Route path="/login" element={<Login />} />
@@ -114,6 +113,7 @@ const App = () => {
                       <Route path="/community" element={<Community />} />
                       <Route path="/developers" element={<Developers />} />
                       <Route path="/developers-page" element={<DevelopersPage />} />
+                      <Route path="/status" element={<SystemStatus />} />
                       <Route path="/system-status" element={<SystemStatus />} />
                       <Route path="/creators" element={<CreatorDirectory />} />
                       <Route path="/domain-verification" element={<DomainVerification />} />
