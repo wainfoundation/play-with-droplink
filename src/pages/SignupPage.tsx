@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useUser } from "@/context/UserContext";
-import { PiAuthButton } from "@/components/auth/PiAuthButton";
+import { SecurePiAuthButton } from "@/components/auth/SecurePiAuthButton";
 import { PiTestNetBanner } from "@/components/PiTestNetBanner";
 import { Helmet } from "react-helmet-async";
 
@@ -38,7 +38,7 @@ const SignupPage = () => {
           
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
             <div className="space-y-6">
-              <PiAuthButton />
+              <SecurePiAuthButton />
               
               <div className="text-center">
                 <p className="text-sm text-gray-500 leading-relaxed">
