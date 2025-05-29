@@ -83,6 +83,7 @@ export const SecurePiAuthButton = () => {
         const { data: newUser, error: insertError } = await supabase
           .from('user_profiles')
           .insert({
+            id: authResult.user.uid, // Include the required id field
             username: authResult.user.username,
             display_name: authResult.user.username,
             created_at: new Date().toISOString(),
