@@ -10,7 +10,7 @@ const Footer = () => {
       <div className="absolute -bottom-40 -left-40 w-80 h-80 md:w-96 md:h-96 bg-gradient-to-br from-purple-600/10 to-yellow-400/10 rounded-full blur-3xl"></div>
       
       <div className="container mx-auto relative z-10">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           <div className="space-y-6 md:col-span-2">
             {/* Logo Section */}
             <div className="flex items-center gap-3">
