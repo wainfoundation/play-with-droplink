@@ -9,7 +9,7 @@ const Hero = () => {
   const { isLoggedIn, profile } = useUser();
 
   return (
-    <section className="relative w-full h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden">
       {/* Full-screen background */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-indigo-50" />
       <div className="absolute -top-40 -right-40 w-80 h-80 md:w-96 md:h-96 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-3xl animate-pulse" />
@@ -35,39 +35,38 @@ const Hero = () => {
           {/* Feature highlights */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-4xl mx-auto my-8 md:my-12">
             <div className="text-center p-3 md:p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/20">
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
                 <Users className="h-5 w-5 md:h-6 md:w-6 text-white" />
               </div>
               <p className="text-sm md:text-base font-semibold text-gray-900">Custom Profiles</p>
             </div>
             
             <div className="text-center p-3 md:p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/20">
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
                 <DollarSign className="h-5 w-5 md:h-6 md:w-6 text-white" />
               </div>
               <p className="text-sm md:text-base font-semibold text-gray-900">Pi Payments</p>
             </div>
             
             <div className="text-center p-3 md:p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/20">
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
                 <Globe className="h-5 w-5 md:h-6 md:w-6 text-white" />
               </div>
               <p className="text-sm md:text-base font-semibold text-gray-900">Pi Domains</p>
             </div>
             
             <div className="text-center p-3 md:p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/20">
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
                 <Zap className="h-5 w-5 md:h-6 md:w-6 text-white" />
               </div>
               <p className="text-sm md:text-base font-semibold text-gray-900">100+ Templates</p>
             </div>
           </div>
 
-          {/* Video Demo Section - Full width without frame */}
+          {/* Video Demo Section */}
           <div className="my-12 md:my-16">
             <div className="max-w-6xl mx-auto">
-              <div className="relative w-full overflow-hidden rounded-3xl shadow-2xl">
-                {/* Video Container - Responsive 16:9 aspect ratio */}
+              <div className="relative w-full overflow-hidden rounded-3xl shadow-2xl bg-black/5 backdrop-blur-sm">
                 <div className="relative w-full" style={{ paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}>
                   <iframe 
                     src="https://www.youtube-nocookie.com/embed/1sv5cf9ygZs?si=rATq0V5J1SH_iNpE&controls=1&modestbranding=1&rel=0" 
@@ -80,7 +79,6 @@ const Hero = () => {
                     className="rounded-3xl"
                   />
                   
-                  {/* Overlay for branding */}
                   <div className="absolute top-4 md:top-6 left-4 md:left-6 bg-black/70 backdrop-blur-sm rounded-xl px-3 md:px-4 py-2 md:py-3 z-10">
                     <div className="flex items-center gap-2 text-white text-sm md:text-base font-medium">
                       <Play className="h-4 w-4 md:h-5 md:w-5" />
@@ -96,7 +94,7 @@ const Hero = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4 md:pt-6">
             {isLoggedIn && profile ? (
               <>
-                <Button asChild size="lg" className="w-full sm:w-auto bg-gradient-hero hover:bg-secondary transform transition hover:scale-105 duration-200 text-lg px-8 py-4">
+                <Button asChild size="lg" className="w-full sm:w-auto bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 transform transition hover:scale-105 duration-200 text-lg px-8 py-4">
                   <Link to="/dashboard" className="flex items-center gap-2">
                     Go to Dashboard <ArrowRight size={20} />
                   </Link>
@@ -107,7 +105,7 @@ const Hero = () => {
               </>
             ) : (
               <>
-                <Button asChild size="lg" className="w-full sm:w-auto bg-gradient-hero hover:bg-secondary transform transition hover:scale-105 duration-200 text-lg px-8 py-4">
+                <Button asChild size="lg" className="w-full sm:w-auto bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 transform transition hover:scale-105 duration-200 text-lg px-8 py-4">
                   <Link to="/signup" className="flex items-center gap-2">
                     Start Building Free <ArrowRight size={20} />
                   </Link>

@@ -32,7 +32,7 @@ const Home = () => {
         <meta property="og:url" content="https://droplink.space" />
       </Helmet>
       
-      <div className="w-full h-screen overflow-y-auto bg-gradient-to-br from-background via-muted/20 to-primary/10">
+      <div className="w-full min-h-screen overflow-y-auto bg-gradient-to-br from-background via-muted/20 to-primary/10">
         <Navbar />
         <main className="w-full">
           <Hero />
