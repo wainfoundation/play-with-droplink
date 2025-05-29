@@ -14,6 +14,7 @@ export const useAuth = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [sessionWarningShown, setSessionWarningShown] = useState(false);
+  const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
   const { handleError } = useErrorHandler();
 
   useEffect(() => {
@@ -25,8 +26,10 @@ export const useAuth = () => {
         
         // Check if session is still valid
         if (session) {
-          const sessionAge = Date.now() - new Date(session.created_at).getTime();
-          if (sessionAge > SESSION_TIMEOUT) {
+          const now = Date.now();
+          const sessionAge = sessionStartTime ? now - sessionStartTime : 0;
+          
+          if (sessionAge > SESSION_TIMEOUT && sessionStartTime) {
             // Session expired, sign out
             await supabase.auth.signOut();
             toast({
@@ -36,13 +39,19 @@ export const useAuth = () => {
             });
             setUser(null);
             setIsLoggedIn(false);
+            setSessionStartTime(null);
           } else {
             setUser(session.user);
             setIsLoggedIn(true);
             
+            // Set session start time if not already set
+            if (!sessionStartTime) {
+              setSessionStartTime(now);
+            }
+            
             // Set up session warning timer
             const timeUntilWarning = SESSION_TIMEOUT - sessionAge - SESSION_WARNING_TIME;
-            if (timeUntilWarning > 0) {
+            if (timeUntilWarning > 0 && sessionStartTime) {
               setTimeout(() => {
                 if (!sessionWarningShown) {
                   setSessionWarningShown(true);
@@ -57,6 +66,7 @@ export const useAuth = () => {
         } else {
           setUser(null);
           setIsLoggedIn(false);
+          setSessionStartTime(null);
         }
         
         console.log('Auth state change: INITIAL_SESSION', session?.user ? 'logged in' : 'logged out');
@@ -65,6 +75,7 @@ export const useAuth = () => {
         handleError(error, 'Getting initial session');
         setUser(null);
         setIsLoggedIn(false);
+        setSessionStartTime(null);
       } finally {
         setIsLoading(false);
       }
@@ -79,12 +90,15 @@ export const useAuth = () => {
         
         // Enhanced security logging
         if (event === 'SIGNED_IN') {
+          const now = Date.now();
+          setSessionStartTime(now);
           console.log('Successful sign in:', {
             timestamp: new Date().toISOString(),
             userId: session?.user?.id,
             method: session?.user?.app_metadata?.provider || 'unknown'
           });
         } else if (event === 'SIGNED_OUT') {
+          setSessionStartTime(null);
           console.log('User signed out:', {
             timestamp: new Date().toISOString(),
             reason: 'user_action'
@@ -97,7 +111,7 @@ export const useAuth = () => {
         setSessionWarningShown(false);
         
         // Set up session timeout for new sessions
-        if (session?.user) {
+        if (session?.user && event === 'SIGNED_IN') {
           setTimeout(() => {
             if (!sessionWarningShown) {
               setSessionWarningShown(true);
@@ -114,7 +128,7 @@ export const useAuth = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [handleError, sessionWarningShown]);
+  }, [handleError, sessionWarningShown, sessionStartTime]);
 
   const signOut = async () => {
     try {
@@ -132,6 +146,7 @@ export const useAuth = () => {
       setUser(null);
       setIsLoggedIn(false);
       setSessionWarningShown(false);
+      setSessionStartTime(null);
       
       toast({
         title: "Signed out successfully",
@@ -154,6 +169,7 @@ export const useAuth = () => {
         setUser(session.user);
         setIsLoggedIn(true);
         setSessionWarningShown(false);
+        setSessionStartTime(Date.now()); // Reset session start time
         
         toast({
           title: "Session Refreshed",

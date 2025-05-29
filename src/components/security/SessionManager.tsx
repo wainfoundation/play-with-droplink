@@ -17,10 +17,14 @@ const SessionManager = () => {
     const SESSION_DURATION = 30 * 60 * 1000;
     const WARNING_TIME = 5 * 60 * 1000; // Show warning 5 minutes before expiry
 
+    // Get session start time from localStorage or use current time as fallback
+    const getSessionStartTime = () => {
+      const stored = localStorage.getItem('session_start_time');
+      return stored ? parseInt(stored) : Date.now();
+    };
+
     const checkSessionTime = () => {
-      if (!user.created_at) return;
-      
-      const sessionStart = new Date(user.created_at).getTime();
+      const sessionStart = getSessionStartTime();
       const now = Date.now();
       const elapsed = now - sessionStart;
       const remaining = SESSION_DURATION - elapsed;
@@ -39,6 +43,11 @@ const SessionManager = () => {
       }
     };
 
+    // Store session start time when component mounts
+    if (!localStorage.getItem('session_start_time')) {
+      localStorage.setItem('session_start_time', Date.now().toString());
+    }
+
     checkSessionTime();
     const interval = setInterval(checkSessionTime, 60000); // Check every minute
 
@@ -49,6 +58,13 @@ const SessionManager = () => {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const handleRefreshSession = () => {
+    // Reset session start time
+    localStorage.setItem('session_start_time', Date.now().toString());
+    refreshSession();
+    setShowWarning(false);
   };
 
   if (!user || !showWarning) return null;
@@ -69,7 +85,7 @@ const SessionManager = () => {
         <Button
           size="sm"
           variant="outline"
-          onClick={refreshSession}
+          onClick={handleRefreshSession}
           className="ml-2"
         >
           <RefreshCw className="h-3 w-3 mr-1" />
