@@ -45,11 +45,11 @@ export const SecurePiAuthButton = () => {
         username: authResult.user.username 
       });
 
-      // Check if user exists in Supabase
+      // Check if user exists in user_profiles
       const { data: existingUser, error: fetchError } = await supabase
-        .from('users')
+        .from('user_profiles')
         .select('*')
-        .eq('pi_username', authResult.user.username)
+        .eq('username', authResult.user.username)
         .single();
 
       if (fetchError && fetchError.code !== 'PGRST116') {
@@ -58,12 +58,11 @@ export const SecurePiAuthButton = () => {
       }
 
       if (existingUser) {
-        // User exists, update last login
+        // User exists, update profile
         const { error: updateError } = await supabase
-          .from('users')
+          .from('user_profiles')
           .update({ 
-            last_login: new Date().toISOString(),
-            pi_access_token: authResult.accessToken 
+            updated_at: new Date().toISOString(),
           })
           .eq('id', existingUser.id);
 
@@ -80,15 +79,14 @@ export const SecurePiAuthButton = () => {
         
         navigate('/dashboard');
       } else {
-        // New user, create account
+        // New user, create profile
         const { data: newUser, error: insertError } = await supabase
-          .from('users')
+          .from('user_profiles')
           .insert({
-            pi_username: authResult.user.username,
-            pi_user_id: authResult.user.uid,
-            pi_access_token: authResult.accessToken,
+            username: authResult.user.username,
+            display_name: authResult.user.username,
             created_at: new Date().toISOString(),
-            last_login: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
           })
           .select()
           .single();
