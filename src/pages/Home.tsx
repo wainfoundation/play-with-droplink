@@ -32,16 +32,17 @@ const Home = () => {
         <meta property="og:url" content="https://droplink.space" />
       </Helmet>
       
-      <div className="w-full min-h-screen overflow-y-auto bg-gradient-to-br from-background via-muted/20 to-primary/10">
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-primary/10">
         <Navbar />
-        <main className="w-full">
+        <main className="overflow-x-hidden">
           <Hero />
           
-          {/* Content sections */}
-          <div className="relative w-full">
+          {/* Enhanced mobile spacing and layout */}
+          <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/30 to-transparent pointer-events-none" />
             
-            <div className="space-y-8 sm:space-y-12 md:space-y-16 w-full">
+            {/* Mobile-optimized sections with better spacing */}
+            <div className="space-y-8 sm:space-y-12 md:space-y-16">
               <PiDomainFeatures />
               <PiDomainShowcase />
               <CustomerSuccessStories />
