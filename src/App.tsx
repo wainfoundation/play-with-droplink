@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,7 +7,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { UserProvider } from "@/context/UserContext";
 import { AdminStatusProvider } from "@/components/admin/AdminStatusProvider";
 import { SecurityHeaders } from "@/components/security/SecurityHeaders";
-import { EnhancedSessionManager } from "@/components/security/EnhancedSessionManager";
+import EnhancedSessionManager from "@/components/security/EnhancedSessionManager";
 import { CookieConsent } from "@/components/privacy/CookieConsent";
 import { NetworkStatus } from "@/components/network/NetworkStatus";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
