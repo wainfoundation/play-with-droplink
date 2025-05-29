@@ -63,8 +63,13 @@ const PiAdsNetwork = ({ placementId = 'default-placement' }: PiAdsProps) => {
     const initializeAds = () => {
       try {
         if (window.PiAdsNetwork) {
-          // Initialize with Pi Ads Network API key
-          const apiKey = "ldtwy98n3q6f8uvxvoxvnidgiklu21ndbfn5ltqpnfxcftbocc9ujxrcfiwcwkj6";
+          // Get API key from environment - will be configured in Supabase secrets
+          const apiKey = import.meta.env.VITE_PI_ADS_API_KEY;
+          if (!apiKey) {
+            setAdError('Pi Ads API key not configured');
+            return;
+          }
+          
           window.PiAdsNetwork.init({ 
             apiKey,
             placementId

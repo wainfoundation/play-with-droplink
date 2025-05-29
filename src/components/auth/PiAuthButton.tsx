@@ -9,6 +9,10 @@ import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Badge } from "@/components/ui/badge";
 import { authenticateWithPi, initPiNetwork, isRunningInPiBrowser } from "@/utils/pi-sdk";
+import { createRateLimiter } from "@/utils/input-sanitizer";
+
+// Create rate limiter for authentication attempts (5 attempts per 15 minutes)
+const authRateLimiter = createRateLimiter(5, 15 * 60 * 1000);
 
 export function PiAuthButton() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -42,6 +46,17 @@ export function PiAuthButton() {
 
   const handleAuth = async () => {
     try {
+      // Rate limiting check
+      const clientId = navigator.userAgent + window.location.hostname;
+      if (!authRateLimiter(clientId)) {
+        toast({
+          title: "Too Many Attempts",
+          description: "Please wait 15 minutes before trying again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       setIsAuthenticating(true);
       
       console.log("Initializing Pi SDK...");
@@ -59,12 +74,30 @@ export function PiAuthButton() {
 
       console.log("Pi auth result:", authResult);
 
+      // Enhanced validation for production
+      if (isProduction) {
+        // Additional validation in production mode
+        if (!authResult.accessToken) {
+          throw new Error("No access token received from Pi authentication");
+        }
+        
+        // Validate access token format (basic check)
+        if (typeof authResult.accessToken !== 'string' || authResult.accessToken.length < 10) {
+          throw new Error("Invalid access token format");
+        }
+      }
+
       // Validate required fields from auth result
       if (!authResult.user?.uid) {
         throw new Error("No user ID returned from Pi authentication");
       }
 
-      // Create a unique email for Pi users
+      // Validate UID format (should be alphanumeric)
+      if (!/^[a-zA-Z0-9]+$/.test(authResult.user.uid)) {
+        throw new Error("Invalid user ID format from Pi authentication");
+      }
+
+      // Create a unique email for Pi users with additional security
       const userEmail = `${authResult.user.uid}@pi-network-user.com`;
       const userPassword = authResult.user.uid;
       
@@ -80,16 +113,25 @@ export function PiAuthButton() {
       if (signInError) {
         console.log("Sign in failed, attempting signup:", signInError.message);
         
+        // Enhanced user data validation
+        const username = authResult.user.username || `pi_user_${authResult.user.uid.slice(-8)}`;
+        
+        // Validate username format
+        if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+          throw new Error("Invalid username format from Pi authentication");
+        }
+        
         const { error: signUpError } = await supabase.auth.signUp({
           email: userEmail,
           password: userPassword,
           options: {
             data: {
-              username: authResult.user.username || `pi_user_${authResult.user.uid.slice(-8)}`,
+              username: username.toLowerCase(),
               pi_uid: authResult.user.uid,
               display_name: authResult.user.username || `Pi User`,
               auth_method: 'pi_network',
-              access_token: authResult.accessToken
+              access_token: isProduction ? authResult.accessToken : 'sandbox_token',
+              authenticated_at: new Date().toISOString()
             }
           }
         });
@@ -111,12 +153,17 @@ export function PiAuthButton() {
         }
       }
       
-      // Check admin status
+      // Check admin status with enhanced security
       try {
         const { data: adminData } = await supabase.functions.invoke("check-admin", {
           body: { 
             piUserId: authResult.user.uid,
-            username: authResult.user.username || `pi_user_${authResult.user.uid.slice(-8)}`
+            username: authResult.user.username || `pi_user_${authResult.user.uid.slice(-8)}`,
+            timestamp: new Date().toISOString(),
+            client_info: {
+              browser: isPiBrowser,
+              production: isProduction
+            }
           }
         });
 
@@ -144,6 +191,15 @@ export function PiAuthButton() {
       navigate('/dashboard');
     } catch (error: any) {
       console.error("Pi auth error details:", error);
+      
+      // Enhanced error logging for security monitoring
+      console.error("Authentication failed:", {
+        timestamp: new Date().toISOString(),
+        error: error.message,
+        isPiBrowser,
+        isProduction,
+        userAgent: navigator.userAgent.substring(0, 100) // Truncated for privacy
+      });
       
       toast({
         title: "Pi Network Authentication Failed",
