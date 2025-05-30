@@ -1,15 +1,17 @@
-
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles, Heart, Globe } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
-const Welcome = () => {
+interface WelcomeProps {
+  onEnter?: () => void;
+}
+
+const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
   const [mascotVisible, setMascotVisible] = useState(false);
   const [welcomeTextVisible, setWelcomeTextVisible] = useState(false);
   const [buttonsVisible, setButtonsVisible] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Animated sequence
@@ -25,7 +27,9 @@ const Welcome = () => {
   }, []);
 
   const handleEnter = () => {
-    navigate('/');
+    if (onEnter) {
+      onEnter();
+    }
   };
 
   return (

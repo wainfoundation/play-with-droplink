@@ -43,9 +43,7 @@ const Root = () => {
         {showSplash ? (
           <SplashScreen onComplete={handleSplashComplete} />
         ) : showWelcome ? (
-          <div onClick={handleWelcomeComplete}>
-            <Welcome />
-          </div>
+          <Welcome onEnter={handleWelcomeComplete} />
         ) : (
           <App />
         )}
