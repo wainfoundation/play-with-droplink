@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Star, Shield, Zap } from 'lucide-react';
+import { ArrowRight, Star, Shield, Zap, Globe } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Hero = () => {
@@ -122,7 +122,7 @@ const Hero = () => {
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center animate-fade-in delay-800">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center animate-fade-in delay-800 mb-12">
             <Button 
               asChild
               size="lg" 
@@ -142,18 +142,43 @@ const Hero = () => {
             </Button>
           </div>
 
+          {/* Embedded Video Section */}
+          <div className="mb-12 animate-fade-in delay-1000">
+            <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-primary/20">
+              <h3 className="text-xl font-bold mb-4 text-center">See Droplink in Action</h3>
+              <div className="relative w-full" style={{ paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}>
+                <iframe 
+                  src="https://www.youtube-nocookie.com/embed/1sv5cf9ygZs?si=rATq0V5J1SH_iNpE&controls=1" 
+                  title="Droplink Demo Video" 
+                  frameBorder="0" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                  referrerPolicy="strict-origin-when-cross-origin" 
+                  allowFullScreen
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                  className="rounded-lg"
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Trust Indicators */}
-          <div className="mt-12 text-center lg:text-left animate-fade-in delay-1000">
+          <div className="text-center lg:text-left animate-fade-in delay-1200">
             <p className="text-sm text-muted-foreground mb-4">
               Trusted by Pi Network pioneers worldwide
             </p>
-            <div className="flex justify-center lg:justify-start items-center space-x-8 opacity-60">
-              <div className="text-2xl font-bold text-primary">π</div>
-              <div className="text-sm font-medium">Pi Browser Compatible</div>
-              <div className="text-2xl font-bold text-primary">🔗</div>
-              <div className="text-sm font-medium">.pi Domain Ready</div>
-              <div className="text-2xl font-bold text-primary">💰</div>
-              <div className="text-sm font-medium">Pi Payments Enabled</div>
+            <div className="flex flex-col sm:flex-row justify-center lg:justify-start items-center gap-6 sm:gap-8">
+              <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm rounded-lg px-4 py-2 border border-primary/20">
+                <div className="text-xl font-bold text-primary">π</div>
+                <span className="text-sm font-medium">Pi Browser Compatible</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm rounded-lg px-4 py-2 border border-primary/20">
+                <Globe className="w-5 h-5 text-primary" />
+                <span className="text-sm font-medium">.pi Domain Ready</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm rounded-lg px-4 py-2 border border-primary/20">
+                <div className="text-xl font-bold text-primary">💰</div>
+                <span className="text-sm font-medium">Pi Payments Enabled</span>
+              </div>
             </div>
           </div>
         </div>
