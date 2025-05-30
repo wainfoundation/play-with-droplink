@@ -7,12 +7,23 @@ const Hero = () => {
   const [currentEmotion, setCurrentEmotion] = useState(0);
   
   const emotions = [
-    { thought: "Welcome to Droplink!", eyes: "happy", mouth: "smile" },
-    { thought: "I'm sleepy... 😴", eyes: "sleepy", mouth: "neutral" },
-    { thought: "Let's build something amazing!", eyes: "excited", mouth: "big-smile" },
-    { thought: "Pi Network is awesome! π", eyes: "normal", mouth: "smile" },
-    { thought: "Ready to get started?", eyes: "wink", mouth: "smile" }
-  ];
+  { thought: "Welcome to Droplink!", eyes: "happy", mouth: "smile" },
+  { thought: "I'm sleepy... 😴", eyes: "sleepy", mouth: "neutral" },
+  { thought: "Let's build something amazing!", eyes: "excited", mouth: "big-smile" },
+  { thought: "Pi Network is awesome! π", eyes: "normal", mouth: "smile" },
+  { thought: "Ready to get started?", eyes: "wink", mouth: "smile" },
+  { thought: "Hmm... I'm thinking 🤔", eyes: "thinking", mouth: "pursed" },
+  { thought: "Wow, that’s cool! 🤩", eyes: "starry", mouth: "open-smile" },
+  { thought: "Uh-oh... something went wrong!", eyes: "worried", mouth: "frown" },
+  { thought: "I love being helpful! 💡", eyes: "bright", mouth: "grin" },
+  { thought: "Yikes! That scared me! 😱", eyes: "wide", mouth: "shocked" },
+  { thought: "You're doing great! 🌟", eyes: "encouraging", mouth: "gentle-smile" },
+  { thought: "Need a break? ☕", eyes: "tired", mouth: "soft-smile" },
+  { thought: "Let's hustle! 🚀", eyes: "focused", mouth: "determined" },
+  { thought: "So peaceful... 🧘", eyes: "calm", mouth: "content" },
+  { thought: "Hehe, that’s funny 😄", eyes: "playful", mouth: "laugh" }
+];
+
 
   useEffect(() => {
     const interval = setInterval(() => {
