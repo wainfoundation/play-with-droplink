@@ -87,8 +87,10 @@ const Help = () => {
   
   const popularArticles = getFeaturedArticles();
   
-  // Get sample FAQs from the first category
-  const faqs = faqData[0]?.questions.slice(0, 5) || [];
+  // Get sample FAQs from multiple categories
+  const faqs = faqData.slice(0, 3).flatMap(category => 
+    category.questions.slice(0, 2)
+  );
 
   return (
     <div className="min-h-screen flex flex-col">

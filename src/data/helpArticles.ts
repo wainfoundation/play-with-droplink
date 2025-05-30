@@ -397,6 +397,132 @@ export const helpArticles: HelpArticle[] = [
     publishedAt: "2024-02-10",
     tags: ["subscription", "plans", "pricing", "billing"],
     featured: false
+  },
+  {
+    id: "profile-setup",
+    title: "Setting Up Your Profile",
+    excerpt: "Complete guide to creating an attractive and effective Droplink profile.",
+    content: `
+      <h2>Profile Setup Guide</h2>
+      <p>Your Droplink profile is your digital business card. Learn how to make it shine and attract your target audience.</p>
+      
+      <h3>Profile Picture Best Practices</h3>
+      <ul>
+        <li>Use a high-quality image (at least 400x400 pixels)</li>
+        <li>Choose a clear, recognizable photo of yourself or logo</li>
+        <li>Ensure good lighting and contrast</li>
+        <li>Keep it professional but authentic</li>
+        <li>Square aspect ratio works best</li>
+      </ul>
+      
+      <h3>Writing Your Bio</h3>
+      <p>Your bio has 80 characters to make an impact:</p>
+      <ul>
+        <li>Start with who you are or what you do</li>
+        <li>Include your main value proposition</li>
+        <li>Use emojis sparingly but effectively</li>
+        <li>Include a call-to-action if space permits</li>
+        <li>Keep it updated with current projects</li>
+      </ul>
+      
+      <h3>Contact Information</h3>
+      <p>Make it easy for people to reach you:</p>
+      <ul>
+        <li>Add your primary email address</li>
+        <li>Include business phone if applicable</li>
+        <li>Add location if relevant to your business</li>
+        <li>Link to your main social media accounts</li>
+      </ul>
+      
+      <h3>Social Media Integration</h3>
+      <p>Connect your social platforms:</p>
+      <ul>
+        <li>Instagram for visual content</li>
+        <li>Twitter for updates and engagement</li>
+        <li>LinkedIn for professional networking</li>
+        <li>YouTube for video content</li>
+        <li>TikTok for short-form videos</li>
+      </ul>
+      
+      <h3>Privacy Settings</h3>
+      <p>Control your profile visibility:</p>
+      <ul>
+        <li>Public profile (recommended for businesses)</li>
+        <li>Private profile (invite-only access)</li>
+        <li>Search engine indexing preferences</li>
+        <li>Analytics sharing settings</li>
+      </ul>
+    `,
+    category: "Getting Started",
+    readTime: "4 min",
+    publishedAt: "2024-02-15",
+    tags: ["profile", "setup", "bio", "social-media"],
+    featured: false
+  },
+  {
+    id: "link-management",
+    title: "Managing Your Links",
+    excerpt: "Learn how to add, organize, and optimize your links for maximum engagement.",
+    content: `
+      <h2>Link Management</h2>
+      <p>Effective link management is crucial for driving traffic and achieving your goals. Here's how to master it.</p>
+      
+      <h3>Adding Links</h3>
+      <p>Steps to add a new link:</p>
+      <ol>
+        <li>Click "Add Link" in your dashboard</li>
+        <li>Enter the destination URL</li>
+        <li>Create an engaging title</li>
+        <li>Write a compelling description</li>
+        <li>Choose or upload a thumbnail image</li>
+        <li>Set link priority (order on your profile)</li>
+      </ol>
+      
+      <h3>Link Types</h3>
+      <ul>
+        <li><strong>Standard Links:</strong> Direct to external websites</li>
+        <li><strong>Social Media:</strong> Links to your social profiles</li>
+        <li><strong>Contact:</strong> Email, phone, or messaging apps</li>
+        <li><strong>Digital Products:</strong> Sell items directly</li>
+        <li><strong>Calendly/Booking:</strong> Schedule appointments</li>
+        <li><strong>Payment Links:</strong> Accept payments</li>
+      </ul>
+      
+      <h3>Link Optimization</h3>
+      <p>Make your links more clickable:</p>
+      <ul>
+        <li>Use action-oriented titles</li>
+        <li>Include benefits in descriptions</li>
+        <li>Choose eye-catching thumbnails</li>
+        <li>Add urgency when appropriate</li>
+        <li>Test different versions</li>
+      </ul>
+      
+      <h3>Link Organization</h3>
+      <p>Structure your links strategically:</p>
+      <ul>
+        <li>Most important links at the top</li>
+        <li>Group similar links together</li>
+        <li>Use consistent naming conventions</li>
+        <li>Remove outdated links regularly</li>
+        <li>Consider seasonal reorganization</li>
+      </ul>
+      
+      <h3>Link Analytics</h3>
+      <p>Track your link performance:</p>
+      <ul>
+        <li>Click-through rates</li>
+        <li>Traffic sources</li>
+        <li>Peak activity times</li>
+        <li>Geographic data</li>
+        <li>Device preferences</li>
+      </ul>
+    `,
+    category: "Getting Started",
+    readTime: "6 min",
+    publishedAt: "2024-02-20",
+    tags: ["links", "management", "optimization", "analytics"],
+    featured: false
   }
 ];
 

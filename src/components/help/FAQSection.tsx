@@ -22,13 +22,13 @@ const FAQSection = ({ faqs }: FAQSectionProps) => {
           {faqs.map((faq, index) => (
             <AccordionItem key={index} value={`faq-${index}`}>
               <AccordionTrigger className="text-lg font-medium text-left">{faq.question}</AccordionTrigger>
-              <AccordionContent>{faq.answer}</AccordionContent>
+              <AccordionContent className="text-muted-foreground">{faq.answer}</AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
         
         <div className="text-center mt-8">
-          <Link to="/help/all-faqs">
+          <Link to="/faqs">
             <Button variant="outline" size="lg">View All FAQs</Button>
           </Link>
         </div>
