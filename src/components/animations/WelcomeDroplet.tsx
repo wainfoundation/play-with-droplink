@@ -130,7 +130,8 @@ const WelcomeDroplet = () => {
         </div>
       </div>
       
-      <style jsx>{`
+      <style>
+        {`
         @keyframes bounce-gentle {
           0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
           40% { transform: translateY(-10px); }
@@ -248,7 +249,8 @@ const WelcomeDroplet = () => {
         .delay-1000 {
           animation-delay: 1s;
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };

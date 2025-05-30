@@ -1,10 +1,10 @@
-
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import Home from "@/pages/Home";
+import Welcome from "@/pages/Welcome";
 import Pricing from "@/pages/Pricing";
 import Contact from "@/pages/Contact";
 import Terms from "@/pages/Terms";
@@ -64,6 +64,7 @@ function App() {
           <Router>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/welcome" element={<Welcome />} />
               <Route path="/index" element={<Index />} />
               <Route path="/about" element={<About />} />
               <Route path="/pricing" element={<Pricing />} />
