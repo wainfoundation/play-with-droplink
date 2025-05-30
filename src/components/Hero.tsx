@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, Globe, Zap, DollarSign, Play } from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import WelcomeDroplet from "@/components/animations/WelcomeDroplet";
 
 const Hero = () => {
   const { isLoggedIn, profile } = useUser();
@@ -14,6 +15,9 @@ const Hero = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-indigo-50" />
       <div className="absolute -top-40 -right-40 w-80 h-80 md:w-96 md:h-96 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-3xl animate-pulse" />
       <div className="absolute -bottom-40 -left-40 w-80 h-80 md:w-96 md:h-96 bg-gradient-to-br from-secondary/20 to-primary/20 rounded-full blur-3xl animate-pulse" />
+      
+      {/* Welcome Droplet Animation */}
+      <WelcomeDroplet />
       
       <div className="container mx-auto relative z-10">
         <div className="text-center max-w-5xl mx-auto space-y-6 md:space-y-8">
