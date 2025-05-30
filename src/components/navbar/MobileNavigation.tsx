@@ -1,6 +1,7 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Home, FileTemplate, DollarSign, HelpCircle, Users, MessageSquare, BarChart3, LogOut, LogIn, UserPlus } from "lucide-react";
+import { Menu, X, Home, File, DollarSign, HelpCircle, Users, MessageSquare, BarChart3, LogOut, LogIn, UserPlus } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -18,7 +19,7 @@ const MobileNavigation = () => {
 
   const navigationItems = [
     { name: "Home", path: "/", icon: Home },
-    { name: "Templates", path: "/templates", icon: FileTemplate },
+    { name: "Templates", path: "/templates", icon: File },
     { name: "Pricing", path: "/pricing", icon: DollarSign },
     { name: "Help", path: "/help", icon: HelpCircle },
     { name: "Community", path: "/community", icon: Users },
