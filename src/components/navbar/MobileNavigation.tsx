@@ -1,101 +1,117 @@
+import React from "react";
+import { Link } from "react-router-dom";
 
-import { Link, useLocation } from "react-router-dom";
-import { Sparkles, Activity } from "lucide-react";
-import { useUser } from "@/context/UserContext";
+import { Icons } from "@/components/icons";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { useAuth } from "@/hooks/useAuth";
 
-interface MobileNavigationProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+interface MobileNavigationProps {}
 
-const MobileNavigation = ({ isOpen, onClose }: MobileNavigationProps) => {
-  const location = useLocation();
-  const { user, signOut } = useUser();
-
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
-
-  const handleLogout = async () => {
-    await signOut();
-    onClose();
-  };
-
-  const navItems = [
-    { name: "Home", path: "/" },
-    { name: "Features", path: "/features" },
-    { name: "Templates", path: "/templates" },
-    { name: "Stickers", path: "/stickers" },
-    { name: "Pricing", path: "/pricing" },
-    { name: "Help", path: "/help" },
-    { name: "Status", path: "/status", icon: Activity },
-  ];
-
-  if (!isOpen) return null;
+const MobileNavigation = () => {
+  const [open, setOpen] = React.useState(false);
+  const { user, signOut } = useAuth();
 
   return (
-    <div className="md:hidden">
-      <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
-        {navItems.map((item) => (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild className="md:hidden">
+        <button className="p-2 rounded-sm">
+          <Icons.menu className="h-6 w-6" />
+          <span className="sr-only">Toggle Navigation Menu</span>
+        </button>
+      </SheetTrigger>
+      <SheetContent side="left" className="pr-0">
+        <SheetHeader className="pl-10">
+          <SheetTitle>Menu</SheetTitle>
+        </SheetHeader>
+        <div className="flex flex-col space-y-3">
           <Link
-            key={item.name}
-            to={item.path}
-            className={`block px-3 py-2 text-base font-medium transition-colors ${
-              isActive(item.path)
-                ? "text-primary bg-primary/10"
-                : "text-gray-600 hover:text-primary hover:bg-gray-50"
-            }`}
-            onClick={onClose}
+            to="/"
+            className="block px-2 py-1 text-lg"
+            onClick={() => setOpen(false)}
           >
-            {item.name === "Stickers" && <Sparkles className="w-4 h-4 inline mr-1" />}
-            {item.name === "Status" && <Activity className="w-4 h-4 inline mr-1" />}
-            {item.name}
+            Home
           </Link>
-        ))}
-        
-        {user ? (
-          <div className="border-t pt-3 mt-3">
-            <Link
-              to={`/@${user.username}`}
-              className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-primary hover:bg-gray-50"
-              onClick={onClose}
-            >
-              Profile
-            </Link>
-            <Link
-              to="/dashboard"
-              className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-primary hover:bg-gray-50"
-              onClick={onClose}
-            >
-              Dashboard
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="block w-full text-left px-3 py-2 text-base font-medium text-gray-600 hover:text-primary hover:bg-gray-50"
-            >
-              Logout
-            </button>
-          </div>
-        ) : (
-          <div className="border-t pt-3 mt-3 space-y-2">
-            <Link
-              to="/login"
-              className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-primary hover:bg-gray-50"
-              onClick={onClose}
-            >
-              Login
-            </Link>
-            <Link
-              to="/signup"
-              className="block px-3 py-2 text-base font-medium bg-primary text-white rounded-md text-center"
-              onClick={onClose}
-            >
-              Sign Up
-            </Link>
-          </div>
-        )}
-      </div>
-    </div>
+          <Link
+            to="/templates"
+            className="block px-2 py-1 text-lg"
+            onClick={() => setOpen(false)}
+          >
+            Templates
+          </Link>
+          <Link
+            to="/pricing"
+            className="block px-2 py-1 text-lg"
+            onClick={() => setOpen(false)}
+          >
+            Pricing
+          </Link>
+          <Link
+            to="/help"
+            className="block px-2 py-1 text-lg"
+            onClick={() => setOpen(false)}
+          >
+            Help
+          </Link>
+          <Link
+            to="/community"
+            className="block px-2 py-1 text-lg"
+            onClick={() => setOpen(false)}
+          >
+            Community
+          </Link>
+          <Link
+            to="/forums"
+            className="block px-2 py-1 text-lg"
+            onClick={() => setOpen(false)}
+          >
+            Forums
+          </Link>
+          {user ? (
+            <>
+              <Link
+                to="/admin"
+                className="block px-2 py-1 text-lg"
+                onClick={() => setOpen(false)}
+              >
+                Dashboard
+              </Link>
+              <button
+                className="block px-2 py-1 text-lg w-full text-left"
+                onClick={() => {
+                  signOut();
+                  setOpen(false);
+                }}
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="block px-2 py-1 text-lg"
+                onClick={() => setOpen(false)}
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="block px-2 py-1 text-lg"
+                onClick={() => setOpen(false)}
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 };
 

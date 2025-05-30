@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { Sparkles, Activity } from "lucide-react";
 
@@ -20,7 +19,7 @@ const DesktopNavigation = () => {
   ];
 
   return (
-    <div className="hidden md:flex items-center space-x-8">
+    <div className="hidden md:flex md:items-center md:space-x-6 ml-6">
       {navItems.map((item) => (
         <Link
           key={item.name}
@@ -36,6 +35,18 @@ const DesktopNavigation = () => {
           {item.name}
         </Link>
       ))}
+      <Link
+        to="/community"
+        className="text-sm font-medium transition-colors hover:text-primary"
+      >
+        Community
+      </Link>
+      <Link
+        to="/forums"
+        className="text-sm font-medium transition-colors hover:text-primary"
+      >
+        Forums
+      </Link>
     </div>
   );
 };

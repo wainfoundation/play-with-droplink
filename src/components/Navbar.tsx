@@ -1,46 +1,43 @@
-
 import React, { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
+
+import { siteConfig } from "@/config/site";
+import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import PiBrowserPrompt from "@/components/PiBrowserPrompt";
-import NavLogo from "./navbar/NavLogo";
-import DesktopNavigation from "./navbar/DesktopNavigation";
-import UserMenu from "./navbar/UserMenu";
-import MobileNavigation from "./navbar/MobileNavigation";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
+import NavLogo from "@/components/NavLogo";
+import DesktopNavigation from "@/components/navbar/DesktopNavigation";
+import MobileNavigation from "@/components/navbar/MobileNavigation";
+import UserMenu from "@/components/navbar/UserMenu";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const { user } = useAuth();
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
 
   return (
-    <>
-      <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <NavLogo />
-            <DesktopNavigation />
-
-            {/* User Menu / Auth Buttons */}
-            <div className="hidden md:flex items-center space-x-4">
-              <UserMenu />
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsOpen(!isOpen)}
-              >
-                {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        <MobileNavigation isOpen={isOpen} onClose={() => setIsOpen(false)} />
-      </nav>
-      <PiBrowserPrompt />
-    </>
+    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center">
+        <NavLogo />
+        
+        <DesktopNavigation />
+        <MobileNavigation />
+        
+        <UserMenu />
+      </div>
+    </nav>
   );
 };
 

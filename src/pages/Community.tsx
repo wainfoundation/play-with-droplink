@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -307,13 +306,27 @@ const Community = () => {
                         <span className="font-medium">{category.topics} topics</span> · 
                         <span className="ml-1">Latest: {category.latestActivity}</span>
                       </div>
-                      <Button variant="outline" size="sm" className="group-hover:bg-primary group-hover:text-white transition-colors">
-                        Browse
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="group-hover:bg-primary group-hover:text-white transition-colors"
+                        asChild
+                      >
+                        <Link to="/forums">Browse</Link>
                       </Button>
                     </div>
                   </CardFooter>
                 </Card>
               ))}
+            </div>
+            
+            <div className="text-center mt-8">
+              <Button size="lg" asChild>
+                <Link to="/forums">
+                  <MessageSquare className="w-5 h-5 mr-2" />
+                  Enter Forums
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
