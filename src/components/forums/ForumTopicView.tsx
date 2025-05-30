@@ -26,10 +26,7 @@ interface TopicDetails {
   view_count: number;
   reply_count: number;
   created_at: string;
-  user_profiles?: {
-    username: string;
-    avatar_url?: string;
-  };
+  user_id: string;
 }
 
 const ForumTopicView = ({ topicId, topicTitle, onBack }: ForumTopicViewProps) => {
@@ -48,10 +45,7 @@ const ForumTopicView = ({ topicId, topicTitle, onBack }: ForumTopicViewProps) =>
     try {
       const { data, error } = await supabase
         .from('forum_topics')
-        .select(`
-          *,
-          user_profiles(username, avatar_url)
-        `)
+        .select('*')
         .eq('id', topicId)
         .single();
 
@@ -135,13 +129,12 @@ const ForumTopicView = ({ topicId, topicTitle, onBack }: ForumTopicViewProps) =>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Avatar className="w-8 h-8">
-                <AvatarImage src={topic.user_profiles?.avatar_url} />
                 <AvatarFallback>
-                  {topic.user_profiles?.username?.charAt(0).toUpperCase()}
+                  U
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="text-sm font-medium">@{topic.user_profiles?.username}</p>
+                <p className="text-sm font-medium">User</p>
                 <p className="text-xs text-muted-foreground">
                   {formatDistanceToNow(new Date(topic.created_at), { addSuffix: true })}
                 </p>
@@ -177,12 +170,11 @@ const ForumTopicView = ({ topicId, topicTitle, onBack }: ForumTopicViewProps) =>
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
                 <Avatar className="w-6 h-6">
-                  <AvatarImage src={reply.user_profiles?.avatar_url} />
                   <AvatarFallback>
-                    {reply.user_profiles?.username?.charAt(0).toUpperCase()}
+                    U
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-sm font-medium">@{reply.user_profiles?.username}</span>
+                <span className="text-sm font-medium">User</span>
                 <span className="text-xs text-muted-foreground">
                   {formatDistanceToNow(new Date(reply.created_at), { addSuffix: true })}
                 </span>

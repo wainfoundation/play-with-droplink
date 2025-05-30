@@ -9,10 +9,7 @@ interface ForumReply {
   content: string;
   is_solution: boolean;
   created_at: string;
-  user_profiles?: {
-    username: string;
-    avatar_url?: string;
-  };
+  user_email?: string;
 }
 
 export const useForumReplies = (topicId: string) => {
@@ -31,10 +28,7 @@ export const useForumReplies = (topicId: string) => {
       setLoading(true);
       const { data, error } = await supabase
         .from('forum_replies')
-        .select(`
-          *,
-          user_profiles(username, avatar_url)
-        `)
+        .select('*')
         .eq('topic_id', topicId)
         .order('created_at', { ascending: true });
 

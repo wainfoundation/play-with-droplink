@@ -14,10 +14,7 @@ interface ForumTopic {
   reply_count: number;
   last_reply_at: string;
   created_at: string;
-  user_profiles?: {
-    username: string;
-    avatar_url?: string;
-  };
+  user_email?: string;
 }
 
 export const useForumTopics = (categoryId?: string) => {
@@ -34,10 +31,7 @@ export const useForumTopics = (categoryId?: string) => {
       setLoading(true);
       let query = supabase
         .from('forum_topics')
-        .select(`
-          *,
-          user_profiles(username, avatar_url)
-        `)
+        .select('*')
         .order('is_pinned', { ascending: false })
         .order('last_reply_at', { ascending: false });
 
