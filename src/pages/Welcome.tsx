@@ -51,7 +51,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
     };
   }, []);
 
-  const handleEnter = () => {
+  const handleGoToHome = () => {
     if (onEnter) {
       onEnter();
     }
@@ -63,14 +63,14 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
   };
 
   const handleSkipTutorial = () => {
-    handleEnter();
+    handleGoToHome();
   };
 
   const handleNextStep = () => {
     if (tutorialStep < tutorialSteps.length - 1) {
       setTutorialStep(tutorialStep + 1);
     } else {
-      handleEnter();
+      handleGoToHome();
     }
   };
 
@@ -81,7 +81,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
   };
 
   const handleFinishTutorial = () => {
-    handleEnter();
+    handleGoToHome();
   };
 
   if (showTutorial) {
@@ -279,7 +279,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
                 Start Tutorial
               </Button>
               <Button 
-                onClick={handleEnter}
+                onClick={handleSkipTutorial}
                 variant="outline" 
                 size="lg" 
                 className="hover:bg-blue-50 transition-colors text-lg px-8 py-4"
