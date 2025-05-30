@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -11,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Search } from "lucide-react";
 import { faqData, searchFAQs } from "@/data/faqData";
+import GoToTop from '@/components/GoToTop';
 
 const AllFaqs = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,7 +25,7 @@ const AllFaqs = () => {
   const displayFAQs = searchQuery.trim() || selectedCategory ? filteredFAQs : faqData;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-primary/10">
+    <div className="min-h-screen flex flex-col">
       <Helmet>
         <title>Frequently Asked Questions - Droplink Help</title>
         <meta name="description" content="Find answers to all your questions about using Droplink, the Pi Network link-in-bio platform." />

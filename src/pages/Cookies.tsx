@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { toast } from "@/hooks/use-toast";
+import GoToTop from '@/components/GoToTop';
 
 const Cookies = () => {
   const [cookiePreferences, setCookiePreferences] = useState({
@@ -33,6 +33,7 @@ const Cookies = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      <GoToTop />
       <main className="flex-grow">
         <div className="container mx-auto py-16 px-4">
           <div className="max-w-4xl mx-auto">

@@ -6,6 +6,7 @@ import { useUser } from "@/context/UserContext";
 import { SecurePiAuthButton } from "@/components/auth/SecurePiAuthButton";
 import { PiTestNetBanner } from "@/components/PiTestNetBanner";
 import { Helmet } from "react-helmet-async";
+import GoToTop from '@/components/GoToTop';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const LoginPage = () => {
   }, [isLoggedIn, navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <>
       <Helmet>
         <title>Login - Droplink.space</title>
         <meta name="description" content="Sign in to your Droplink account with Pi Network" />
@@ -55,7 +56,8 @@ const LoginPage = () => {
         </div>
       </main>
       <Footer />
-    </div>
+      <GoToTop />
+    </>
   );
 };
 

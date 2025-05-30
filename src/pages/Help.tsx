@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -12,6 +11,7 @@ import ContactSupportSection from "@/components/help/ContactSupportSection";
 import SearchResults from "@/components/help/SearchResults";
 import { getFeaturedArticles } from "@/data/helpArticles";
 import { faqData } from "@/data/faqData";
+import GoToTop from '@/components/GoToTop';
 
 const Help = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -118,6 +118,7 @@ const Help = () => {
         <ContactSupportSection />
         <CTA />
       </main>
+      <GoToTop />
       <Footer />
     </div>
   );

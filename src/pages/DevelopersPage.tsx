@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -6,6 +5,7 @@ import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
 import { Helmet } from "react-helmet-async";
 import { useUserPermissions } from "@/hooks/useUserPermissions";
+import GoToTop from '@/components/GoToTop';
 
 // Import developer components
 import HeroSection from "@/components/developers/HeroSection";
@@ -47,6 +47,7 @@ const DevelopersPage = () => {
         <DevCTASection />
         <CTA />
       </main>
+      <GoToTop />
       <Footer />
     </div>
   );

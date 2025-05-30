@@ -1,13 +1,19 @@
-
+import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
+import GoToTop from '@/components/GoToTop';
 
 const About = () => {
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>About - Droplink</title>
+        <meta name="description" content="Learn about Droplink and our mission to empower creators in the Pi Network ecosystem." />
+      </Helmet>
       <Navbar />
       <main className="flex-grow">
         <div className="container mx-auto py-16 px-4">
@@ -99,6 +105,7 @@ const About = () => {
         <CTA />
       </main>
       <Footer />
+      <GoToTop />
     </div>
   );
 };

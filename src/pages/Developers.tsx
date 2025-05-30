@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
 import { Helmet } from "react-helmet-async";
 import { useUserPermissions } from "@/hooks/useUserPermissions";
+import GoToTop from '@/components/GoToTop';
 
 // Import developer components
 import AdminBanner from "@/components/developers/AdminBanner";
@@ -68,6 +69,7 @@ const Developers = () => {
         
         <CTA />
       </main>
+      <GoToTop />
       <Footer />
     </div>
   );

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { Helmet } from "react-helmet-async";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { useUser } from "@/context/UserContext";
 import { supabase } from "@/integrations/supabase/client";
+import GoToTop from '@/components/GoToTop';
 
 const Complete = () => {
   const navigate = useNavigate();
@@ -89,7 +89,7 @@ const Complete = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
+    <>
       <Helmet>
         <title>Setup Complete - Droplink</title>
       </Helmet>
@@ -235,7 +235,8 @@ const Complete = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+      <GoToTop />
+    </>
   );
 };
 

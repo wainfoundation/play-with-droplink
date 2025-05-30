@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
 import CareerApplicationForm from "@/components/careers/CareerApplicationForm";
+import GoToTop from '@/components/GoToTop';
 
 const Careers = () => {
   const departments = [
@@ -246,6 +247,7 @@ const Careers = () => {
         
         <CTA />
       </main>
+      <GoToTop />
       <Footer />
     </div>
   );

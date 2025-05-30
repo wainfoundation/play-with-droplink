@@ -8,6 +8,7 @@ import { Code, Users, Settings, BarChart3 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { useAdminStatus } from "@/hooks/useAdminStatus";
 import { useUser } from "@/context/UserContext";
+import GoToTop from '@/components/GoToTop';
 
 const Admin = () => {
   const { isLoading: userLoading } = useUser();
@@ -25,7 +26,7 @@ const Admin = () => {
   }
   
   return (
-    <div className="min-h-screen flex flex-col">
+    <>
       <Helmet>
         <title>Admin Portal - Droplink</title>
         <meta name="description" content="Admin management portal for Droplink.space" />
@@ -106,7 +107,8 @@ const Admin = () => {
         </div>
       </main>
       <Footer />
-    </div>
+      <GoToTop />
+    </>
   );
 };
 

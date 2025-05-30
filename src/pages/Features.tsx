@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -11,6 +10,7 @@ import FeaturesTable from "@/components/features/FeaturesTable";
 import UserWelcomeSection from "@/components/features/UserWelcomeSection";
 import LoginPromptSection from "@/components/features/LoginPromptSection";
 import { featuresList } from "@/data/featuresData";
+import GoToTop from '@/components/GoToTop';
 
 const Features = () => {
   const [userPlan, setUserPlan] = useState<string | null>(null);
@@ -100,6 +100,7 @@ const Features = () => {
       </main>
       <CTA />
       <Footer />
+      <GoToTop />
     </div>
   );
 };

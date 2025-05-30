@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { Helmet } from "react-helmet-async";
 import DemoPreview from "@/components/DemoPreview";
 import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { toast } from "@/hooks/use-toast";
+import GoToTop from '@/components/GoToTop';
 
 const YourInformation = () => {
   const navigate = useNavigate();
@@ -87,63 +87,66 @@ const YourInformation = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
+    <>
       <Helmet>
         <title>Your Goals - Droplink</title>
       </Helmet>
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl w-full items-center">
-        {/* Form Section */}
-        <Card className="w-full max-w-lg mx-auto shadow-xl">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">What's your main goal with Droplink?</CardTitle>
-            <p className="text-gray-600">This helps us customize your experience</p>
-          </CardHeader>
-          
-          <CardContent className="space-y-4">
-            {intents.map((intent) => (
-              <div
-                key={intent.id}
-                onClick={() => setSelectedIntent(intent.id)}
-                className={`p-6 border-2 rounded-xl cursor-pointer transition-all transform hover:scale-105 ${
-                  selectedIntent === intent.id 
-                    ? "border-primary bg-gradient-to-r from-primary/10 to-blue-500/10 shadow-lg" 
-                    : "border-gray-200 hover:border-gray-300 hover:shadow-md"
-                }`}
-              >
-                <div className="flex items-center space-x-4">
-                  <div className={`p-3 rounded-lg bg-gradient-to-r ${intent.color} text-white`}>
-                    {intent.icon}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg">{intent.title}</h3>
-                    <p className="text-sm text-gray-600">{intent.description}</p>
-                  </div>
-                  {selectedIntent === intent.id && (
-                    <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                      <div className="w-2 h-2 bg-white rounded-full"></div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl w-full items-center">
+          {/* Form Section */}
+          <Card className="w-full max-w-lg mx-auto shadow-xl">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl">What's your main goal with Droplink?</CardTitle>
+              <p className="text-gray-600">This helps us customize your experience</p>
+            </CardHeader>
             
-            <Button 
-              onClick={handleContinue}
-              disabled={!selectedIntent || isLoading}
-              className="w-full mt-6 bg-gradient-to-r from-primary to-blue-600"
-            >
-              {isLoading ? "Saving..." : "Continue"}
-            </Button>
-          </CardContent>
-        </Card>
+            <CardContent className="space-y-4">
+              {intents.map((intent) => (
+                <div
+                  key={intent.id}
+                  onClick={() => setSelectedIntent(intent.id)}
+                  className={`p-6 border-2 rounded-xl cursor-pointer transition-all transform hover:scale-105 ${
+                    selectedIntent === intent.id 
+                      ? "border-primary bg-gradient-to-r from-primary/10 to-blue-500/10 shadow-lg" 
+                      : "border-gray-200 hover:border-gray-300 hover:shadow-md"
+                  }`}
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className={`p-3 rounded-lg bg-gradient-to-r ${intent.color} text-white`}>
+                      {intent.icon}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg">{intent.title}</h3>
+                      <p className="text-sm text-gray-600">{intent.description}</p>
+                    </div>
+                    {selectedIntent === intent.id && (
+                      <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+              
+              <Button 
+                onClick={handleContinue}
+                disabled={!selectedIntent || isLoading}
+                className="w-full mt-6 bg-gradient-to-r from-primary to-blue-600"
+              >
+                {isLoading ? "Saving..." : "Continue"}
+              </Button>
+            </CardContent>
+          </Card>
 
-        {/* Live Preview Section */}
-        <div className="flex justify-center">
-          <DemoPreview profileData={getPreviewData()} />
+          {/* Live Preview Section */}
+          <div className="flex justify-center">
+            <DemoPreview profileData={getPreviewData()} />
+          </div>
         </div>
       </div>
-    </div>
+      <GoToTop />
+    </>
   );
 };
 

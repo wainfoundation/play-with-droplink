@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
@@ -15,6 +14,7 @@ import StickerPurchaseModal from "@/components/stickers/StickerPurchaseModal";
 import CustomStickerDialog from "@/components/stickers/CustomStickerDialog";
 import AnimatedSticker from "@/components/stickers/AnimatedSticker";
 import { useCustomStickers } from "@/hooks/useCustomStickers";
+import GoToTop from '@/components/GoToTop';
 
 interface Sticker {
   id: string;
@@ -381,7 +381,8 @@ const Stickers = () => {
         </div>
       </main>
       <Footer />
-
+      <GoToTop />
+      
       {/* Purchase Modal */}
       {selectedSticker && (
         <StickerPurchaseModal

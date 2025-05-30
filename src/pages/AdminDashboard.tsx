@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
@@ -13,6 +12,7 @@ import PlanStatusHeader from "@/components/dashboard/PlanStatusHeader";
 import PlanUpgradeModal from "@/components/dashboard/PlanUpgradeModal";
 import { Helmet } from "react-helmet-async";
 import { toast } from "@/hooks/use-toast";
+import GoToTop from '@/components/GoToTop';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -85,7 +85,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
       <Helmet>
         <title>Admin Dashboard - Droplink</title>
       </Helmet>
@@ -134,7 +134,9 @@ const AdminDashboard = () => {
         feature={upgradeFeature}
         currentPlan={plan}
       />
-    </div>
+      
+      <GoToTop />
+    </>
   );
 };
 

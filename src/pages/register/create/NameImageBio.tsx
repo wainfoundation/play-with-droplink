@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,6 +13,7 @@ import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
+import GoToTop from '@/components/GoToTop';
 
 const NameImageBio = () => {
   const navigate = useNavigate();
@@ -159,146 +159,149 @@ const NameImageBio = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
+    <>
       <Helmet>
         <title>Profile Setup - Droplink</title>
       </Helmet>
       
-      <div className="max-w-7xl w-full">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-4">Complete Your Profile</h1>
-          <p className="text-gray-600">Add your name, photo, and bio to make your profile shine</p>
-          
-          <div className="flex justify-center mt-4">
-            <Badge variant="default" className="text-sm">
-              <CheckCircle className="w-4 h-4 mr-1" />
-              {plan} Plan Active
-            </Badge>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          {/* Profile Form */}
-          <Card className="w-full max-w-lg mx-auto shadow-xl">
-            <CardHeader className="text-center">
-              <CardTitle className="text-xl">Profile Information</CardTitle>
-              <p className="text-sm text-gray-600">This is how others will see you</p>
-            </CardHeader>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
+        <div className="max-w-7xl w-full">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold mb-4">Complete Your Profile</h1>
+            <p className="text-gray-600">Add your name, photo, and bio to make your profile shine</p>
             
-            <CardContent className="space-y-6">
-              {/* Profile Image Upload */}
-              <div className="space-y-2">
-                <Label htmlFor="avatar" className="text-sm font-medium">Profile Image</Label>
-                <div className="flex items-center space-x-4">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center overflow-hidden">
-                    {profileData.avatarUrl ? (
-                      <img src={profileData.avatarUrl} alt="Profile" className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-white text-2xl font-bold">
-                        {profileData.displayName.charAt(0).toUpperCase() || "?"}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <input
-                      type="file"
-                      id="avatar"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                    />
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full"
-                      onClick={() => document.getElementById('avatar')?.click()}
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload Photo
-                    </Button>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Recommended: 400x400px, PNG or JPG
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Display Name */}
-              <div className="space-y-2">
-                <Label htmlFor="displayName" className="text-sm font-medium">
-                  Display Name *
-                </Label>
-                <Input
-                  id="displayName"
-                  value={profileData.displayName}
-                  onChange={(e) => handleInputChange('displayName', e.target.value)}
-                  placeholder="Your full name or brand"
-                  className="transition-all focus:ring-2 focus:ring-primary/20"
-                />
-              </div>
-
-              {/* Bio */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="bio" className="text-sm font-medium">Bio</Label>
-                  <span className="text-xs text-gray-500">
-                    {profileData.bio.length}/80
-                  </span>
-                </div>
-                <Textarea
-                  id="bio"
-                  value={profileData.bio}
-                  onChange={(e) => handleInputChange('bio', e.target.value.slice(0, 80))}
-                  placeholder="Tell people about yourself..."
-                  className="transition-all focus:ring-2 focus:ring-primary/20 resize-none"
-                  rows={3}
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={generateBio}
-                  disabled={isGeneratingBio}
-                  className="w-full"
-                >
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  {isGeneratingBio ? "Generating..." : "Generate Bio with AI"}
-                </Button>
-              </div>
-
-              {/* Bio Suggestions */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Quick Bio Ideas</Label>
-                <div className="grid gap-2">
-                  {bioSuggestions.slice(0, 2).map((suggestion, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleInputChange('bio', suggestion)}
-                      className="p-2 text-left text-xs bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors border"
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            <div className="flex justify-center mt-4">
+              <Badge variant="default" className="text-sm">
+                <CheckCircle className="w-4 h-4 mr-1" />
+                {plan} Plan Active
+              </Badge>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            {/* Profile Form */}
+            <Card className="w-full max-w-lg mx-auto shadow-xl">
+              <CardHeader className="text-center">
+                <CardTitle className="text-xl">Profile Information</CardTitle>
+                <p className="text-sm text-gray-600">This is how others will see you</p>
+              </CardHeader>
               
-              <Button 
-                onClick={handleContinue} 
-                disabled={!profileData.displayName.trim() || isLoading}
-                className="w-full bg-gradient-to-r from-primary to-blue-600"
-                size="lg"
-              >
-                {isLoading ? "Saving Profile..." : "Complete Setup"}
-              </Button>
-            </CardContent>
-          </Card>
+              <CardContent className="space-y-6">
+                {/* Profile Image Upload */}
+                <div className="space-y-2">
+                  <Label htmlFor="avatar" className="text-sm font-medium">Profile Image</Label>
+                  <div className="flex items-center space-x-4">
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center overflow-hidden">
+                      {profileData.avatarUrl ? (
+                        <img src={profileData.avatarUrl} alt="Profile" className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-white text-2xl font-bold">
+                          {profileData.displayName.charAt(0).toUpperCase() || "?"}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <input
+                        type="file"
+                        id="avatar"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => document.getElementById('avatar')?.click()}
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload Photo
+                      </Button>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Recommended: 400x400px, PNG or JPG
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
-          {/* Live Preview Section */}
-          <div className="flex justify-center">
-            <DemoPreview profileData={getPreviewData()} />
+                {/* Display Name */}
+                <div className="space-y-2">
+                  <Label htmlFor="displayName" className="text-sm font-medium">
+                    Display Name *
+                  </Label>
+                  <Input
+                    id="displayName"
+                    value={profileData.displayName}
+                    onChange={(e) => handleInputChange('displayName', e.target.value)}
+                    placeholder="Your full name or brand"
+                    className="transition-all focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+
+                {/* Bio */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="bio" className="text-sm font-medium">Bio</Label>
+                    <span className="text-xs text-gray-500">
+                      {profileData.bio.length}/80
+                    </span>
+                  </div>
+                  <Textarea
+                    id="bio"
+                    value={profileData.bio}
+                    onChange={(e) => handleInputChange('bio', e.target.value.slice(0, 80))}
+                    placeholder="Tell people about yourself..."
+                    className="transition-all focus:ring-2 focus:ring-primary/20 resize-none"
+                    rows={3}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={generateBio}
+                    disabled={isGeneratingBio}
+                    className="w-full"
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    {isGeneratingBio ? "Generating..." : "Generate Bio with AI"}
+                  </Button>
+                </div>
+
+                {/* Bio Suggestions */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Quick Bio Ideas</Label>
+                  <div className="grid gap-2">
+                    {bioSuggestions.slice(0, 2).map((suggestion, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleInputChange('bio', suggestion)}
+                        className="p-2 text-left text-xs bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors border"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                <Button 
+                  onClick={handleContinue} 
+                  disabled={!profileData.displayName.trim() || isLoading}
+                  className="w-full bg-gradient-to-r from-primary to-blue-600"
+                  size="lg"
+                >
+                  {isLoading ? "Saving Profile..." : "Complete Setup"}
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Live Preview Section */}
+            <div className="flex justify-center">
+              <DemoPreview profileData={getPreviewData()} />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <GoToTop />
+    </>
   );
 };
 

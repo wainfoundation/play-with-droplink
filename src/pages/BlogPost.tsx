@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from "@/components/Navbar";
@@ -6,6 +5,7 @@ import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
 import { ArrowLeft, Calendar, User, Clock, Share2, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import GoToTop from '@/components/GoToTop';
 
 const BlogPost = () => {
   const { slug } = useParams();
@@ -233,6 +233,7 @@ const BlogPost = () => {
         <CTA />
       </main>
       <Footer />
+      <GoToTop />
     </div>
   );
 };

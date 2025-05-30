@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { MessageSquare, Users, ExternalLink, Bookmark, Award, Star, Activity, Search, Plus, Heart, TrendingUp } from "lucide-react";
+import GoToTop from '@/components/GoToTop';
 
 const Community = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -482,6 +483,7 @@ const Community = () => {
           </div>
         </section>
       </main>
+      <GoToTop />
       <Footer />
     </div>
   );

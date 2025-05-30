@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import GoToTop from '@/components/GoToTop';
 import ForumCategoryList from '@/components/forums/ForumCategoryList';
 import ForumTopicList from '@/components/forums/ForumTopicList';
 import ForumTopicView from '@/components/forums/ForumTopicView';
@@ -172,6 +172,7 @@ const Forums = () => {
       </main>
       
       <Footer />
+      <GoToTop />
     </div>
   );
 };

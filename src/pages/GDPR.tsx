@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { toast } from "@/hooks/use-toast";
+import GoToTop from '@/components/GoToTop';
 
 const GDPR = () => {
   const [dataRequestType, setDataRequestType] = useState<string | null>(null);
@@ -337,6 +337,7 @@ const GDPR = () => {
           </div>
         </div>
       </main>
+      <GoToTop />
       <Footer />
     </div>
   );

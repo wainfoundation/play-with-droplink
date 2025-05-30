@@ -12,6 +12,7 @@ import { Helmet } from "react-helmet-async";
 import { useUserPlan } from "@/hooks/use-user-plan";
 import { useUser } from "@/context/UserContext";
 import { useNavigate } from "react-router-dom";
+import GoToTop from '@/components/GoToTop';
 
 const Templates = () => {
   const [activeTab, setActiveTab] = useState("all");
@@ -345,6 +346,7 @@ const Templates = () => {
         <CTA />
       </main>
       <Footer />
+      <GoToTop />
     </div>
   );
 };

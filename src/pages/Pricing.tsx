@@ -8,6 +8,7 @@ import PiAdsNetwork from "@/components/PiAdsNetwork";
 import { useUser } from "@/context/UserContext";
 import { useToast } from "@/hooks/use-toast";
 import { usePiPayment } from "@/hooks/usePiPayment";
+import GoToTop from '@/components/GoToTop';
 
 const PricingCard = ({ 
   title, 
@@ -370,6 +371,7 @@ const Pricing = () => {
           )}
         </div>
       </main>
+      <GoToTop />
       <Footer />
     </div>
   );

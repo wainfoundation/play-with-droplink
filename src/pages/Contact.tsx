@@ -11,6 +11,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
 import { useState } from "react";
+import GoToTop from '@/components/GoToTop';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -206,6 +207,7 @@ const Contact = () => {
           </div>
         </div>
         <CTA />
+        <GoToTop />
       </main>
       <Footer />
     </div>

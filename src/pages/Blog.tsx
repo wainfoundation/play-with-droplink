@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -9,6 +8,7 @@ import { useBlogPosts, useFeaturedBlogPost } from "@/hooks/useBlogPosts";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import GoToTop from '@/components/GoToTop';
 
 const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -210,6 +210,7 @@ const Blog = () => {
         <CommunityLove />
         <CTA />
       </main>
+      <GoToTop />
       <Footer />
     </div>
   );

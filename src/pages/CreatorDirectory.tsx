@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
+import GoToTop from '@/components/GoToTop';
 
 const CreatorDirectory = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -272,6 +272,7 @@ const CreatorDirectory = () => {
         <CTA />
       </main>
       <Footer />
+      <GoToTop />
     </div>
   );
 };

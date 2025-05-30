@@ -1,10 +1,10 @@
-
 import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { CheckCircle, AlertCircle, XCircle, Clock } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import GoToTop from '@/components/GoToTop';
 
 const SystemStatus = () => {
   // Mock data for system status - in a real app, this would come from an API
@@ -226,6 +226,7 @@ const SystemStatus = () => {
           </div>
         </div>
       </main>
+      <GoToTop />
       <Footer />
     </div>
   );

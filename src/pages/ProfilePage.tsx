@@ -1,4 +1,3 @@
-
 import { useParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -7,6 +6,7 @@ import ErrorState from "@/components/profile/ErrorState";
 import ProfileContent from "@/components/profile/ProfileContent";
 import { useProfileData } from "@/hooks/useProfileData";
 import { useProfileActions } from "@/hooks/useProfileActions";
+import GoToTop from '@/components/GoToTop';
 
 const ProfilePage = () => {
   const { username } = useParams();
@@ -27,7 +27,7 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <>
       <Navbar />
       <ProfileContent
         profileData={profileData}
@@ -37,7 +37,8 @@ const ProfilePage = () => {
         processingTip={processingTip}
       />
       <Footer />
-    </div>
+      <GoToTop />
+    </>
   );
 };
 

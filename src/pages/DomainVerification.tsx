@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +7,7 @@ import { Copy, CheckCircle, XCircle, Globe } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import GoToTop from '@/components/GoToTop';
 
 const DomainVerification = () => {
   const [domain, setDomain] = useState('');
@@ -224,6 +224,7 @@ const DomainVerification = () => {
           </Card>
         </div>
       </main>
+      <GoToTop />
       <Footer />
     </div>
   );

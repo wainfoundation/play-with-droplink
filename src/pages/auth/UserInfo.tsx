@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNewsletterSubscription } from "@/hooks/useNewsletterSubscription";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import GoToTop from '@/components/GoToTop';
 
 const UserInfo = () => {
   const navigate = useNavigate();
@@ -92,7 +92,7 @@ const UserInfo = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
+    <>
       <Helmet>
         <title>Setup Your Profile - Droplink</title>
       </Helmet>
@@ -170,7 +170,8 @@ const UserInfo = () => {
           </form>
         </CardContent>
       </Card>
-    </div>
+      <GoToTop />
+    </>
   );
 };
 

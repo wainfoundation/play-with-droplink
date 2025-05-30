@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -9,6 +8,7 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, Check, MousePointer, BarChart4, Zap, Crown, Shield, Star, Lock, Palette, Calendar, QrCode, Settings, Eye, Users, DollarSign, TrendingUp } from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import GoToTop from '@/components/GoToTop';
 
 const Demo = () => {
   const { isLoggedIn, profile } = useUser();
@@ -118,7 +118,7 @@ const Demo = () => {
   const currentPlan = plans.find(p => p.id === selectedPlan);
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <Helmet>
         <title>Droplink Demo - Preview Your .pi Profile | Pi Network Link Hub</title>
         <meta name="description" content="Try our interactive demo to see how your .pi profile looks on different subscription plans. Preview features before you subscribe!" />
@@ -332,7 +332,8 @@ const Demo = () => {
         </div>
       </main>
       <Footer />
-    </>
+      <GoToTop />
+    </div>
   );
 };
 
