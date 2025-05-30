@@ -20,6 +20,7 @@ import Dashboard from "@/pages/Dashboard";
 import ProfilePage from "@/pages/ProfilePage";
 import Admin from "@/pages/Admin";
 import Forums from "@/pages/Forums";
+import HelpArticle from "@/pages/HelpArticle";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ function App() {
               <Route path="/features" element={<Features />} />
               <Route path="/community" element={<Community />} />
               <Route path="/help" element={<Help />} />
+              <Route path="/help/article/:articleId" element={<HelpArticle />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/dashboard" element={<Dashboard />} />
