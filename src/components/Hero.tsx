@@ -1,10 +1,100 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Star, Shield, Zap, Globe } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Hero = () => {
+  const [currentEmotion, setCurrentEmotion] = useState(0);
+  
+  const emotions = [
+    { thought: "Welcome to Droplink!", eyes: "happy", mouth: "smile" },
+    { thought: "I'm sleepy... 😴", eyes: "sleepy", mouth: "neutral" },
+    { thought: "Let's build something amazing!", eyes: "excited", mouth: "big-smile" },
+    { thought: "Pi Network is awesome! π", eyes: "normal", mouth: "smile" },
+    { thought: "Ready to get started?", eyes: "wink", mouth: "smile" }
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentEmotion((prev) => (prev + 1) % emotions.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const renderEyes = (type: string) => {
+    switch (type) {
+      case "happy":
+        return (
+          <>
+            <path d="M110 160 Q120 155 130 160" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
+            <path d="M170 160 Q180 155 190 160" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
+          </>
+        );
+      case "sleepy":
+        return (
+          <>
+            <path d="M110 165 L130 165" stroke="#333" strokeWidth="3" strokeLinecap="round" />
+            <path d="M170 165 L190 165" stroke="#333" strokeWidth="3" strokeLinecap="round" />
+          </>
+        );
+      case "excited":
+        return (
+          <>
+            <circle cx="120" cy="165" r="9" fill="#fff" />
+            <circle cx="180" cy="165" r="9" fill="#fff" />
+            <circle cx="120" cy="165" r="6" fill="#333" />
+            <circle cx="180" cy="165" r="6" fill="#333" />
+          </>
+        );
+      case "wink":
+        return (
+          <>
+            <circle cx="120" cy="165" r="9" fill="#fff" />
+            <circle cx="123" cy="168" r="4.5" fill="#333" />
+            <path d="M170 160 Q180 155 190 160" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
+          </>
+        );
+      default:
+        return (
+          <>
+            <circle cx="120" cy="165" r="9" fill="#fff" />
+            <circle cx="180" cy="165" r="9" fill="#fff" />
+            <circle cx="123" cy="168" r="4.5" fill="#333" className="animate-gentle-blink" />
+            <circle cx="183" cy="168" r="4.5" fill="#333" className="animate-gentle-blink" />
+          </>
+        );
+    }
+  };
+
+  const renderMouth = (type: string) => {
+    switch (type) {
+      case "big-smile":
+        return (
+          <path
+            d="M115 210 Q150 250 185 210"
+            stroke="#fff"
+            strokeWidth="4.5"
+            fill="none"
+            strokeLinecap="round"
+          />
+        );
+      case "neutral":
+        return (
+          <ellipse cx="150" cy="220" rx="8" ry="3" fill="#fff" />
+        );
+      default:
+        return (
+          <path
+            d="M120 210 Q150 240 180 210"
+            stroke="#fff"
+            strokeWidth="4.5"
+            fill="none"
+            strokeLinecap="round"
+          />
+        );
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-muted/20 to-primary/10">
       {/* Background Effects */}
@@ -47,39 +137,31 @@ const Hero = () => {
           />
           
           {/* Face */}
-          {/* Eyes */}
-          <circle cx="120" cy="165" r="9" fill="#fff" />
-          <circle cx="180" cy="165" r="9" fill="#fff" />
-          <circle cx="123" cy="168" r="4.5" fill="#333" className="animate-blink" />
-          <circle cx="183" cy="168" r="4.5" fill="#333" className="animate-blink" />
+          {renderEyes(emotions[currentEmotion].eyes)}
+          {renderMouth(emotions[currentEmotion].mouth)}
           
-          {/* Smile */}
-          <path
-            d="M120 210 Q150 240 180 210"
-            stroke="#fff"
-            strokeWidth="4.5"
-            fill="none"
-            strokeLinecap="round"
-            className="animate-smile"
-          />
-          
-          {/* Speech bubble */}
+          {/* Thought bubble */}
           <g className="animate-float">
             <path
-              d="M200 80 Q200 60 220 60 L280 60 Q300 60 300 80 L300 120 Q300 140 280 140 L240 140 L220 160 L240 140 L220 140 Q200 140 200 120 Z"
+              d="M200 60 Q200 40 220 40 L290 40 Q310 40 310 60 L310 110 Q310 130 290 130 L250 130 L230 150 L250 130 L220 130 Q200 130 200 110 Z"
               fill="#fff"
               stroke="#0099ee"
               strokeWidth="2"
+              className="drop-shadow-md"
             />
-            <text x="250" y="85" textAnchor="middle" className="text-xs font-medium fill-primary">
-              Welcome to
+            <text x="255" y="70" textAnchor="middle" className="text-xs font-medium fill-primary">
+              {emotions[currentEmotion].thought.split(' ').slice(0, 2).join(' ')}
             </text>
-            <text x="250" y="100" textAnchor="middle" className="text-xs font-bold fill-primary">
-              Droplink!
+            <text x="255" y="85" textAnchor="middle" className="text-xs font-medium fill-primary">
+              {emotions[currentEmotion].thought.split(' ').slice(2, 4).join(' ')}
             </text>
-            <text x="250" y="115" textAnchor="middle" className="text-xs fill-primary">
-              🚀 π Ready
+            <text x="255" y="100" textAnchor="middle" className="text-xs font-medium fill-primary">
+              {emotions[currentEmotion].thought.split(' ').slice(4).join(' ')}
             </text>
+            
+            {/* Small thought bubbles */}
+            <circle cx="210" cy="140" r="3" fill="#fff" stroke="#0099ee" strokeWidth="1" />
+            <circle cx="200" cy="148" r="2" fill="#fff" stroke="#0099ee" strokeWidth="1" />
           </g>
         </svg>
       </div>
@@ -197,9 +279,9 @@ const Hero = () => {
           50% { opacity: 0.8; }
         }
         
-        @keyframes blink {
-          0%, 90%, 100% { transform: scaleY(1); }
-          95% { transform: scaleY(0.1); }
+        @keyframes gentle-blink {
+          0%, 85%, 100% { opacity: 1; }
+          90%, 95% { opacity: 0.1; }
         }
         
         @keyframes shimmer {
@@ -207,14 +289,9 @@ const Hero = () => {
           50% { opacity: 1; }
         }
         
-        @keyframes smile {
-          0%, 100% { stroke-dasharray: 0, 100; }
-          50% { stroke-dasharray: 30, 100; }
-        }
-        
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
+          50% { transform: translateY(-8px); }
         }
         
         .animate-bounce-gentle {
@@ -225,20 +302,16 @@ const Hero = () => {
           animation: pulse-gentle 3s ease-in-out infinite;
         }
         
-        .animate-blink {
-          animation: blink 5s ease-in-out infinite;
+        .animate-gentle-blink {
+          animation: gentle-blink 6s ease-in-out infinite;
         }
         
         .animate-shimmer {
           animation: shimmer 2.5s ease-in-out infinite;
         }
         
-        .animate-smile {
-          animation: smile 4s ease-in-out infinite;
-        }
-        
         .animate-float {
-          animation: float 3s ease-in-out infinite;
+          animation: float 4s ease-in-out infinite;
         }
         `}
       </style>
