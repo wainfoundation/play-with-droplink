@@ -1,7 +1,8 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles, Heart, Globe } from 'lucide-react';
+import { ArrowRight, Sparkles, Heart, Globe, Play, SkipForward, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
 interface WelcomeProps {
@@ -12,6 +13,31 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
   const [mascotVisible, setMascotVisible] = useState(false);
   const [welcomeTextVisible, setWelcomeTextVisible] = useState(false);
   const [buttonsVisible, setButtonsVisible] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
+
+  const tutorialSteps = [
+    {
+      title: "Create Your Profile",
+      description: "Set up your Droplink profile with your bio, links, and social media accounts.",
+      icon: "👤"
+    },
+    {
+      title: "Add Your Links",
+      description: "Connect all your social media, websites, and important links in one place.",
+      icon: "🔗"
+    },
+    {
+      title: "Accept Pi Payments",
+      description: "Enable Pi tipping and sell digital products directly from your profile.",
+      icon: "💰"
+    },
+    {
+      title: "Share Your Profile",
+      description: "Share your droplink.space/@username with the world and start earning!",
+      icon: "🚀"
+    }
+  ];
 
   useEffect(() => {
     // Animated sequence
@@ -31,6 +57,115 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
       onEnter();
     }
   };
+
+  const handleStartTutorial = () => {
+    setShowTutorial(true);
+    setTutorialStep(0);
+  };
+
+  const handleSkipTutorial = () => {
+    handleEnter();
+  };
+
+  const handleNextStep = () => {
+    if (tutorialStep < tutorialSteps.length - 1) {
+      setTutorialStep(tutorialStep + 1);
+    } else {
+      handleEnter();
+    }
+  };
+
+  const handlePrevStep = () => {
+    if (tutorialStep > 0) {
+      setTutorialStep(tutorialStep - 1);
+    }
+  };
+
+  const handleFinishTutorial = () => {
+    handleEnter();
+  };
+
+  if (showTutorial) {
+    return (
+      <>
+        <Helmet>
+          <title>Droplink Tutorial - Learn How to Get Started</title>
+          <meta name="description" content="Learn how to use Droplink to create your Pi Network profile and start earning." />
+        </Helmet>
+        
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden">
+          {/* Background Effects */}
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-secondary/20 to-primary/20 rounded-full blur-3xl animate-pulse" />
+          
+          <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 text-center">
+            {/* Tutorial Content */}
+            <div className="max-w-2xl mx-auto">
+              <div className="text-6xl mb-6">{tutorialSteps[tutorialStep].icon}</div>
+              <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
+                {tutorialSteps[tutorialStep].title}
+              </h1>
+              <p className="text-lg text-gray-600 mb-8 max-w-xl mx-auto">
+                {tutorialSteps[tutorialStep].description}
+              </p>
+              
+              {/* Progress Bar */}
+              <div className="w-full bg-gray-200 rounded-full h-2 mb-8">
+                <div 
+                  className="bg-gradient-to-r from-primary to-secondary h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${((tutorialStep + 1) / tutorialSteps.length) * 100}%` }}
+                ></div>
+              </div>
+              
+              {/* Step Counter */}
+              <p className="text-sm text-gray-500 mb-8">
+                Step {tutorialStep + 1} of {tutorialSteps.length}
+              </p>
+              
+              {/* Navigation Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <Button 
+                  onClick={handlePrevStep}
+                  variant="outline"
+                  disabled={tutorialStep === 0}
+                  className="flex items-center gap-2"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Button>
+                
+                {tutorialStep < tutorialSteps.length - 1 ? (
+                  <Button 
+                    onClick={handleNextStep}
+                    className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 flex items-center gap-2"
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                ) : (
+                  <Button 
+                    onClick={handleFinishTutorial}
+                    className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 flex items-center gap-2"
+                  >
+                    Start Building
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                )}
+                
+                <Button 
+                  onClick={handleSkipTutorial}
+                  variant="ghost"
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  Skip Tutorial
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -110,56 +245,6 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
                   className="animate-smile"
                 />
               </svg>
-              
-              {/* Left hand */}
-              <div className="absolute -left-12 top-20 animate-wave-left">
-                <svg width="50" height="60" viewBox="0 0 50 60">
-                  <path
-                    d="M8 25 Q13 17, 20 20 Q27 13, 33 20 Q40 17, 42 25 Q42 33, 37 42 Q30 50, 20 47 Q13 42, 8 33 Z"
-                    fill="#00aaff"
-                    stroke="#0077cc"
-                    strokeWidth="2"
-                  />
-                  {/* Fingers */}
-                  <circle cx="20" cy="10" r="3" fill="#00aaff" className="animate-finger-wave" />
-                  <circle cx="27" cy="8" r="3" fill="#00aaff" className="animate-finger-wave delay-100" />
-                  <circle cx="33" cy="10" r="3" fill="#00aaff" className="animate-finger-wave delay-200" />
-                </svg>
-              </div>
-              
-              {/* Right hand */}
-              <div className="absolute -right-12 top-20 animate-wave-right">
-                <svg width="50" height="60" viewBox="0 0 50 60">
-                  <path
-                    d="M42 25 Q37 17, 30 20 Q23 13, 17 20 Q10 17, 8 25 Q8 33, 13 42 Q20 50, 30 47 Q37 42, 42 33 Z"
-                    fill="#00aaff"
-                    stroke="#0077cc"
-                    strokeWidth="2"
-                  />
-                  {/* Fingers */}
-                  <circle cx="30" cy="10" r="3" fill="#00aaff" className="animate-finger-wave" />
-                  <circle cx="23" cy="8" r="3" fill="#00aaff" className="animate-finger-wave delay-100" />
-                  <circle cx="17" cy="10" r="3" fill="#00aaff" className="animate-finger-wave delay-200" />
-                </svg>
-              </div>
-              
-              {/* Left leg */}
-              <div className="absolute -left-6 bottom-8 animate-leg-kick-left">
-                <svg width="40" height="55" viewBox="0 0 40 55">
-                  <ellipse cx="20" cy="28" rx="10" ry="25" fill="#00aaff" stroke="#0077cc" strokeWidth="2" />
-                  {/* Foot */}
-                  <ellipse cx="20" cy="48" rx="12" ry="6" fill="#0077cc" />
-                </svg>
-              </div>
-              
-              {/* Right leg */}
-              <div className="absolute -right-6 bottom-8 animate-leg-kick-right">
-                <svg width="40" height="55" viewBox="0 0 40 55">
-                  <ellipse cx="20" cy="28" rx="10" ry="25" fill="#00aaff" stroke="#0077cc" strokeWidth="2" />
-                  {/* Foot */}
-                  <ellipse cx="20" cy="48" rx="12" ry="6" fill="#0077cc" />
-                </svg>
-              </div>
             </div>
           </div>
 
@@ -187,19 +272,21 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
           }`}>
             <div className="flex flex-col sm:flex-row gap-4 mt-8">
               <Button 
-                onClick={handleEnter}
+                onClick={handleStartTutorial}
                 size="lg" 
                 className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 transform transition hover:scale-105 duration-200 text-lg px-8 py-4"
               >
-                Enter Droplink <ArrowRight className="ml-2 h-5 w-5" />
+                <Play className="mr-2 h-5 w-5" />
+                Start Tutorial
               </Button>
               <Button 
-                asChild
+                onClick={handleEnter}
                 variant="outline" 
                 size="lg" 
                 className="hover:bg-blue-50 transition-colors text-lg px-8 py-4"
               >
-                <Link to="/demo">Watch Demo</Link>
+                <SkipForward className="mr-2 h-5 w-5" />
+                Skip Tutorial
               </Button>
             </div>
           </div>
@@ -216,31 +303,6 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
           @keyframes pulse-gentle {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.8; }
-          }
-          
-          @keyframes wave-left {
-            0%, 100% { transform: rotate(-20deg); }
-            50% { transform: rotate(20deg); }
-          }
-          
-          @keyframes wave-right {
-            0%, 100% { transform: rotate(20deg); }
-            50% { transform: rotate(-20deg); }
-          }
-          
-          @keyframes leg-kick-left {
-            0%, 100% { transform: rotate(-8deg); }
-            50% { transform: rotate(15deg); }
-          }
-          
-          @keyframes leg-kick-right {
-            0%, 100% { transform: rotate(8deg); }
-            50% { transform: rotate(-15deg); }
-          }
-          
-          @keyframes finger-wave {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
           }
           
           @keyframes blink {
@@ -266,26 +328,6 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
             animation: pulse-gentle 3s ease-in-out infinite;
           }
           
-          .animate-wave-left {
-            animation: wave-left 2s ease-in-out infinite;
-          }
-          
-          .animate-wave-right {
-            animation: wave-right 2s ease-in-out infinite;
-          }
-          
-          .animate-leg-kick-left {
-            animation: leg-kick-left 2.5s ease-in-out infinite;
-          }
-          
-          .animate-leg-kick-right {
-            animation: leg-kick-right 2.5s ease-in-out infinite;
-          }
-          
-          .animate-finger-wave {
-            animation: finger-wave 1.2s ease-in-out infinite;
-          }
-          
           .animate-blink {
             animation: blink 5s ease-in-out infinite;
           }
@@ -296,14 +338,6 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
           
           .animate-smile {
             animation: smile 4s ease-in-out infinite;
-          }
-          
-          .delay-100 {
-            animation-delay: 0.1s;
-          }
-          
-          .delay-200 {
-            animation-delay: 0.2s;
           }
           `}
         </style>

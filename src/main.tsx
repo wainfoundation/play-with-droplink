@@ -15,16 +15,14 @@ const Root = () => {
   
   const handleSplashComplete = () => {
     setShowSplash(false);
-    // Check if this is first visit
-    const hasVisited = localStorage.getItem('droplink_visited');
-    if (!hasVisited) {
-      setShowWelcome(true);
-      localStorage.setItem('droplink_visited', 'true');
-    }
+    // Always show welcome page after splash
+    setShowWelcome(true);
   };
 
   const handleWelcomeComplete = () => {
     setShowWelcome(false);
+    // Mark that user has seen welcome
+    localStorage.setItem('droplink_welcomed', 'true');
   };
 
   useEffect(() => {
