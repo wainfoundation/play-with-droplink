@@ -36,7 +36,7 @@ export const useForumTopics = (categoryId?: string) => {
         .from('forum_topics')
         .select(`
           *,
-          user_profiles!inner(username, avatar_url)
+          user_profiles(username, avatar_url)
         `)
         .order('is_pinned', { ascending: false })
         .order('last_reply_at', { ascending: false });
@@ -51,6 +51,7 @@ export const useForumTopics = (categoryId?: string) => {
       setTopics(data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error('Error fetching topics:', err);
     } finally {
       setLoading(false);
     }

@@ -33,7 +33,7 @@ export const useForumReplies = (topicId: string) => {
         .from('forum_replies')
         .select(`
           *,
-          user_profiles!inner(username, avatar_url)
+          user_profiles(username, avatar_url)
         `)
         .eq('topic_id', topicId)
         .order('created_at', { ascending: true });
@@ -42,6 +42,7 @@ export const useForumReplies = (topicId: string) => {
       setReplies(data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error('Error fetching replies:', err);
     } finally {
       setLoading(false);
     }

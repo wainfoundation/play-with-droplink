@@ -1,8 +1,8 @@
+
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
 
-import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,7 +16,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
-import NavLogo from "@/components/NavLogo";
+import NavLogo from "@/components/navbar/NavLogo";
 import DesktopNavigation from "@/components/navbar/DesktopNavigation";
 import MobileNavigation from "@/components/navbar/MobileNavigation";
 import UserMenu from "@/components/navbar/UserMenu";

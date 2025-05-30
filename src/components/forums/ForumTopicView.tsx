@@ -50,7 +50,7 @@ const ForumTopicView = ({ topicId, topicTitle, onBack }: ForumTopicViewProps) =>
         .from('forum_topics')
         .select(`
           *,
-          user_profiles!inner(username, avatar_url)
+          user_profiles(username, avatar_url)
         `)
         .eq('id', topicId)
         .single();
@@ -64,10 +64,18 @@ const ForumTopicView = ({ topicId, topicTitle, onBack }: ForumTopicViewProps) =>
 
   const incrementViewCount = async () => {
     try {
-      await supabase
+      const { data: currentTopic } = await supabase
         .from('forum_topics')
-        .update({ view_count: supabase.sql`view_count + 1` })
-        .eq('id', topicId);
+        .select('view_count')
+        .eq('id', topicId)
+        .single();
+
+      if (currentTopic) {
+        await supabase
+          .from('forum_topics')
+          .update({ view_count: currentTopic.view_count + 1 })
+          .eq('id', topicId);
+      }
     } catch (err) {
       console.error('Error incrementing view count:', err);
     }

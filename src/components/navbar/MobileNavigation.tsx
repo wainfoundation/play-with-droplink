@@ -1,7 +1,7 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
-
-import { Icons } from "@/components/icons";
+import { Menu } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -11,8 +11,6 @@ import {
 } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/useAuth";
 
-interface MobileNavigationProps {}
-
 const MobileNavigation = () => {
   const [open, setOpen] = React.useState(false);
   const { user, signOut } = useAuth();
@@ -21,7 +19,7 @@ const MobileNavigation = () => {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild className="md:hidden">
         <button className="p-2 rounded-sm">
-          <Icons.menu className="h-6 w-6" />
+          <Menu className="h-6 w-6" />
           <span className="sr-only">Toggle Navigation Menu</span>
         </button>
       </SheetTrigger>

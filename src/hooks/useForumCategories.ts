@@ -26,26 +26,36 @@ export const useForumCategories = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      
+      // First get categories
+      const { data: categoriesData, error: categoriesError } = await supabase
         .from('forum_categories')
-        .select(`
-          *,
-          forum_topics!inner(count)
-        `)
+        .select('*')
         .eq('is_active', true)
         .order('sort_order');
 
-      if (error) throw error;
+      if (categoriesError) throw categoriesError;
 
-      const categoriesWithCounts = data.map(category => ({
-        ...category,
-        topic_count: category.forum_topics?.length || 0,
-        latest_activity: '2 hours ago' // This would be calculated from actual data
-      }));
+      // Then get topic counts for each category
+      const categoriesWithCounts = await Promise.all(
+        (categoriesData || []).map(async (category) => {
+          const { count } = await supabase
+            .from('forum_topics')
+            .select('*', { count: 'exact', head: true })
+            .eq('category_id', category.id);
+
+          return {
+            ...category,
+            topic_count: count || 0,
+            latest_activity: '2 hours ago' // This would be calculated from actual data
+          };
+        })
+      );
 
       setCategories(categoriesWithCounts);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error('Error fetching categories:', err);
     } finally {
       setLoading(false);
     }
