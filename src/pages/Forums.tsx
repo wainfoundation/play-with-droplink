@@ -89,9 +89,8 @@ const Forums = () => {
             {viewState.type === 'topics' && (
               <ForumTopicList
                 categoryId={viewState.categoryId}
-                categoryName={viewState.categoryName}
                 onTopicSelect={handleTopicSelect}
-                onBack={handleBackToCategories}
+                onCreateTopic={() => {}}
               />
             )}
 

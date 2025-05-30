@@ -13,7 +13,7 @@ import Features from "@/pages/Features";
 import Community from "@/pages/Community";
 import Help from "@/pages/Help";
 import NotFound from "@/pages/NotFound";
-import { UserContextProvider } from "@/context/UserContext";
+import { UserProvider } from "@/context/UserContext";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import Dashboard from "@/pages/Dashboard";
@@ -27,7 +27,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <HelmetProvider>
-        <UserContextProvider>
+        <UserProvider>
           <Router>
             <Routes>
               <Route path="/" element={<Home />} />
@@ -47,7 +47,7 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Router>
-        </UserContextProvider>
+        </UserProvider>
       </HelmetProvider>
     </QueryClientProvider>
   );
