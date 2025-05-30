@@ -1,3 +1,4 @@
+
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
@@ -13,6 +14,7 @@ import Features from "@/pages/Features";
 import Community from "@/pages/Community";
 import Help from "@/pages/Help";
 import NotFound from "@/pages/NotFound";
+import PlayWithMascot from "@/pages/PlayWithMascot";
 import { UserProvider } from "@/context/UserContext";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
@@ -90,6 +92,7 @@ function App() {
               <Route path="/stickers" element={<Stickers />} />
               <Route path="/store" element={<Store />} />
               <Route path="/status" element={<SystemStatus />} />
+              <Route path="/play" element={<PlayWithMascot />} />
               <Route path="/login" element={<Login />} />
               <Route path="/login-page" element={<LoginPage />} />
               <Route path="/signup" element={<Signup />} />
