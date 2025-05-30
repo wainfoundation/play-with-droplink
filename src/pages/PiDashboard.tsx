@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
@@ -13,18 +14,18 @@ import { ArrowRight, BarChart3, CreditCard, DollarSign, Users, Wallet } from 'lu
 import GoToTop from '@/components/GoToTop';
 
 const PiDashboard = () => {
-  const { user, loading } = useAuth();
+  const { user, isLoading } = useAuth();
   const { isLoggedIn } = useUser();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
-    if (!loading && !isLoggedIn) {
+    if (!isLoading && !isLoggedIn) {
       navigate('/login');
     }
-  }, [loading, isLoggedIn, navigate]);
+  }, [isLoading, isLoggedIn, navigate]);
 
-  if (loading) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 

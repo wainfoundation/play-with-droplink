@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
@@ -19,8 +20,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
-import { generateUsername } from "@/lib/username-generator";
 import { useToast } from "@/components/ui/use-toast"
+import { signUpWithEmail } from "@/services/authService";
 import GoToTop from '@/components/GoToTop';
 
 const formSchema = z.object({
@@ -29,7 +30,6 @@ const formSchema = z.object({
 });
 
 const SignupPage = () => {
-  const { signUp } = useAuth();
   const { toast } = useToast()
   const {
     register,
@@ -45,7 +45,12 @@ const SignupPage = () => {
 
   const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (data) => {
     try {
-      await signUp(data.email, data.password);
+      const { user, session, error } = await signUpWithEmail(data.email, data.password);
+      
+      if (error) {
+        throw new Error(error.message || 'Signup failed');
+      }
+      
       toast({
         title: "Signup successful!",
         description: "You have successfully signed up.",
