@@ -55,7 +55,7 @@ const Help = () => {
       icon: "π",
       articles: [
         { title: "Connecting Your Pi Wallet", slug: "connecting-pi-wallet" },
-        { title: "Setting Up Pi Payments", slug: "setup-pi-payments" },
+        { title: "Setting Up Pi Payments", slug: "pi-payments-setup" },
         { title: "Pi Transaction Fees", slug: "pi-transaction-fees" },
         { title: "Pi Tips and Donations", slug: "pi-tips-donations" },
         { title: "Pi Network Authentication", slug: "pi-network-auth" }
@@ -65,7 +65,7 @@ const Help = () => {
       name: "Analytics & Insights",
       icon: "📊",
       articles: [
-        { title: "Understanding Your Dashboard", slug: "dashboard-analytics" },
+        { title: "Understanding Your Dashboard", slug: "analytics-guide" },
         { title: "Traffic Sources", slug: "traffic-sources" },
         { title: "Link Performance", slug: "link-performance" },
         { title: "Audience Demographics", slug: "audience-demographics" },
@@ -93,8 +93,9 @@ const Help = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
-        <title>Help Center - Droplink</title>
-        <meta name="description" content="Get help with using Droplink, the Pi Network link-in-bio platform. Find tutorials, FAQs, and guides." />
+        <title>Help Center - Droplink Support & Documentation</title>
+        <meta name="description" content="Get comprehensive help with using Droplink, the Pi Network link-in-bio platform. Find tutorials, FAQs, guides, and support for all features." />
+        <meta name="keywords" content="droplink help, pi network support, link in bio tutorial, droplink documentation, pi payments help" />
       </Helmet>
       <Navbar />
       <main className="flex-grow">
