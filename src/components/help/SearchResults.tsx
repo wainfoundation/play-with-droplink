@@ -1,9 +1,9 @@
-
 import { Link } from "react-router-dom";
 import { Clock, User, Tag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { searchArticles, searchFAQs } from "@/data/helpArticles";
+import { searchArticles } from "@/data/helpArticles";
+import { searchFAQs } from "@/data/faqData";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface SearchResultsProps {
