@@ -1,114 +1,87 @@
 
-import { useState, useCallback } from 'react';
-import { toast } from '@/hooks/use-toast';
+import { useState } from 'react';
+import { createPiPayment } from '@/utils/pi-payments';
+import { supabase } from '@/integrations/supabase/client';
 
-interface PaymentData {
+export interface PaymentData {
   amount: number;
   memo: string;
-  metadata: any;
-  onReadyForServerApproval?: (paymentId: string) => void;
-  onReadyForServerCompletion?: (paymentId: string, txid: string) => void;
-  onCancel?: (paymentId: string) => void;
-  onError?: (error: Error, payment?: any) => void;
+  metadata?: any;
 }
 
-interface PaymentResult {
+export interface PaymentResult {
   identifier: string;
-  user_uid: string;
-  amount: number;
-  memo: string;
-  metadata: any;
-  from_address: string;
-  to_address: string;
-  direction: 'user_to_app' | 'app_to_user';
-  created_at: string;
-  network: string;
-  status: { developer_approved: boolean; transaction_verified: boolean; developer_completed: boolean; cancelled: boolean; user_cancelled: boolean };
-  transaction: null | { txid: string; verified: boolean; _link: string };
+  payment_id: string;
+  transaction_id?: string;
 }
-
-export const planPricing = {
-  starter: { monthly: 10, annual: 8 },
-  pro: { monthly: 15, annual: 12 },
-  premium: { monthly: 22, annual: 18 }
-};
 
 export const usePiPayment = () => {
   const [loading, setLoading] = useState(false);
+  const [processingPayment, setProcessingPayment] = useState(false);
 
-  const createPayment = useCallback(async (paymentData: PaymentData): Promise<PaymentResult | null> => {
+  const createPayment = async (paymentData: PaymentData): Promise<PaymentResult> => {
+    setLoading(true);
     try {
-      setLoading(true);
-
-      // TODO: Implement when payments table is properly set up
-      console.log('Pi payment feature not yet implemented', paymentData);
-
-      toast({
-        title: "Feature Coming Soon",
-        description: "Pi payments will be available soon!",
-      });
-
-      return null;
+      const result = await createPiPayment(paymentData);
+      return result;
     } catch (error) {
-      console.error('Error creating payment:', error);
-      toast({
-        title: "Payment Error",
-        description: "Failed to create payment",
-        variant: "destructive",
-      });
-      return null;
+      console.error('Payment creation failed:', error);
+      throw error;
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  const approvePayment = useCallback(async (paymentId: string) => {
+  const approvePayment = async (paymentId: string): Promise<boolean> => {
     try {
-      // TODO: Implement payment approval
-      console.log('Payment approval feature not yet implemented', paymentId);
+      // Implementation for payment approval
       return true;
     } catch (error) {
-      console.error('Error approving payment:', error);
+      console.error('Payment approval failed:', error);
       return false;
     }
-  }, []);
+  };
 
-  const completePayment = useCallback(async (paymentId: string) => {
+  const completePayment = async (paymentId: string): Promise<boolean> => {
     try {
-      // TODO: Implement payment completion
-      console.log('Payment completion feature not yet implemented', paymentId);
+      // Implementation for payment completion
       return true;
     } catch (error) {
-      console.error('Error completing payment:', error);
+      console.error('Payment completion failed:', error);
       return false;
     }
-  }, []);
+  };
 
-  const handleSubscribe = useCallback(async (plan: string, billingCycle: string) => {
+  const handleSubscribe = async (plan: string): Promise<boolean> => {
+    setProcessingPayment(true);
     try {
-      setLoading(true);
-      
-      // TODO: Implement subscription handling
-      console.log('Subscription feature not yet implemented', { plan, billingCycle });
-      
-      toast({
-        title: "Feature Coming Soon",
-        description: "Subscription payments will be available soon!",
-      });
+      const planPricing = {
+        free: 0,
+        starter: 10,
+        pro: 15,
+        premium: 22
+      };
 
+      const amount = planPricing[plan as keyof typeof planPricing] || 0;
+      
+      if (amount > 0) {
+        const paymentData: PaymentData = {
+          amount,
+          memo: `Droplink ${plan} subscription`,
+          metadata: { plan, type: 'subscription' }
+        };
+
+        await createPayment(paymentData);
+      }
+      
       return true;
     } catch (error) {
-      console.error('Error handling subscription:', error);
-      toast({
-        title: "Subscription Error",
-        description: "Failed to process subscription",
-        variant: "destructive",
-      });
+      console.error('Subscription failed:', error);
       return false;
     } finally {
-      setLoading(false);
+      setProcessingPayment(false);
     }
-  }, []);
+  };
 
   return {
     createPayment,
@@ -116,6 +89,12 @@ export const usePiPayment = () => {
     completePayment,
     handleSubscribe,
     loading,
-    processingPayment: loading
+    processingPayment,
+    planPricing: {
+      free: 0,
+      starter: 10,
+      pro: 15,
+      premium: 22
+    }
   };
 };

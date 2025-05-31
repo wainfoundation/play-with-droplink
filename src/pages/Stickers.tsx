@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
 import { toast } from "@/hooks/use-toast";
@@ -393,8 +392,9 @@ const Stickers = () => {
         <StickerPurchaseModal
           isOpen={showPurchaseModal}
           onClose={() => setShowPurchaseModal(false)}
-          sticker={selectedSticker}
-          onSuccess={handlePurchaseSuccess}
+          stickerId={selectedSticker.id}
+          stickerName={selectedSticker.name}
+          price={selectedSticker.price_pi}
         />
       )}
     </div>

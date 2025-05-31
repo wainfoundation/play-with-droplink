@@ -1,152 +1,112 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Building, Heart } from "lucide-react";
-import { Helmet } from "react-helmet-async";
-import DemoPreview from "@/components/DemoPreview";
-import { useOnboardingProgress } from "@/hooks/useOnboardingProgress";
-import { toast } from "@/hooks/use-toast";
-import GoToTop from '@/components/GoToTop';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
+import { useUserProfile } from '@/hooks/useUserProfile';
+
+const formSchema = z.object({
+  display_name: z.string().min(2, {
+    message: "Display name must be at least 2 characters.",
+  }),
+  bio: z.string().max(160, {
+    message: "Bio must be less than 160 characters.",
+  }).optional(),
+});
+
+interface FormData {
+  display_name: string;
+  bio?: string;
+}
 
 const YourInformation = () => {
   const navigate = useNavigate();
-  const [selectedIntent, setSelectedIntent] = useState<string>("");
+  const { toast } = useToast();
+  const { updateProfile } = useUserProfile();
   const [isLoading, setIsLoading] = useState(false);
-  const { updateProgress } = useOnboardingProgress();
 
-  const intents = [
-    {
-      id: "creator",
-      title: "Creator",
-      description: "Monetize audience & build community",
-      icon: <User className="w-6 h-6" />,
-      color: "from-purple-500 to-pink-500"
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      display_name: "",
+      bio: "",
     },
-    {
-      id: "business", 
-      title: "Business",
-      description: "Reach more customers & sell products",
-      icon: <Building className="w-6 h-6" />,
-      color: "from-blue-500 to-cyan-500"
-    },
-    {
-      id: "personal",
-      title: "Personal", 
-      description: "Share links with friends & family",
-      icon: <Heart className="w-6 h-6" />,
-      color: "from-green-500 to-emerald-500"
-    }
-  ];
+  });
 
-  const handleContinue = async () => {
-    if (!selectedIntent) return;
-    
+  const { user } = useUserProfile();
+
+  const handleSubmit = async (data: FormData) => {
+    if (!user?.id) return;
+
     setIsLoading(true);
-    
     try {
-      const success = await updateProgress('your-information', {
-        intent: selectedIntent
+      const success = await updateProfile({
+        display_name: data.display_name,
+        bio: data.bio
       });
 
       if (success) {
-        navigate("/register/select-categories");
+        toast({
+          title: "Profile updated!",
+          description: "Your information has been saved.",
+        });
+        navigate('/register/select-categories');
+      } else {
+        throw new Error('Failed to update profile');
       }
     } catch (error) {
+      console.error('Error updating profile:', error);
       toast({
         title: "Error",
-        description: "Failed to save your selection. Please try again.",
-        variant: "destructive"
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Generate preview data based on selected intent
-  const getPreviewData = () => {
-    const intentData = {
-      creator: {
-        title: "Creative Pro",
-        bio: "🎨 Content Creator | 📱 Digital Artist | 🌟 Follow my creative journey",
-        username: "creativeuser"
-      },
-      business: {
-        title: "Business Name",
-        bio: "💼 Professional Services | 🚀 Growing Business | 📈 Let's connect",
-        username: "mybusiness"
-      },
-      personal: {
-        title: "Your Name",
-        bio: "😊 Sharing my interests | 🌟 Personal links | 💬 Let's be friends",
-        username: "yourname"
-      }
-    };
-
-    return selectedIntent ? intentData[selectedIntent as keyof typeof intentData] : undefined;
-  };
-
   return (
-    <>
-      <Helmet>
-        <title>Your Goals - Droplink</title>
-      </Helmet>
-      
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl w-full items-center">
-          {/* Form Section */}
-          <Card className="w-full max-w-lg mx-auto shadow-xl">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl">What's your main goal with Droplink?</CardTitle>
-              <p className="text-gray-600">This helps us customize your experience</p>
-            </CardHeader>
-            
-            <CardContent className="space-y-4">
-              {intents.map((intent) => (
-                <div
-                  key={intent.id}
-                  onClick={() => setSelectedIntent(intent.id)}
-                  className={`p-6 border-2 rounded-xl cursor-pointer transition-all transform hover:scale-105 ${
-                    selectedIntent === intent.id 
-                      ? "border-primary bg-gradient-to-r from-primary/10 to-blue-500/10 shadow-lg" 
-                      : "border-gray-200 hover:border-gray-300 hover:shadow-md"
-                  }`}
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className={`p-3 rounded-lg bg-gradient-to-r ${intent.color} text-white`}>
-                      {intent.icon}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg">{intent.title}</h3>
-                      <p className="text-sm text-gray-600">{intent.description}</p>
-                    </div>
-                    {selectedIntent === intent.id && (
-                      <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                        <div className="w-2 h-2 bg-white rounded-full"></div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-              
-              <Button 
-                onClick={handleContinue}
-                disabled={!selectedIntent || isLoading}
-                className="w-full mt-6 bg-gradient-to-r from-primary to-blue-600"
-              >
-                {isLoading ? "Saving..." : "Continue"}
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Live Preview Section */}
-          <div className="flex justify-center">
-            <DemoPreview profileData={getPreviewData()} />
-          </div>
+    <div className="container max-w-md mx-auto py-8">
+      <h1 className="text-2xl font-bold mb-4">Your Information</h1>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <div>
+          <Label htmlFor="display_name">Display Name</Label>
+          <Input
+            id="display_name"
+            type="text"
+            placeholder="Your Name"
+            {...form.register("display_name")}
+          />
+          {form.formState.errors.display_name && (
+            <p className="text-red-500 text-sm mt-1">
+              {form.formState.errors.display_name.message}
+            </p>
+          )}
         </div>
-      </div>
-      <GoToTop />
-    </>
+        <div>
+          <Label htmlFor="bio">Bio</Label>
+          <Textarea
+            id="bio"
+            placeholder="A short bio about yourself"
+            {...form.register("bio")}
+          />
+          {form.formState.errors.bio && (
+            <p className="text-red-500 text-sm mt-1">
+              {form.formState.errors.bio.message}
+            </p>
+          )}
+        </div>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? "Updating..." : "Continue"}
+        </Button>
+      </form>
+    </div>
   );
 };
 

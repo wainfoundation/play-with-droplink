@@ -11,7 +11,7 @@ import GoToTop from '@/components/GoToTop';
 
 const ProfilePage = () => {
   const { username } = useParams();
-  const { loading, error, profile } = useProfileData(username);
+  const { profile, links, loading, error } = useProfileData(username);
   const {
     processingTip,
     handleLinkClick,
@@ -30,7 +30,8 @@ const ProfilePage = () => {
   // Create the profile data with links array to match expected interface
   const profileData = {
     ...profile,
-    links: profile.links || [] // Ensure links array exists
+    bio: profile.bio || "Digital creator & Pi pioneer",
+    links: links || []
   };
 
   return (
