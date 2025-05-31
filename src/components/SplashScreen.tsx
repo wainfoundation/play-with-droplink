@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { playSound, sounds } from '@/utils/sounds';
 import { Progress } from "@/components/ui/progress";
