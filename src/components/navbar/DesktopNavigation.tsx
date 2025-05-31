@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Sparkles, Activity, Play, Heart } from "lucide-react";
+import { Sparkles, Activity, Home, Heart } from "lucide-react";
 
 const DesktopNavigation = () => {
   const location = useLocation();
@@ -10,8 +10,8 @@ const DesktopNavigation = () => {
   };
 
   const navItems = [
-    { name: "Home", path: "/", icon: null },
-    { name: "Play My Boo", path: "/play", icon: Heart },
+    { name: "Home", path: "/", icon: Home },
+    { name: "My Character", path: "/character", icon: Heart },
     { name: "Features", path: "/features", icon: null },
     { name: "Pricing", path: "/pricing", icon: null },
     { name: "Help", path: "/help", icon: null },

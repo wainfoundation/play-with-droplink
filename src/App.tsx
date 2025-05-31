@@ -10,8 +10,8 @@ import { HelmetProvider } from 'react-helmet-async';
 
 import SplashScreen from "@/components/SplashScreen";
 import Index from "./pages/Index";
-import PlayWithMascot from "./pages/PlayWithMascot";
 import Welcome from "./pages/Welcome";
+import CharacterHome from "./pages/CharacterHome";
 
 // Placeholder components for other pages
 const ComingSoonPage = ({ pageName }: { pageName: string }) => (
@@ -22,12 +22,12 @@ const ComingSoonPage = ({ pageName }: { pageName: string }) => (
       <p className="text-xl text-gray-600 max-w-md">Coming Soon!</p>
       <p className="text-gray-500">We're working hard to bring you this feature.</p>
       <div className="space-y-2">
-        <p className="text-sm text-gray-400">For now, enjoy our amazing games:</p>
+        <p className="text-sm text-gray-400">For now, enjoy your character experience:</p>
         <a 
-          href="/play" 
+          href="/character" 
           className="inline-block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
         >
-          🎮 Play Games
+          🏠 Go to Character Home
         </a>
       </div>
     </div>
@@ -58,12 +58,13 @@ const App = () => {
               <Routes>
                 {/* Main gaming workflow */}
                 <Route path="/" element={<Index />} />
-                <Route path="/welcome" element={<Welcome onEnter={() => window.location.href = '/play'} />} />
-                <Route path="/play" element={<PlayWithMascot />} />
+                <Route path="/welcome" element={<Welcome onEnter={() => window.location.href = '/character'} />} />
+                <Route path="/character" element={<CharacterHome />} />
                 
-                {/* Redirect common routes to play */}
-                <Route path="/dashboard" element={<Navigate to="/play" replace />} />
-                <Route path="/games" element={<Navigate to="/play" replace />} />
+                {/* Redirect common routes to character */}
+                <Route path="/play" element={<Navigate to="/character" replace />} />
+                <Route path="/dashboard" element={<Navigate to="/character" replace />} />
+                <Route path="/games" element={<Navigate to="/character" replace />} />
                 
                 {/* Coming soon pages */}
                 <Route path="/pricing" element={<ComingSoonPage pageName="Pricing Plans" />} />
