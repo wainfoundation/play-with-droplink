@@ -15,6 +15,13 @@ export interface PaymentResult {
   transaction_id?: string;
 }
 
+export const planPricing = {
+  free: { monthly: 0, annual: 0 },
+  starter: { monthly: 10, annual: 100 },
+  pro: { monthly: 15, annual: 150 },
+  premium: { monthly: 22, annual: 220 }
+};
+
 export const usePiPayment = () => {
   const [loading, setLoading] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
@@ -52,23 +59,16 @@ export const usePiPayment = () => {
     }
   };
 
-  const handleSubscribe = async (plan: string): Promise<boolean> => {
+  const handleSubscribe = async (plan: string, billingCycle: string = 'monthly'): Promise<boolean> => {
     setProcessingPayment(true);
     try {
-      const planPricing = {
-        free: 0,
-        starter: 10,
-        pro: 15,
-        premium: 22
-      };
-
-      const amount = planPricing[plan as keyof typeof planPricing] || 0;
+      const amount = planPricing[plan as keyof typeof planPricing]?.[billingCycle as 'monthly' | 'annual'] || 0;
       
       if (amount > 0) {
         const paymentData: PaymentData = {
           amount,
-          memo: `Droplink ${plan} subscription`,
-          metadata: { plan, type: 'subscription' }
+          memo: `Droplink ${plan} subscription (${billingCycle})`,
+          metadata: { plan, type: 'subscription', billingCycle }
         };
 
         await createPayment(paymentData);
@@ -90,11 +90,6 @@ export const usePiPayment = () => {
     handleSubscribe,
     loading,
     processingPayment,
-    planPricing: {
-      free: 0,
-      starter: 10,
-      pro: 15,
-      premium: 22
-    }
+    planPricing
   };
 };

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -38,12 +39,12 @@ const NameImageBio = () => {
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      display_name: user?.user_metadata?.full_name || "",
-      bio: user?.user_metadata?.bio || "",
+      display_name: user?.email || "",
+      bio: "",
     },
   });
 
-  const handleSubmit = async (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     if (!user?.id) return;
 
     setIsLoading(true);
@@ -95,7 +96,7 @@ const NameImageBio = () => {
         <p className="text-gray-500">Make your profile stand out!</p>
       </div>
 
-      <form onSubmit={handleSubmit(handleSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div>
           <Label htmlFor="display_name">Display Name</Label>
           <Input

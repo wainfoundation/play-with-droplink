@@ -27,10 +27,11 @@ const ProfilePage = () => {
     return <ErrorState username={username} />;
   }
 
-  // Create the profile data with links array to match expected interface
+  // Create the profile data with required properties
   const profileData = {
     ...profile,
     bio: profile.bio || "Digital creator & Pi pioneer",
+    avatar_url: profile.avatar_url || "/placeholder.svg",
     links: links || []
   };
 

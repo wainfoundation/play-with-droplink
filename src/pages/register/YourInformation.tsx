@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -27,7 +28,7 @@ interface FormData {
 const YourInformation = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { updateProfile } = useUserProfile();
+  const { updateProfile, profile } = useUserProfile();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<FormData>({
@@ -38,10 +39,8 @@ const YourInformation = () => {
     },
   });
 
-  const { user } = useUserProfile();
-
   const handleSubmit = async (data: FormData) => {
-    if (!user?.id) return;
+    if (!profile?.id) return;
 
     setIsLoading(true);
     try {
