@@ -6,6 +6,8 @@ import SplashScreen from "@/components/SplashScreen";
 import Welcome from "@/pages/Welcome";
 import PlayWithMascot from "@/pages/PlayWithMascot";
 import Help from "@/pages/Help";
+import HelpArticle from "@/pages/HelpArticle";
+import Contact from "@/pages/Contact";
 import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
 
@@ -40,6 +42,8 @@ function App() {
           <Route path="/" element={<PlayWithMascot />} />
           <Route path="/play" element={<PlayWithMascot />} />
           <Route path="/help" element={<Help />} />
+          <Route path="/help/article/:slug" element={<HelpArticle />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
         </Routes>

@@ -10,6 +10,17 @@ export const gamesData = [
     description: 'Connect blocks through millions of levels! Watch ads to play, pay Pi for hints, unlock premium for ad-free gaming. Features infinite progression (1-9,999,999 levels), lives system, and sound effects.'
   },
   
+  // Enhanced Daily Crossword with all features
+  {
+    id: 'daily-crossword',
+    name: 'Daily Crossword',
+    category: 'puzzle',
+    difficulty: 'Hard',
+    is_free: true,
+    price_pi: 0,
+    description: 'Solve fresh crossword puzzles daily! Infinite levels (1-9,999,999), daily challenges, duel mode, Pi hints, lives system, and leaderboards. Watch ads to play or pay Pi for premium features.'
+  },
+  
   // Existing Puzzle Games
   {
     id: 'sudoku-classic',
