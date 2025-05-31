@@ -211,16 +211,16 @@ const CharacterRenderer: React.FC<CharacterRendererProps> = ({ character, size =
       )}
 
       {/* Mood indicator - small icon based on mood */}
-      {mood === 'hungry' && (
+      {character.mood === 'hungry' && (
         <text x="140" y="80" fontSize="16" fill="#ff6b35">🍎</text>
       )}
-      {mood === 'sleepy' && (
+      {character.mood === 'sleepy' && (
         <text x="140" y="80" fontSize="16" fill="#6b73ff">💤</text>
       )}
-      {mood === 'playful' && (
+      {character.mood === 'playful' && (
         <text x="140" y="80" fontSize="16" fill="#ff6b6b">⚽</text>
       )}
-      {mood === 'focused' && (
+      {character.mood === 'focused' && (
         <text x="140" y="80" fontSize="16" fill="#4ecdc4">🎯</text>
       )}
     </svg>
