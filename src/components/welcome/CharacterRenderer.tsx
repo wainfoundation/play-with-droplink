@@ -18,7 +18,7 @@ interface CharacterRendererProps {
 const CharacterRenderer: React.FC<CharacterRendererProps> = ({ character, size = 120 }) => {
   const gradientId = `${character.id}Gradient`;
   
-  // Eye styles based on mood
+  // Eye styles based on mood - fixed positioning to prevent jumping
   const getEyes = (mood: string) => {
     switch (mood) {
       case 'excited':
@@ -35,8 +35,48 @@ const CharacterRenderer: React.FC<CharacterRendererProps> = ({ character, size =
       case 'calm':
         return (
           <>
-            <path d="M70 100 Q80 95 90 100" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
-            <path d="M110 100 Q120 95 130 100" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
+            <circle cx="80" cy="105" r="8" fill="#fff" />
+            <circle cx="120" cy="105" r="8" fill="#fff" />
+            <circle cx="80" cy="108" r="3" fill="#333" />
+            <circle cx="120" cy="108" r="3" fill="#333" />
+          </>
+        );
+      case 'sleepy':
+        return (
+          <>
+            <path d="M70 105 Q80 100 90 105" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
+            <path d="M110 105 Q120 100 130 105" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
+          </>
+        );
+      case 'hungry':
+        return (
+          <>
+            <circle cx="80" cy="105" r="8" fill="#fff" />
+            <circle cx="120" cy="105" r="8" fill="#fff" />
+            <circle cx="80" cy="105" r="6" fill="#333" />
+            <circle cx="120" cy="105" r="6" fill="#333" />
+            <circle cx="82" cy="103" r="2" fill="#fff" />
+            <circle cx="122" cy="103" r="2" fill="#fff" />
+          </>
+        );
+      case 'playful':
+        return (
+          <>
+            <circle cx="80" cy="105" r="8" fill="#fff" />
+            <circle cx="120" cy="105" r="8" fill="#fff" />
+            <circle cx="82" cy="106" r="4" fill="#333" />
+            <circle cx="118" cy="106" r="4" fill="#333" />
+            <circle cx="83" cy="104" r="1.5" fill="#fff" />
+            <circle cx="119" cy="104" r="1.5" fill="#fff" />
+          </>
+        );
+      case 'focused':
+        return (
+          <>
+            <circle cx="80" cy="105" r="8" fill="#fff" />
+            <circle cx="120" cy="105" r="8" fill="#fff" />
+            <circle cx="80" cy="105" r="4" fill="#333" />
+            <circle cx="120" cy="105" r="4" fill="#333" />
           </>
         );
       default: // happy
@@ -44,8 +84,10 @@ const CharacterRenderer: React.FC<CharacterRendererProps> = ({ character, size =
           <>
             <circle cx="80" cy="105" r="8" fill="#fff" />
             <circle cx="120" cy="105" r="8" fill="#fff" />
-            <circle cx="83" cy="108" r="4" fill="#333" className="animate-gentle-blink" />
-            <circle cx="123" cy="108" r="4" fill="#333" className="animate-gentle-blink" />
+            <circle cx="80" cy="108" r="4" fill="#333" />
+            <circle cx="120" cy="108" r="4" fill="#333" />
+            <circle cx="82" cy="106" r="1.5" fill="#fff" />
+            <circle cx="122" cy="106" r="1.5" fill="#fff" />
           </>
         );
     }
@@ -56,20 +98,59 @@ const CharacterRenderer: React.FC<CharacterRendererProps> = ({ character, size =
     switch (mood) {
       case 'excited':
         return (
-          <path
-            d="M75 140 Q100 165 125 140"
-            stroke="#fff"
-            strokeWidth="4"
-            fill="none"
-            strokeLinecap="round"
+          <ellipse
+            cx="100"
+            cy="150"
+            rx="20"
+            ry="12"
+            fill="#333"
           />
         );
       case 'calm':
         return (
           <path
             d="M85 145 Q100 150 115 145"
-            stroke="#fff"
+            stroke="#333"
             strokeWidth="3"
+            fill="none"
+            strokeLinecap="round"
+          />
+        );
+      case 'sleepy':
+        return (
+          <circle
+            cx="100"
+            cy="148"
+            r="3"
+            fill="#333"
+          />
+        );
+      case 'hungry':
+        return (
+          <ellipse
+            cx="100"
+            cy="150"
+            rx="15"
+            ry="10"
+            fill="#333"
+          />
+        );
+      case 'playful':
+        return (
+          <path
+            d="M75 140 Q100 165 125 140"
+            stroke="#333"
+            strokeWidth="4"
+            fill="none"
+            strokeLinecap="round"
+          />
+        );
+      case 'focused':
+        return (
+          <path
+            d="M90 148 Q100 145 110 148"
+            stroke="#333"
+            strokeWidth="2"
             fill="none"
             strokeLinecap="round"
           />
@@ -78,7 +159,7 @@ const CharacterRenderer: React.FC<CharacterRendererProps> = ({ character, size =
         return (
           <path
             d="M80 140 Q100 155 120 140"
-            stroke="#fff"
+            stroke="#333"
             strokeWidth="4"
             fill="none"
             strokeLinecap="round"
@@ -127,6 +208,20 @@ const CharacterRenderer: React.FC<CharacterRendererProps> = ({ character, size =
           fill="#ff1493"
           opacity="0.8"
         />
+      )}
+
+      {/* Mood indicator - small icon based on mood */}
+      {mood === 'hungry' && (
+        <text x="140" y="80" fontSize="16" fill="#ff6b35">🍎</text>
+      )}
+      {mood === 'sleepy' && (
+        <text x="140" y="80" fontSize="16" fill="#6b73ff">💤</text>
+      )}
+      {mood === 'playful' && (
+        <text x="140" y="80" fontSize="16" fill="#ff6b6b">⚽</text>
+      )}
+      {mood === 'focused' && (
+        <text x="140" y="80" fontSize="16" fill="#4ecdc4">🎯</text>
       )}
     </svg>
   );

@@ -1,11 +1,9 @@
 
 export const characters = [
-  // Male Characters - Blue Variations
   {
     id: 'droplet-blue-happy',
     name: 'Droplink',
     gender: 'male',
-    description: 'The original water droplet mascot',
     color: '#00aaff',
     mood: 'happy',
     personality: 'Cheerful and optimistic'
@@ -14,7 +12,6 @@ export const characters = [
     id: 'droplet-blue-excited',
     name: 'Droplink',
     gender: 'male',
-    description: 'Energetic water droplet',
     color: '#00aaff',
     mood: 'excited',
     personality: 'Full of energy and enthusiasm'
@@ -23,67 +20,104 @@ export const characters = [
     id: 'droplet-blue-calm',
     name: 'Droplink',
     gender: 'male',
-    description: 'Peaceful water droplet',
     color: '#00aaff',
     mood: 'calm',
-    personality: 'Zen and relaxed'
+    personality: 'Peaceful and relaxed'
   },
-  
-  // Female Characters - Pink/Purple Variations
+  {
+    id: 'droplet-blue-hungry',
+    name: 'Droplink',
+    gender: 'male',
+    color: '#00aaff',
+    mood: 'hungry',
+    personality: 'Ready for some snacks!'
+  },
+  {
+    id: 'droplet-blue-playful',
+    name: 'Droplink',
+    gender: 'male',
+    color: '#00aaff',
+    mood: 'playful',
+    personality: 'Loves games and fun activities'
+  },
+  {
+    id: 'droplet-blue-sleepy',
+    name: 'Droplink',
+    gender: 'male',
+    color: '#00aaff',
+    mood: 'sleepy',
+    personality: 'Feeling a bit drowsy'
+  },
+  {
+    id: 'droplet-blue-focused',
+    name: 'Droplink',
+    gender: 'male',
+    color: '#00aaff',
+    mood: 'focused',
+    personality: 'Ready to concentrate on games'
+  },
   {
     id: 'droplet-pink-happy',
-    name: 'Dropla',
+    name: 'Droplia',
     gender: 'female',
-    description: 'Sweet and caring companion',
     color: '#ff69b4',
     mood: 'happy',
-    personality: 'Kind and nurturing'
+    personality: 'Sweet and friendly'
   },
   {
     id: 'droplet-pink-excited',
-    name: 'Dropla',
+    name: 'Droplia',
     gender: 'female',
-    description: 'Bubbly and enthusiastic',
     color: '#ff69b4',
     mood: 'excited',
-    personality: 'Playful and spirited'
+    personality: 'Bubbling with excitement'
   },
   {
-    id: 'droplet-purple-calm',
+    id: 'droplet-pink-playful',
+    name: 'Droplia',
+    gender: 'female',
+    color: '#ff69b4',
+    mood: 'playful',
+    personality: 'Loves creative games'
+  },
+  {
+    id: 'droplet-green-calm',
+    name: 'Dropzen',
+    gender: 'male',
+    color: '#32cd32',
+    mood: 'calm',
+    personality: 'Zen-like and thoughtful'
+  },
+  {
+    id: 'droplet-green-focused',
+    name: 'Dropzen',
+    gender: 'male',
+    color: '#32cd32',
+    mood: 'focused',
+    personality: 'Master of concentration'
+  },
+  {
+    id: 'droplet-purple-excited',
     name: 'Dropia',
     gender: 'female',
-    description: 'Wise and thoughtful',
-    color: '#9b59b6',
-    mood: 'calm',
-    personality: 'Intelligent and serene'
-  },
-  
-  // Additional Color Variations
-  {
-    id: 'droplet-green-happy',
-    name: 'Dropie',
-    gender: 'male',
-    description: 'Nature-loving companion',
-    color: '#27ae60',
-    mood: 'happy',
-    personality: 'Eco-friendly and fresh'
-  },
-  {
-    id: 'droplet-orange-excited',
-    name: 'Dropo',
-    gender: 'male',
-    description: 'Fiery and passionate',
-    color: '#ff6b35',
+    color: '#9370db',
     mood: 'excited',
-    personality: 'Bold and adventurous'
+    personality: 'Magical and energetic'
   },
   {
-    id: 'droplet-cyan-calm',
-    name: 'Dropella',
-    gender: 'female',
-    description: 'Cool and collected',
-    color: '#1abc9c',
-    mood: 'calm',
-    personality: 'Steady and reliable'
+    id: 'droplet-orange-playful',
+    name: 'Dropfire',
+    gender: 'male',
+    color: '#ff6347',
+    mood: 'playful',
+    personality: 'Fiery and fun-loving'
+  },
+  {
+    id: 'droplet-orange-hungry',
+    name: 'Dropfire',
+    gender: 'male',
+    color: '#ff6347',
+    mood: 'hungry',
+    personality: 'Always ready for a snack break'
   }
 ];

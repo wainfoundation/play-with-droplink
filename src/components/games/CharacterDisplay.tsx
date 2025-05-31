@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { TrophyIcon, CrownIcon, CoinsIcon, Coins } from 'lucide-react';
@@ -26,7 +26,37 @@ const CharacterDisplay: React.FC<CharacterDisplayProps> = ({
   onAdReward,
   onAdError
 }) => {
+  const [currentMood, setCurrentMood] = useState(selectedCharacter?.mood || 'happy');
+  const [moodMessage, setMoodMessage] = useState('Let\'s play some amazing games! 🎮');
+
+  // Mood rotation every 30 seconds during gameplay
+  useEffect(() => {
+    const moods = ['happy', 'excited', 'playful', 'focused', 'hungry', 'calm'];
+    const messages = {
+      happy: 'Let\'s play some amazing games! 🎮',
+      excited: 'Wow! This is so much fun! ⚡',
+      playful: 'I love playing games with you! 🎲',
+      focused: 'Time to concentrate and win! 🎯',
+      hungry: 'I\'m getting hungry... snack break? 🍎',
+      calm: 'Taking it easy, enjoying the games 😌'
+    };
+
+    const interval = setInterval(() => {
+      const randomMood = moods[Math.floor(Math.random() * moods.length)];
+      setCurrentMood(randomMood);
+      setMoodMessage(messages[randomMood as keyof typeof messages]);
+    }, 30000); // Change mood every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   if (!selectedCharacter) return null;
+
+  // Create character with current mood
+  const characterWithMood = {
+    ...selectedCharacter,
+    mood: currentMood
+  };
 
   return (
     <>
@@ -34,12 +64,12 @@ const CharacterDisplay: React.FC<CharacterDisplayProps> = ({
         <div className="sticky top-4">
           <div className="flex flex-col items-center">
             <div className="relative mb-6">
-              <CharacterRenderer character={selectedCharacter} size={200} />
+              <CharacterRenderer character={characterWithMood} size={200} />
               
-              {/* Thought bubble */}
+              {/* Thought bubble with dynamic mood message */}
               <div className="absolute -right-4 -top-4 bg-white rounded-lg p-3 shadow-lg border-2 border-primary/20 max-w-xs animate-float">
                 <p className="text-sm font-medium text-primary">
-                  Let's play some amazing games! 🎮
+                  {moodMessage}
                 </p>
               </div>
             </div>
@@ -53,8 +83,8 @@ const CharacterDisplay: React.FC<CharacterDisplayProps> = ({
                 }`}>
                   {selectedCharacter.gender === 'male' ? '♂' : '♀'} {selectedCharacter.gender}
                 </span>
-                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
-                  {selectedCharacter.mood}
+                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs capitalize">
+                  {currentMood}
                 </span>
               </div>
               <p className="text-sm text-gray-600 mt-2">{selectedCharacter.personality}</p>
