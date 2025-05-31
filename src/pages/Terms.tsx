@@ -1,6 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowLeft, HelpCircle, Shield, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Footer from '@/components/Footer';
 
@@ -16,13 +17,44 @@ const Terms = () => {
         <meta name="description" content="Read the terms and conditions for using Play with Droplink gaming platform." />
       </Helmet>
       
+      {/* Navigation Header */}
+      <header className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex justify-between items-center">
+            <Button variant="ghost" onClick={handleBack} className="flex items-center gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              Back to Game
+            </Button>
+            <nav className="flex items-center gap-6">
+              <Link 
+                to="/help" 
+                className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors font-medium"
+              >
+                <HelpCircle className="w-4 h-4" />
+                Help
+              </Link>
+              <Link 
+                to="/privacy" 
+                className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors font-medium"
+              >
+                <Shield className="w-4 h-4" />
+                Privacy
+              </Link>
+              <Link 
+                to="/terms" 
+                className="flex items-center gap-2 text-primary font-medium"
+              >
+                <FileText className="w-4 h-4" />
+                Terms
+              </Link>
+            </nav>
+          </div>
+        </div>
+      </header>
+
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
           <div className="mb-6">
-            <Button variant="ghost" onClick={handleBack} className="mb-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Game
-            </Button>
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Terms of Service</h1>
             <p className="text-gray-600">Last updated: {new Date().toLocaleDateString()}</p>
           </div>

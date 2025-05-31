@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
@@ -12,6 +13,7 @@ import SearchResults from "@/components/help/SearchResults";
 import { getFeaturedArticles } from "@/data/helpArticles";
 import { faqData } from "@/data/faqData";
 import GoToTop from '@/components/GoToTop';
+import { HelpCircle, Shield, FileText } from 'lucide-react';
 
 const Help = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -99,6 +101,38 @@ const Help = () => {
         <meta name="description" content="Get comprehensive help with using Droplink, the Pi Network link-in-bio platform. Find tutorials, FAQs, guides, and support for all features." />
         <meta name="keywords" content="droplink help, pi network support, link in bio tutorial, droplink documentation, pi payments help" />
       </Helmet>
+      
+      {/* Navigation Header */}
+      <header className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex justify-end">
+            <nav className="flex items-center gap-6">
+              <Link 
+                to="/help" 
+                className="flex items-center gap-2 text-primary font-medium"
+              >
+                <HelpCircle className="w-4 h-4" />
+                Help
+              </Link>
+              <Link 
+                to="/privacy" 
+                className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors font-medium"
+              >
+                <Shield className="w-4 h-4" />
+                Privacy
+              </Link>
+              <Link 
+                to="/terms" 
+                className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors font-medium"
+              >
+                <FileText className="w-4 h-4" />
+                Terms
+              </Link>
+            </nav>
+          </div>
+        </div>
+      </header>
+      
       <Navbar />
       <main className="flex-grow">
         <SearchSection searchQuery={searchQuery} setSearchQuery={setSearchQuery} />

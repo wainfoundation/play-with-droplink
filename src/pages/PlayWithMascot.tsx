@@ -1,6 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
 import { useUser } from '@/context/UserContext';
 import { useToast } from '@/components/ui/use-toast';
 import { useGames } from '@/hooks/useGames';
@@ -11,6 +11,7 @@ import CharacterDisplay from '@/components/games/CharacterDisplay';
 import GameCategories from '@/components/games/GameCategories';
 import PremiumCTA from '@/components/games/PremiumCTA';
 import { isRunningInPiBrowser } from '@/utils/pi-sdk';
+import { HelpCircle, Shield, FileText } from 'lucide-react';
 
 const PlayWithMascot = () => {
   const { user, isLoggedIn } = useUser();
@@ -278,6 +279,38 @@ const PlayWithMascot = () => {
             />
           </div>
         </div>
+
+        {/* Footer with navigation links */}
+        <footer className="mt-16 border-t bg-white/50 backdrop-blur-sm">
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex flex-col md:flex-row justify-center items-center gap-6">
+              <Link 
+                to="/help" 
+                className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors font-medium"
+              >
+                <HelpCircle className="w-5 h-5" />
+                Help Center
+              </Link>
+              <Link 
+                to="/privacy" 
+                className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors font-medium"
+              >
+                <Shield className="w-5 h-5" />
+                Privacy Policy
+              </Link>
+              <Link 
+                to="/terms" 
+                className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors font-medium"
+              >
+                <FileText className="w-5 h-5" />
+                Terms of Service
+              </Link>
+            </div>
+            <div className="text-center mt-4 text-sm text-gray-500">
+              © {new Date().getFullYear()} Droplink Gaming. All rights reserved.
+            </div>
+          </div>
+        </footer>
 
         <style>
           {`
