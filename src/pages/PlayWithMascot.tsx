@@ -25,16 +25,28 @@ import {
 } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 import { useToast } from '@/components/ui/use-toast';
+import { useGames } from '@/hooks/useGames';
 
 const PlayWithMascot = () => {
   const { user, isLoggedIn } = useUser();
   const { toast } = useToast();
+  const { games, loading: gamesLoading } = useGames();
   const [currentEmotion, setCurrentEmotion] = useState(0);
   const [score, setScore] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
   const [currentGame, setCurrentGame] = useState(null);
-  const [userPlan, setUserPlan] = useState('free'); // 'free' or 'premium'
-  const [purchasedGames, setPurchasedGames] = useState([]);
+  const [userPlan, setUserPlan] = useState('free');
+  const [purchasedGames, setPurchasedGames] = useState<string[]>([]);
+
+  // Set user plan from user data
+  useEffect(() => {
+    if (user?.plan) {
+      setUserPlan(user.plan);
+    }
+    if (user?.total_score) {
+      setTotalScore(user.total_score);
+    }
+  }, [user]);
 
   // Mascot emotions
   const emotions = [
@@ -50,94 +62,44 @@ const PlayWithMascot = () => {
     { name: "mischievous", eyes: "sly", mouth: "smirk", thought: "I have some fun games for you... 😏" }
   ];
 
-  // Game categories with detailed game lists
-  const gameCategories = {
-    puzzle: {
-      name: "Puzzle & Logic",
-      icon: PuzzleIcon,
-      color: "bg-blue-500",
-      games: [
-        { id: 'memory-match', name: 'Memory Match', difficulty: 'Easy', free: true },
-        { id: 'word-guess', name: 'Word Guess', difficulty: 'Easy', free: true },
-        { id: 'pi-wordle', name: 'Pi Wordle', difficulty: 'Medium', free: true },
-        { id: 'logic-flow', name: 'Logic Flow', difficulty: 'Hard', free: false },
-        { id: 'match-3', name: 'Match 3', difficulty: 'Easy', free: true },
-        { id: 'tile-flipper', name: 'Tile Flipper', difficulty: 'Medium', free: true },
-        { id: 'sequence-grid', name: 'Sequence Grid', difficulty: 'Hard', free: false },
-        { id: 'number-maze', name: 'Number Maze', difficulty: 'Medium', free: true },
-        { id: 'block-connect', name: 'Block Connect', difficulty: 'Hard', free: false },
-        { id: 'color-merge', name: 'Color Merge', difficulty: 'Easy', free: true }
-      ]
-    },
-    action: {
-      name: "Action & Reflex",
-      icon: RocketIcon,
-      color: "bg-red-500",
-      games: [
-        { id: 'droplink-runner', name: 'Droplink Runner', difficulty: 'Medium', free: true },
-        { id: 'tap-the-drop', name: 'Tap the Drop', difficulty: 'Easy', free: true },
-        { id: 'jump-catch', name: 'Jump & Catch', difficulty: 'Medium', free: true },
-        { id: 'avoid-spike', name: 'Avoid the Spike', difficulty: 'Hard', free: false },
-        { id: 'pi-dash', name: 'Pi Dash', difficulty: 'Medium', free: true },
-        { id: 'reflex-taps', name: 'Reflex Taps', difficulty: 'Easy', free: true },
-        { id: 'speed-dodger', name: 'Speed Dodger', difficulty: 'Hard', free: false },
-        { id: 'pi-jumper', name: 'Pi Jumper', difficulty: 'Medium', free: true },
-        { id: 'side-dash', name: 'Side Dash', difficulty: 'Easy', free: true },
-        { id: 'swipe-attack', name: 'Swipe Attack', difficulty: 'Hard', free: false }
-      ]
-    },
-    trivia: {
-      name: "Trivia & Quiz",
-      icon: BrainIcon,
-      color: "bg-green-500",
-      games: [
-        { id: 'pi-trivia-tower', name: 'Pi Trivia Tower', difficulty: 'Medium', free: true },
-        { id: 'emoji-quiz', name: 'Emoji Quiz', difficulty: 'Easy', free: true },
-        { id: 'fact-or-fake', name: 'Fact or Fake', difficulty: 'Medium', free: true },
-        { id: 'typing-speed', name: 'Typing Speed Test', difficulty: 'Easy', free: true },
-        { id: 'knowledge-rush', name: 'General Knowledge Rush', difficulty: 'Hard', free: false },
-        { id: 'time-quiz', name: 'Time Quiz', difficulty: 'Medium', free: true },
-        { id: 'category-frenzy', name: 'Category Frenzy', difficulty: 'Hard', free: false },
-        { id: 'true-false', name: 'True or False', difficulty: 'Easy', free: true },
-        { id: 'pi-quiz-duel', name: 'Pi Quiz Duel', difficulty: 'Hard', free: false },
-        { id: 'one-word-answer', name: 'One-Word Answer', difficulty: 'Medium', free: true }
-      ]
-    },
-    creative: {
-      name: "Creative & Fun",
-      icon: PaletteIcon,
-      color: "bg-purple-500",
-      games: [
-        { id: 'droplink-dress-up', name: 'Droplink Dress Up', difficulty: 'Easy', free: true },
-        { id: 'paint-pi', name: 'Paint Pi', difficulty: 'Easy', free: true },
-        { id: 'mascot-builder', name: 'Mascot Builder', difficulty: 'Medium', free: true },
-        { id: 'fortune-teller', name: 'Fortune Teller', difficulty: 'Easy', free: true },
-        { id: 'design-badge', name: 'Design the Badge', difficulty: 'Medium', free: false },
-        { id: 'pixel-painter', name: 'Pixel Painter', difficulty: 'Medium', free: true },
-        { id: 'pi-puzzle-art', name: 'Pi Puzzle Art', difficulty: 'Hard', free: false },
-        { id: 'avatar-maker', name: 'Avatar Maker', difficulty: 'Easy', free: true },
-        { id: 'pi-memoji', name: 'Pi Memoji', difficulty: 'Medium', free: false },
-        { id: 'doodle-drop', name: 'Doodle Drop', difficulty: 'Easy', free: true }
-      ]
-    },
-    infinite: {
-      name: "Infinite Games",
-      icon: InfinityIcon,
-      color: "bg-orange-500",
-      games: [
-        { id: 'infinite-quiz', name: 'Infinite Quiz', difficulty: 'Easy', free: true },
-        { id: 'endless-memory', name: 'Endless Memory Match', difficulty: 'Medium', free: true },
-        { id: 'pattern-repeat', name: 'Pattern Repeat', difficulty: 'Medium', free: true },
-        { id: 'pi-galaxy-shooter', name: 'Pi Galaxy Shooter', difficulty: 'Hard', free: false },
-        { id: 'typing-chain', name: 'Typing Chain', difficulty: 'Easy', free: true },
-        { id: 'survival-reflex', name: 'Survival Reflex', difficulty: 'Hard', free: false },
-        { id: 'infinite-flow', name: 'Infinite Flow', difficulty: 'Medium', free: true },
-        { id: 'brain-cycle', name: 'Brain Cycle', difficulty: 'Hard', free: false },
-        { id: 'rapid-clicker', name: 'Rapid Clicker', difficulty: 'Easy', free: true },
-        { id: 'loop-logic', name: 'Loop the Logic', difficulty: 'Medium', free: true }
-      ]
-    }
+  // Game categories organized by category from database
+  const organizeGamesByCategory = () => {
+    const categories = {
+      puzzle: {
+        name: "Puzzle & Logic",
+        icon: PuzzleIcon,
+        color: "bg-blue-500",
+        games: games.filter(game => game.category === 'puzzle')
+      },
+      action: {
+        name: "Action & Reflex",
+        icon: RocketIcon,
+        color: "bg-red-500",
+        games: games.filter(game => game.category === 'action')
+      },
+      trivia: {
+        name: "Trivia & Quiz",
+        icon: BrainIcon,
+        color: "bg-green-500",
+        games: games.filter(game => game.category === 'trivia')
+      },
+      creative: {
+        name: "Creative & Fun",
+        icon: PaletteIcon,
+        color: "bg-purple-500",
+        games: games.filter(game => game.category === 'creative')
+      },
+      infinite: {
+        name: "Infinite Games",
+        icon: InfinityIcon,
+        color: "bg-orange-500",
+        games: games.filter(game => game.category === 'infinite')
+      }
+    };
+    return categories;
   };
+
+  const gameCategories = organizeGamesByCategory();
 
   // Paid games with Pi pricing
   const paidGames = [
@@ -147,7 +109,8 @@ const PlayWithMascot = () => {
     { id: 'build-a-mascot', name: 'Build-a-Mascot', price: 0.75, memo: 'Purchase: Build Mascot' }
   ];
 
-  const renderMascotEyes = (type) => {
+  // Mascot eyes
+  const renderMascotEyes = (type: string) => {
     switch (type) {
       case "happy":
         return (
@@ -210,7 +173,8 @@ const PlayWithMascot = () => {
     }
   };
 
-  const renderMascotMouth = (type) => {
+  // Mascot mouth
+  const renderMascotMouth = (type: string) => {
     switch (type) {
       case "big-smile":
         return (
@@ -257,8 +221,8 @@ const PlayWithMascot = () => {
     }
   };
 
-  const handleGameClick = (game, category) => {
-    if (!game.free && userPlan === 'free') {
+  const handleGameClick = (game: any, category: string) => {
+    if (!game.is_free && userPlan === 'free') {
       toast({
         title: "Premium Required",
         description: `${game.name} requires a Premium subscription or individual purchase.`,
@@ -275,7 +239,7 @@ const PlayWithMascot = () => {
     });
   };
 
-  const handlePurchaseGame = (game) => {
+  const handlePurchaseGame = (game: any) => {
     if (!isLoggedIn) {
       toast({
         title: "Login Required",
@@ -326,9 +290,9 @@ const PlayWithMascot = () => {
     }, 2000);
   };
 
-  const renderGameCard = (game, categoryKey) => {
-    const category = gameCategories[categoryKey];
-    const isLocked = !game.free && userPlan === 'free' && !purchasedGames.includes(game.id);
+  const renderGameCard = (game: any, categoryKey: string) => {
+    const category = gameCategories[categoryKey as keyof typeof gameCategories];
+    const isLocked = !game.is_free && userPlan === 'free' && !purchasedGames.includes(game.id);
     const isPaid = paidGames.find(p => p.id === game.id);
 
     return (
@@ -390,6 +354,17 @@ const PlayWithMascot = () => {
     );
   };
 
+  if (gamesLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-lg text-gray-600">Loading games...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <Helmet>
@@ -405,7 +380,7 @@ const PlayWithMascot = () => {
               Droplink Gaming Platform
             </h1>
             <p className="text-lg text-gray-600 mb-6">
-              50+ interactive games and activities with Pi Network integration
+              {games.length}+ interactive games and activities with Pi Network integration
             </p>
             
             {/* Score & Status Display */}
@@ -426,7 +401,7 @@ const PlayWithMascot = () => {
                 <CardContent className="p-4 text-center">
                   <CrownIcon className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
                   <h3 className="font-semibold text-yellow-800 mb-2">Upgrade to Premium</h3>
-                  <p className="text-sm text-yellow-700 mb-3">Unlock all 50+ games, remove ads, and get exclusive features!</p>
+                  <p className="text-sm text-yellow-700 mb-3">Unlock all {games.length}+ games, remove ads, and get exclusive features!</p>
                   <Button onClick={handleUpgradeToPremium} className="bg-yellow-600 hover:bg-yellow-700">
                     <CoinsIcon className="w-4 h-4 mr-2" />
                     Upgrade for 10 Pi

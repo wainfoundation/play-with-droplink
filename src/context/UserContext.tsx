@@ -1,70 +1,98 @@
 
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useUserProfile } from "@/hooks/useUserProfile";
-import { useSubscription } from "@/hooks/useSubscription";
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
-export type SubscriptionPlan = "starter" | "pro" | "premium" | "free" | null;
-
-interface UserContextType {
-  user: any;
-  profile: any;
-  subscription: any;
-  isLoading: boolean;
-  isLoggedIn: boolean;
-  showAds: boolean;
-  isAdmin: boolean;
-  setIsAdmin: (value: boolean) => void;
-  refreshUserData: () => Promise<void>;
-  signOut: () => Promise<void>;
-  updateProfile: (data: any) => Promise<void>;
-  cancelSubscription: () => Promise<boolean>;
+interface UserProfile {
+  id: string;
+  username: string;
+  display_name?: string;
+  avatar_url?: string;
+  bio?: string;
+  pi_domain?: string;
+  custom_domain?: string;
+  plan?: string;
+  pi_wallet_address?: string;
+  total_score?: number;
+  games_played?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
+interface UserContextType {
+  user: UserProfile | null;
+  isLoggedIn: boolean;
+  loading: boolean;
+  refreshUser: () => Promise<void>;
+}
 
-export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const { user, isLoading: authLoading, isLoggedIn, signOut } = useAuth();
-  const { profile, isLoading: profileLoading, updateProfile, refreshProfile } = useUserProfile(user);
-  const { subscription, isLoading: subscriptionLoading, cancelSubscription, refreshSubscription } = useSubscription(user);
-  const [isAdmin, setIsAdmin] = useState(false);
-  
-  // Overall loading state
-  const isLoading = authLoading || profileLoading || subscriptionLoading;
-  
-  // Only show ads for free plan users or starter plan users
-  const showAds = isLoggedIn && !isAdmin && 
-    (!subscription || subscription?.plan === "free" || subscription?.plan === "starter");
+const UserContext = createContext<UserContextType>({
+  user: null,
+  isLoggedIn: false,
+  loading: true,
+  refreshUser: async () => {},
+});
 
-  const refreshUserData = useCallback(async () => {
-    await Promise.all([
-      refreshProfile(),
-      refreshSubscription()
-    ]);
-  }, [refreshProfile, refreshSubscription]);
+export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const value: UserContextType = {
-    user,
-    profile,
-    subscription,
-    isLoading,
-    isLoggedIn,
-    showAds,
-    isAdmin,
-    setIsAdmin,
-    refreshUserData,
-    signOut,
-    updateProfile,
-    cancelSubscription
+  const refreshUser = async () => {
+    try {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      
+      if (authUser) {
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', authUser.id)
+          .single();
+        
+        setUser(profile);
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+  useEffect(() => {
+    refreshUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' && session?.user) {
+          await refreshUser();
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  return (
+    <UserContext.Provider 
+      value={{ 
+        user, 
+        isLoggedIn: !!user, 
+        loading,
+        refreshUser 
+      }}
+    >
+      {children}
+    </UserContext.Provider>
+  );
 };
 
 export const useUser = () => {
   const context = useContext(UserContext);
-  if (context === undefined) {
-    throw new Error("useUser must be used within a UserProvider");
+  if (!context) {
+    throw new Error('useUser must be used within a UserProvider');
   }
   return context;
 };
