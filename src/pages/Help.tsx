@@ -87,7 +87,7 @@ const Help = () => {
   const popularArticles = getFeaturedArticles().map(article => ({
     ...article,
     title: article.title.replace("Droplink", "Play with Droplink Gaming"),
-    description: article.description.replace("link-in-bio", "gaming").replace("links", "games")
+    excerpt: article.excerpt.replace("link-in-bio", "gaming").replace("links", "games")
   }));
   
   // Get sample FAQs focused on gaming
