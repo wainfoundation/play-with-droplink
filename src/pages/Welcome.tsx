@@ -8,7 +8,8 @@ import WelcomeFloatingElements from '@/components/welcome/WelcomeFloatingElement
 import WelcomeContent from '@/components/welcome/WelcomeContent';
 import WelcomeActions from '@/components/welcome/WelcomeActions';
 import CharacterCreationModal from '@/components/welcome/CharacterCreationModal';
-import { CharacterCustomization } from '@/components/character/types';
+import { useCharacter } from '@/hooks/useCharacter';
+import { useUser } from '@/context/UserContext';
 import { useToast } from '@/components/ui/use-toast';
 
 interface WelcomeProps {
@@ -18,6 +19,8 @@ interface WelcomeProps {
 const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, isLoggedIn } = useUser();
+  const { character, loading } = useCharacter();
   const [mascotVisible, setMascotVisible] = useState(false);
   const [welcomeTextVisible, setWelcomeTextVisible] = useState(false);
   const [buttonsVisible, setButtonsVisible] = useState(false);
@@ -37,6 +40,24 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
     };
   }, []);
 
+  // Check if user has character and redirect appropriately
+  useEffect(() => {
+    if (isLoggedIn && !loading) {
+      if (character) {
+        // User has character, check tutorial status
+        if (!character.tutorial_completed) {
+          setShowTutorial(true);
+        } else {
+          // Character exists and tutorial completed, go to play
+          handleGoToHome();
+        }
+      } else {
+        // User logged in but no character, show creation modal
+        setShowCharacterCreation(true);
+      }
+    }
+  }, [isLoggedIn, character, loading]);
+
   const handleGoToHome = () => {
     if (onEnter) {
       onEnter();
@@ -46,36 +67,56 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
   };
 
   const handleStartTutorial = () => {
+    if (!isLoggedIn) {
+      toast({
+        title: "Please Sign In",
+        description: "You need to sign in first to start the tutorial.",
+        variant: "destructive"
+      });
+      return;
+    }
     setShowTutorial(true);
     setTutorialStep(0);
   };
 
   const handleSkipTutorial = () => {
+    if (!isLoggedIn) {
+      toast({
+        title: "Please Sign In",
+        description: "You need to sign in first to continue.",
+        variant: "destructive"
+      });
+      return;
+    }
     handleGoToHome();
   };
 
   const handleCreateCharacter = () => {
+    if (!isLoggedIn) {
+      toast({
+        title: "Please Sign In",
+        description: "You need to sign in first to create a character.",
+        variant: "destructive"
+      });
+      return;
+    }
     setShowCharacterCreation(true);
   };
 
-  const handleCharacterCreated = (character: CharacterCustomization) => {
-    // Store character in localStorage for now
-    localStorage.setItem('droplinkCharacter', JSON.stringify(character));
-    
+  const handleCharacterCreated = () => {
     toast({
       title: "Character Created! 🎉",
-      description: `${character.name} is ready to play!`,
+      description: "Your character is ready! Starting tutorial...",
     });
-
-    // Navigate to the play page
-    handleGoToHome();
+    setShowTutorial(true);
+    setTutorialStep(0);
   };
 
   const handleNextStep = () => {
     if (tutorialStep < 3) {
       setTutorialStep(tutorialStep + 1);
     } else {
-      handleGoToHome();
+      handleFinishTutorial();
     }
   };
 
@@ -88,6 +129,17 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
   const handleFinishTutorial = () => {
     handleGoToHome();
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-lg text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (showTutorial) {
     return (

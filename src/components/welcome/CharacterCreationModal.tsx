@@ -6,12 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Palette, Sparkles } from 'lucide-react';
-import { CharacterCustomization } from '@/components/character/types';
+import { useCharacter } from '@/hooks/useCharacter';
+import { useToast } from '@/components/ui/use-toast';
 
 interface CharacterCreationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCharacterCreated: (character: CharacterCustomization) => void;
+  onCharacterCreated: () => void;
 }
 
 const CharacterCreationModal: React.FC<CharacterCreationModalProps> = ({
@@ -21,6 +22,10 @@ const CharacterCreationModal: React.FC<CharacterCreationModalProps> = ({
 }) => {
   const [characterName, setCharacterName] = useState('My Droplink');
   const [selectedColor, setSelectedColor] = useState('#00aaff');
+  const [selectedBackground, setSelectedBackground] = useState('bedroom');
+  const [isCreating, setIsCreating] = useState(false);
+  const { saveCharacter } = useCharacter();
+  const { toast } = useToast();
 
   const colors = [
     '#00aaff', // Default blue
@@ -34,21 +39,47 @@ const CharacterCreationModal: React.FC<CharacterCreationModalProps> = ({
     '#5f27cd'  // Purple
   ];
 
-  const handleCreateCharacter = () => {
-    const newCharacter: CharacterCustomization = {
-      id: crypto.randomUUID(),
+  const backgrounds = [
+    { id: 'bedroom', name: 'Bedroom', icon: '🛏️' },
+    { id: 'kitchen', name: 'Kitchen', icon: '🍳' },
+    { id: 'bathroom', name: 'Bathroom', icon: '🛁' },
+    { id: 'garden', name: 'Garden', icon: '🌸' }
+  ];
+
+  const handleCreateCharacter = async () => {
+    if (!characterName.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a character name.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsCreating(true);
+
+    const characterData = {
       name: characterName,
       color: selectedColor,
-      clothes: [],
+      background: selectedBackground,
       accessories: [],
-      background: 'default',
-      room: 'default',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      stats: { happiness: 80, hunger: 60, cleanliness: 70, energy: 85 },
+      tutorial_completed: false,
+      unlocked_rooms: ['bedroom']
     };
 
-    onCharacterCreated(newCharacter);
-    onClose();
+    const success = await saveCharacter(characterData);
+
+    if (success) {
+      toast({
+        title: "Character Created! 🎉",
+        description: `${characterName} is ready to play!`,
+      });
+      onCharacterCreated();
+      onClose();
+    }
+
+    setIsCreating(false);
   };
 
   return (
@@ -146,6 +177,27 @@ const CharacterCreationModal: React.FC<CharacterCreationModalProps> = ({
             </div>
           </div>
 
+          {/* Background Selection */}
+          <div className="space-y-3">
+            <Label>Choose Home</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {backgrounds.map((bg) => (
+                <button
+                  key={bg.id}
+                  className={`p-3 rounded-lg border-2 transition-all hover:scale-105 ${
+                    selectedBackground === bg.id 
+                      ? 'border-primary bg-primary/10' 
+                      : 'border-gray-300 hover:border-gray-400'
+                  }`}
+                  onClick={() => setSelectedBackground(bg.id)}
+                >
+                  <div className="text-2xl mb-1">{bg.icon}</div>
+                  <div className="text-sm font-medium">{bg.name}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Action Buttons */}
           <div className="flex gap-3">
             <Button variant="outline" onClick={onClose} className="flex-1">
@@ -154,9 +206,9 @@ const CharacterCreationModal: React.FC<CharacterCreationModalProps> = ({
             <Button 
               onClick={handleCreateCharacter} 
               className="flex-1"
-              disabled={!characterName.trim()}
+              disabled={!characterName.trim() || isCreating}
             >
-              Create Character
+              {isCreating ? 'Creating...' : 'Create Character'}
             </Button>
           </div>
         </div>

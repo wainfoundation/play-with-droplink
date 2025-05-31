@@ -3,12 +3,11 @@ export interface CharacterCustomization {
   id: string;
   name: string;
   color: string;
-  clothes: string[];
-  accessories: string[];
-  eyewear?: string;
-  hat?: string;
   background: string;
-  room: string;
+  accessories: string[];
+  stats: CharacterStats;
+  tutorial_completed: boolean;
+  unlocked_rooms: string[];
   created_at: string;
   updated_at: string;
 }
@@ -18,7 +17,7 @@ export interface ShopItem {
   name: string;
   type: 'color' | 'clothes' | 'accessory' | 'eyewear' | 'hat' | 'background' | 'room';
   price: number;
-  currency: 'pi' | 'ad';
+  currency: 'pi' | 'coins' | 'ad';
   preview_url?: string;
   description?: string;
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
@@ -32,8 +31,7 @@ export interface CharacterStats {
 }
 
 export interface PetInteraction {
-  type: 'feed' | 'play' | 'clean' | 'rest';
-  timestamp: string;
+  type: 'feed' | 'play' | 'clean' | 'sleep';
   happiness_gain: number;
   energy_change: number;
 }

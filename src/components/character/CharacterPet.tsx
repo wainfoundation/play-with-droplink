@@ -47,7 +47,7 @@ const CharacterPet: React.FC<CharacterPetProps> = ({
         case 'feed': sounds.powerup(); break;
         case 'play': sounds.success(); break;
         case 'clean': sounds.coin(); break;
-        case 'rest': sounds.unlock(); break;
+        case 'sleep': sounds.unlock(); break;
       }
     }
 
@@ -65,7 +65,6 @@ const CharacterPet: React.FC<CharacterPetProps> = ({
 
     const interaction: PetInteraction = {
       type: action,
-      timestamp: new Date().toISOString(),
       happiness_gain: statChanges.happiness || 0,
       energy_change: statChanges.energy || 0
     };
@@ -76,13 +75,6 @@ const CharacterPet: React.FC<CharacterPetProps> = ({
       setIsAnimating(false);
       setLastAction('');
     }, 1500);
-  };
-
-  const getStatColor = (value: number) => {
-    if (value >= 80) return 'bg-green-500';
-    if (value >= 60) return 'bg-yellow-500';
-    if (value >= 40) return 'bg-orange-500';
-    return 'bg-red-500';
   };
 
   const getCharacterExpression = () => {
@@ -202,12 +194,12 @@ const CharacterPet: React.FC<CharacterPetProps> = ({
             </Button>
 
             <Button
-              onClick={() => performAction('rest', { energy: 25, happiness: 5 }, 'rest')}
+              onClick={() => performAction('sleep', { energy: 25, happiness: 5 }, 'sleep')}
               className="flex items-center gap-2"
               disabled={stats.energy >= 95}
             >
               <Zap className="w-4 h-4" />
-              Rest
+              Sleep
             </Button>
           </div>
         </CardContent>
