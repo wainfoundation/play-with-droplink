@@ -7,7 +7,7 @@ import {
   MessageCircleIcon,
   ZapIcon,
   MicIcon,
-  DiceIcon
+  Dices
 } from 'lucide-react';
 import GameCard from './GameCard';
 import InteractiveMascot from '@/components/mascot/InteractiveMascot';
@@ -82,7 +82,7 @@ const GameManager: React.FC<GameManagerProps> = ({
       },
       randomfun: {
         name: "Random Fun",
-        icon: DiceIcon,
+        icon: Dices,
         color: "bg-pink-500",
         description: "50+ amazing games to keep you entertained!",
         games: games.filter(game => {
