@@ -1,26 +1,43 @@
 
-import { useEffect } from 'react';
-import { useUser } from '@/context/UserContext';
-import { trackPageView } from '@/services/analyticsService';
+import { useState, useEffect } from 'react';
+import { getAnalyticsData, getLinkAnalytics, AnalyticsData, LinkAnalytics } from '@/services/analyticsService';
 
-export function useAnalytics() {
-  const { user } = useUser();
+export const useAnalytics = (userId: string) => {
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [linkAnalytics, setLinkAnalytics] = useState<LinkAnalytics[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const trackPage = (path: string) => {
-    if (user?.id) {
-      trackPageView(user.id, path);
-    }
-  };
-
-  const trackEvent = (eventName: string, properties?: Record<string, any>) => {
-    // Analytics event tracking
-    console.log('Analytics Event:', eventName, properties);
+  const fetchAnalytics = async (period: string = '30d') => {
+    if (!userId) return;
     
-    // You can integrate with analytics services here
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', eventName, properties);
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const [analytics, links] = await Promise.all([
+        getAnalyticsData(userId, period),
+        getLinkAnalytics(userId, period)
+      ]);
+      
+      setAnalyticsData(analytics);
+      setLinkAnalytics(links);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch analytics');
+    } finally {
+      setLoading(false);
     }
   };
 
-  return { trackPage, trackEvent };
-}
+  useEffect(() => {
+    fetchAnalytics();
+  }, [userId]);
+
+  return {
+    analyticsData,
+    linkAnalytics,
+    loading,
+    error,
+    refetch: fetchAnalytics
+  };
+};

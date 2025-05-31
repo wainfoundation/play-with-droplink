@@ -1,42 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Helmet } from 'react-helmet-async';
 import { 
-  GamepadIcon, 
-  BrainIcon, 
-  MessageSquareIcon, 
-  TrophyIcon, 
-  StarIcon, 
-  HeartIcon,
-  RefreshCwIcon,
-  ZapIcon,
-  SmileIcon,
   PuzzleIcon,
   RocketIcon,
+  BrainIcon,
   PaletteIcon,
   InfinityIcon,
+  TrophyIcon,
   CrownIcon,
-  LockIcon,
-  PlayIcon,
   CoinsIcon
 } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 import { useToast } from '@/components/ui/use-toast';
 import { useGames } from '@/hooks/useGames';
+import { usePiPayment } from '@/hooks/usePiPayment';
+import GameCard from '@/components/games/GameCard';
+import GameEngine from '@/components/games/GameEngine';
+import PiBrowserCheck from '@/components/PiBrowserCheck';
+import PiAdsNetwork from '@/components/PiAdsNetwork';
+import { isRunningInPiBrowser } from '@/utils/pi-sdk';
 
 const PlayWithMascot = () => {
   const { user, isLoggedIn } = useUser();
   const { toast } = useToast();
   const { games, loading: gamesLoading } = useGames();
+  const { handleSubscribe, loading: paymentLoading } = usePiPayment();
   const [currentEmotion, setCurrentEmotion] = useState(0);
-  const [score, setScore] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
-  const [currentGame, setCurrentGame] = useState(null);
+  const [currentGame, setCurrentGame] = useState<any>(null);
   const [userPlan, setUserPlan] = useState('free');
   const [purchasedGames, setPurchasedGames] = useState<string[]>([]);
+  const [showPiBrowserCheck, setShowPiBrowserCheck] = useState(true);
+
+  // Check Pi Browser on component mount
+  useEffect(() => {
+    const isPiBrowser = isRunningInPiBrowser();
+    if (isPiBrowser) {
+      setShowPiBrowserCheck(false);
+    }
+  }, []);
 
   // Set user plan from user data
   useEffect(() => {
@@ -101,15 +106,26 @@ const PlayWithMascot = () => {
 
   const gameCategories = organizeGamesByCategory();
 
-  // Paid games with Pi pricing
-  const paidGames = [
-    { id: 'pi-chess', name: 'Pi Chess', price: 1, memo: 'Purchase: Pi Chess' },
-    { id: 'droplink-dash-extreme', name: 'Droplink Dash Extreme', price: 0.5, memo: 'Purchase: Dash Extreme' },
-    { id: 'puzzle-builder-pro', name: 'Puzzle Builder Pro', price: 0.75, memo: 'Purchase: Puzzle Builder' },
-    { id: 'build-a-mascot', name: 'Build-a-Mascot', price: 0.75, memo: 'Purchase: Build Mascot' }
-  ];
+  // Pi Ads integration
+  const showAdForReward = () => {
+    if (!isRunningInPiBrowser()) {
+      toast({
+        title: "Pi Browser Required",
+        description: "Please use Pi Browser to view ads and earn rewards.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  // Mascot eyes
+    // Simulate ad reward
+    toast({
+      title: "Ad Reward Earned!",
+      description: "You earned 0.1 Pi for watching an ad!",
+    });
+    setTotalScore(prev => prev + 10);
+  };
+
+  // Mascot rendering functions
   const renderMascotEyes = (type: string) => {
     switch (type) {
       case "happy":
@@ -173,7 +189,6 @@ const PlayWithMascot = () => {
     }
   };
 
-  // Mascot mouth
   const renderMascotMouth = (type: string) => {
     switch (type) {
       case "big-smile":
@@ -222,7 +237,7 @@ const PlayWithMascot = () => {
   };
 
   const handleGameClick = (game: any, category: string) => {
-    if (!game.is_free && userPlan === 'free') {
+    if (!game.is_free && userPlan === 'free' && !purchasedGames.includes(game.id)) {
       toast({
         title: "Premium Required",
         description: `${game.name} requires a Premium subscription or individual purchase.`,
@@ -239,7 +254,7 @@ const PlayWithMascot = () => {
     });
   };
 
-  const handlePurchaseGame = (game: any) => {
+  const handlePurchaseGame = async (game: any) => {
     if (!isLoggedIn) {
       toast({
         title: "Login Required",
@@ -249,23 +264,39 @@ const PlayWithMascot = () => {
       return;
     }
 
-    // Mock Pi payment
-    toast({
-      title: "Purchase Initiated",
-      description: `Processing ${game.price} Pi payment for ${game.name}...`,
-    });
-
-    // Simulate successful purchase
-    setTimeout(() => {
-      setPurchasedGames([...purchasedGames, game.id]);
+    if (!isRunningInPiBrowser()) {
       toast({
-        title: "Purchase Successful!",
-        description: `You now own ${game.name}!`,
+        title: "Pi Browser Required",
+        description: "Please use Pi Browser to make Pi payments.",
+        variant: "destructive",
       });
-    }, 2000);
+      return;
+    }
+
+    try {
+      toast({
+        title: "Processing Payment",
+        description: `Processing ${game.price_pi} Pi payment for ${game.name}...`,
+      });
+
+      // Simulate Pi payment
+      setTimeout(() => {
+        setPurchasedGames([...purchasedGames, game.id]);
+        toast({
+          title: "Purchase Successful!",
+          description: `You now own ${game.name}!`,
+        });
+      }, 2000);
+    } catch (error) {
+      toast({
+        title: "Payment Failed",
+        description: "Failed to process Pi payment. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleUpgradeToPremium = () => {
+  const handleUpgradeToPremium = async () => {
     if (!isLoggedIn) {
       toast({
         title: "Login Required",
@@ -275,84 +306,53 @@ const PlayWithMascot = () => {
       return;
     }
 
+    if (!isRunningInPiBrowser()) {
+      toast({
+        title: "Pi Browser Required",
+        description: "Please use Pi Browser to make Pi payments.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await handleSubscribe('premium', 'monthly');
+      setUserPlan('premium');
+    } catch (error) {
+      console.error('Premium upgrade failed:', error);
+    }
+  };
+
+  const handleGameComplete = (score: number) => {
+    setTotalScore(prev => prev + score);
+    setCurrentEmotion(8); // proud
+    
     toast({
-      title: "Premium Upgrade",
-      description: "Processing 10 Pi payment for Premium Game Pass...",
+      title: "Great Job!",
+      description: `You earned ${score} points!`,
     });
 
-    // Simulate successful premium upgrade
-    setTimeout(() => {
-      setUserPlan('premium');
-      toast({
-        title: "Welcome to Premium!",
-        description: "All games are now unlocked!",
-      });
-    }, 2000);
+    // Show ad after game completion for extra reward
+    if (isRunningInPiBrowser()) {
+      setTimeout(() => {
+        showAdForReward();
+      }, 1000);
+    }
   };
 
-  const renderGameCard = (game: any, categoryKey: string) => {
-    const category = gameCategories[categoryKey as keyof typeof gameCategories];
-    const isLocked = !game.is_free && userPlan === 'free' && !purchasedGames.includes(game.id);
-    const isPaid = paidGames.find(p => p.id === game.id);
+  const handleBackToGames = () => {
+    setCurrentGame(null);
+    setCurrentEmotion(0);
+  };
 
+  if (showPiBrowserCheck && !isRunningInPiBrowser()) {
     return (
-      <Card key={game.id} className="relative overflow-hidden hover:shadow-lg transition-shadow">
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-medium">{game.name}</CardTitle>
-            {isLocked && <LockIcon className="w-4 h-4 text-gray-400" />}
-            {userPlan === 'premium' && <CrownIcon className="w-4 h-4 text-yellow-500" />}
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge variant={game.difficulty === 'Easy' ? 'default' : game.difficulty === 'Medium' ? 'secondary' : 'destructive'} className="text-xs">
-              {game.difficulty}
-            </Badge>
-            {isPaid && (
-              <Badge variant="outline" className="text-xs">
-                {isPaid.price} Pi
-              </Badge>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="flex gap-2">
-            {isLocked ? (
-              isPaid ? (
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  className="flex-1"
-                  onClick={() => handlePurchaseGame(isPaid)}
-                >
-                  <CoinsIcon className="w-3 h-3 mr-1" />
-                  Buy {isPaid.price} Pi
-                </Button>
-              ) : (
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  className="flex-1"
-                  onClick={handleUpgradeToPremium}
-                >
-                  <CrownIcon className="w-3 h-3 mr-1" />
-                  Premium
-                </Button>
-              )
-            ) : (
-              <Button 
-                size="sm" 
-                className="flex-1"
-                onClick={() => handleGameClick(game, categoryKey)}
-              >
-                <PlayIcon className="w-3 h-3 mr-1" />
-                Play
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <PiBrowserCheck 
+        showContinueOption={true}
+        onContinueAnyway={() => setShowPiBrowserCheck(false)}
+      />
     );
-  };
+  }
 
   if (gamesLoading) {
     return (
@@ -362,6 +362,26 @@ const PlayWithMascot = () => {
           <p className="text-lg text-gray-600">Loading games...</p>
         </div>
       </div>
+    );
+  }
+
+  // Show game engine if a game is selected
+  if (currentGame) {
+    return (
+      <>
+        <Helmet>
+          <title>{currentGame.name} - Droplink Gaming</title>
+        </Helmet>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">
+          <div className="container mx-auto px-4">
+            <GameEngine
+              game={currentGame}
+              onBack={handleBackToGames}
+              onGameComplete={handleGameComplete}
+            />
+          </div>
+        </div>
+      </>
     );
   }
 
@@ -390,7 +410,7 @@ const PlayWithMascot = () => {
                 Score: {totalScore}
               </Badge>
               <Badge variant={userPlan === 'premium' ? 'default' : 'outline'} className="text-lg px-4 py-2">
-                {userPlan === 'premium' ? <CrownIcon className="w-5 h-5 mr-2" /> : <StarIcon className="w-5 h-5 mr-2" />}
+                {userPlan === 'premium' ? <CrownIcon className="w-5 h-5 mr-2" /> : <CoinsIcon className="w-5 h-5 mr-2" />}
                 {userPlan === 'premium' ? 'Premium' : 'Free Plan'}
               </Badge>
             </div>
@@ -402,10 +422,14 @@ const PlayWithMascot = () => {
                   <CrownIcon className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
                   <h3 className="font-semibold text-yellow-800 mb-2">Upgrade to Premium</h3>
                   <p className="text-sm text-yellow-700 mb-3">Unlock all {games.length}+ games, remove ads, and get exclusive features!</p>
-                  <Button onClick={handleUpgradeToPremium} className="bg-yellow-600 hover:bg-yellow-700">
-                    <CoinsIcon className="w-4 h-4 mr-2" />
-                    Upgrade for 10 Pi
-                  </Button>
+                  <button 
+                    onClick={handleUpgradeToPremium} 
+                    disabled={paymentLoading}
+                    className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded disabled:opacity-50"
+                  >
+                    <CoinsIcon className="w-4 h-4 mr-2 inline" />
+                    {paymentLoading ? 'Processing...' : 'Upgrade for 10 Pi'}
+                  </button>
                 </CardContent>
               </Card>
             )}
@@ -461,20 +485,8 @@ const PlayWithMascot = () => {
                     </div>
                   </div>
 
-                  {/* Emotion Buttons */}
-                  <div className="grid grid-cols-5 gap-2 mb-6">
-                    {emotions.slice(0, 10).map((emotion, index) => (
-                      <Button
-                        key={emotion.name}
-                        variant={currentEmotion === index ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setCurrentEmotion(index)}
-                        className="text-xs"
-                      >
-                        {emotion.name}
-                      </Button>
-                    ))}
-                  </div>
+                  {/* Pi Ads Network */}
+                  <PiAdsNetwork placementId="gaming-sidebar" />
                 </div>
               </div>
             </div>
@@ -505,57 +517,31 @@ const PlayWithMascot = () => {
                       </CardHeader>
                       <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {category.games.map(game => renderGameCard(game, key))}
+                          {category.games.map(game => {
+                            const isLocked = !game.is_free && userPlan === 'free' && !purchasedGames.includes(game.id);
+                            return (
+                              <GameCard
+                                key={game.id}
+                                game={game}
+                                isLocked={isLocked}
+                                userPlan={userPlan}
+                                onPlay={(game) => handleGameClick(game, key)}
+                                onPurchase={handlePurchaseGame}
+                                onUpgrade={handleUpgradeToPremium}
+                              />
+                            );
+                          })}
+                        </div>
+                        
+                        {/* Pi Ads between games */}
+                        <div className="mt-6">
+                          <PiAdsNetwork placementId={`${key}-games`} />
                         </div>
                       </CardContent>
                     </Card>
                   </TabsContent>
                 ))}
               </Tabs>
-
-              {/* Paid Games Section */}
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <CoinsIcon className="w-6 h-6" />
-                    Premium One-Time Purchase Games
-                  </CardTitle>
-                  <CardDescription>
-                    Special premium games available for individual purchase
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {paidGames.map(game => (
-                      <Card key={game.id} className="border-yellow-200">
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-sm font-medium">{game.name}</CardTitle>
-                          <Badge variant="secondary" className="w-fit">
-                            {game.price} Pi
-                          </Badge>
-                        </CardHeader>
-                        <CardContent className="pt-0">
-                          {purchasedGames.includes(game.id) ? (
-                            <Button size="sm" variant="outline" className="w-full" disabled>
-                              <StarIcon className="w-3 h-3 mr-1" />
-                              Owned
-                            </Button>
-                          ) : (
-                            <Button 
-                              size="sm" 
-                              className="w-full"
-                              onClick={() => handlePurchaseGame(game)}
-                            >
-                              <CoinsIcon className="w-3 h-3 mr-1" />
-                              Buy for {game.price} Pi
-                            </Button>
-                          )}
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           </div>
         </div>
@@ -571,11 +557,6 @@ const PlayWithMascot = () => {
           @keyframes pulse-gentle {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.8; }
-          }
-          
-          @keyframes gentle-blink {
-            0%, 85%, 100% { opacity: 1; }
-            90%, 95% { opacity: 0.1; }
           }
           
           @keyframes shimmer {
@@ -594,10 +575,6 @@ const PlayWithMascot = () => {
           
           .animate-pulse-gentle {
             animation: pulse-gentle 3s ease-in-out infinite;
-          }
-          
-          .animate-gentle-blink {
-            animation: gentle-blink 6s ease-in-out infinite;
           }
           
           .animate-shimmer {
