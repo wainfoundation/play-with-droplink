@@ -1,343 +1,189 @@
 
-import React, { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles, Heart, Globe, Play, SkipForward, ChevronLeft, ChevronRight } from 'lucide-react';
+import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { useNavigate } from 'react-router-dom';
+import { 
+  Gamepad2, 
+  Heart, 
+  Crown, 
+  Sparkles,
+  Play,
+  Star
+} from 'lucide-react';
 
-interface WelcomeProps {
-  onEnter?: () => void;
-}
+const Welcome = () => {
+  const navigate = useNavigate();
 
-const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
-  const [mascotVisible, setMascotVisible] = useState(false);
-  const [welcomeTextVisible, setWelcomeTextVisible] = useState(false);
-  const [buttonsVisible, setButtonsVisible] = useState(false);
-  const [showTutorial, setShowTutorial] = useState(false);
-  const [tutorialStep, setTutorialStep] = useState(0);
-
-  const tutorialSteps = [
-    {
-      title: "Create Your Profile",
-      description: "Set up your Droplink profile with your bio, links, and social media accounts.",
-      icon: "👤"
-    },
-    {
-      title: "Add Your Links",
-      description: "Connect all your social media, websites, and important links in one place.",
-      icon: "🔗"
-    },
-    {
-      title: "Accept Pi Payments",
-      description: "Enable Pi tipping and sell digital products directly from your profile.",
-      icon: "💰"
-    },
-    {
-      title: "Share Your Profile",
-      description: "Share your droplink.space/@username with the world and start earning!",
-      icon: "🚀"
-    }
-  ];
-
-  useEffect(() => {
-    // Animated sequence
-    const timer1 = setTimeout(() => setMascotVisible(true), 300);
-    const timer2 = setTimeout(() => setWelcomeTextVisible(true), 1500);
-    const timer3 = setTimeout(() => setButtonsVisible(true), 2500);
-
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-    };
-  }, []);
-
-  const handleGoToHome = () => {
-    if (onEnter) {
-      onEnter();
-    }
+  const handleMeetMascot = () => {
+    navigate('/mascot');
   };
 
-  const handleStartTutorial = () => {
-    setShowTutorial(true);
-    setTutorialStep(0);
+  const handleEnterPlayhouse = () => {
+    navigate('/playhouse');
   };
-
-  const handleSkipTutorial = () => {
-    handleGoToHome();
-  };
-
-  const handleNextStep = () => {
-    if (tutorialStep < tutorialSteps.length - 1) {
-      setTutorialStep(tutorialStep + 1);
-    } else {
-      handleGoToHome();
-    }
-  };
-
-  const handlePrevStep = () => {
-    if (tutorialStep > 0) {
-      setTutorialStep(tutorialStep - 1);
-    }
-  };
-
-  const handleFinishTutorial = () => {
-    handleGoToHome();
-  };
-
-  if (showTutorial) {
-    return (
-      <>
-        <Helmet>
-          <title>Droplink Tutorial - Learn How to Get Started</title>
-          <meta name="description" content="Learn how to use Droplink to create your Pi Network profile and start earning." />
-        </Helmet>
-        
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden">
-          {/* Background Effects */}
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-secondary/20 to-primary/20 rounded-full blur-3xl animate-pulse" />
-          
-          <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 text-center">
-            {/* Tutorial Content */}
-            <div className="max-w-2xl mx-auto">
-              <div className="text-6xl mb-6">{tutorialSteps[tutorialStep].icon}</div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
-                {tutorialSteps[tutorialStep].title}
-              </h1>
-              <p className="text-lg text-gray-600 mb-8 max-w-xl mx-auto">
-                {tutorialSteps[tutorialStep].description}
-              </p>
-              
-              {/* Progress Bar */}
-              <div className="w-full bg-gray-200 rounded-full h-2 mb-8">
-                <div 
-                  className="bg-gradient-to-r from-primary to-secondary h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${((tutorialStep + 1) / tutorialSteps.length) * 100}%` }}
-                ></div>
-              </div>
-              
-              {/* Step Counter */}
-              <p className="text-sm text-gray-500 mb-8">
-                Step {tutorialStep + 1} of {tutorialSteps.length}
-              </p>
-              
-              {/* Navigation Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Button 
-                  onClick={handlePrevStep}
-                  variant="outline"
-                  disabled={tutorialStep === 0}
-                  className="flex items-center gap-2"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
-                </Button>
-                
-                {tutorialStep < tutorialSteps.length - 1 ? (
-                  <Button 
-                    onClick={handleNextStep}
-                    className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 flex items-center gap-2"
-                  >
-                    Next
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                ) : (
-                  <Button 
-                    onClick={handleFinishTutorial}
-                    className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 flex items-center gap-2"
-                  >
-                    Start Building
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                )}
-                
-                <Button 
-                  onClick={handleSkipTutorial}
-                  variant="ghost"
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  Skip Tutorial
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  }
 
   return (
     <>
       <Helmet>
-        <title>Welcome to Droplink - Your Pi Network Link Hub</title>
-        <meta name="description" content="Welcome to Droplink! Transform your Pi domain into a powerful business hub." />
+        <title>🎮 Play with Droplink - Pi Gaming World</title>
+        <meta name="description" content="Welcome to Play with Droplink — your ultimate Pi-powered gaming world! Take care of your Droplink mascot and enjoy 50+ games." />
       </Helmet>
-      
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-secondary/20 to-primary/20 rounded-full blur-3xl animate-pulse" />
-        
-        {/* Floating Elements */}
-        <div className="absolute top-20 left-20 animate-bounce">
-          <Sparkles className="text-primary/30 h-8 w-8" />
-        </div>
-        <div className="absolute top-40 right-32 animate-bounce delay-300">
-          <Heart className="text-red-400/30 h-6 w-6" />
-        </div>
-        <div className="absolute bottom-32 left-32 animate-bounce delay-700">
-          <Globe className="text-blue-400/30 h-7 w-7" />
+
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-yellow-500/10 rounded-full blur-3xl animate-pulse" />
         </div>
 
-        <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 text-center">
-          {/* Mascot */}
-          <div className={`transition-all duration-1000 ${
-            mascotVisible ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-50 translate-y-10'
-          }`}>
-            <div className="relative mb-8">
-              <svg
-                width="200"
-                height="240"
-                viewBox="0 0 200 240"
-                className="animate-bounce-gentle"
-              >
-                {/* Droplet shape */}
-                <path
-                  d="M100 20 C60 60, 35 100, 35 140 C35 185, 65 220, 100 220 C135 220, 165 185, 165 140 C165 100, 140 60, 100 20 Z"
-                  fill="url(#welcomeDropletGradient)"
-                  className="animate-pulse-gentle"
-                />
-                
-                {/* Gradient definition */}
-                <defs>
-                  <linearGradient id="welcomeDropletGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#00aaff" />
-                    <stop offset="50%" stopColor="#0099ee" />
-                    <stop offset="100%" stopColor="#0077cc" />
-                  </linearGradient>
-                </defs>
-                
-                {/* Highlight */}
-                <ellipse
-                  cx="75"
-                  cy="70"
-                  rx="12"
-                  ry="18"
-                  fill="rgba(255, 255, 255, 0.6)"
-                  className="animate-shimmer"
-                />
-                
-                {/* Face */}
-                {/* Eyes */}
-                <circle cx="80" cy="110" r="6" fill="#fff" />
-                <circle cx="120" cy="110" r="6" fill="#fff" />
-                <circle cx="82" cy="112" r="3" fill="#333" className="animate-blink" />
-                <circle cx="122" cy="112" r="3" fill="#333" className="animate-blink" />
-                
-                {/* Smile */}
-                <path
-                  d="M80 140 Q100 160 120 140"
-                  stroke="#fff"
-                  strokeWidth="3"
-                  fill="none"
-                  strokeLinecap="round"
-                  className="animate-smile"
-                />
-              </svg>
+        <div className="relative z-10 container mx-auto px-4 py-16">
+          {/* Main Header */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-6 animate-bounce-gentle">
+              <Gamepad2 className="w-12 h-12 text-white" />
             </div>
-          </div>
-
-          {/* Welcome Text */}
-          <div className={`transition-all duration-1000 delay-500 ${
-            welcomeTextVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}>
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
-                Welcome to Droplink!
+            
+            <h1 className="text-5xl md:text-7xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-yellow-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+                🎮 Play with Droplink
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 mb-2">
-              Your Pi Network Link Hub
-            </p>
-            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-              Transform your .pi domain into a powerful business hub with Pi payments, 
-              professional profiles, and seamless Pi Browser integration.
+            
+            <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto">
+              Welcome to Play with Droplink — your ultimate Pi-powered gaming world!<br/>
+              Take care of your Droplink mascot, explore the Playhouse, and enjoy 50+ exciting games across Puzzle, Action, Trivia, and Creative categories.
             </p>
           </div>
 
-          {/* Action Buttons */}
-          <div className={`transition-all duration-1000 delay-1000 ${
-            buttonsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}>
-            <div className="flex flex-col sm:flex-row gap-4 mt-8">
-              <Button 
-                onClick={handleStartTutorial}
-                size="lg" 
-                className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 transform transition hover:scale-105 duration-200 text-lg px-8 py-4"
-              >
-                <Play className="mr-2 h-5 w-5" />
-                Start Tutorial
+          {/* Tutorial Cards */}
+          <div className="grid md:grid-cols-3 gap-6 mb-12 max-w-6xl mx-auto">
+            <Card className="bg-gray-900/50 border-pink-500/30 backdrop-blur-sm">
+              <CardHeader className="text-center">
+                <div className="text-4xl mb-3">👾</div>
+                <CardTitle className="text-white">Meet Your Mascot</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300 text-center">
+                  Meet your Droplink Mascot! Feed, play, and care for your mascot like a virtual pet.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-900/50 border-blue-500/30 backdrop-blur-sm">
+              <CardHeader className="text-center">
+                <div className="text-4xl mb-3">🎲</div>
+                <CardTitle className="text-white">Visit the Playhouse</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300 text-center">
+                  Visit the Playhouse with 50+ free and premium games across multiple categories.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-900/50 border-purple-500/30 backdrop-blur-sm">
+              <CardHeader className="text-center">
+                <div className="text-4xl mb-3">💎</div>
+                <CardTitle className="text-white">Premium Gaming</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300 text-center">
+                  Subscribe to Premium to unlock all games, remove ads, and earn exclusive badges.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Main Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+            <Button 
+              onClick={handleMeetMascot}
+              className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+            >
+              <Heart className="w-6 h-6 mr-2" />
+              🐾 Meet Your Mascot
+            </Button>
+            
+            <Button 
+              onClick={handleEnterPlayhouse}
+              className="bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+            >
+              <Play className="w-6 h-6 mr-2" />
+              🎲 Enter the Playhouse
+            </Button>
+          </div>
+
+          {/* Game Stats */}
+          <div className="text-center mb-12">
+            <div className="flex flex-wrap justify-center gap-6">
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-6 py-4">
+                <div className="text-3xl font-bold text-yellow-400">50+</div>
+                <div className="text-sm text-gray-300">Games Available</div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-6 py-4">
+                <div className="text-3xl font-bold text-blue-400">5</div>
+                <div className="text-sm text-gray-300">Categories</div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-6 py-4">
+                <div className="text-3xl font-bold text-purple-400">Pi</div>
+                <div className="text-sm text-gray-300">Powered</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Game Categories Preview */}
+          <Card className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 border-purple-500/30 backdrop-blur-sm max-w-4xl mx-auto">
+            <CardHeader>
+              <CardTitle className="text-2xl text-white text-center">🎯 Game Categories</CardTitle>
+              <CardDescription className="text-gray-300 text-center">
+                Explore diverse gaming experiences across multiple categories
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap justify-center gap-3">
+                <Badge className="bg-blue-600 text-white text-sm py-2 px-4">🧩 Puzzle & Logic</Badge>
+                <Badge className="bg-red-600 text-white text-sm py-2 px-4">⚡ Action & Reflex</Badge>
+                <Badge className="bg-green-600 text-white text-sm py-2 px-4">🧠 Trivia & Quiz</Badge>
+                <Badge className="bg-purple-600 text-white text-sm py-2 px-4">🎨 Creative & Fun</Badge>
+                <Badge className="bg-orange-600 text-white text-sm py-2 px-4">♾️ Infinite Games</Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Call to Action Footer */}
+          <div className="mt-16 text-center">
+            <p className="text-gray-400 mb-6">
+              Ready to start your Pi-powered gaming adventure?
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Button variant="outline" className="border-yellow-500 text-yellow-400 hover:bg-yellow-500 hover:text-black">
+                <Crown className="w-4 h-4 mr-2" />
+                Get Premium
               </Button>
-              <Button 
-                onClick={handleSkipTutorial}
-                variant="outline" 
-                size="lg" 
-                className="hover:bg-blue-50 transition-colors text-lg px-8 py-4"
-              >
-                <SkipForward className="mr-2 h-5 w-5" />
-                Skip Tutorial
+              <Button variant="outline" className="border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white">
+                <Star className="w-4 h-4 mr-2" />
+                View Leaderboards
               </Button>
             </div>
           </div>
         </div>
 
+        {/* Custom Animation Styles */}
         <style>
           {`
-          @keyframes bounce-gentle {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-15px); }
-            60% { transform: translateY(-8px); }
-          }
-          
-          @keyframes pulse-gentle {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-          }
-          
-          @keyframes blink {
-            0%, 90%, 100% { transform: scaleY(1); }
-            95% { transform: scaleY(0.1); }
-          }
-          
-          @keyframes shimmer {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
-          }
-          
-          @keyframes smile {
-            0%, 100% { stroke-dasharray: 0, 100; }
-            50% { stroke-dasharray: 30, 100; }
-          }
-          
-          .animate-bounce-gentle {
-            animation: bounce-gentle 4s ease-in-out infinite;
-          }
-          
-          .animate-pulse-gentle {
-            animation: pulse-gentle 3s ease-in-out infinite;
-          }
-          
-          .animate-blink {
-            animation: blink 5s ease-in-out infinite;
-          }
-          
-          .animate-shimmer {
-            animation: shimmer 2.5s ease-in-out infinite;
-          }
-          
-          .animate-smile {
-            animation: smile 4s ease-in-out infinite;
-          }
+            @keyframes bounce-gentle {
+              0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+              40% { transform: translateY(-15px); }
+              60% { transform: translateY(-8px); }
+            }
+            
+            .animate-bounce-gentle {
+              animation: bounce-gentle 4s ease-in-out infinite;
+            }
           `}
         </style>
       </div>

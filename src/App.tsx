@@ -9,6 +9,15 @@ import { useState, useEffect } from "react";
 import { HelmetProvider } from 'react-helmet-async';
 
 import SplashScreen from "@/components/SplashScreen";
+import Welcome from "./pages/Welcome";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Playhouse from "./pages/Playhouse";
+import GamePlay from "./pages/GamePlay";
+import Monetization from "./pages/Monetization";
+import Leaderboards from "./pages/Leaderboards";
+import Profile from "./pages/Profile";
+import MascotCare from "./pages/MascotCare";
 import Index from "./pages/Index";
 import PlayWithMascot from "./pages/PlayWithMascot";
 import GameWorkflow from "./pages/GameWorkflow";
@@ -24,10 +33,10 @@ const ComingSoonPage = ({ pageName }: { pageName: string }) => (
       <div className="space-y-2">
         <p className="text-sm text-gray-400">For now, enjoy our amazing games:</p>
         <a 
-          href="/play" 
+          href="/welcome" 
           className="inline-block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
         >
-          🎮 Play Games
+          🎮 Start Gaming
         </a>
       </div>
     </div>
@@ -57,25 +66,40 @@ const App = () => {
             <BrowserRouter>
               <Routes>
                 {/* Main gaming workflow */}
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={<Navigate to="/welcome" replace />} />
+                <Route path="/welcome" element={<Welcome />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/playhouse" element={<Playhouse />} />
+                <Route path="/gameplay" element={<GamePlay />} />
+                <Route path="/monetization" element={<Monetization />} />
+                <Route path="/leaderboards" element={<Leaderboards />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/mascot" element={<MascotCare />} />
+                
+                {/* Legacy routes for compatibility */}
+                <Route path="/index" element={<Index />} />
                 <Route path="/play" element={<PlayWithMascot />} />
                 <Route path="/workflow" element={<GameWorkflow />} />
                 
-                {/* Redirect common routes to play */}
-                <Route path="/dashboard" element={<Navigate to="/play" replace />} />
-                <Route path="/games" element={<Navigate to="/play" replace />} />
+                {/* Game routes */}
+                <Route path="/games/free" element={<Playhouse />} />
+                <Route path="/games/premium" element={<Playhouse />} />
+                <Route path="/games/paid" element={<Playhouse />} />
+                <Route path="/rewards" element={<ComingSoonPage pageName="Rewards Center" />} />
                 
                 {/* Coming soon pages */}
                 <Route path="/pricing" element={<ComingSoonPage pageName="Pricing Plans" />} />
                 <Route path="/features" element={<ComingSoonPage pageName="Features" />} />
                 <Route path="/about" element={<ComingSoonPage pageName="About Us" />} />
                 <Route path="/contact" element={<ComingSoonPage pageName="Contact" />} />
-                <Route path="/profile/*" element={<ComingSoonPage pageName="User Profiles" />} />
+                <Route path="/help" element={<ComingSoonPage pageName="Help Center" />} />
+                <Route path="/community" element={<ComingSoonPage pageName="Community" />} />
+                <Route path="/forums" element={<ComingSoonPage pageName="Forums" />} />
                 <Route path="/register/*" element={<ComingSoonPage pageName="Registration" />} />
-                <Route path="/login" element={<ComingSoonPage pageName="Login" />} />
                 
-                {/* Catch all - redirect to home */}
-                <Route path="*" element={<Navigate to="/" replace />} />
+                {/* Catch all - redirect to welcome */}
+                <Route path="*" element={<Navigate to="/welcome" replace />} />
               </Routes>
             </BrowserRouter>
           </TooltipProvider>
