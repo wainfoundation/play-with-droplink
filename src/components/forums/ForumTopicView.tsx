@@ -43,14 +43,19 @@ const ForumTopicView = ({ topicId, topicTitle, onBack }: ForumTopicViewProps) =>
 
   const fetchTopicDetails = async () => {
     try {
-      const { data, error } = await supabase
-        .from('forum_topics')
-        .select('*')
-        .eq('id', topicId)
-        .single();
-
-      if (error) throw error;
-      setTopic(data);
+      // Create a temporary workaround since forum_topics might not be in types yet
+      const response = await fetch(`https://tzptajfvmjsiddjjoyqu.supabase.co/rest/v1/forum_topics?id=eq.${topicId}&select=*`, {
+        headers: {
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cHRhamZ2bWpzaWRkampveXF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg2NjEwNDcsImV4cCI6MjA2NDIzNzA0N30.nO2d3la6HsOHy71OQwoHLhuWCv6ffnZqQWv00GqpZSI',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cHRhamZ2bWpzaWRkampveXF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg2NjEwNDcsImV4cCI6MjA2NDIzNzA0N30.nO2d3la6HsOHy71OQwoHLhuWCv6ffnZqQWv00GqpZSI',
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const data = await response.json();
+      if (data && data.length > 0) {
+        setTopic(data[0] as TopicDetails);
+      }
     } catch (err) {
       console.error('Error fetching topic:', err);
     }
@@ -58,18 +63,16 @@ const ForumTopicView = ({ topicId, topicTitle, onBack }: ForumTopicViewProps) =>
 
   const incrementViewCount = async () => {
     try {
-      const { data: currentTopic } = await supabase
-        .from('forum_topics')
-        .select('view_count')
-        .eq('id', topicId)
-        .single();
-
-      if (currentTopic) {
-        await supabase
-          .from('forum_topics')
-          .update({ view_count: currentTopic.view_count + 1 })
-          .eq('id', topicId);
-      }
+      // Use fetch API for now until types are updated
+      await fetch(`https://tzptajfvmjsiddjjoyqu.supabase.co/rest/v1/forum_topics?id=eq.${topicId}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cHRhamZ2bWpzaWRkampveXF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg2NjEwNDcsImV4cCI6MjA2NDIzNzA0N30.nO2d3la6HsOHy71OQwoHLhuWCv6ffnZqQWv00GqpZSI',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cHRhamZ2bWpzaWRkampveXF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg2NjEwNDcsImV4cCI6MjA2NDIzNzA0N30.nO2d3la6HsOHy71OQwoHLhuWCv6ffnZqQWv00GqpZSI',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ view_count: (topic?.view_count || 0) + 1 })
+      });
     } catch (err) {
       console.error('Error incrementing view count:', err);
     }

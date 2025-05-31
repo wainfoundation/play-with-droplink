@@ -72,6 +72,218 @@ export type Database = {
         }
         Relationships: []
       }
+      digital_products: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          download_count: number | null
+          download_expires_hours: number | null
+          file_size: number | null
+          file_type: string | null
+          file_url: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          max_downloads: number | null
+          price: number
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          download_count?: number | null
+          download_expires_hours?: number | null
+          file_size?: number | null
+          file_type?: string | null
+          file_url?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          max_downloads?: number | null
+          price?: number
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          download_count?: number | null
+          download_expires_hours?: number | null
+          file_size?: number | null
+          file_type?: string | null
+          file_url?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          max_downloads?: number | null
+          price?: number
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "digital_products_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forum_categories: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      forum_replies: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          is_solution: boolean | null
+          topic_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          is_solution?: boolean | null
+          topic_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_solution?: boolean | null
+          topic_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_replies_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "forum_topics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_replies_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forum_topics: {
+        Row: {
+          category_id: string | null
+          content: string
+          created_at: string | null
+          id: string
+          is_locked: boolean | null
+          is_pinned: boolean | null
+          last_reply_at: string | null
+          reply_count: number | null
+          title: string
+          updated_at: string | null
+          user_id: string | null
+          view_count: number | null
+        }
+        Insert: {
+          category_id?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          is_locked?: boolean | null
+          is_pinned?: boolean | null
+          last_reply_at?: string | null
+          reply_count?: number | null
+          title: string
+          updated_at?: string | null
+          user_id?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          category_id?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_locked?: boolean | null
+          is_pinned?: boolean | null
+          last_reply_at?: string | null
+          reply_count?: number | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string | null
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_topics_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "forum_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_topics_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_sessions: {
         Row: {
           completed: boolean | null
@@ -236,6 +448,88 @@ export type Database = {
           {
             foreignKeyName: "links_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          access_token: string | null
+          amount: number
+          buyer_email: string | null
+          buyer_id: string | null
+          created_at: string | null
+          currency: string | null
+          download_count: number | null
+          download_expires_at: string | null
+          download_link: string | null
+          id: string
+          max_downloads: number | null
+          pi_payment_id: string | null
+          pi_transaction_id: string | null
+          product_id: string | null
+          seller_id: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          access_token?: string | null
+          amount: number
+          buyer_email?: string | null
+          buyer_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          download_count?: number | null
+          download_expires_at?: string | null
+          download_link?: string | null
+          id?: string
+          max_downloads?: number | null
+          pi_payment_id?: string | null
+          pi_transaction_id?: string | null
+          product_id?: string | null
+          seller_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          access_token?: string | null
+          amount?: number
+          buyer_email?: string | null
+          buyer_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          download_count?: number | null
+          download_expires_at?: string | null
+          download_link?: string | null
+          id?: string
+          max_downloads?: number | null
+          pi_payment_id?: string | null
+          pi_transaction_id?: string | null
+          product_id?: string | null
+          seller_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "digital_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_seller_id_fkey"
+            columns: ["seller_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
