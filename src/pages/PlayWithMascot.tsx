@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { Helmet } from 'react-helmet-async';
 import { 
   PuzzleIcon,
@@ -11,7 +13,9 @@ import {
   InfinityIcon,
   TrophyIcon,
   CrownIcon,
-  CoinsIcon
+  CoinsIcon,
+  Eye,
+  Coins
 } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 import { useToast } from '@/components/ui/use-toast';
@@ -20,7 +24,7 @@ import { usePiPayment } from '@/hooks/usePiPayment';
 import GameCard from '@/components/games/GameCard';
 import GameEngine from '@/components/games/GameEngine';
 import PiBrowserCheck from '@/components/PiBrowserCheck';
-import PiAdsNetwork from '@/components/PiAdsNetwork';
+import RewardedAdButton from '@/components/RewardedAdButton';
 import { isRunningInPiBrowser } from '@/utils/pi-sdk';
 
 const PlayWithMascot = () => {
@@ -34,12 +38,44 @@ const PlayWithMascot = () => {
   const [userPlan, setUserPlan] = useState('free');
   const [purchasedGames, setPurchasedGames] = useState<string[]>([]);
   const [showPiBrowserCheck, setShowPiBrowserCheck] = useState(true);
+  const [selectedCharacter, setSelectedCharacter] = useState<any>(null);
 
   // Check Pi Browser on component mount
   useEffect(() => {
     const isPiBrowser = isRunningInPiBrowser();
     if (isPiBrowser) {
       setShowPiBrowserCheck(false);
+    }
+  }, []);
+
+  // Load selected character from localStorage
+  useEffect(() => {
+    const savedCharacter = localStorage.getItem('selectedCharacter');
+    if (savedCharacter) {
+      try {
+        setSelectedCharacter(JSON.parse(savedCharacter));
+      } catch (error) {
+        console.error('Error parsing saved character:', error);
+        // Set default character
+        setSelectedCharacter({
+          id: 'droplet-blue-happy',
+          name: 'Droplink',
+          gender: 'male',
+          color: '#00aaff',
+          mood: 'happy',
+          personality: 'Cheerful and optimistic'
+        });
+      }
+    } else {
+      // Set default character
+      setSelectedCharacter({
+        id: 'droplet-blue-happy',
+        name: 'Droplink',
+        gender: 'male',
+        color: '#00aaff',
+        mood: 'happy',
+        personality: 'Cheerful and optimistic'
+      });
     }
   }, []);
 
@@ -106,27 +142,10 @@ const PlayWithMascot = () => {
 
   const gameCategories = organizeGamesByCategory();
 
-  // Pi Ads integration
-  const showAdForReward = () => {
-    if (!isRunningInPiBrowser()) {
-      toast({
-        title: "Pi Browser Required",
-        description: "Please use Pi Browser to view ads and earn rewards.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Simulate ad reward
-    toast({
-      title: "Ad Reward Earned!",
-      description: "You earned 0.1 Pi for watching an ad!",
-    });
-    setTotalScore(prev => prev + 10);
-  };
-
-  // Mascot rendering functions
+  // Mascot rendering functions based on selected character
   const renderMascotEyes = (type: string) => {
+    if (!selectedCharacter) return null;
+    
     switch (type) {
       case "happy":
         return (
@@ -190,6 +209,8 @@ const PlayWithMascot = () => {
   };
 
   const renderMascotMouth = (type: string) => {
+    if (!selectedCharacter) return null;
+    
     switch (type) {
       case "big-smile":
         return (
@@ -331,18 +352,28 @@ const PlayWithMascot = () => {
       title: "Great Job!",
       description: `You earned ${score} points!`,
     });
-
-    // Show ad after game completion for extra reward
-    if (isRunningInPiBrowser()) {
-      setTimeout(() => {
-        showAdForReward();
-      }, 1000);
-    }
   };
 
   const handleBackToGames = () => {
     setCurrentGame(null);
     setCurrentEmotion(0);
+  };
+
+  const handleAdReward = (reward: any) => {
+    setTotalScore(prev => prev + 10);
+    setCurrentEmotion(1); // excited
+    toast({
+      title: "Ad Reward Earned!",
+      description: `You earned ${reward.amount} ${reward.type} for watching an ad!`,
+    });
+  };
+
+  const handleAdError = (error: string) => {
+    toast({
+      title: "Ad Error",
+      description: error,
+      variant: "destructive",
+    });
   };
 
   if (showPiBrowserCheck && !isRunningInPiBrowser()) {
@@ -354,7 +385,7 @@ const PlayWithMascot = () => {
     );
   }
 
-  if (gamesLoading) {
+  if (gamesLoading || !selectedCharacter) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -388,8 +419,8 @@ const PlayWithMascot = () => {
   return (
     <>
       <Helmet>
-        <title>Play with Droplink - 50+ Interactive Games & Activities</title>
-        <meta name="description" content="Play 50+ interactive games with the Droplink mascot! Puzzle games, action games, trivia, creative activities, and premium challenges." />
+        <title>Play with {selectedCharacter.name} - 50+ Interactive Games & Activities</title>
+        <meta name="description" content="Play 50+ interactive games with your chosen character companion! Puzzle games, action games, trivia, creative activities, and premium challenges." />
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">
@@ -397,10 +428,10 @@ const PlayWithMascot = () => {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
-              Droplink Gaming Platform
+              Gaming with {selectedCharacter.name}
             </h1>
             <p className="text-lg text-gray-600 mb-6">
-              {games.length}+ interactive games and activities with Pi Network integration
+              {games.length}+ interactive games with your {selectedCharacter.gender} {selectedCharacter.mood} companion
             </p>
             
             {/* Score & Status Display */}
@@ -436,7 +467,7 @@ const PlayWithMascot = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {/* Mascot Display */}
+            {/* Character Display */}
             <div className="lg:col-span-1">
               <div className="sticky top-4">
                 <div className="flex flex-col items-center">
@@ -447,18 +478,18 @@ const PlayWithMascot = () => {
                       viewBox="0 0 200 240"
                       className="animate-bounce-gentle"
                     >
-                      {/* Droplet shape */}
+                      {/* Character shape */}
                       <path
                         d="M100 20 C60 60, 35 100, 35 140 C35 185, 65 220, 100 220 C135 220, 165 185, 165 140 C165 100, 140 60, 100 20 Z"
-                        fill="url(#playDropletGradient)"
+                        fill={`url(#playCharacterGradient)`}
                         className="animate-pulse-gentle"
                       />
                       
                       <defs>
-                        <linearGradient id="playDropletGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                          <stop offset="0%" stopColor="#00aaff" />
-                          <stop offset="50%" stopColor="#0099ee" />
-                          <stop offset="100%" stopColor="#0077cc" />
+                        <linearGradient id="playCharacterGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="0%" stopColor={selectedCharacter.color} />
+                          <stop offset="50%" stopColor={selectedCharacter.color} stopOpacity="0.8" />
+                          <stop offset="100%" stopColor={selectedCharacter.color} stopOpacity="0.6" />
                         </linearGradient>
                       </defs>
                       
@@ -472,9 +503,18 @@ const PlayWithMascot = () => {
                         className="animate-shimmer"
                       />
                       
-                      {/* Face */}
+                      {/* Face based on current emotion */}
                       {renderMascotEyes(emotions[currentEmotion].eyes)}
                       {renderMascotMouth(emotions[currentEmotion].mouth)}
+
+                      {/* Gender indicator for female characters */}
+                      {selectedCharacter.gender === 'female' && (
+                        <path
+                          d="M85 45 Q100 35 115 45 Q100 55 85 45"
+                          fill="#ff1493"
+                          opacity="0.8"
+                        />
+                      )}
                     </svg>
                     
                     {/* Thought bubble */}
@@ -485,8 +525,41 @@ const PlayWithMascot = () => {
                     </div>
                   </div>
 
-                  {/* Pi Ads Network */}
-                  <PiAdsNetwork placementId="gaming-sidebar" />
+                  {/* Character Info */}
+                  <div className="text-center mb-4">
+                    <h3 className="text-xl font-semibold">{selectedCharacter.name}</h3>
+                    <div className="flex items-center justify-center gap-2 mt-2">
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        selectedCharacter.gender === 'male' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'
+                      }`}>
+                        {selectedCharacter.gender === 'male' ? '♂' : '♀'} {selectedCharacter.gender}
+                      </span>
+                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
+                        {selectedCharacter.mood}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 mt-2">{selectedCharacter.personality}</p>
+                  </div>
+
+                  {/* Watch Ad and Pay for Pi Buttons */}
+                  <div className="flex flex-col gap-3 w-full max-w-xs">
+                    <RewardedAdButton
+                      reward={{ type: "pi", amount: 0.1, description: "Watch ad reward" }}
+                      onAdComplete={handleAdReward}
+                      onAdError={handleAdError}
+                      buttonText="Watch Ad for Reward"
+                      className="w-full"
+                    />
+                    
+                    <Button 
+                      onClick={handleUpgradeToPremium}
+                      disabled={paymentLoading || userPlan === 'premium'}
+                      className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
+                    >
+                      <Coins className="w-4 h-4 mr-2" />
+                      {userPlan === 'premium' ? 'Premium Active' : 'Pay 10 Pi for Premium'}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -531,11 +604,6 @@ const PlayWithMascot = () => {
                               />
                             );
                           })}
-                        </div>
-                        
-                        {/* Pi Ads between games */}
-                        <div className="mt-6">
-                          <PiAdsNetwork placementId={`${key}-games`} />
                         </div>
                       </CardContent>
                     </Card>

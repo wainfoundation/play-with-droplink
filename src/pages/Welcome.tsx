@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles, Heart, Globe, Play, SkipForward, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -14,33 +13,95 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
   const [buttonsVisible, setButtonsVisible] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [showCharacterSelect, setShowCharacterSelect] = useState(false);
-  const [selectedCharacter, setSelectedCharacter] = useState('droplet');
+  const [selectedCharacter, setSelectedCharacter] = useState('droplet-blue-happy');
   const [tutorialStep, setTutorialStep] = useState(0);
 
   const characters = [
+    // Male Characters - Blue Variations
     {
-      id: 'droplet',
+      id: 'droplet-blue-happy',
       name: 'Droplink',
+      gender: 'male',
       description: 'The original water droplet mascot',
-      color: '#00aaff'
+      color: '#00aaff',
+      mood: 'happy',
+      personality: 'Cheerful and optimistic'
     },
     {
-      id: 'fire',
-      name: 'Flame',
-      description: 'A fiery companion for action games',
-      color: '#ff4444'
+      id: 'droplet-blue-excited',
+      name: 'Droplink',
+      gender: 'male',
+      description: 'Energetic water droplet',
+      color: '#00aaff',
+      mood: 'excited',
+      personality: 'Full of energy and enthusiasm'
     },
     {
-      id: 'earth',
-      name: 'Rocky',
-      description: 'A sturdy earth-based character',
-      color: '#8B4513'
+      id: 'droplet-blue-calm',
+      name: 'Droplink',
+      gender: 'male',
+      description: 'Peaceful water droplet',
+      color: '#00aaff',
+      mood: 'calm',
+      personality: 'Zen and relaxed'
+    },
+    
+    // Female Characters - Pink/Purple Variations
+    {
+      id: 'droplet-pink-happy',
+      name: 'Dropla',
+      gender: 'female',
+      description: 'Sweet and caring companion',
+      color: '#ff69b4',
+      mood: 'happy',
+      personality: 'Kind and nurturing'
     },
     {
-      id: 'air',
-      name: 'Breeze',
-      description: 'A light and airy character',
-      color: '#87CEEB'
+      id: 'droplet-pink-excited',
+      name: 'Dropla',
+      gender: 'female',
+      description: 'Bubbly and enthusiastic',
+      color: '#ff69b4',
+      mood: 'excited',
+      personality: 'Playful and spirited'
+    },
+    {
+      id: 'droplet-purple-calm',
+      name: 'Dropia',
+      gender: 'female',
+      description: 'Wise and thoughtful',
+      color: '#9b59b6',
+      mood: 'calm',
+      personality: 'Intelligent and serene'
+    },
+    
+    // Additional Color Variations
+    {
+      id: 'droplet-green-happy',
+      name: 'Dropie',
+      gender: 'male',
+      description: 'Nature-loving companion',
+      color: '#27ae60',
+      mood: 'happy',
+      personality: 'Eco-friendly and fresh'
+    },
+    {
+      id: 'droplet-orange-excited',
+      name: 'Dropo',
+      gender: 'male',
+      description: 'Fiery and passionate',
+      color: '#ff6b35',
+      mood: 'excited',
+      personality: 'Bold and adventurous'
+    },
+    {
+      id: 'droplet-cyan-calm',
+      name: 'Dropella',
+      gender: 'female',
+      description: 'Cool and collected',
+      color: '#1abc9c',
+      mood: 'calm',
+      personality: 'Steady and reliable'
     }
   ];
 
@@ -62,7 +123,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
     },
     {
       title: "Ready to Play!",
-      description: "Your gaming adventure with Droplink begins now!",
+      description: "Your gaming adventure begins now!",
       icon: "🚀"
     }
   ];
@@ -100,7 +161,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
   };
 
   const handleConfirmCharacter = () => {
-    localStorage.setItem('selectedCharacter', selectedCharacter);
+    localStorage.setItem('selectedCharacter', JSON.stringify(characters.find(c => c.id === selectedCharacter)));
     handleGoToGaming();
   };
 
@@ -120,6 +181,75 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
 
   const renderCharacter = (character: any, size: number = 120) => {
     const gradientId = `${character.id}Gradient`;
+    
+    // Eye styles based on mood
+    const getEyes = (mood: string) => {
+      switch (mood) {
+        case 'excited':
+          return (
+            <>
+              <circle cx="80" cy="105" r="8" fill="#fff" />
+              <circle cx="120" cy="105" r="8" fill="#fff" />
+              <circle cx="80" cy="105" r="5" fill="#333" />
+              <circle cx="120" cy="105" r="5" fill="#333" />
+              <circle cx="82" cy="103" r="2" fill="#fff" />
+              <circle cx="122" cy="103" r="2" fill="#fff" />
+            </>
+          );
+        case 'calm':
+          return (
+            <>
+              <path d="M70 100 Q80 95 90 100" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
+              <path d="M110 100 Q120 95 130 100" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
+            </>
+          );
+        default: // happy
+          return (
+            <>
+              <circle cx="80" cy="105" r="8" fill="#fff" />
+              <circle cx="120" cy="105" r="8" fill="#fff" />
+              <circle cx="83" cy="108" r="4" fill="#333" className="animate-gentle-blink" />
+              <circle cx="123" cy="108" r="4" fill="#333" className="animate-gentle-blink" />
+            </>
+          );
+      }
+    };
+
+    // Mouth styles based on mood
+    const getMouth = (mood: string) => {
+      switch (mood) {
+        case 'excited':
+          return (
+            <path
+              d="M75 140 Q100 165 125 140"
+              stroke="#fff"
+              strokeWidth="4"
+              fill="none"
+              strokeLinecap="round"
+            />
+          );
+        case 'calm':
+          return (
+            <path
+              d="M85 145 Q100 150 115 145"
+              stroke="#fff"
+              strokeWidth="3"
+              fill="none"
+              strokeLinecap="round"
+            />
+          );
+        default: // happy
+          return (
+            <path
+              d="M80 140 Q100 155 120 140"
+              stroke="#fff"
+              strokeWidth="4"
+              fill="none"
+              strokeLinecap="round"
+            />
+          );
+      }
+    };
     
     return (
       <svg width={size} height={size * 1.2} viewBox="0 0 200 240" className="animate-bounce-gentle">
@@ -148,20 +278,20 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
           className="animate-shimmer"
         />
         
-        {/* Eyes */}
-        <circle cx="80" cy="105" r="8" fill="#fff" />
-        <circle cx="120" cy="105" r="8" fill="#fff" />
-        <circle cx="83" cy="108" r="4" fill="#333" className="animate-gentle-blink" />
-        <circle cx="123" cy="108" r="4" fill="#333" className="animate-gentle-blink" />
+        {/* Eyes based on mood */}
+        {getEyes(character.mood)}
         
-        {/* Smile */}
-        <path
-          d="M80 140 Q100 155 120 140"
-          stroke="#fff"
-          strokeWidth="4"
-          fill="none"
-          strokeLinecap="round"
-        />
+        {/* Mouth based on mood */}
+        {getMouth(character.mood)}
+
+        {/* Gender indicator (optional bow for female characters) */}
+        {character.gender === 'female' && (
+          <path
+            d="M85 45 Q100 35 115 45 Q100 55 85 45"
+            fill="#ff1493"
+            opacity="0.8"
+          />
+        )}
       </svg>
     );
   };
@@ -180,7 +310,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
           <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-secondary/20 to-primary/20 rounded-full blur-3xl animate-pulse" />
           
           <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 text-center">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-6xl mx-auto">
               <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
                 Choose Your Gaming Character
               </h1>
@@ -189,7 +319,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
               </p>
               
               {/* Character Selection Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 mb-8">
                 {characters.map((character) => (
                   <div
                     key={character.id}
@@ -201,9 +331,21 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
                     }`}
                   >
                     <div className="flex flex-col items-center">
-                      {renderCharacter(character, 100)}
-                      <h3 className="font-semibold text-lg mt-2">{character.name}</h3>
-                      <p className="text-sm text-gray-600 mt-1">{character.description}</p>
+                      {renderCharacter(character, 80)}
+                      <div className="mt-3 text-center">
+                        <h3 className="font-semibold text-lg">{character.name}</h3>
+                        <div className="flex items-center justify-center gap-2 mt-1">
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            character.gender === 'male' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'
+                          }`}>
+                            {character.gender === 'male' ? '♂' : '♀'} {character.gender}
+                          </span>
+                          <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
+                            {character.mood}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-2">{character.personality}</p>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -212,15 +354,27 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
               {/* Selected Character Preview */}
               <div className="bg-white rounded-xl p-6 mb-8 border-2 border-primary/20">
                 <h3 className="text-xl font-semibold mb-4">Your Gaming Companion:</h3>
-                <div className="flex items-center justify-center gap-4">
-                  {renderCharacter(characters.find(c => c.id === selectedCharacter)!, 80)}
+                <div className="flex items-center justify-center gap-6">
+                  {renderCharacter(characters.find(c => c.id === selectedCharacter)!, 100)}
                   <div className="text-left">
                     <h4 className="text-lg font-semibold">
                       {characters.find(c => c.id === selectedCharacter)?.name}
                     </h4>
-                    <p className="text-gray-600">
-                      {characters.find(c => c.id === selectedCharacter)?.description}
+                    <p className="text-gray-600 mb-2">
+                      {characters.find(c => c.id === selectedCharacter)?.personality}
                     </p>
+                    <div className="flex gap-2">
+                      <span className={`px-3 py-1 rounded-full text-sm ${
+                        characters.find(c => c.id === selectedCharacter)?.gender === 'male' 
+                          ? 'bg-blue-100 text-blue-700' 
+                          : 'bg-pink-100 text-pink-700'
+                      }`}>
+                        {characters.find(c => c.id === selectedCharacter)?.gender}
+                      </span>
+                      <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                        {characters.find(c => c.id === selectedCharacter)?.mood}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
