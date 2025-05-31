@@ -231,8 +231,8 @@ const PlayWithMascot = () => {
   return (
     <>
       <Helmet>
-        <title>Play with {selectedCharacter.name} - 50+ Interactive Games & Activities</title>
-        <meta name="description" content="Play 50+ interactive games with your chosen character companion! Puzzle games, action games, trivia, creative activities, and premium challenges." />
+        <title>Play with Droplink - 50+ Interactive Games & Activities</title>
+        <meta name="description" content="Play 50+ interactive games with Droplink! Puzzle games, action games, trivia, creative activities, and premium challenges." />
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">
@@ -240,10 +240,10 @@ const PlayWithMascot = () => {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
-              Gaming with {selectedCharacter.name}
+              Play with Droplink
             </h1>
             <p className="text-lg text-gray-600 mb-6">
-              {games.length}+ interactive games with your {selectedCharacter.gender} {selectedCharacter.mood} companion
+              {games.length}+ interactive games with your gaming companion
             </p>
             
             {/* Premium CTA for Free Users */}
