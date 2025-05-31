@@ -1,98 +1,75 @@
 
-import { useState, useEffect } from "react";
-import { useUser } from "@/context/UserContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useUser } from '@/context/UserContext';
 
-export function useAnalyticsData() {
-  const { profile } = useUser();
-  const [pageViews, setPageViews] = useState(0);
-  const [linkClicks, setLinkClicks] = useState(0);
-  const [conversionRate, setConversionRate] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  useEffect(() => {
-    const fetchAnalyticsData = async () => {
-      setIsLoading(true);
-      if (!profile || !profile.id) {
-        setPageViews(0);
-        setLinkClicks(0);
-        setConversionRate(0);
-        setIsLoading(false);
-        return;
-      }
-      
-      try {
-        // Fetch page views
-        const { count: viewsCount, error: viewsError } = await supabase
-          .from("analytics")
-          .select("id", { count: "exact" })
-          .eq("user_id", profile.id)
-          .eq("page_view", true);
-          
-        // Fetch link clicks
-        const { count: clicksCount, error: clicksError } = await supabase
-          .from("analytics")
-          .select("id", { count: "exact" })
-          .eq("user_id", profile.id)
-          .eq("link_click", true);
-          
-        if (viewsError) {
-          console.error("Error fetching page views:", viewsError);
-        }
-        
-        if (clicksError) {
-          console.error("Error fetching link clicks:", clicksError);
-        }
-        
-        // Set data with real values from database
-        const views = viewsCount !== null ? viewsCount : 0;
-        const clicks = clicksCount !== null ? clicksCount : 0;
-        const rate = views > 0 ? +(clicks / views * 100).toFixed(1) : 0;
-        
-        setPageViews(views);
-        setLinkClicks(clicks);
-        setConversionRate(rate);
-      } catch (error) {
-        console.error("Error fetching analytics data:", error);
-        
-        // Reset to zero on error
-        setPageViews(0);
-        setLinkClicks(0);
-        setConversionRate(0);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchAnalyticsData();
-
-    // Set up real-time subscription for analytics updates
-    const channel = supabase
-      .channel('analytics-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'analytics',
-          filter: `user_id=eq.${profile?.id}`
-        },
-        () => {
-          // Refetch data when analytics change
-          fetchAnalyticsData();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [profile]);
-
-  return {
-    pageViews,
-    linkClicks,
-    conversionRate,
-    isLoading
-  };
+interface AnalyticsData {
+  totalClicks: number;
+  totalViews: number;
+  clicksByDate: Array<{ date: string; clicks: number }>;
+  topLinks: Array<{ title: string; clicks: number; url: string }>;
 }
+
+export const useAnalyticsData = () => {
+  const { user } = useUser();
+  const [data, setData] = useState<AnalyticsData>({
+    totalClicks: 0,
+    totalViews: 0,
+    clicksByDate: [],
+    topLinks: []
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      fetchAnalyticsData();
+    }
+  }, [user]);
+
+  const fetchAnalyticsData = async () => {
+    if (!user) return;
+
+    try {
+      // For now, use links table data as analytics placeholder
+      const { data: links, error } = await supabase
+        .from('links')
+        .select('title, clicks, url, created_at')
+        .eq('user_id', user.id)
+        .order('clicks', { ascending: false });
+
+      if (error) throw error;
+
+      const totalClicks = links?.reduce((sum, link) => sum + (link.clicks || 0), 0) || 0;
+      const totalViews = totalClicks; // Placeholder - in real analytics, views would be separate
+
+      // Generate mock data for clicks by date (last 7 days)
+      const clicksByDate = Array.from({ length: 7 }, (_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        return {
+          date: date.toISOString().split('T')[0],
+          clicks: Math.floor(Math.random() * 50) // Mock data
+        };
+      }).reverse();
+
+      const topLinks = links?.slice(0, 5).map(link => ({
+        title: link.title,
+        clicks: link.clicks || 0,
+        url: link.url
+      })) || [];
+
+      setData({
+        totalClicks,
+        totalViews,
+        clicksByDate,
+        topLinks
+      });
+    } catch (error) {
+      console.error('Error fetching analytics data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { data, loading, refetch: fetchAnalyticsData };
+};

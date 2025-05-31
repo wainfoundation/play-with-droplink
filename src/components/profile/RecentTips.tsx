@@ -23,15 +23,6 @@ interface Tip {
   from_user: TipUser | null;
 }
 
-// We need a more flexible raw data interface that can handle errors
-interface RawTipData {
-  id: string;
-  amount: number;
-  created_at: string;
-  user_id: string;
-  from_user?: TipUser | { error: boolean } | null;
-}
-
 const RecentTips = ({ userId }: { userId: string }) => {
   const [tips, setTips] = useState<Tip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,17 +32,18 @@ const RecentTips = ({ userId }: { userId: string }) => {
       try {
         setLoading(true);
         
-        // Query payments where the current user is the recipient
+        // Query tips where the current user is the recipient
         const { data, error } = await supabase
-          .from("payments")
+          .from("tips")
           .select(`
             id, 
             amount, 
             created_at, 
-            user_id, 
-            from_user:user_profiles!user_id(id, username, avatar_url)
+            from_user_id,
+            to_user_id,
+            from_user:user_profiles!from_user_id(id, username, avatar_url)
           `)
-          .eq("user_id", userId)
+          .eq("to_user_id", userId)
           .order("created_at", { ascending: false })
           .limit(5);
           
@@ -66,44 +58,7 @@ const RecentTips = ({ userId }: { userId: string }) => {
           return;
         }
         
-        if (!data || !Array.isArray(data)) {
-          setTips([]);
-          return;
-        }
-        
-        // Convert data to the expected format
-        const formattedTips: Tip[] = [];
-        
-        for (const item of data) {
-          // First cast to unknown then to our expected type to avoid type errors
-          const rawItem = item as unknown as RawTipData;
-          let tipUser: TipUser | null = null;
-          
-          // Check if from_user exists, is an object, and has the required properties
-          if (rawItem.from_user && 
-              typeof rawItem.from_user === 'object' && 
-              !('error' in rawItem.from_user) &&
-              'id' in rawItem.from_user && 
-              'username' in rawItem.from_user) {
-            
-            tipUser = {
-              id: rawItem.from_user.id,
-              username: rawItem.from_user.username,
-              avatar_url: rawItem.from_user.avatar_url
-            };
-          }
-          
-          formattedTips.push({
-            id: rawItem.id,
-            amount: rawItem.amount,
-            created_at: rawItem.created_at,
-            from_user_id: rawItem.user_id,
-            to_user_id: userId, // Since we're querying where user_id = userId
-            from_user: tipUser
-          });
-        }
-        
-        setTips(formattedTips);
+        setTips(data || []);
       } catch (err) {
         console.error("Error in fetchTips:", err);
         toast({

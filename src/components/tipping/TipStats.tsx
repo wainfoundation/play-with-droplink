@@ -1,143 +1,118 @@
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, TrendingUp, TrendingDown, Pi, Users } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useUser } from "@/context/UserContext";
 
-interface TipStatsProps {
-  userId: string;
-}
-
-interface Stats {
-  totalReceived: number;
+interface TipStats {
   totalSent: number;
-  recentTips: number;
-  uniqueTippers: number;
+  totalReceived: number;
+  tipCount: number;
+  avgTipAmount: number;
 }
 
-const TipStats = ({ userId }: TipStatsProps) => {
-  const [stats, setStats] = useState<Stats | null>(null);
+const TipStats = () => {
+  const { user } = useUser();
+  const [stats, setStats] = useState<TipStats>({
+    totalSent: 0,
+    totalReceived: 0,
+    tipCount: 0,
+    avgTipAmount: 0
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        setLoading(true);
-        
-        // Get total received
-        const { data: receivedData } = await supabase
-          .rpc('get_user_tips_received', { user_id_param: userId });
-        
-        // Get total sent
-        const { data: sentData } = await supabase
-          .rpc('get_user_tips_sent', { user_id_param: userId });
-        
-        // Get recent tips (last 7 days)
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        
-        const { data: recentTips } = await supabase
-          .from('tips')
-          .select('amount')
-          .eq('to_user_id', userId)
-          .eq('status', 'completed')
-          .gte('completed_at', sevenDaysAgo.toISOString());
-        
-        // Get unique tippers
-        const { data: uniqueTippers } = await supabase
-          .from('tips')
-          .select('from_user_id')
-          .eq('to_user_id', userId)
-          .eq('status', 'completed');
-        
-        const uniqueTipperIds = new Set(uniqueTippers?.map(t => t.from_user_id) || []);
-        const recentTipsTotal = recentTips?.reduce((sum, tip) => sum + Number(tip.amount), 0) || 0;
-        
-        setStats({
-          totalReceived: Number(receivedData) || 0,
-          totalSent: Number(sentData) || 0,
-          recentTips: recentTipsTotal,
-          uniqueTippers: uniqueTipperIds.size
-        });
-      } catch (error) {
-        console.error("Error fetching tip stats:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    if (userId) {
-      fetchStats();
+    if (user) {
+      fetchTipStats();
     }
-  }, [userId]);
+  }, [user]);
+
+  const fetchTipStats = async () => {
+    if (!user) return;
+
+    try {
+      // Get sent tips
+      const { data: sentTips } = await supabase
+        .from('tips')
+        .select('amount')
+        .eq('from_user_id', user.id);
+
+      // Get received tips
+      const { data: receivedTips } = await supabase
+        .from('tips')
+        .select('amount')
+        .eq('to_user_id', user.id);
+
+      const totalSent = sentTips?.reduce((sum, tip) => sum + tip.amount, 0) || 0;
+      const totalReceived = receivedTips?.reduce((sum, tip) => sum + tip.amount, 0) || 0;
+      const tipCount = (sentTips?.length || 0) + (receivedTips?.length || 0);
+      const avgTipAmount = tipCount > 0 ? (totalSent + totalReceived) / tipCount : 0;
+
+      setStats({
+        totalSent,
+        totalReceived,
+        tipCount,
+        avgTipAmount: Math.round(avgTipAmount * 100) / 100
+      });
+    } catch (error) {
+      console.error('Error fetching tip stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Tip Statistics</CardTitle>
-        </CardHeader>
-        <CardContent className="flex justify-center py-8">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <Card key={i}>
+            <CardHeader className="pb-2">
+              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+            </CardHeader>
+            <CardContent>
+              <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     );
   }
-  
-  if (!stats) {
-    return null;
-  }
-  
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Received</CardTitle>
-          <TrendingUp className="h-4 w-4 text-green-600" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold text-green-600 flex items-center gap-1">
-            <Pi className="h-5 w-5" />
-            {stats.totalReceived.toFixed(2)}
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium">Total Sent</CardTitle>
-          <TrendingDown className="h-4 w-4 text-blue-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-blue-600 flex items-center gap-1">
-            <Pi className="h-5 w-5" />
-            {stats.totalSent.toFixed(2)}
-          </div>
+          <div className="text-2xl font-bold">π{stats.totalSent}</div>
         </CardContent>
       </Card>
-      
+
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Recent Tips (7d)</CardTitle>
-          <Pi className="h-4 w-4 text-yellow-600" />
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Total Received</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-yellow-600 flex items-center gap-1">
-            <Pi className="h-5 w-5" />
-            {stats.recentTips.toFixed(2)}
-          </div>
+          <div className="text-2xl font-bold">π{stats.totalReceived}</div>
         </CardContent>
       </Card>
-      
+
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Unique Tippers</CardTitle>
-          <Users className="h-4 w-4 text-purple-600" />
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Total Tips</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-purple-600">
-            {stats.uniqueTippers}
-          </div>
+          <div className="text-2xl font-bold">{stats.tipCount}</div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Avg Tip Amount</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">π{stats.avgTipAmount}</div>
         </CardContent>
       </Card>
     </div>

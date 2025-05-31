@@ -25,9 +25,12 @@ interface UserContextType {
   loading: boolean;
   isAdmin: boolean; // Added isAdmin
   showAds: boolean; // Added showAds
+  subscription: any; // Added subscription
+  isLoading: boolean; // Added isLoading alias
   refreshUser: () => Promise<void>;
   refreshUserData: () => Promise<void>; // Added refreshUserData alias
   setIsAdmin: (isAdmin: boolean) => void; // Added setIsAdmin
+  signOut: () => Promise<void>; // Added signOut
 }
 
 const UserContext = createContext<UserContextType>({
@@ -37,9 +40,12 @@ const UserContext = createContext<UserContextType>({
   loading: true,
   isAdmin: false,
   showAds: true,
+  subscription: null,
+  isLoading: true,
   refreshUser: async () => {},
   refreshUserData: async () => {},
   setIsAdmin: () => {},
+  signOut: async () => {},
 });
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -68,6 +74,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setLoading(false);
     }
+  };
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setIsAdmin(false);
   };
 
   // Calculate showAds based on user plan
@@ -99,9 +111,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         isAdmin,
         showAds,
+        subscription: null, // placeholder for subscription
+        isLoading: loading, // isLoading is an alias for loading
         refreshUser,
         refreshUserData: refreshUser, // refreshUserData is an alias for refreshUser
-        setIsAdmin
+        setIsAdmin,
+        signOut
       }}
     >
       {children}

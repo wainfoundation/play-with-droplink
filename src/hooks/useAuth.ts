@@ -60,5 +60,27 @@ export const useAuth = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  return { user, loading };
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+  };
+
+  const refreshSession = async () => {
+    const { data: { session } } = await supabase.auth.refreshSession();
+    if (session?.user) {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+      
+      setUser(profile ? {
+        id: profile.id,
+        email: session.user.email,
+        username: profile.username
+      } : null);
+    }
+  };
+
+  return { user, loading, signOut, refreshSession };
 };
