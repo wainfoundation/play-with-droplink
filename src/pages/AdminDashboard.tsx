@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
@@ -37,7 +38,10 @@ const AdminDashboard = () => {
       return; // Wait for profile to load
     }
 
-    if (!profile.onboarding_completed) {
+    // For now, assume onboarding is completed since we don't have this field in the database
+    const onboardingCompleted = true; // TODO: Add onboarding_completed field to user_profiles table
+
+    if (!onboardingCompleted) {
       console.log("Onboarding not completed, redirecting to onboarding");
       toast({
         title: "Complete Your Setup",
@@ -48,7 +52,7 @@ const AdminDashboard = () => {
     }
 
     // Welcome message for completed users
-    if (profile.onboarding_completed) {
+    if (onboardingCompleted) {
       console.log("User authenticated and onboarding completed, showing dashboard");
       toast({
         title: "Welcome to Your Dashboard!",

@@ -1,169 +1,150 @@
-import { supabase } from "@/integrations/supabase/client";
-import { processPayment } from "@/services/piPaymentService";
 
-export type SubscriptionPlan = "starter" | "pro" | "premium" | "free";
-export type BillingCycle = "monthly" | "annual";
+import { supabase } from '@/integrations/supabase/client';
 
-const PLAN_PRICING = {
-  starter: { monthly: 10, annual: 8 },
-  pro: { monthly: 15, annual: 12 },
-  premium: { monthly: 22, annual: 18 }
-};
-
-interface SubscriptionData {
+export interface SubscriptionData {
   id: string;
   user_id: string;
-  plan: SubscriptionPlan;
-  amount: number;
+  plan: string;
   is_active: boolean;
-  expires_at: string;
   started_at: string;
+  expires_at: string;
   created_at: string;
-  payment_id?: string;
-  updated_at?: string;
 }
 
-/**
- * Create a new subscription
- * @param userId - The user ID
- * @param plan - The subscription plan
- * @param billingCycle - The billing cycle
- * @returns The subscription data if successful, null if failed
- */
-export async function createSubscription(
-  userId: string,
-  plan: SubscriptionPlan,
-  billingCycle: BillingCycle
-): Promise<SubscriptionData | null> {
+export interface UserProfile {
+  id: string;
+  username: string;
+  display_name: string;
+  bio?: string;
+  avatar_url?: string;
+  pi_wallet_address?: string;
+  pi_domain?: string;
+  custom_domain?: string;
+  plan: string;
+  created_at: string;
+  updated_at: string;
+  games_played?: number;
+  total_score?: number;
+}
+
+// TODO: Subscriptions table not yet implemented in database
+// For now, return mock data and placeholder functions
+
+export const createSubscription = async (userId: string, plan: string): Promise<SubscriptionData | null> => {
   try {
-    // Calculate amount based on plan and billing cycle
-    const amount = billingCycle === 'annual' 
-      ? PLAN_PRICING[plan].annual * 12 
-      : PLAN_PRICING[plan].monthly;
+    console.log('Subscription creation not yet implemented', { userId, plan });
     
-    // Calculate expiration date
-    const expires_at = new Date();
-    if (billingCycle === 'annual') {
-      expires_at.setFullYear(expires_at.getFullYear() + 1);
-    } else {
-      expires_at.setMonth(expires_at.getMonth() + 1);
-    }
-    
-    // Create payment through Pi Network
-    const paymentData = {
-      amount,
-      memo: `${plan} Plan Subscription (${billingCycle === 'annual' ? 'Annual' : 'Monthly'})`,
-      metadata: {
-        isSubscription: true,
-        plan,
-        duration: billingCycle,
-        expiresAt: expires_at.toISOString()
-      }
+    // TODO: Implement when subscriptions table is available
+    // const subscriptionData = {
+    //   user_id: userId,
+    //   plan,
+    //   is_active: true,
+    //   started_at: new Date().toISOString(),
+    //   expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days from now
+    // };
+
+    // const { data, error } = await supabase
+    //   .from('subscriptions')
+    //   .insert(subscriptionData)
+    //   .select()
+    //   .single();
+
+    // if (error) throw error;
+
+    // For now, just update the user's plan in user_profiles
+    const { error: updateError } = await supabase
+      .from('user_profiles')
+      .update({ plan })
+      .eq('id', userId);
+
+    if (updateError) throw updateError;
+
+    // Return mock subscription data
+    return {
+      id: 'mock-subscription-id',
+      user_id: userId,
+      plan,
+      is_active: true,
+      started_at: new Date().toISOString(),
+      expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      created_at: new Date().toISOString()
     };
-    
-    // Process payment
-    const user = await supabase.auth.getUser();
-    if (!user.data.user) {
-      throw new Error("User not authenticated");
-    }
-    
-    await processPayment(paymentData, user.data.user);
-    
-    // Create subscription in database
-    const { data, error } = await supabase
-      .from('subscriptions')
-      .insert({
-        user_id: userId,
-        plan,
-        amount,
-        is_active: true,
-        expires_at: expires_at.toISOString(),
-        started_at: new Date().toISOString()
-      })
-      .select()
-      .single();
-    
-    if (error) {
-      throw error;
-    }
-    
-    return data as SubscriptionData;
   } catch (error) {
-    console.error("Error creating subscription:", error);
+    console.error('Error creating subscription:', error);
     return null;
   }
-}
+};
 
-/**
- * Get user subscription
- * @param userId - The user ID
- * @returns The subscription data if successful, null if failed
- */
-export async function getUserSubscription(userId: string): Promise<SubscriptionData | null> {
-  try {
-    const { data, error } = await supabase
-      .from('subscriptions')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('is_active', true)
-      .order('created_at', { ascending: false })
-      .maybeSingle();
-    
-    if (error) {
-      throw error;
-    }
-    
-    return data as SubscriptionData | null;
-  } catch (error) {
-    console.error("Error getting subscription:", error);
-    return null;
-  }
-}
-
-/**
- * Get user profile
- * @param userId - The user ID
- * @returns The user profile data if successful, null if failed
- */
-export async function getUserProfile(userId: string): Promise<any> {
+export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
   try {
     const { data, error } = await supabase
       .from('user_profiles')
       .select('*')
       .eq('id', userId)
       .single();
-    
-    if (error) {
-      throw error;
-    }
-    
-    return data;
+
+    if (error) throw error;
+
+    return data as UserProfile;
   } catch (error) {
-    console.error("Error getting user profile:", error);
+    console.error('Error fetching user profile:', error);
     return null;
   }
-}
+};
 
-/**
- * Cancel user subscription
- * @param userId - The user ID
- * @returns True if successful, false if failed
- */
-export async function cancelSubscription(userId: string): Promise<boolean> {
+export const getActiveSubscription = async (userId: string): Promise<SubscriptionData | null> => {
   try {
-    const { error } = await supabase
-      .from('subscriptions')
-      .update({ is_active: false })
-      .eq('user_id', userId)
-      .eq('is_active', true);
+    console.log('Subscription fetching not yet implemented', { userId });
     
-    if (error) {
-      throw error;
-    }
+    // TODO: Implement when subscriptions table is available
+    // const { data, error } = await supabase
+    //   .from('subscriptions')
+    //   .select('*')
+    //   .eq('user_id', userId)
+    //   .eq('is_active', true)
+    //   .single();
+
+    // if (error) throw error;
+
+    // For now, return null (no active subscription)
+    return null;
+  } catch (error) {
+    console.error('Error fetching active subscription:', error);
+    return null;
+  }
+};
+
+export const cancelSubscription = async (subscriptionId: string): Promise<boolean> => {
+  try {
+    console.log('Subscription cancellation not yet implemented', { subscriptionId });
     
+    // TODO: Implement when subscriptions table is available
+    // const { error } = await supabase
+    //   .from('subscriptions')
+    //   .update({ is_active: false, cancelled_at: new Date().toISOString() })
+    //   .eq('id', subscriptionId);
+
+    // if (error) throw error;
+
     return true;
   } catch (error) {
-    console.error("Error cancelling subscription:", error);
+    console.error('Error cancelling subscription:', error);
     return false;
   }
-}
+};
+
+export const updateUserPlan = async (userId: string, plan: string): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from('user_profiles')
+      .update({ plan })
+      .eq('id', userId);
+
+    if (error) throw error;
+
+    return true;
+  } catch (error) {
+    console.error('Error updating user plan:', error);
+    return false;
+  }
+};

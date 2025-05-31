@@ -1,252 +1,181 @@
 
-import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet-async';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useAuth } from '@/hooks/useAuth';
-import { useUser } from '@/context/UserContext';
-import { ArrowRight, BarChart3, CreditCard, DollarSign, Users, Wallet } from 'lucide-react';
-import GoToTop from '@/components/GoToTop';
+import React from "react";
+import { useUser } from "@/context/UserContext";
+import { useAdminStatus } from "@/hooks/useAdminStatus";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Crown, Shield, Users, TrendingUp } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 
 const PiDashboard = () => {
-  const { user, isLoading } = useAuth();
-  const { isLoggedIn } = useUser();
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
+  const { user, loading } = useUser(); // Use 'loading' instead of 'isLoading'
+  const { isAdmin, adminData, isLoading: adminLoading, error } = useAdminStatus();
 
-  useEffect(() => {
-    if (!isLoading && !isLoggedIn) {
-      navigate('/login');
-    }
-  }, [isLoading, isLoggedIn, navigate]);
+  if (loading || adminLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading Pi Dashboard...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
-  if (isLoading) {
-    return <div>Loading...</div>;
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
+            <p className="text-gray-600">Please log in to access the Pi Dashboard.</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <Helmet>
         <title>Pi Dashboard - Droplink</title>
-        <meta name="description" content="Manage your Pi earnings and transactions on Droplink" />
+        <meta name="description" content="Manage your Pi Network integration and admin features" />
       </Helmet>
-
-      <div className="flex min-h-screen flex-col">
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Pi Dashboard</h2>
-            <div className="flex items-center space-x-2">
-              <Button>
-                <Wallet className="mr-2 h-4 w-4" />
-                Connect Pi Wallet
-              </Button>
-            </div>
+      
+      <Navbar />
+      <main className="flex-grow py-12 px-4">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Pi Dashboard
+            </h1>
+            <p className="text-lg text-gray-600">
+              Manage your Pi Network integration and access admin features
+            </p>
           </div>
-          
-          <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="earnings">Earnings</TabsTrigger>
-              <TabsTrigger value="transactions">Transactions</TabsTrigger>
-              <TabsTrigger value="settings">Settings</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="overview" className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Total Balance
-                    </CardTitle>
-                    <DollarSign className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">π 128.42</div>
-                    <p className="text-xs text-muted-foreground">
-                      +20.1% from last month
-                    </p>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Tips Received
-                    </CardTitle>
-                    <CreditCard className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">π 24.50</div>
-                    <p className="text-xs text-muted-foreground">
-                      +12 tips this month
-                    </p>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Product Sales
-                    </CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">π 89.90</div>
-                    <p className="text-xs text-muted-foreground">
-                      +7 sales this month
-                    </p>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Subscription Revenue
-                    </CardTitle>
-                    <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">π 14.02</div>
-                    <p className="text-xs text-muted-foreground">
-                      +2.1% from last month
-                    </p>
-                  </CardContent>
-                </Card>
+
+          {/* Admin Status */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Admin Status</CardTitle>
+                <Shield className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center space-x-2">
+                  {isAdmin ? (
+                    <Badge variant="default" className="bg-green-500">
+                      <Crown className="h-3 w-3 mr-1" />
+                      Admin
+                    </Badge>
+                  ) : (
+                    <Badge variant="secondary">Regular User</Badge>
+                  )}
+                </div>
+                {error && (
+                  <p className="text-sm text-red-500 mt-2">{error}</p>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Pi User ID</CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold truncate">{user.id}</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Platform</CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">Pi Network</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Admin Features */}
+          {isAdmin && (
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Crown className="h-5 w-5" />
+                  Admin Features
+                </CardTitle>
+                <CardDescription>
+                  Access to administrative functions and controls
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Button variant="outline" className="h-auto p-4 flex flex-col items-start">
+                    <div className="font-semibold">User Management</div>
+                    <div className="text-sm text-gray-600">Manage user accounts and permissions</div>
+                  </Button>
+                  <Button variant="outline" className="h-auto p-4 flex flex-col items-start">
+                    <div className="font-semibold">Platform Analytics</div>
+                    <div className="text-sm text-gray-600">View platform usage and statistics</div>
+                  </Button>
+                  <Button variant="outline" className="h-auto p-4 flex flex-col items-start">
+                    <div className="font-semibold">Content Moderation</div>
+                    <div className="text-sm text-gray-600">Review and moderate user content</div>
+                  </Button>
+                  <Button variant="outline" className="h-auto p-4 flex flex-col items-start">
+                    <div className="font-semibold">System Settings</div>
+                    <div className="text-sm text-gray-600">Configure platform settings</div>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Pi Integration Status */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Pi Network Integration</CardTitle>
+              <CardDescription>
+                Your Pi Network connection and integration status
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span>Pi Authentication</span>
+                  <Badge variant="default" className="bg-green-500">Connected</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Pi Payments</span>
+                  <Badge variant="default" className="bg-green-500">Enabled</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Pi Ads Network</span>
+                  <Badge variant="default" className="bg-green-500">Active</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Pi Domain</span>
+                  <Badge variant="secondary">Available</Badge>
+                </div>
               </div>
-              
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4">
-                  <CardHeader>
-                    <CardTitle>Recent Transactions</CardTitle>
-                    <CardDescription>
-                      Your recent Pi transactions on Droplink
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ScrollArea className="h-[300px]">
-                      <div className="space-y-4">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <div key={i} className="flex items-center justify-between border-b pb-2">
-                            <div>
-                              <p className="font-medium">Tip from @user{i}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {new Date().toLocaleDateString()}
-                              </p>
-                            </div>
-                            <div className="font-medium text-green-600">+π {(Math.random() * 10).toFixed(2)}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full">
-                      View All Transactions
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </CardFooter>
-                </Card>
-                
-                <Card className="col-span-3">
-                  <CardHeader>
-                    <CardTitle>Pi Wallet</CardTitle>
-                    <CardDescription>
-                      Manage your Pi wallet settings
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="wallet-address">Wallet Address</Label>
-                      <Input id="wallet-address" value="Pi1xj8dkf93jd9f3jd9f3jd9f3" readOnly />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="wallet-status">Status</Label>
-                      <div className="flex items-center space-x-2">
-                        <div className="h-3 w-3 rounded-full bg-green-500"></div>
-                        <span>Connected</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex justify-between">
-                    <Button variant="outline">Disconnect</Button>
-                    <Button>Send Pi</Button>
-                  </CardFooter>
-                </Card>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="earnings" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Earnings Overview</CardTitle>
-                  <CardDescription>
-                    Your Pi earnings from all sources on Droplink
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[300px] flex items-center justify-center border rounded">
-                    <p className="text-muted-foreground">Earnings chart will appear here</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="transactions" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Transaction History</CardTitle>
-                  <CardDescription>
-                    A complete record of your Pi transactions
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[400px] flex items-center justify-center border rounded">
-                    <p className="text-muted-foreground">Transaction history will appear here</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="settings" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Pi Wallet Settings</CardTitle>
-                  <CardDescription>
-                    Configure your Pi wallet preferences
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="auto-withdraw">Auto Withdraw</Label>
-                    <div className="flex items-center space-x-2">
-                      <input type="checkbox" id="auto-withdraw" className="h-4 w-4" />
-                      <span className="text-sm">Automatically withdraw earnings to my Pi wallet</span>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="min-withdraw">Minimum Withdrawal</Label>
-                    <Input id="min-withdraw" type="number" placeholder="10" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="notification-threshold">Notification Threshold</Label>
-                    <Input id="notification-threshold" type="number" placeholder="50" />
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button>Save Settings</Button>
-                </CardFooter>
-              </Card>
-            </TabsContent>
-          </Tabs>
+            </CardContent>
+          </Card>
         </div>
-      </div>
-      <GoToTop />
-    </>
+      </main>
+      <Footer />
+    </div>
   );
 };
 

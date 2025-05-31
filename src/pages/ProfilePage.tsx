@@ -1,3 +1,4 @@
+
 import { useParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -10,28 +11,34 @@ import GoToTop from '@/components/GoToTop';
 
 const ProfilePage = () => {
   const { username } = useParams();
-  const { loading, error, profileData } = useProfileData(username);
+  const { loading, error, profile } = useProfileData(username);
   const {
     processingTip,
     handleLinkClick,
     handleTipSubmit,
     handleShareProfile
-  } = useProfileActions(profileData?.id);
+  } = useProfileActions(profile?.id);
 
   if (loading) {
     return <LoadingState />;
   }
 
-  if (error || !profileData) {
+  if (error || !profile) {
     return <ErrorState username={username} />;
   }
+
+  // Create the profile data with links array to match expected interface
+  const profileData = {
+    ...profile,
+    links: profile.links || [] // Ensure links array exists
+  };
 
   return (
     <>
       <Navbar />
       <ProfileContent
         profileData={profileData}
-        onLinkClick={handleLinkClick}
+        onLinkClick={(link) => handleLinkClick(link.id, link.url)}
         onTipSubmit={(amount, message) => handleTipSubmit(amount, message, profileData.username)}
         onShareProfile={() => handleShareProfile(profileData.username)}
         processingTip={processingTip}

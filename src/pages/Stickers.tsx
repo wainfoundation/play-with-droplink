@@ -392,7 +392,7 @@ const Stickers = () => {
       {selectedSticker && (
         <StickerPurchaseModal
           isOpen={showPurchaseModal}
-          onOpenChange={setShowPurchaseModal}
+          onClose={() => setShowPurchaseModal(false)}
           sticker={selectedSticker}
           onSuccess={handlePurchaseSuccess}
         />
