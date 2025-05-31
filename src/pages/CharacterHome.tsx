@@ -4,18 +4,19 @@ import { Helmet } from 'react-helmet-async';
 import { useUser } from '@/context/UserContext';
 import { useToast } from '@/components/ui/use-toast';
 import { useCharacter } from '@/hooks/useCharacter';
-import Navbar from '@/components/Navbar';
 import { sounds, createBackgroundMusicController } from '@/utils/sounds';
 import CharacterHomeHeader from '@/components/character/CharacterHomeHeader';
-import CharacterTabContent from '@/components/character/CharacterTabContent';
-import CharacterNavigation from '@/components/character/CharacterNavigation';
-import CharacterStats from '@/components/character/CharacterStats';
+import CharacterBottomNavigation from '@/components/character/CharacterBottomNavigation';
+import CharacterMainDisplay from '@/components/character/CharacterMainDisplay';
+import CharacterStylePage from '@/components/character/CharacterStylePage';
+import CharacterGamesPage from '@/components/character/CharacterGamesPage';
+import CharacterCommunityPage from '@/components/character/CharacterCommunityPage';
 import { useCharacterInteractionHandler } from '@/components/character/CharacterInteractionHandler';
 
 const CharacterHome = () => {
   const { user, isLoggedIn } = useUser();
   const { toast } = useToast();
-  const { character, loading: characterLoading, updateStats, unlockRoom } = useCharacter();
+  const { character, loading: characterLoading, updateStats } = useCharacter();
   
   const [currentRoom, setCurrentRoom] = useState('bedroom');
   const [activeTab, setActiveTab] = useState('home');
@@ -52,16 +53,8 @@ const CharacterHome = () => {
   }, [isLoggedIn, character, characterLoading]);
 
   const handleRoomChange = (room: string) => {
-    if (character?.unlocked_rooms.includes(room)) {
-      setCurrentRoom(room);
-      if (soundEnabled) sounds.click();
-    } else {
-      toast({
-        title: "Room Locked!",
-        description: "Complete more activities to unlock this room!",
-        variant: "destructive"
-      });
-    }
+    setCurrentRoom(room);
+    if (soundEnabled) sounds.click();
   };
 
   const toggleSound = () => {
@@ -71,60 +64,69 @@ const CharacterHome = () => {
     }
   };
 
-  const handlePurchase = (item: any) => {
-    if (coins >= item.price) {
-      setCoins(prev => prev - item.price);
-      toast({
-        title: "Purchase Successful!",
-        description: `You bought ${item.name}!`,
-      });
-    } else {
-      toast({
-        title: "Not enough coins!",
-        description: "Complete more activities to earn coins!",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleGameComplete = (score: number) => {
-    setCoins(prev => prev + score);
-    toast({
-      title: "Great Job!",
-      description: `You earned ${score} coins!`,
-    });
+  const handleStyleChange = (style: any) => {
+    // Handle style changes here
+    console.log('Style changed:', style);
   };
 
   if (characterLoading) {
     return (
-      <>
-        <Navbar />
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-lg text-gray-600">Loading your character...</p>
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-100 to-purple-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-lg text-gray-600">Loading your character...</p>
         </div>
-      </>
+      </div>
     );
   }
 
   if (!character) {
     return (
-      <>
-        <Navbar />
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">No Character Found</h1>
-            <p className="text-gray-600 mb-4">Please create a character first.</p>
-            <a href="/welcome" className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90">
-              Create Character
-            </a>
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-100 to-purple-100">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">No Character Found</h1>
+          <p className="text-gray-600 mb-4">Please create a character first.</p>
+          <a href="/welcome" className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90">
+            Create Character
+          </a>
         </div>
-      </>
+      </div>
     );
   }
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'home':
+        return (
+          <CharacterMainDisplay
+            character={character}
+            currentRoom={currentRoom}
+            onRoomChange={handleRoomChange}
+            onInteraction={handleCharacterInteraction}
+          />
+        );
+      case 'style':
+        return (
+          <CharacterStylePage
+            character={character}
+            onStyleChange={handleStyleChange}
+          />
+        );
+      case 'games':
+        return <CharacterGamesPage />;
+      case 'community':
+        return <CharacterCommunityPage />;
+      default:
+        return (
+          <CharacterMainDisplay
+            character={character}
+            currentRoom={currentRoom}
+            onRoomChange={handleRoomChange}
+            onInteraction={handleCharacterInteraction}
+          />
+        );
+    }
+  };
 
   return (
     <>
@@ -133,9 +135,7 @@ const CharacterHome = () => {
         <meta name="description" content={`Take care of your virtual character ${character.name} and explore different rooms!`} />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-b from-blue-100 via-purple-100 to-pink-100">
-        <Navbar />
-        
+      <div className="min-h-screen bg-gray-100">
         <CharacterHomeHeader
           character={character}
           level={level}
@@ -144,40 +144,14 @@ const CharacterHome = () => {
           onToggleSound={toggleSound}
         />
 
-        {/* Main Content */}
-        <div className="container mx-auto px-4 py-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Character Display */}
-            <div className="lg:col-span-2">
-              <CharacterTabContent
-                activeTab={activeTab}
-                character={character}
-                currentRoom={currentRoom}
-                coins={coins}
-                soundEnabled={soundEnabled}
-                onInteraction={handleCharacterInteraction}
-                onRoomChange={handleRoomChange}
-                onUnlockRoom={unlockRoom}
-                onPurchase={handlePurchase}
-                onGameComplete={handleGameComplete}
-              />
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-6">
-              <CharacterStats
-                character={character}
-                onStatsUpdate={updateStats}
-              />
-              
-              <CharacterNavigation
-                activeTab={activeTab}
-                onTabChange={setActiveTab}
-                unlockedTabs={character.tutorial_completed ? ['home', 'rooms', 'shop', 'games'] : ['home']}
-              />
-            </div>
-          </div>
+        <div className="pb-24">
+          {renderContent()}
         </div>
+
+        <CharacterBottomNavigation
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
       </div>
     </>
   );
