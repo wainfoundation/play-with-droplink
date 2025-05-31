@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, RefreshCw, Trophy, Heart, Lightbulb, Skip, Crown, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Trophy, Heart, Lightbulb, SkipForward, Crown, Volume2, VolumeX } from 'lucide-react';
 import { showRewardedAd } from '@/services/piAdService';
 import { createPiPayment } from '@/services/piNetwork';
 import { toast } from '@/hooks/use-toast';
@@ -555,7 +554,7 @@ const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameCompl
                 size="sm"
                 className="flex items-center gap-1"
               >
-                <Skip className="w-3 h-3" />
+                <SkipForward className="w-3 h-3" />
                 2π Skip
               </Button>
             </div>
