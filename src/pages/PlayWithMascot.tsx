@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -97,6 +98,104 @@ const PlayWithMascot = () => {
     { name: "proud", eyes: "bright", mouth: "proud-smile", thought: "You're absolutely amazing! 🌟" },
     { name: "mischievous", eyes: "sly", mouth: "smirk", thought: "I have some fun games for you... 😏" }
   ];
+
+  // Mascot rendering functions
+  const renderMascotEyes = (eyeType: string) => {
+    const eyeProps = {
+      cx: "85",
+      cy: "80",
+      rx: "8",
+      ry: "12",
+      fill: "#000"
+    };
+
+    const rightEyeProps = {
+      cx: "115",
+      cy: "80",
+      rx: "8",
+      ry: "12",
+      fill: "#000"
+    };
+
+    switch (eyeType) {
+      case "happy":
+        return (
+          <>
+            <ellipse {...eyeProps} ry="6" />
+            <ellipse {...rightEyeProps} ry="6" />
+          </>
+        );
+      case "excited":
+        return (
+          <>
+            <ellipse {...eyeProps} ry="15" />
+            <ellipse {...rightEyeProps} ry="15" />
+          </>
+        );
+      case "sleepy":
+        return (
+          <>
+            <line x1="77" y1="80" x2="93" y2="80" stroke="#000" strokeWidth="3" />
+            <line x1="107" y1="80" x2="123" y2="80" stroke="#000" strokeWidth="3" />
+          </>
+        );
+      case "hearts":
+        return (
+          <>
+            <text x="85" y="85" fontSize="12" textAnchor="middle" fill="red">♥</text>
+            <text x="115" y="85" fontSize="12" textAnchor="middle" fill="red">♥</text>
+          </>
+        );
+      case "wide":
+        return (
+          <>
+            <ellipse {...eyeProps} rx="12" ry="15" />
+            <ellipse {...rightEyeProps} rx="12" ry="15" />
+          </>
+        );
+      case "wink":
+        return (
+          <>
+            <ellipse {...eyeProps} ry="6" />
+            <line x1="107" y1="80" x2="123" y2="80" stroke="#000" strokeWidth="3" />
+          </>
+        );
+      default:
+        return (
+          <>
+            <ellipse {...eyeProps} />
+            <ellipse {...rightEyeProps} />
+          </>
+        );
+    }
+  };
+
+  const renderMascotMouth = (mouthType: string) => {
+    switch (mouthType) {
+      case "smile":
+        return <path d="M 85 110 Q 100 125 115 110" stroke="#000" strokeWidth="3" fill="none" />;
+      case "big-smile":
+        return <path d="M 80 110 Q 100 130 120 110" stroke="#000" strokeWidth="3" fill="none" />;
+      case "neutral":
+        return <line x1="90" y1="115" x2="110" y2="115" stroke="#000" strokeWidth="2" />;
+      case "open":
+        return <ellipse cx="100" cy="115" rx="8" ry="12" fill="#000" />;
+      case "yawn":
+        return <ellipse cx="100" cy="115" rx="12" ry="15" fill="#000" />;
+      case "gentle-smile":
+        return <path d="M 87 112 Q 100 120 113 112" stroke="#000" strokeWidth="2" fill="none" />;
+      case "puzzled":
+        return <path d="M 85 115 Q 95 110 105 115 Q 110 120 115 115" stroke="#000" strokeWidth="2" fill="none" />;
+      case "grin":
+        return <path d="M 80 108 Q 100 128 120 108" stroke="#000" strokeWidth="3" fill="none" />;
+      case "proud-smile":
+        return <path d="M 82 108 Q 100 128 118 108" stroke="#000" strokeWidth="3" fill="none" />;
+      case "smirk":
+        return <path d="M 85 115 Q 95 120 110 112" stroke="#000" strokeWidth="2" fill="none" />;
+      default:
+        return <path d="M 85 110 Q 100 125 115 110" stroke="#000" strokeWidth="3" fill="none" />;
+    }
+  };
 
   // Game categories organized by category from database
   const organizeGamesByCategory = () => {
