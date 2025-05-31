@@ -18,6 +18,11 @@ import Navbar from '@/components/Navbar';
 import { isRunningInPiBrowser } from '@/utils/pi-sdk';
 import { sounds, createBackgroundMusicController } from '@/utils/sounds';
 import { CharacterCustomization, CharacterStats, ShopItem, PetInteraction } from '@/components/character/types';
+import MyBooHeader from '@/components/games/MyBooHeader';
+import MyBooBottomNavigation from '@/components/games/MyBooBottomNavigation';
+import MyBooCharacterDisplay from '@/components/games/MyBooCharacterDisplay';
+import MyBooGameGrid from '@/components/games/MyBooGameGrid';
+import MyBooStyleShop from '@/components/games/MyBooStyleShop';
 
 const PlayWithMascot = () => {
   const { user, isLoggedIn } = useUser();
@@ -303,87 +308,154 @@ const PlayWithMascot = () => {
     );
   }
 
+  const [coins, setCoins] = useState(1125);
+  const [level, setLevel] = useState(2);
+
+  const handleMyBooInteraction = (type: string) => {
+    setCurrentEmotion(1);
+    
+    // Update coins and stats based on interaction
+    if (type === 'feed') {
+      setCharacterStats(prev => ({
+        ...prev,
+        hunger: Math.min(100, prev.hunger + 25),
+        happiness: Math.min(100, prev.happiness + 10)
+      }));
+      setCoins(prev => prev + 10);
+    } else if (type === 'play') {
+      setCharacterStats(prev => ({
+        ...prev,
+        happiness: Math.min(100, prev.happiness + 20),
+        energy: Math.max(0, prev.energy - 10)
+      }));
+      setCoins(prev => prev + 15);
+    } else if (type === 'clean') {
+      setCharacterStats(prev => ({
+        ...prev,
+        cleanliness: Math.min(100, prev.cleanliness + 30),
+        happiness: Math.min(100, prev.happiness + 5)
+      }));
+      setCoins(prev => prev + 8);
+    } else if (type === 'rest') {
+      setCharacterStats(prev => ({
+        ...prev,
+        energy: Math.min(100, prev.energy + 25),
+        happiness: Math.min(100, prev.happiness + 5)
+      }));
+      setCoins(prev => prev + 5);
+    }
+
+    if (soundEnabled) sounds.powerup();
+    
+    toast({
+      title: "Great!",
+      description: `Your Boo enjoyed ${type}ing! +${type === 'play' ? 15 : type === 'feed' ? 10 : type === 'clean' ? 8 : 5} coins`,
+    });
+  };
+
+  const handleMyBooGameClick = (game: any) => {
+    if (soundEnabled) sounds.click();
+    
+    if (game.locked) {
+      toast({
+        title: "Game Locked!",
+        description: "Complete more activities to unlock this game!",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setCurrentGame({ ...game, category: 'minigames' });
+    setCurrentEmotion(1);
+    toast({
+      title: `Starting ${game.name}`,
+      description: "Let's play!",
+    });
+  };
+
+  const handleStylePurchase = (item: any) => {
+    if (coins >= item.price) {
+      setCoins(prev => prev - item.price);
+      toast({
+        title: "Purchase Successful!",
+        description: `You bought ${item.name}!`,
+      });
+    } else {
+      toast({
+        title: "Not enough coins!",
+        description: "Play more games to earn coins!",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <>
       <Helmet>
-        <title>Play with {character.name} - Droplink Gaming Platform</title>
-        <meta name="description" content={`Play 50+ interactive games with your character ${character.name}, customize, battle, and explore rooms on Droplink!`} />
+        <title>My Boo - Play with {character.name}</title>
+        <meta name="description" content={`Take care of your virtual pet ${character.name}, play minigames, and customize their style!`} />
       </Helmet>
 
-      <Navbar />
-      
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">
-        <div className="container mx-auto px-4">
-          <PlayWithMascotHeader
-            totalScore={totalScore}
-            userPlan={userPlan}
-            soundEnabled={soundEnabled}
-            activeTab={activeTab}
-            onSoundToggle={toggleSound}
-            onTabChange={setActiveTab}
-          />
+      <div className="min-h-screen bg-gradient-to-b from-yellow-200 via-orange-200 to-pink-200">
+        {/* Header */}
+        <MyBooHeader
+          totalScore={totalScore}
+          coins={coins}
+          level={level}
+          soundEnabled={soundEnabled}
+          onSoundToggle={toggleSound}
+        />
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-7xl mx-auto">
-            <TabsContent value="games">
-              <GameManager
-                games={games}
-                userPlan={userPlan}
-                purchasedGames={purchasedGames}
-                soundEnabled={soundEnabled}
-                onGameClick={handleGameClick}
-                onPurchaseGame={handlePurchaseGame}
-                onMoodChange={handleMoodChange}
-              />
-            </TabsContent>
+        {/* Main Content */}
+        <div className="px-4 pt-4 pb-20">
+          {activeTab === 'character' && (
+            <MyBooCharacterDisplay
+              character={character}
+              stats={characterStats}
+              onInteraction={handleMyBooInteraction}
+              soundEnabled={soundEnabled}
+            />
+          )}
 
-            <TabsContent value="character">
-              <CharacterManager
-                character={character}
-                characterStats={characterStats}
-                activeTab={activeTab}
-                soundEnabled={soundEnabled}
-                onCharacterUpdate={handleCharacterUpdate}
-                onStatsUpdate={setCharacterStats}
-                onPurchaseItem={handlePurchaseItem}
-                onPetInteraction={handlePetInteraction}
-              />
-            </TabsContent>
+          {activeTab === 'games' && (
+            <MyBooGameGrid
+              games={games}
+              onGameClick={handleMyBooGameClick}
+              userCoins={coins}
+            />
+          )}
 
-            <TabsContent value="customize">
-              <CharacterManager
-                character={character}
-                characterStats={characterStats}
-                activeTab={activeTab}
-                soundEnabled={soundEnabled}
-                onCharacterUpdate={handleCharacterUpdate}
-                onStatsUpdate={setCharacterStats}
-                onPurchaseItem={handlePurchaseItem}
-                onPetInteraction={handlePetInteraction}
-              />
-            </TabsContent>
+          {activeTab === 'customize' && (
+            <MyBooStyleShop
+              character={character}
+              onPurchase={handleStylePurchase}
+              userCoins={coins}
+            />
+          )}
 
-            <TabsContent value="store">
-              <StoreManager
-                onPurchase={handleStorePurchase}
-                soundEnabled={soundEnabled}
-              />
-            </TabsContent>
+          {activeTab === 'store' && (
+            <StoreManager
+              onPurchase={handleStorePurchase}
+              soundEnabled={soundEnabled}
+            />
+          )}
 
-            <TabsContent value="room">
-              <RoomManager
-                soundEnabled={soundEnabled}
-              />
-            </TabsContent>
-
-            <TabsContent value="battles">
-              <BattleManager
-                soundEnabled={soundEnabled}
-                onStartBattle={handleStartBattle}
-              />
-            </TabsContent>
-          </Tabs>
+          {activeTab === 'room' && (
+            <div className="text-center py-8">
+              <div className="text-6xl mb-4">🏠</div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Community</h2>
+              <p className="text-gray-600">Connect with other Boo owners!</p>
+            </div>
+          )}
         </div>
 
+        {/* Bottom Navigation */}
+        <MyBooBottomNavigation
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
+
+        {/* Game Upgrade Modal */}
         <GameUpgradeModal
           isOpen={upgradeModal.isOpen}
           onClose={() => setUpgradeModal(prev => ({ ...prev, isOpen: false }))}
