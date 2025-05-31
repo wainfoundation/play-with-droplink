@@ -15,8 +15,11 @@ const Root = () => {
   
   const handleSplashComplete = () => {
     setShowSplash(false);
-    // Always show welcome page after splash
-    setShowWelcome(true);
+    // Check if user has seen welcome before
+    const hasSeenWelcome = localStorage.getItem('droplink_welcomed');
+    if (!hasSeenWelcome) {
+      setShowWelcome(true);
+    }
   };
 
   const handleWelcomeComplete = () => {

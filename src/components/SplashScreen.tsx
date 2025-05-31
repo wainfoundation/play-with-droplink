@@ -102,7 +102,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.5, ease: "easeOut" }}
             >
-              Droplink
+              Play with Droplink
             </motion.h1>
             
             {/* Company Name */}

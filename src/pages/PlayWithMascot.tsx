@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +13,9 @@ import {
   CrownIcon,
   CoinsIcon,
   Volume2,
-  VolumeX
+  VolumeX,
+  User,
+  Settings
 } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 import { useToast } from '@/components/ui/use-toast';
@@ -26,9 +27,12 @@ import GameUpgradeModal from '@/components/games/GameUpgradeModal';
 import PiBrowserCheck from '@/components/PiBrowserCheck';
 import PiAdsNetwork from '@/components/PiAdsNetwork';
 import InteractiveMascot from '@/components/mascot/InteractiveMascot';
+import CharacterCustomizer from '@/components/character/CharacterCustomizer';
+import CharacterPet from '@/components/character/CharacterPet';
 import { isRunningInPiBrowser } from '@/utils/pi-sdk';
 import { sounds, createBackgroundMusicController } from '@/utils/sounds';
 import { Button } from '@/components/ui/button';
+import { CharacterCustomization, CharacterStats, ShopItem, PetInteraction } from '@/components/character/types';
 
 const PlayWithMascot = () => {
   const { user, isLoggedIn } = useUser();
@@ -43,6 +47,28 @@ const PlayWithMascot = () => {
   const [showPiBrowserCheck, setShowPiBrowserCheck] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [musicController] = useState(() => createBackgroundMusicController());
+  const [activeTab, setActiveTab] = useState('games');
+  
+  // Character system states
+  const [character, setCharacter] = useState<CharacterCustomization>({
+    id: '1',
+    name: 'My Character',
+    color: '#4ecdc4',
+    clothes: [],
+    accessories: [],
+    background: 'default',
+    room: 'default',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  });
+  
+  const [characterStats, setCharacterStats] = useState<CharacterStats>({
+    happiness: 80,
+    hunger: 60,
+    cleanliness: 70,
+    energy: 85
+  });
+
   const [upgradeModal, setUpgradeModal] = useState<{
     isOpen: boolean;
     upgradeType: 'skill' | 'powerup' | 'unlock' | 'boost';
@@ -100,6 +126,44 @@ const PlayWithMascot = () => {
     { name: "mischievous", eyes: "sly", mouth: "smirk", thought: "I have some fun games for you... 😏" }
   ];
 
+  const handleCharacterUpdate = (updatedCharacter: CharacterCustomization) => {
+    setCharacter(updatedCharacter);
+    // Here you would save to database
+    toast({
+      title: "Character Updated!",
+      description: `${updatedCharacter.name} has been updated.`,
+    });
+  };
+
+  const handlePurchaseItem = async (item: ShopItem) => {
+    if (item.currency === 'pi') {
+      // Handle Pi payment
+      setUpgradeModal({
+        isOpen: true,
+        upgradeType: 'unlock',
+        upgradeName: item.name,
+        piCost: item.price
+      });
+    } else {
+      // Handle ad viewing
+      toast({
+        title: "Watch Ad",
+        description: "Watch an ad to unlock this item!",
+      });
+      // Here you would show an ad
+    }
+  };
+
+  const handlePetInteraction = (interaction: PetInteraction) => {
+    // Update character happiness based on interaction
+    setCurrentEmotion(1); // excited
+    
+    toast({
+      title: "Character Interaction",
+      description: `Your character enjoyed ${interaction.type}ing!`,
+    });
+  };
+
   // Game categories organized by category from database
   const organizeGamesByCategory = () => {
     const categories = {
@@ -110,7 +174,7 @@ const PlayWithMascot = () => {
         games: games.filter(game => game.category === 'puzzle')
       },
       action: {
-        name: "Action & Reflex",
+        name: "Action & Reflex", 
         icon: RocketIcon,
         color: "bg-red-500",
         games: games.filter(game => game.category === 'action')
@@ -118,7 +182,7 @@ const PlayWithMascot = () => {
       trivia: {
         name: "Trivia & Quiz",
         icon: BrainIcon,
-        color: "bg-green-500",
+        color: "bg-green-500", 
         games: games.filter(game => game.category === 'trivia')
       },
       creative: {
@@ -278,15 +342,14 @@ const PlayWithMascot = () => {
     return (
       <>
         <Helmet>
-          <title>{currentGame.name} - Droplink Gaming</title>
+          <title>{currentGame.name} - Play with Droplink</title>
         </Helmet>
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">
           <div className="container mx-auto px-4">
-            {/* Sound Toggle */}
             <Button
               variant="outline"
               size="sm"
-              onClick={toggleSound}
+              onClick={() => setSoundEnabled(!soundEnabled)}
               className="fixed top-4 right-4 z-50"
             >
               {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
@@ -294,8 +357,16 @@ const PlayWithMascot = () => {
             
             <GameEngine
               game={currentGame}
-              onBack={handleBackToGames}
-              onGameComplete={handleGameComplete}
+              onBack={() => setCurrentGame(null)}
+              onGameComplete={(score) => {
+                setTotalScore(prev => prev + score);
+                setCurrentEmotion(8); // proud
+                if (soundEnabled) sounds.success();
+                toast({
+                  title: "Great Job!",
+                  description: `You earned ${score} points!`,
+                });
+              }}
             />
           </div>
         </div>
@@ -306,14 +377,14 @@ const PlayWithMascot = () => {
   return (
     <>
       <Helmet>
-        <title>Play with Droplink - 50+ Interactive Games & Activities</title>
-        <meta name="description" content="Play 50+ interactive games with the Droplink mascot! Puzzle games, action games, trivia, creative activities, and premium challenges." />
+        <title>Play with Droplink - Interactive Games & Character Customization</title>
+        <meta name="description" content="Play 50+ interactive games and customize your unique character! Feed, play, and enhance your virtual pet with Pi Network integration." />
       </Helmet>
 
       <Button
         variant="outline"
         size="sm"
-        onClick={toggleSound}
+        onClick={() => setSoundEnabled(!soundEnabled)}
         className="fixed top-4 right-4 z-50"
       >
         {soundEnabled ? (
@@ -333,10 +404,10 @@ const PlayWithMascot = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
-              Droplink Gaming Platform
+              Play with Droplink
             </h1>
             <p className="text-lg text-gray-600 mb-6">
-              {games.length}+ interactive games and activities with Pi Network integration
+              Your interactive gaming platform with character customization
             </p>
             
             <div className="flex justify-center gap-4 mb-6">
@@ -349,97 +420,127 @@ const PlayWithMascot = () => {
                 {userPlan === 'premium' ? 'Premium' : 'Free Plan'}
               </Badge>
             </div>
-
-            {userPlan === 'free' && (
-              <Card className="max-w-md mx-auto mb-6 border-yellow-200 bg-yellow-50">
-                <CardContent className="p-4 text-center">
-                  <CrownIcon className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
-                  <h3 className="font-semibold text-yellow-800 mb-2">Upgrade to Premium</h3>
-                  <p className="text-sm text-yellow-700 mb-3">Unlock all {games.length}+ games, remove ads, and get exclusive features!</p>
-                  <button 
-                    onClick={handleUpgradeToPremium} 
-                    disabled={paymentLoading}
-                    className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded disabled:opacity-50"
-                  >
-                    <CoinsIcon className="w-4 h-4 mr-2 inline" />
-                    {paymentLoading ? 'Processing...' : 'Upgrade for 10 Pi'}
-                  </button>
-                </CardContent>
-              </Card>
-            )}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            <div className="lg:col-span-1">
-              <div className="sticky top-4 space-y-6">
-                {/* Interactive Mascot */}
-                <InteractiveMascot 
-                  onMoodChange={handleMoodChange}
-                  soundEnabled={soundEnabled}
-                />
-                
-                {/* Thought Bubble */}
-                <div className="bg-white rounded-lg p-3 shadow-lg border-2 border-primary/20 max-w-xs mx-auto">
-                  <p className="text-sm font-medium text-primary text-center">
-                    {emotions[currentEmotion].thought}
-                  </p>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-7xl mx-auto">
+            <TabsList className="grid w-full grid-cols-3 mb-6">
+              <TabsTrigger value="games" className="flex items-center gap-2">
+                <PuzzleIcon className="w-4 h-4" />
+                Games
+              </TabsTrigger>
+              <TabsTrigger value="character" className="flex items-center gap-2">
+                <User className="w-4 h-4" />
+                My Character
+              </TabsTrigger>
+              <TabsTrigger value="customize" className="flex items-center gap-2">
+                <Settings className="w-4 h-4" />
+                Customize
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="games">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-1">
+                  <div className="sticky top-4 space-y-6">
+                    <InteractiveMascot 
+                      onMoodChange={setCurrentEmotion}
+                      soundEnabled={soundEnabled}
+                    />
+                    <PiAdsNetwork placementId="gaming-sidebar" />
+                  </div>
                 </div>
 
-                <PiAdsNetwork placementId="gaming-sidebar" />
+                <div className="lg:col-span-2">
+                  <Tabs defaultValue="puzzle" className="w-full">
+                    <TabsList className="grid w-full grid-cols-5 mb-6">
+                      {Object.entries(gameCategories).map(([key, category]) => (
+                        <TabsTrigger key={key} value={key} className="flex items-center gap-1 text-xs">
+                          <category.icon className="w-3 h-3" />
+                          <span className="hidden sm:inline">{category.name.split(' ')[0]}</span>
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+
+                    {Object.entries(gameCategories).map(([key, category]) => (
+                      <TabsContent key={key} value={key}>
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                              <category.icon className="w-6 h-6" />
+                              {category.name}
+                            </CardTitle>
+                            <CardDescription>
+                              Choose from {category.games.length} amazing {category.name.toLowerCase()} games
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {category.games.map(game => {
+                                const isLocked = !game.is_free && userPlan === 'free' && !purchasedGames.includes(game.id);
+                                return (
+                                  <GameCard
+                                    key={game.id}
+                                    game={game}
+                                    isLocked={isLocked}
+                                    userPlan={userPlan}
+                                    onPlay={(game) => setCurrentGame({ ...game, category: key })}
+                                    onPurchase={() => {}}
+                                    onUpgrade={() => {}}
+                                  />
+                                );
+                              })}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </TabsContent>
+                    ))}
+                  </Tabs>
+                </div>
               </div>
-            </div>
+            </TabsContent>
 
-            <div className="lg:col-span-2">
-              <Tabs defaultValue="puzzle" className="w-full">
-                <TabsList className="grid w-full grid-cols-5 mb-6">
-                  {Object.entries(gameCategories).map(([key, category]) => (
-                    <TabsTrigger key={key} value={key} className="flex items-center gap-1 text-xs">
-                      <category.icon className="w-3 h-3" />
-                      <span className="hidden sm:inline">{category.name.split(' ')[0]}</span>
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
+            <TabsContent value="character">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <CharacterPet
+                  stats={characterStats}
+                  onStatsUpdate={setCharacterStats}
+                  onInteraction={handlePetInteraction}
+                  soundEnabled={soundEnabled}
+                />
+                <div>
+                  <Card className="mb-4">
+                    <CardHeader>
+                      <CardTitle>Character Profile</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-center">
+                        <div 
+                          className="w-24 h-24 mx-auto rounded-full border-4 border-white shadow-lg mb-4"
+                          style={{ backgroundColor: character.color }}
+                        >
+                          <div className="w-full h-full flex items-center justify-center text-3xl">
+                            😊
+                          </div>
+                        </div>
+                        <h3 className="text-xl font-bold">{character.name}</h3>
+                        <p className="text-gray-600">Created {new Date(character.created_at).toLocaleDateString()}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <PiAdsNetwork placementId="character-sidebar" />
+                </div>
+              </div>
+            </TabsContent>
 
-                {Object.entries(gameCategories).map(([key, category]) => (
-                  <TabsContent key={key} value={key}>
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <category.icon className="w-6 h-6" />
-                          {category.name}
-                        </CardTitle>
-                        <CardDescription>
-                          Choose from {category.games.length} amazing {category.name.toLowerCase()} games
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {category.games.map(game => {
-                            const isLocked = !game.is_free && userPlan === 'free' && !purchasedGames.includes(game.id);
-                            return (
-                              <GameCard
-                                key={game.id}
-                                game={game}
-                                isLocked={isLocked}
-                                userPlan={userPlan}
-                                onPlay={(game) => handleGameClick(game, key)}
-                                onPurchase={handlePurchaseGame}
-                                onUpgrade={handleUpgradeToPremium}
-                              />
-                            );
-                          })}
-                        </div>
-                        
-                        <div className="mt-6">
-                          <PiAdsNetwork placementId={`${key}-games`} />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
-                ))}
-              </Tabs>
-            </div>
-          </div>
+            <TabsContent value="customize">
+              <CharacterCustomizer
+                character={character}
+                onCharacterUpdate={handleCharacterUpdate}
+                onPurchaseItem={handlePurchaseItem}
+                soundEnabled={soundEnabled}
+              />
+            </TabsContent>
+          </Tabs>
         </div>
 
         <GameUpgradeModal
@@ -448,41 +549,18 @@ const PlayWithMascot = () => {
           upgradeType={upgradeModal.upgradeType}
           upgradeName={upgradeModal.upgradeName}
           piCost={upgradeModal.piCost}
-          onUpgradeComplete={handleUpgradeComplete}
+          onUpgradeComplete={(method) => {
+            if (soundEnabled) {
+              if (method === 'pi') {
+                sounds.coin();
+              } else {
+                sounds.powerup();
+              }
+            }
+            setCurrentEmotion(8); // proud
+          }}
         />
       </div>
-
-      <style>
-        {`
-          @keyframes bounce-gentle {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-15px); }
-            60% { transform: translateY(-8px); }
-          }
-          
-          @keyframes pulse-gentle {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-          }
-          
-          @keyframes shimmer {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
-          }
-          
-          .animate-bounce-gentle {
-            animation: bounce-gentle 4s ease-in-out infinite;
-          }
-          
-          .animate-pulse-gentle {
-            animation: pulse-gentle 3s ease-in-out infinite;
-          }
-          
-          .animate-shimmer {
-            animation: shimmer 2.5s ease-in-out infinite;
-          }
-        `}
-      </style>
     </>
   );
 };
