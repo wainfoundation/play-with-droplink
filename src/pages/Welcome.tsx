@@ -1,21 +1,28 @@
 
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';
 import WelcomeMascot from '@/components/welcome/WelcomeMascot';
 import WelcomeTutorial from '@/components/welcome/WelcomeTutorial';
 import WelcomeFloatingElements from '@/components/welcome/WelcomeFloatingElements';
 import WelcomeContent from '@/components/welcome/WelcomeContent';
 import WelcomeActions from '@/components/welcome/WelcomeActions';
+import CharacterCreationModal from '@/components/welcome/CharacterCreationModal';
+import { CharacterCustomization } from '@/components/character/types';
+import { useToast } from '@/components/ui/use-toast';
 
 interface WelcomeProps {
   onEnter?: () => void;
 }
 
 const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [mascotVisible, setMascotVisible] = useState(false);
   const [welcomeTextVisible, setWelcomeTextVisible] = useState(false);
   const [buttonsVisible, setButtonsVisible] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showCharacterCreation, setShowCharacterCreation] = useState(false);
   const [tutorialStep, setTutorialStep] = useState(0);
 
   useEffect(() => {
@@ -33,6 +40,8 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
   const handleGoToHome = () => {
     if (onEnter) {
       onEnter();
+    } else {
+      navigate('/play');
     }
   };
 
@@ -42,6 +51,23 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
   };
 
   const handleSkipTutorial = () => {
+    handleGoToHome();
+  };
+
+  const handleCreateCharacter = () => {
+    setShowCharacterCreation(true);
+  };
+
+  const handleCharacterCreated = (character: CharacterCustomization) => {
+    // Store character in localStorage for now
+    localStorage.setItem('droplinkCharacter', JSON.stringify(character));
+    
+    toast({
+      title: "Character Created! 🎉",
+      description: `${character.name} is ready to play!`,
+    });
+
+    // Navigate to the play page
     handleGoToHome();
   };
 
@@ -93,8 +119,8 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
   return (
     <>
       <Helmet>
-        <title>Welcome to Droplink Gaming - Your Pi Network Game Hub</title>
-        <meta name="description" content="Welcome to Droplink Gaming! Play 50+ interactive games, earn Pi rewards, and enjoy premium gaming on Pi Network." />
+        <title>Welcome to Droplink Gaming - Create Your Water Character</title>
+        <meta name="description" content="Welcome to Droplink Gaming! Create your unique water droplet character and start your Pi Network gaming adventure." />
       </Helmet>
       
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden">
@@ -111,8 +137,15 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
             visible={buttonsVisible}
             onStartTutorial={handleStartTutorial}
             onSkipTutorial={handleSkipTutorial}
+            onCreateCharacter={handleCreateCharacter}
           />
         </div>
+
+        <CharacterCreationModal
+          isOpen={showCharacterCreation}
+          onClose={() => setShowCharacterCreation(false)}
+          onCharacterCreated={handleCharacterCreated}
+        />
 
         <style>
           {`

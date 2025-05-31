@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Helmet } from 'react-helmet-async';
@@ -35,17 +34,27 @@ const PlayWithMascot = () => {
   const [musicController] = useState(() => createBackgroundMusicController());
   const [activeTab, setActiveTab] = useState('games');
   
-  // Character system states
-  const [character, setCharacter] = useState<CharacterCustomization>({
-    id: '1',
-    name: 'My Character',
-    color: '#4ecdc4',
-    clothes: [],
-    accessories: [],
-    background: 'default',
-    room: 'default',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+  // Character system states - Load from localStorage or use default
+  const [character, setCharacter] = useState<CharacterCustomization>(() => {
+    const saved = localStorage.getItem('droplinkCharacter');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse saved character:', e);
+      }
+    }
+    return {
+      id: '1',
+      name: 'My Droplink',
+      color: '#00aaff',
+      clothes: [],
+      accessories: [],
+      background: 'default',
+      room: 'default',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
   });
   
   const [characterStats, setCharacterStats] = useState<CharacterStats>({
@@ -100,6 +109,8 @@ const PlayWithMascot = () => {
 
   const handleCharacterUpdate = (updatedCharacter: CharacterCustomization) => {
     setCharacter(updatedCharacter);
+    // Save to localStorage
+    localStorage.setItem('droplinkCharacter', JSON.stringify(updatedCharacter));
     toast({
       title: "Character Updated!",
       description: `${updatedCharacter.name} has been updated.`,
@@ -286,8 +297,8 @@ const PlayWithMascot = () => {
   return (
     <>
       <Helmet>
-        <title>Play with Droplink - Interactive Games, Character Customization & P2P Battles</title>
-        <meta name="description" content="Play 50+ interactive games, customize your character, decorate rooms, shop for items, and battle other players in epic P2P competitions!" />
+        <title>Play with {character.name} - Droplink Gaming Platform</title>
+        <meta name="description" content={`Play 50+ interactive games with your character ${character.name}, customize, battle, and explore rooms on Droplink!`} />
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">

@@ -1,18 +1,20 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, SkipForward } from 'lucide-react';
+import { Play, SkipForward, User } from 'lucide-react';
 
 interface WelcomeActionsProps {
   visible: boolean;
   onStartTutorial: () => void;
   onSkipTutorial: () => void;
+  onCreateCharacter: () => void;
 }
 
 const WelcomeActions: React.FC<WelcomeActionsProps> = ({
   visible,
   onStartTutorial,
-  onSkipTutorial
+  onSkipTutorial,
+  onCreateCharacter
 }) => {
   return (
     <div className={`transition-all duration-1000 delay-1000 ${
@@ -20,16 +22,25 @@ const WelcomeActions: React.FC<WelcomeActionsProps> = ({
     }`}>
       <div className="flex flex-col sm:flex-row gap-4 mt-8">
         <Button 
+          onClick={onCreateCharacter}
+          size="lg" 
+          className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 transform transition hover:scale-105 duration-200 text-lg px-8 py-4"
+        >
+          <User className="mr-2 h-5 w-5" />
+          Create Your Character
+        </Button>
+        <Button 
           onClick={onStartTutorial}
           size="lg" 
-          className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 transform transition hover:scale-105 duration-200 text-lg px-8 py-4"
+          variant="outline"
+          className="hover:bg-blue-50 transition-colors text-lg px-8 py-4"
         >
           <Play className="mr-2 h-5 w-5" />
-          Start Gaming Tutorial
+          Start Tutorial
         </Button>
         <Button 
           onClick={onSkipTutorial}
-          variant="outline" 
+          variant="ghost" 
           size="lg" 
           className="hover:bg-blue-50 transition-colors text-lg px-8 py-4"
         >
