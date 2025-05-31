@@ -2,20 +2,22 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Play } from 'lucide-react';
+import { Eye, Play, Crown } from 'lucide-react';
 
 interface ColorMergeStartScreenProps {
   level: number;
   adWatched: boolean;
   onStartLevel: () => void;
+  isPremium?: boolean;
 }
 
 const ColorMergeStartScreen: React.FC<ColorMergeStartScreenProps> = ({
   level,
   adWatched,
-  onStartLevel
+  onStartLevel,
+  isPremium = false
 }) => {
-  const needsAd = !adWatched && level > 1;
+  const needsAd = !isPremium && !adWatched && level > 1;
   
   return (
     <div className="text-center space-y-4">
@@ -24,6 +26,14 @@ const ColorMergeStartScreen: React.FC<ColorMergeStartScreenProps> = ({
       <p className="text-sm text-gray-600">
         Mix colors to match the target! Reach {level < 50 ? '90%' : level < 100 ? '92%' : '95%'} accuracy to pass.
       </p>
+      
+      {isPremium && (
+        <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white">
+          <Crown className="w-3 h-3 mr-1" />
+          Premium - No Ads Required!
+        </Badge>
+      )}
+      
       {level > 9999 && (
         <Badge variant="destructive" className="animate-pulse">
           🔥 Extreme Mode Active!
@@ -50,7 +60,7 @@ const ColorMergeStartScreen: React.FC<ColorMergeStartScreenProps> = ({
         ) : (
           <>
             <Play className="w-4 h-4" />
-            Start Level
+            {isPremium ? 'Start Level (Premium)' : 'Start Level'}
           </>
         )}
       </Button>

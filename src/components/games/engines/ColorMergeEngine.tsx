@@ -1,13 +1,15 @@
+
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Trophy, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Trophy, AlertCircle, Crown } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { playSoundEffect } from '@/utils/sounds';
 import { useColorMergeGame } from '@/hooks/useColorMergeGame';
 import { initializePiAds, showRewardedAd, showInterstitialAd, isAdServiceReady } from '@/services/piAdService';
 import { isRunningInPiBrowser } from '@/utils/pi-sdk';
+import { useUserPlan } from '@/hooks/useUserPlan';
 import ColorMergeStats from '@/components/games/color-merge/ColorMergeStats';
 import ColorMergeStartScreen from '@/components/games/color-merge/ColorMergeStartScreen';
 import ColorMergeGameOver from '@/components/games/color-merge/ColorMergeGameOver';
@@ -21,6 +23,10 @@ interface ColorMergeEngineProps {
 const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameComplete }) => {
   const [adServiceReady, setAdServiceReady] = useState(false);
   const [showPiWarning, setShowPiWarning] = useState(false);
+  
+  // Get user plan to determine ad behavior
+  const { plan, showAds, canAccessAllGames } = useUserPlan();
+  const isPremium = plan === 'premium';
 
   const {
     level,
@@ -56,8 +62,13 @@ const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameCompl
     setCurrentColor,
   } = useColorMergeGame();
 
-  // Initialize Pi Ads on component mount
+  // Initialize Pi Ads only for free users
   useEffect(() => {
+    if (!showAds || isPremium) {
+      setAdServiceReady(false);
+      return;
+    }
+
     const initAds = async () => {
       const isPiBrowser = isRunningInPiBrowser();
       
@@ -103,7 +114,7 @@ const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameCompl
     };
 
     initAds();
-  }, [soundEnabled]);
+  }, [soundEnabled, showAds, isPremium]);
 
   // Handle game completion milestone
   useEffect(() => {
@@ -113,6 +124,21 @@ const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameCompl
   }, [level, score, onGameComplete]);
 
   const startLevel = async () => {
+    // Premium users skip ad requirements
+    if (isPremium) {
+      setIsPlaying(true);
+      setTimeLeft(60 + Math.floor(level / 10) * 10);
+      setShowHint(false);
+      setHintColor(null);
+      generateLevel();
+      
+      if (soundEnabled) {
+        playSoundEffect('newLevel', 0.7);
+      }
+      return;
+    }
+
+    // Free users need to watch ads after level 1
     if (!adWatched && level > 1) {
       if (!adServiceReady) {
         toast({
@@ -159,8 +185,8 @@ const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameCompl
       playSoundEffect('newLevel', 0.7);
     }
 
-    // Show interstitial ad every 5 levels for engagement
-    if (level > 1 && level % 5 === 0 && adServiceReady) {
+    // Show interstitial ad every 5 levels for free users
+    if (!isPremium && level > 1 && level % 5 === 0 && adServiceReady) {
       setTimeout(async () => {
         await showInterstitialAd();
       }, 1000);
@@ -168,6 +194,19 @@ const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameCompl
   };
 
   const retryWithAd = async () => {
+    // Premium users can retry without ads
+    if (isPremium) {
+      resetGame();
+      if (soundEnabled) {
+        playSoundEffect('gainLife', 0.7);
+      }
+      toast({
+        title: "Lives Restored! ❤️",
+        description: "Premium retry activated!",
+      });
+      return;
+    }
+
     if (!adServiceReady) {
       toast({
         title: "Ad Service Not Ready",
@@ -207,13 +246,35 @@ const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameCompl
   };
 
   const buyHint = async () => {
+    // Premium users get hints without ads
+    if (isPremium) {
+      const bestColor = findBestNextColor();
+      setHintColor(bestColor);
+      setShowHint(true);
+      setHintsUsed(prev => prev + 1);
+      
+      if (soundEnabled) {
+        playSoundEffect('piPayment', 0.8);
+      }
+      
+      toast({
+        title: "Premium Hint! 💡",
+        description: "The best color choice is highlighted",
+      });
+      
+      setTimeout(() => {
+        setShowHint(false);
+        setHintColor(null);
+      }, 5000);
+      return;
+    }
+
     if (!adServiceReady) {
       toast({
         title: "Watch Ad for Hint",
         description: "Ads not available - try the hint anyway!",
         variant: "destructive"
       });
-      // Still provide the hint as fallback
       provideFreeHint();
       return;
     }
@@ -251,7 +312,6 @@ const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameCompl
         description: "Unable to show ad for hint",
         variant: "destructive"
       });
-      // Provide free hint as fallback
       provideFreeHint();
     }
   };
@@ -274,6 +334,19 @@ const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameCompl
   };
 
   const skipLevel = async () => {
+    // Premium users can skip without ads
+    if (isPremium) {
+      if (soundEnabled) {
+        playSoundEffect('piPayment', 0.8);
+      }
+      
+      toast({
+        title: "Level Skipped! ⏭️",
+        description: `Premium skip to level ${level + 1}`,
+      });
+      return;
+    }
+
     if (!adServiceReady) {
       toast({
         title: "Skip Not Available",
@@ -295,7 +368,6 @@ const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameCompl
           playSoundEffect('piPayment', 0.8);
         }
         
-        // Skip to next level logic would go here
         toast({
           title: "Level Skipped! ⏭️",
           description: `Moved to level ${level + 1}`,
@@ -327,6 +399,7 @@ const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameCompl
             onRetryWithAd={retryWithAd}
             onResetGame={resetGame}
             onBack={onBack}
+            isPremium={isPremium}
           />
         </CardHeader>
       </Card>
@@ -344,18 +417,24 @@ const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameCompl
           <CardTitle className="flex items-center gap-2">
             🎨 Color Merge
             <Badge variant="outline">Level {level.toLocaleString()}</Badge>
+            {isPremium && (
+              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white">
+                <Crown className="w-3 h-3 mr-1" />
+                Premium
+              </Badge>
+            )}
           </CardTitle>
           <div className="flex items-center gap-2">
             <Trophy className="w-4 h-4 text-yellow-500" />
             <span className="font-semibold">{score.toLocaleString()}</span>
-            {showPiWarning && (
+            {showPiWarning && !isPremium && (
               <AlertCircle className="w-4 h-4 text-yellow-500" />
             )}
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {showPiWarning && (
+        {showPiWarning && !isPremium && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
             <div className="flex items-center gap-2 text-yellow-800">
               <AlertCircle className="w-4 h-4" />
@@ -384,6 +463,7 @@ const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameCompl
             level={level}
             adWatched={adWatched}
             onStartLevel={startLevel}
+            isPremium={isPremium}
           />
         )}
 
@@ -399,6 +479,7 @@ const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameCompl
             onResetColor={handleResetColor}
             onBuyHint={buyHint}
             onSkipLevel={skipLevel}
+            isPremium={isPremium}
           />
         )}
       </CardContent>

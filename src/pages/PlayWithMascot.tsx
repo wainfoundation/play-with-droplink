@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
@@ -5,6 +6,7 @@ import { useUser } from '@/context/UserContext';
 import { useToast } from '@/components/ui/use-toast';
 import { useGames } from '@/hooks/useGames';
 import { usePiPayment } from '@/hooks/usePiPayment';
+import { useUserPlan } from '@/hooks/useUserPlan';
 import { useIsMobile } from '@/hooks/use-mobile';
 import GameEngine from '@/components/games/GameEngine';
 import PiBrowserCheck from '@/components/PiBrowserCheck';
@@ -12,21 +14,23 @@ import CharacterDisplay from '@/components/games/CharacterDisplay';
 import GameCategories from '@/components/games/GameCategories';
 import PremiumCTA from '@/components/games/PremiumCTA';
 import { isRunningInPiBrowser } from '@/utils/pi-sdk';
-import { HelpCircle, Shield, FileText } from 'lucide-react';
+import { HelpCircle, Shield, FileText, Crown } from 'lucide-react';
 
 const PlayWithMascot = () => {
   const { user, isLoggedIn } = useUser();
   const { toast } = useToast();
   const { games, loading: gamesLoading } = useGames();
   const { handleSubscribe, loading: paymentLoading } = usePiPayment();
+  const { plan, canAccessAllGames, showAds } = useUserPlan();
   const isMobile = useIsMobile();
   
   const [totalScore, setTotalScore] = useState(0);
   const [currentGame, setCurrentGame] = useState<any>(null);
-  const [userPlan, setUserPlan] = useState('free');
   const [purchasedGames, setPurchasedGames] = useState<string[]>([]);
   const [showPiBrowserCheck, setShowPiBrowserCheck] = useState(true);
   const [selectedCharacter, setSelectedCharacter] = useState<any>(null);
+
+  const isPremium = plan === 'premium';
 
   // Check Pi Browser on component mount
   useEffect(() => {
@@ -44,7 +48,6 @@ const PlayWithMascot = () => {
         setSelectedCharacter(JSON.parse(savedCharacter));
       } catch (error) {
         console.error('Error parsing saved character:', error);
-        // Set default character
         setSelectedCharacter({
           id: 'droplet-blue-happy',
           name: 'Droplink',
@@ -55,7 +58,6 @@ const PlayWithMascot = () => {
         });
       }
     } else {
-      // Set default character
       setSelectedCharacter({
         id: 'droplet-blue-happy',
         name: 'Droplink',
@@ -67,21 +69,29 @@ const PlayWithMascot = () => {
     }
   }, []);
 
-  // Set user plan from user data
+  // Set user score from user data
   useEffect(() => {
-    if (user?.plan) {
-      setUserPlan(user.plan);
-    }
     if (user?.total_score) {
       setTotalScore(user.total_score);
     }
   }, [user]);
 
   const handleGameClick = (game: any, category: string) => {
-    if (!game.is_free && userPlan === 'free' && !purchasedGames.includes(game.id)) {
+    // Premium users can access all games
+    if (isPremium || canAccessAllGames) {
+      setCurrentGame({ ...game, category });
+      toast({
+        title: `Starting ${game.name}`,
+        description: isPremium ? "Enjoy ad-free gaming!" : "Get ready to play!",
+      });
+      return;
+    }
+
+    // Free users need to check game access
+    if (!game.is_free && !purchasedGames.includes(game.id)) {
       toast({
         title: "Premium Required",
-        description: `${game.name} requires a Premium subscription or individual purchase.`,
+        description: `${game.name} requires Premium subscription (10π/month) or individual purchase.`,
         variant: "destructive",
       });
       return;
@@ -157,7 +167,10 @@ const PlayWithMascot = () => {
 
     try {
       await handleSubscribe('premium', 'monthly');
-      setUserPlan('premium');
+      toast({
+        title: "Premium Activated! 👑",
+        description: "Welcome to ad-free gaming with all games unlocked!",
+      });
     } catch (error) {
       console.error('Premium upgrade failed:', error);
     }
@@ -177,19 +190,23 @@ const PlayWithMascot = () => {
   };
 
   const handleAdReward = (reward: any) => {
-    setTotalScore(prev => prev + 10);
-    toast({
-      title: "Ad Reward Earned!",
-      description: `You earned ${reward.amount} ${reward.type} for watching an ad!`,
-    });
+    if (!isPremium) {
+      setTotalScore(prev => prev + 10);
+      toast({
+        title: "Ad Reward Earned!",
+        description: `You earned ${reward.amount} ${reward.type} for watching an ad!`,
+      });
+    }
   };
 
   const handleAdError = (error: string) => {
-    toast({
-      title: "Ad Error",
-      description: error,
-      variant: "destructive",
-    });
+    if (!isPremium) {
+      toast({
+        title: "Ad Error",
+        description: error,
+        variant: "destructive",
+      });
+    }
   };
 
   if (showPiBrowserCheck && !isRunningInPiBrowser()) {
@@ -243,20 +260,31 @@ const PlayWithMascot = () => {
         <div className="container mx-auto px-4">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
-              Play with Droplink
-            </h1>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
+                Play with Droplink
+              </h1>
+              {isPremium && (
+                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full flex items-center gap-1 text-sm font-semibold">
+                  <Crown className="w-4 h-4" />
+                  Premium
+                </div>
+              )}
+            </div>
             <p className="text-lg text-gray-600 mb-6">
               {games.length}+ interactive games with your gaming companion
+              {isPremium && " - Ad-free experience!"}
             </p>
             
             {/* Premium CTA for Free Users */}
-            <PremiumCTA
-              userPlan={userPlan}
-              gamesCount={games.length}
-              paymentLoading={paymentLoading}
-              onUpgradeToPremium={handleUpgradeToPremium}
-            />
+            {!isPremium && (
+              <PremiumCTA
+                userPlan={plan}
+                gamesCount={games.length}
+                paymentLoading={paymentLoading}
+                onUpgradeToPremium={handleUpgradeToPremium}
+              />
+            )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
@@ -264,7 +292,7 @@ const PlayWithMascot = () => {
             <CharacterDisplay
               selectedCharacter={selectedCharacter}
               totalScore={totalScore}
-              userPlan={userPlan}
+              userPlan={plan}
               paymentLoading={paymentLoading}
               onUpgradeToPremium={handleUpgradeToPremium}
               onAdReward={handleAdReward}
@@ -274,11 +302,13 @@ const PlayWithMascot = () => {
             {/* Games Area */}
             <GameCategories
               games={games}
-              userPlan={userPlan}
+              userPlan={plan}
               purchasedGames={purchasedGames}
               onGameClick={handleGameClick}
               onPurchaseGame={handlePurchaseGame}
               onUpgradeToPremium={handleUpgradeToPremium}
+              isPremium={isPremium}
+              canAccessAllGames={canAccessAllGames}
             />
           </div>
         </div>

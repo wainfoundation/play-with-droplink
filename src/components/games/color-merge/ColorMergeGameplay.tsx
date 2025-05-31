@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Lightbulb, SkipForward, Eye } from 'lucide-react';
+import { Lightbulb, SkipForward, Eye, Crown } from 'lucide-react';
 
 interface Color {
   r: number;
@@ -20,6 +20,7 @@ interface ColorMergeGameplayProps {
   onResetColor: () => void;
   onBuyHint: () => void;
   onSkipLevel: () => void;
+  isPremium?: boolean;
 }
 
 const ColorMergeGameplay: React.FC<ColorMergeGameplayProps> = ({
@@ -32,7 +33,8 @@ const ColorMergeGameplay: React.FC<ColorMergeGameplayProps> = ({
   onMergeColor,
   onResetColor,
   onBuyHint,
-  onSkipLevel
+  onSkipLevel,
+  isPremium = false
 }) => {
   return (
     <div className="space-y-6">
@@ -89,9 +91,19 @@ const ColorMergeGameplay: React.FC<ColorMergeGameplayProps> = ({
           size="sm"
           className="flex items-center gap-1"
         >
-          <Eye className="w-3 h-3" />
-          <Lightbulb className="w-3 h-3" />
-          Watch Ad for Hint
+          {isPremium ? (
+            <>
+              <Crown className="w-3 h-3" />
+              <Lightbulb className="w-3 h-3" />
+              Premium Hint
+            </>
+          ) : (
+            <>
+              <Eye className="w-3 h-3" />
+              <Lightbulb className="w-3 h-3" />
+              Watch Ad for Hint
+            </>
+          )}
         </Button>
         <Button 
           onClick={onSkipLevel}
@@ -99,9 +111,19 @@ const ColorMergeGameplay: React.FC<ColorMergeGameplayProps> = ({
           size="sm"
           className="flex items-center gap-1"
         >
-          <Eye className="w-3 h-3" />
-          <SkipForward className="w-3 h-3" />
-          Watch Ad to Skip
+          {isPremium ? (
+            <>
+              <Crown className="w-3 h-3" />
+              <SkipForward className="w-3 h-3" />
+              Premium Skip
+            </>
+          ) : (
+            <>
+              <Eye className="w-3 h-3" />
+              <SkipForward className="w-3 h-3" />
+              Watch Ad to Skip
+            </>
+          )}
         </Button>
       </div>
 
@@ -109,6 +131,7 @@ const ColorMergeGameplay: React.FC<ColorMergeGameplayProps> = ({
         <div className="text-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
           <p className="text-sm text-yellow-800">
             💡 The highlighted color will get you closer to the target!
+            {isPremium && " (Premium Feature)"}
           </p>
         </div>
       )}

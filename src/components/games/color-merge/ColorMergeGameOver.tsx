@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, RefreshCw, Crown, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Crown, Volume2, VolumeX, Eye } from 'lucide-react';
 
 interface ColorMergeGameOverProps {
   score: number;
@@ -13,6 +13,7 @@ interface ColorMergeGameOverProps {
   onRetryWithAd: () => void;
   onResetGame: () => void;
   onBack: () => void;
+  isPremium?: boolean;
 }
 
 const ColorMergeGameOver: React.FC<ColorMergeGameOverProps> = ({
@@ -23,7 +24,8 @@ const ColorMergeGameOver: React.FC<ColorMergeGameOverProps> = ({
   setSoundEnabled,
   onRetryWithAd,
   onResetGame,
-  onBack
+  onBack,
+  isPremium = false
 }) => {
   return (
     <div className="text-center space-y-4">
@@ -48,11 +50,27 @@ const ColorMergeGameOver: React.FC<ColorMergeGameOverProps> = ({
             Advanced Player
           </Badge>
         )}
+        {isPremium && (
+          <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white mx-auto">
+            <Crown className="w-3 h-3 mr-1" />
+            Premium Player
+          </Badge>
+        )}
       </div>
       
       <div className="flex gap-2">
         <Button onClick={onRetryWithAd} variant="outline" className="flex-1">
-          📺 Watch Ad to Retry
+          {isPremium ? (
+            <>
+              <Crown className="w-4 h-4 mr-2" />
+              Premium Retry
+            </>
+          ) : (
+            <>
+              <Eye className="w-4 h-4 mr-2" />
+              Watch Ad to Retry
+            </>
+          )}
         </Button>
         <Button onClick={onResetGame} variant="outline" className="flex-1">
           <RefreshCw className="w-4 h-4 mr-2" />
