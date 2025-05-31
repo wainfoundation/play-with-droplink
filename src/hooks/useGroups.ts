@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 export interface Group {
@@ -40,15 +39,9 @@ export const useGroups = () => {
 
   const fetchPublicGroups = async () => {
     try {
-      const { data, error } = await supabase
-        .from('groups')
-        .select('*')
-        .eq('is_active', true)
-        .eq('is_private', false)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setGroups(data || []);
+      // TODO: Implement when groups table is available
+      console.log('Groups feature not yet implemented');
+      setGroups([]);
     } catch (error) {
       console.error('Error fetching groups:', error);
       toast({
@@ -61,25 +54,9 @@ export const useGroups = () => {
 
   const fetchMyGroups = async () => {
     try {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) return;
-
-      const { data, error } = await supabase
-        .from('groups')
-        .select(`
-          *,
-          group_memberships!inner(
-            role,
-            status,
-            joined_at
-          )
-        `)
-        .eq('group_memberships.user_id', user.user.id)
-        .eq('group_memberships.status', 'active')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setMyGroups(data || []);
+      // TODO: Implement when groups and group_memberships tables are available
+      console.log('My groups feature not yet implemented');
+      setMyGroups([]);
     } catch (error) {
       console.error('Error fetching my groups:', error);
     }
@@ -87,47 +64,17 @@ export const useGroups = () => {
 
   const createGroup = async (groupData: Partial<Group>) => {
     try {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) throw new Error('Not authenticated');
-
       if (!groupData.name) throw new Error('Group name is required');
 
-      const { data, error } = await supabase
-        .from('groups')
-        .insert({
-          name: groupData.name,
-          description: groupData.description,
-          price: groupData.price || 0,
-          currency: groupData.currency || 'Pi',
-          is_private: groupData.is_private || false,
-          max_members: groupData.max_members,
-          image_url: groupData.image_url,
-          category: groupData.category,
-          tags: groupData.tags,
-          creator_id: user.user.id,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Add creator as admin member
-      await supabase
-        .from('group_memberships')
-        .insert({
-          group_id: data.id,
-          user_id: user.user.id,
-          role: 'admin',
-          status: 'active',
-        });
+      // TODO: Implement when groups table is available
+      console.log('Create group feature not yet implemented', groupData);
 
       toast({
-        title: "Success",
-        description: "Group created successfully",
+        title: "Feature Coming Soon",
+        description: "Group creation will be available soon!",
       });
 
-      fetchMyGroups();
-      return data;
+      return null;
     } catch (error) {
       console.error('Error creating group:', error);
       toast({
@@ -141,28 +88,15 @@ export const useGroups = () => {
 
   const joinGroup = async (groupId: string, paymentId?: string) => {
     try {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) throw new Error('Not authenticated');
-
-      const { error } = await supabase
-        .from('group_memberships')
-        .insert({
-          group_id: groupId,
-          user_id: user.user.id,
-          role: 'member',
-          status: 'active',
-          payment_id: paymentId,
-        });
-
-      if (error) throw error;
+      // TODO: Implement when group_memberships table is available
+      console.log('Join group feature not yet implemented', { groupId, paymentId });
 
       toast({
-        title: "Success",
-        description: "Joined group successfully",
+        title: "Feature Coming Soon",
+        description: "Group joining will be available soon!",
       });
 
-      fetchMyGroups();
-      return true;
+      return false;
     } catch (error) {
       console.error('Error joining group:', error);
       toast({
