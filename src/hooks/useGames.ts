@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { gamesData } from '@/data/gamesData';
 
 interface Game {
   id: string;
@@ -22,13 +22,9 @@ export const useGames = () => {
   useEffect(() => {
     const fetchGames = async () => {
       try {
-        const { data, error } = await supabase
-          .from('games')
-          .select('*')
-          .order('name');
-
-        if (error) throw error;
-        setGames(data || []);
+        // Simulate loading delay for better UX
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setGames(gamesData);
       } catch (err) {
         console.error('Error fetching games:', err);
         setError(err instanceof Error ? err.message : 'Failed to fetch games');

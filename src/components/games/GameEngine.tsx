@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, Trophy, Star, Heart, RefreshCw } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import BlockConnectEngine from '@/components/games/engines/BlockConnectEngine';
+import ColorMergeEngine from '@/components/games/engines/ColorMergeEngine';
 
 interface GameEngineProps {
   game: {
@@ -19,6 +20,15 @@ interface GameEngineProps {
 }
 
 const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete }) => {
+  // Check if we have a specific engine for this game
+  if (game.id === 'block-connect') {
+    return <BlockConnectEngine onBack={onBack} onGameComplete={onGameComplete} />;
+  }
+  
+  if (game.id === 'color-merge') {
+    return <ColorMergeEngine onBack={onBack} onGameComplete={onGameComplete} />;
+  }
+
   const [gameState, setGameState] = useState<any>({});
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
