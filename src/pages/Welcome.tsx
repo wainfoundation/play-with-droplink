@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles, Heart, Globe, Play, SkipForward, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, Sparkles, Heart, Globe, Play, SkipForward, ChevronLeft, ChevronRight, Gamepad2, Zap } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
 interface WelcomeProps {
@@ -14,27 +14,35 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
   const [buttonsVisible, setButtonsVisible] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialStep, setTutorialStep] = useState(0);
+  const [mascotMood, setMascotMood] = useState(0); // 0: happy, 1: excited, 2: thinking, 3: playful
+
+  const moods = [
+    { name: 'Happy', eyes: 'normal', mouth: 'smile', color: '#00aaff' },
+    { name: 'Excited', eyes: 'wide', mouth: 'big_smile', color: '#ff6600' },
+    { name: 'Thinking', eyes: 'squint', mouth: 'neutral', color: '#9966ff' },
+    { name: 'Playful', eyes: 'wink', mouth: 'tongue', color: '#00cc66' }
+  ];
 
   const tutorialSteps = [
     {
-      title: "Create Your Profile",
-      description: "Set up your Droplink profile with your bio, links, and social media accounts.",
-      icon: "👤"
+      title: "🎮 50+ Interactive Games",
+      description: "Play puzzle games, action challenges, trivia, and creative activities designed for Pi Network users.",
+      icon: "🎮"
     },
     {
-      title: "Add Your Links",
-      description: "Connect all your social media, websites, and important links in one place.",
-      icon: "🔗"
+      title: "⚡ Pi Network Integration",
+      description: "Watch ads to earn Pi rewards or pay directly with Pi to unlock premium games and remove ads forever.",
+      icon: "⚡"
     },
     {
-      title: "Accept Pi Payments",
-      description: "Enable Pi tipping and sell digital products directly from your profile.",
-      icon: "💰"
+      title: "💎 Gaming Subscriptions",
+      description: "Subscribe monthly for unlimited access to all games or purchase individual games with Pi payments.",
+      icon: "💎"
     },
     {
-      title: "Share Your Profile",
-      description: "Share your droplink.space/@username with the world and start earning!",
-      icon: "🚀"
+      title: "🏆 Compete & Earn",
+      description: "Join leaderboards, earn achievements, and compete with other Pi Network gamers worldwide!",
+      icon: "🏆"
     }
   ];
 
@@ -44,10 +52,16 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
     const timer2 = setTimeout(() => setWelcomeTextVisible(true), 1500);
     const timer3 = setTimeout(() => setButtonsVisible(true), 2500);
 
+    // Mood cycling for mascot
+    const moodTimer = setInterval(() => {
+      setMascotMood(prev => (prev + 1) % moods.length);
+    }, 3000);
+
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
       clearTimeout(timer3);
+      clearInterval(moodTimer);
     };
   }, []);
 
@@ -84,12 +98,97 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
     handleGoToHome();
   };
 
+  const renderMascotEyes = (mood: typeof moods[0]) => {
+    switch (mood.eyes) {
+      case 'wide':
+        return (
+          <>
+            <circle cx="80" cy="105" r="8" fill="#fff" />
+            <circle cx="120" cy="105" r="8" fill="#fff" />
+            <circle cx="80" cy="105" r="4" fill="#333" />
+            <circle cx="120" cy="105" r="4" fill="#333" />
+            <circle cx="78" cy="103" r="1.5" fill="#fff" />
+            <circle cx="118" cy="103" r="1.5" fill="#fff" />
+          </>
+        );
+      case 'squint':
+        return (
+          <>
+            <path d="M 72 110 Q 80 105 88 110" stroke="#333" strokeWidth="2" fill="none" />
+            <path d="M 112 110 Q 120 105 128 110" stroke="#333" strokeWidth="2" fill="none" />
+          </>
+        );
+      case 'wink':
+        return (
+          <>
+            <circle cx="80" cy="110" r="6" fill="#fff" />
+            <circle cx="82" cy="112" r="3" fill="#333" />
+            <circle cx="83" cy="111" r="1" fill="#fff" />
+            <path d="M 112 115 Q 120 110 128 115" stroke="#333" strokeWidth="2" fill="none" />
+          </>
+        );
+      default:
+        return (
+          <>
+            <circle cx="80" cy="110" r="6" fill="#fff" />
+            <circle cx="120" cy="110" r="6" fill="#fff" />
+            <circle cx="82" cy="112" r="3" fill="#333" className="animate-pulse" />
+            <circle cx="122" cy="112" r="3" fill="#333" className="animate-pulse" />
+            <circle cx="83" cy="111" r="1" fill="#fff" />
+            <circle cx="123" cy="111" r="1" fill="#fff" />
+          </>
+        );
+    }
+  };
+
+  const renderMascotMouth = (mood: typeof moods[0]) => {
+    switch (mood.mouth) {
+      case 'big_smile':
+        return (
+          <path
+            d="M75 140 Q100 165 125 140"
+            stroke="#fff"
+            strokeWidth="4"
+            fill="none"
+            strokeLinecap="round"
+          />
+        );
+      case 'neutral':
+        return (
+          <ellipse cx="100" cy="145" rx="8" ry="2" fill="#fff" />
+        );
+      case 'tongue':
+        return (
+          <>
+            <path
+              d="M80 140 Q100 160 120 140"
+              stroke="#fff"
+              strokeWidth="3"
+              fill="none"
+              strokeLinecap="round"
+            />
+            <ellipse cx="100" cy="150" rx="4" ry="6" fill="#ff69b4" />
+          </>
+        );
+      default:
+        return (
+          <path
+            d="M80 140 Q100 155 120 140"
+            stroke="#fff"
+            strokeWidth="3"
+            fill="none"
+            strokeLinecap="round"
+          />
+        );
+    }
+  };
+
   if (showTutorial) {
     return (
       <>
         <Helmet>
-          <title>Droplink Tutorial - Learn How to Get Started</title>
-          <meta name="description" content="Learn how to use Droplink to create your Pi Network profile and start earning." />
+          <title>Droplink Gaming Tutorial - Learn How to Play & Earn Pi</title>
+          <meta name="description" content="Learn how to play 50+ games on Droplink, earn Pi rewards, and unlock premium gaming content." />
         </Helmet>
         
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden">
@@ -146,8 +245,8 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
                     onClick={handleFinishTutorial}
                     className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 flex items-center gap-2"
                   >
-                    Start Building
-                    <ArrowRight className="h-4 w-4" />
+                    Start Playing!
+                    <Gamepad2 className="h-4 w-4" />
                   </Button>
                 )}
                 
@@ -166,11 +265,13 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
     );
   }
 
+  const currentMood = moods[mascotMood];
+
   return (
     <>
       <Helmet>
-        <title>Welcome to Droplink - Your Pi Network Link Hub</title>
-        <meta name="description" content="Welcome to Droplink! Transform your Pi domain into a powerful business hub." />
+        <title>Welcome to Droplink Gaming - Your Pi Network Game Hub</title>
+        <meta name="description" content="Welcome to Droplink Gaming! Play 50+ interactive games, earn Pi rewards, and enjoy premium gaming on Pi Network." />
       </Helmet>
       
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden">
@@ -178,19 +279,19 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-3xl animate-pulse" />
         <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-secondary/20 to-primary/20 rounded-full blur-3xl animate-pulse" />
         
-        {/* Floating Elements */}
+        {/* Floating Gaming Elements */}
         <div className="absolute top-20 left-20 animate-bounce">
-          <Sparkles className="text-primary/30 h-8 w-8" />
+          <Gamepad2 className="text-primary/30 h-8 w-8" />
         </div>
         <div className="absolute top-40 right-32 animate-bounce delay-300">
           <Heart className="text-red-400/30 h-6 w-6" />
         </div>
         <div className="absolute bottom-32 left-32 animate-bounce delay-700">
-          <Globe className="text-blue-400/30 h-7 w-7" />
+          <Zap className="text-yellow-400/30 h-7 w-7" />
         </div>
 
         <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 text-center">
-          {/* Mascot */}
+          {/* Gaming Mascot */}
           <div className={`transition-all duration-1000 ${
             mascotVisible ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-50 translate-y-10'
           }`}>
@@ -201,21 +302,28 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
                 viewBox="0 0 200 240"
                 className="animate-bounce-gentle"
               >
-                {/* Droplet shape */}
-                <path
-                  d="M100 20 C60 60, 35 100, 35 140 C35 185, 65 220, 100 220 C135 220, 165 185, 165 140 C165 100, 140 60, 100 20 Z"
-                  fill="url(#welcomeDropletGradient)"
-                  className="animate-pulse-gentle"
-                />
-                
-                {/* Gradient definition */}
+                {/* Droplet shape with mood color */}
                 <defs>
-                  <linearGradient id="welcomeDropletGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#00aaff" />
-                    <stop offset="50%" stopColor="#0099ee" />
+                  <linearGradient id="mascotGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor={currentMood.color} />
+                    <stop offset="50%" stopColor={currentMood.color} />
                     <stop offset="100%" stopColor="#0077cc" />
                   </linearGradient>
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge> 
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
                 </defs>
+                
+                <path
+                  d="M100 20 C60 60, 35 100, 35 140 C35 185, 65 220, 100 220 C135 220, 165 185, 165 140 C165 100, 140 60, 100 20 Z"
+                  fill="url(#mascotGradient)"
+                  filter="url(#glow)"
+                  className="transition-all duration-500"
+                />
                 
                 {/* Highlight */}
                 <ellipse
@@ -227,23 +335,25 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
                   className="animate-shimmer"
                 />
                 
-                {/* Face */}
-                {/* Eyes */}
-                <circle cx="80" cy="110" r="6" fill="#fff" />
-                <circle cx="120" cy="110" r="6" fill="#fff" />
-                <circle cx="82" cy="112" r="3" fill="#333" className="animate-blink" />
-                <circle cx="122" cy="112" r="3" fill="#333" className="animate-blink" />
+                {/* Gaming controller pattern */}
+                <circle cx="65" cy="160" r="3" fill="rgba(255,255,255,0.3)" />
+                <circle cx="135" cy="160" r="3" fill="rgba(255,255,255,0.3)" />
+                <rect x="95" y="155" width="10" height="2" fill="rgba(255,255,255,0.3)" />
+                <rect x="99" y="151" width="2" height="10" fill="rgba(255,255,255,0.3)" />
                 
-                {/* Smile */}
-                <path
-                  d="M80 140 Q100 160 120 140"
-                  stroke="#fff"
-                  strokeWidth="3"
-                  fill="none"
-                  strokeLinecap="round"
-                  className="animate-smile"
-                />
+                {/* Mood-based eyes */}
+                {renderMascotEyes(currentMood)}
+                
+                {/* Mood-based mouth */}
+                {renderMascotMouth(currentMood)}
               </svg>
+              
+              {/* Mood indicator */}
+              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
+                <div className="bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-gray-600">
+                  {currentMood.name}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -253,15 +363,17 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
           }`}>
             <h1 className="text-4xl md:text-6xl font-bold mb-4">
               <span className="bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
-                Welcome to Droplink!
+                Welcome to Droplink! 🎮
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 mb-2">
-              Your Pi Network Link Hub
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-primary">
+              Play with Droplink
+            </h2>
+            <p className="text-lg text-gray-500 max-w-2xl mx-auto mb-2">
+              Your ultimate Pi Network gaming platform with 50+ interactive games.
             </p>
-            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-              Transform your .pi domain into a powerful business hub with Pi payments, 
-              professional profiles, and seamless Pi Browser integration.
+            <p className="text-base text-gray-600 max-w-2xl mx-auto">
+              Watch ads to earn Pi rewards, subscribe for unlimited access, or pay with Pi to unlock premium games instantly. Start your gaming adventure on Pi Network today!
             </p>
           </div>
 
@@ -276,7 +388,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
                 className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 transform transition hover:scale-105 duration-200 text-lg px-8 py-4"
               >
                 <Play className="mr-2 h-5 w-5" />
-                Start Tutorial
+                Start Gaming Tutorial
               </Button>
               <Button 
                 onClick={handleSkipTutorial}
@@ -285,7 +397,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
                 className="hover:bg-blue-50 transition-colors text-lg px-8 py-4"
               >
                 <SkipForward className="mr-2 h-5 w-5" />
-                Skip Tutorial
+                Skip to Games
               </Button>
             </div>
           </div>
@@ -299,44 +411,17 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
             60% { transform: translateY(-8px); }
           }
           
-          @keyframes pulse-gentle {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-          }
-          
-          @keyframes blink {
-            0%, 90%, 100% { transform: scaleY(1); }
-            95% { transform: scaleY(0.1); }
-          }
-          
           @keyframes shimmer {
             0%, 100% { opacity: 0.6; }
             50% { opacity: 1; }
-          }
-          
-          @keyframes smile {
-            0%, 100% { stroke-dasharray: 0, 100; }
-            50% { stroke-dasharray: 30, 100; }
           }
           
           .animate-bounce-gentle {
             animation: bounce-gentle 4s ease-in-out infinite;
           }
           
-          .animate-pulse-gentle {
-            animation: pulse-gentle 3s ease-in-out infinite;
-          }
-          
-          .animate-blink {
-            animation: blink 5s ease-in-out infinite;
-          }
-          
           .animate-shimmer {
             animation: shimmer 2.5s ease-in-out infinite;
-          }
-          
-          .animate-smile {
-            animation: smile 4s ease-in-out infinite;
           }
           `}
         </style>
