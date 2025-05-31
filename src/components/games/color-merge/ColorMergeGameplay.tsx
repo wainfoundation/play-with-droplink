@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Lightbulb, SkipForward } from 'lucide-react';
+import { Lightbulb, SkipForward, Eye } from 'lucide-react';
 
 interface Color {
   r: number;
@@ -89,8 +89,9 @@ const ColorMergeGameplay: React.FC<ColorMergeGameplayProps> = ({
           size="sm"
           className="flex items-center gap-1"
         >
+          <Eye className="w-3 h-3" />
           <Lightbulb className="w-3 h-3" />
-          1π Hint
+          Watch Ad for Hint
         </Button>
         <Button 
           onClick={onSkipLevel}
@@ -98,8 +99,9 @@ const ColorMergeGameplay: React.FC<ColorMergeGameplayProps> = ({
           size="sm"
           className="flex items-center gap-1"
         >
+          <Eye className="w-3 h-3" />
           <SkipForward className="w-3 h-3" />
-          2π Skip
+          Watch Ad to Skip
         </Button>
       </div>
 
