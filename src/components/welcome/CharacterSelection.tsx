@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Helmet } from 'react-helmet-async';
-import { ChevronLeft, Play } from 'lucide-react';
+import { ChevronLeft, Play, Shuffle } from 'lucide-react';
 import CharacterRenderer from './CharacterRenderer';
 import { characters } from './characterData';
+import { generateRandomName, resetUsedNames } from '@/utils/nameGenerator';
 
 interface CharacterSelectionProps {
   selectedCharacter: string;
@@ -19,7 +20,28 @@ const CharacterSelection: React.FC<CharacterSelectionProps> = ({
   onBack,
   onConfirm
 }) => {
-  const selectedCharacterData = characters.find(c => c.id === selectedCharacter);
+  const [charactersWithRandomNames, setCharactersWithRandomNames] = useState(characters);
+
+  useEffect(() => {
+    // Reset used names and generate new random names for all characters
+    resetUsedNames();
+    const updatedCharacters = characters.map(character => ({
+      ...character,
+      name: generateRandomName()
+    }));
+    setCharactersWithRandomNames(updatedCharacters);
+  }, []);
+
+  const handleGenerateNewNames = () => {
+    resetUsedNames();
+    const updatedCharacters = characters.map(character => ({
+      ...character,
+      name: generateRandomName()
+    }));
+    setCharactersWithRandomNames(updatedCharacters);
+  };
+
+  const selectedCharacterData = charactersWithRandomNames.find(c => c.id === selectedCharacter);
 
   return (
     <>
@@ -38,13 +60,23 @@ const CharacterSelection: React.FC<CharacterSelectionProps> = ({
             <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
               Choose Your Gaming Character
             </h1>
-            <p className="text-lg text-gray-600 mb-8">
+            <p className="text-lg text-gray-600 mb-4">
               Select a character to accompany you on your gaming adventure!
             </p>
             
+            {/* Generate New Names Button */}
+            <Button 
+              onClick={handleGenerateNewNames}
+              variant="outline"
+              className="mb-6 flex items-center gap-2"
+            >
+              <Shuffle className="h-4 w-4" />
+              Generate New Names
+            </Button>
+            
             {/* Character Selection Grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 mb-8">
-              {characters.map((character) => (
+              {charactersWithRandomNames.map((character) => (
                 <div
                   key={character.id}
                   onClick={() => onCharacterSelect(character.id)}
