@@ -11,7 +11,10 @@ import {
   VolumeX,
   PuzzleIcon,
   User,
-  Settings
+  Settings,
+  ShoppingCartIcon,
+  HomeIcon,
+  SwordsIcon
 } from 'lucide-react';
 
 interface PlayWithMascotHeaderProps {
@@ -57,7 +60,7 @@ const PlayWithMascotHeader: React.FC<PlayWithMascotHeaderProps> = ({
           Play with Droplink
         </h1>
         <p className="text-lg text-gray-600 mb-6">
-          Your interactive gaming platform with character customization
+          Your interactive gaming platform with character customization & P2P battles
         </p>
         
         <div className="flex justify-center gap-4 mb-6">
@@ -73,18 +76,30 @@ const PlayWithMascotHeader: React.FC<PlayWithMascotHeaderProps> = ({
       </div>
 
       <Tabs value={activeTab} onValueChange={onTabChange} className="w-full max-w-7xl mx-auto">
-        <TabsList className="grid w-full grid-cols-3 mb-6">
+        <TabsList className="grid w-full grid-cols-5 mb-6">
           <TabsTrigger value="games" className="flex items-center gap-2">
             <PuzzleIcon className="w-4 h-4" />
             Games
           </TabsTrigger>
           <TabsTrigger value="character" className="flex items-center gap-2">
             <User className="w-4 h-4" />
-            My Character
+            Character
           </TabsTrigger>
           <TabsTrigger value="customize" className="flex items-center gap-2">
             <Settings className="w-4 h-4" />
             Customize
+          </TabsTrigger>
+          <TabsTrigger value="store" className="flex items-center gap-2">
+            <ShoppingCartIcon className="w-4 h-4" />
+            Store
+          </TabsTrigger>
+          <TabsTrigger value="room" className="flex items-center gap-2">
+            <HomeIcon className="w-4 h-4" />
+            Room
+          </TabsTrigger>
+          <TabsTrigger value="battles" className="flex items-center gap-2">
+            <SwordsIcon className="w-4 h-4" />
+            Battles
           </TabsTrigger>
         </TabsList>
       </Tabs>

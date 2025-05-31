@@ -11,6 +11,9 @@ import GameUpgradeModal from '@/components/games/GameUpgradeModal';
 import PiBrowserCheck from '@/components/PiBrowserCheck';
 import GameManager from '@/components/games/GameManager';
 import CharacterManager from '@/components/character/CharacterManager';
+import StoreManager from '@/components/store/StoreManager';
+import RoomManager from '@/components/room/RoomManager';
+import BattleManager from '@/components/battles/BattleManager';
 import PlayWithMascotHeader from '@/components/games/PlayWithMascotHeader';
 import { isRunningInPiBrowser } from '@/utils/pi-sdk';
 import { sounds, createBackgroundMusicController } from '@/utils/sounds';
@@ -24,6 +27,7 @@ const PlayWithMascot = () => {
   const [currentEmotion, setCurrentEmotion] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
   const [currentGame, setCurrentGame] = useState<any>(null);
+  const [currentBattle, setCurrentBattle] = useState<any>(null);
   const [userPlan, setUserPlan] = useState('free');
   const [purchasedGames, setPurchasedGames] = useState<string[]>([]);
   const [showPiBrowserCheck, setShowPiBrowserCheck] = useState(true);
@@ -96,16 +100,14 @@ const PlayWithMascot = () => {
 
   const handleCharacterUpdate = (updatedCharacter: CharacterCustomization) => {
     setCharacter(updatedCharacter);
-    // Here you would save to database
     toast({
       title: "Character Updated!",
       description: `${updatedCharacter.name} has been updated.`,
     });
   };
 
-  const handlePurchaseItem = async (item: ShopItem) => {
+  const handleStorePurchase = (item: any) => {
     if (item.currency === 'pi') {
-      // Handle Pi payment
       setUpgradeModal({
         isOpen: true,
         upgradeType: 'unlock',
@@ -113,22 +115,43 @@ const PlayWithMascot = () => {
         piCost: item.price
       });
     } else {
-      // Handle ad viewing
       toast({
         title: "Watch Ad",
         description: "Watch an ad to unlock this item!",
       });
-      // Here you would show an ad
+    }
+  };
+
+  const handlePurchaseItem = async (item: ShopItem) => {
+    if (item.currency === 'pi') {
+      setUpgradeModal({
+        isOpen: true,
+        upgradeType: 'unlock',
+        upgradeName: item.name,
+        piCost: item.price
+      });
+    } else {
+      toast({
+        title: "Watch Ad",
+        description: "Watch an ad to unlock this item!",
+      });
     }
   };
 
   const handlePetInteraction = (interaction: PetInteraction) => {
-    // Update character happiness based on interaction
-    setCurrentEmotion(1); // excited
-    
+    setCurrentEmotion(1);
     toast({
       title: "Character Interaction",
       description: `Your character enjoyed ${interaction.type}ing!`,
+    });
+  };
+
+  const handleStartBattle = (battle: any) => {
+    setCurrentBattle(battle);
+    setCurrentEmotion(1);
+    toast({
+      title: "Battle Starting!",
+      description: "Get ready to battle!",
     });
   };
 
@@ -153,7 +176,7 @@ const PlayWithMascot = () => {
     }
 
     setCurrentGame({ ...game, category });
-    setCurrentEmotion(1); // excited
+    setCurrentEmotion(1);
     toast({
       title: `Starting ${game.name}`,
       description: "Get ready to play!",
@@ -180,8 +203,7 @@ const PlayWithMascot = () => {
       }
     }
     
-    setCurrentEmotion(8); // proud
-    // Apply the upgrade logic here
+    setCurrentEmotion(8);
   };
 
   const handleMoodChange = (mood: number) => {
@@ -222,7 +244,7 @@ const PlayWithMascot = () => {
               onBack={() => setCurrentGame(null)}
               onGameComplete={(score) => {
                 setTotalScore(prev => prev + score);
-                setCurrentEmotion(8); // proud
+                setCurrentEmotion(8);
                 if (soundEnabled) sounds.success();
                 toast({
                   title: "Great Job!",
@@ -236,11 +258,36 @@ const PlayWithMascot = () => {
     );
   }
 
+  // Show battle engine if a battle is selected
+  if (currentBattle) {
+    return (
+      <>
+        <Helmet>
+          <title>Battle Arena - Play with Droplink</title>
+        </Helmet>
+        <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 py-8">
+          <div className="container mx-auto px-4">
+            <div className="text-center">
+              <h1 className="text-4xl font-bold mb-4">Battle Arena</h1>
+              <p className="text-lg text-gray-600 mb-8">Battle in progress...</p>
+              <button 
+                onClick={() => setCurrentBattle(null)}
+                className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600"
+              >
+                Exit Battle
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <Helmet>
-        <title>Play with Droplink - Interactive Games & Character Customization</title>
-        <meta name="description" content="Play 50+ interactive games and customize your unique character! Feed, play, and enhance your virtual pet with Pi Network integration." />
+        <title>Play with Droplink - Interactive Games, Character Customization & P2P Battles</title>
+        <meta name="description" content="Play 50+ interactive games, customize your character, decorate rooms, shop for items, and battle other players in epic P2P competitions!" />
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">
@@ -290,6 +337,26 @@ const PlayWithMascot = () => {
                 onStatsUpdate={setCharacterStats}
                 onPurchaseItem={handlePurchaseItem}
                 onPetInteraction={handlePetInteraction}
+              />
+            </TabsContent>
+
+            <TabsContent value="store">
+              <StoreManager
+                onPurchase={handleStorePurchase}
+                soundEnabled={soundEnabled}
+              />
+            </TabsContent>
+
+            <TabsContent value="room">
+              <RoomManager
+                soundEnabled={soundEnabled}
+              />
+            </TabsContent>
+
+            <TabsContent value="battles">
+              <BattleManager
+                soundEnabled={soundEnabled}
+                onStartBattle={handleStartBattle}
               />
             </TabsContent>
           </Tabs>
