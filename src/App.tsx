@@ -4,8 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { UserProvider } from "@/context/UserContext";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { HelmetProvider } from 'react-helmet-async';
 
 import SplashScreen from "@/components/SplashScreen";
@@ -50,37 +49,35 @@ const App = () => {
   return (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
-        <UserProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                {/* Main gaming workflow */}
-                <Route path="/" element={<Index />} />
-                <Route path="/welcome" element={<Welcome onEnter={() => window.location.href = '/character'} />} />
-                <Route path="/character" element={<CharacterHome />} />
-                
-                {/* Redirect common routes to character */}
-                <Route path="/play" element={<Navigate to="/character" replace />} />
-                <Route path="/dashboard" element={<Navigate to="/character" replace />} />
-                <Route path="/games" element={<Navigate to="/character" replace />} />
-                
-                {/* Coming soon pages */}
-                <Route path="/pricing" element={<ComingSoonPage pageName="Pricing Plans" />} />
-                <Route path="/features" element={<ComingSoonPage pageName="Features" />} />
-                <Route path="/about" element={<ComingSoonPage pageName="About Us" />} />
-                <Route path="/contact" element={<ComingSoonPage pageName="Contact" />} />
-                <Route path="/profile/*" element={<ComingSoonPage pageName="User Profiles" />} />
-                <Route path="/register/*" element={<ComingSoonPage pageName="Registration" />} />
-                <Route path="/login" element={<ComingSoonPage pageName="Login" />} />
-                
-                {/* Catch all - redirect to home */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </UserProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* Main gaming workflow */}
+              <Route path="/" element={<Index />} />
+              <Route path="/welcome" element={<Welcome onEnter={() => window.location.href = '/character'} />} />
+              <Route path="/character" element={<CharacterHome />} />
+              
+              {/* Redirect common routes to character */}
+              <Route path="/play" element={<Navigate to="/character" replace />} />
+              <Route path="/dashboard" element={<Navigate to="/character" replace />} />
+              <Route path="/games" element={<Navigate to="/character" replace />} />
+              
+              {/* Coming soon pages */}
+              <Route path="/pricing" element={<ComingSoonPage pageName="Pricing Plans" />} />
+              <Route path="/features" element={<ComingSoonPage pageName="Features" />} />
+              <Route path="/about" element={<ComingSoonPage pageName="About Us" />} />
+              <Route path="/contact" element={<ComingSoonPage pageName="Contact" />} />
+              <Route path="/profile/*" element={<ComingSoonPage pageName="User Profiles" />} />
+              <Route path="/register/*" element={<ComingSoonPage pageName="Registration" />} />
+              <Route path="/login" element={<ComingSoonPage pageName="Login" />} />
+              
+              {/* Catch all - redirect to home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
       </QueryClientProvider>
     </HelmetProvider>
   );
