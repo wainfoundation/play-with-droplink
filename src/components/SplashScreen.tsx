@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { playSound, sounds } from '@/utils/sounds';
 import { Progress } from "@/components/ui/progress";
+import MascotIcon from './MascotIcon';
 
 export interface SplashScreenProps {
   onComplete: () => void;
@@ -73,9 +74,9 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
             transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
             className="text-center"
           >
-            {/* Logo */}
+            {/* Mascot Logo */}
             <motion.div
-              className="mx-auto mb-6 h-24 w-24 rounded-xl bg-white p-4 shadow-lg"
+              className="mx-auto mb-6 h-24 w-24 rounded-xl bg-white p-4 shadow-lg flex items-center justify-center"
               initial={{ scale: 0.8, rotate: -5 }}
               animate={{ 
                 scale: [0.8, 1.05, 1],
@@ -88,11 +89,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
                 times: [0, 0.7, 1] 
               }}
             >
-              <img 
-                src="/lovable-uploads/1dc40f50-2eba-46b0-a495-962b97bfaf8d.png" 
-                alt="Droplink Logo" 
-                className="h-full w-full" 
-              />
+              <MascotIcon size={64} mood="excited" />
             </motion.div>
             
             {/* App Name */}

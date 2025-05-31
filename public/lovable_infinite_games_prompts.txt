@@ -1,0 +1,260 @@
+
+App Title: Block Connect
+Category: Puzzle & Logic
+
+Short Description:
+Connect blocks strategically
+
+Detailed Description:
+Strategically connect blocks on a grid to solve complex puzzles. Blocks must align by color or shape to clear levels.
+
+Features:
+- Infinite level or challenge progression (Level 1 to 9,999,999)
+- Game Over screen with Retry and Back to Menu options
+- Players must watch a Pi AdNetwork ad to play each round
+- Option to unlock game permanently for 0 Pi
+- ✅ Sound effects for gameplay events (taps, matches, fails, background)
+- Mobile-optimized with smooth animations
+- Matches Droplink's modern and clean aesthetic
+
+---
+
+App Title: Color Merge
+Category: Puzzle & Logic
+
+Short Description:
+Merge colors to create new ones
+
+Detailed Description:
+Merge tiles of different colors to create new combinations. The goal is to reach the ultimate color tile with as few moves as possible.
+
+Features:
+- Infinite level or challenge progression (Level 1 to 9,999,999)
+- Game Over screen with Retry and Back to Menu options
+- Players must watch a Pi AdNetwork ad to play each round
+- Option to unlock game permanently for 0 Pi
+- ✅ Sound effects for gameplay events (taps, matches, fails, background)
+- Mobile-optimized with smooth animations
+- Matches Droplink's modern and clean aesthetic
+
+---
+
+App Title: Logic Flow
+Category: Puzzle & Logic
+
+Short Description:
+Complex logic puzzles
+
+Detailed Description:
+Solve advanced logic puzzles by determining the correct flow of operations, paths, or numbers to reach the goal.
+
+Features:
+- Infinite level or challenge progression (Level 1 to 9,999,999)
+- Game Over screen with Retry and Back to Menu options
+- Players must watch a Pi AdNetwork ad to play each round
+- Option to unlock game permanently for 0 Pi
+- ✅ Sound effects for gameplay events (taps, matches, fails, background)
+- Mobile-optimized with smooth animations
+- Matches Droplink's modern and clean aesthetic
+
+---
+
+App Title: Match 3
+Category: Puzzle & Logic
+
+Short Description:
+Classic match-three gameplay
+
+Detailed Description:
+Match three or more items to clear the board and progress to more complex patterns and bonuses.
+
+Features:
+- Infinite level or challenge progression (Level 1 to 9,999,999)
+- Game Over screen with Retry and Back to Menu options
+- Players must watch a Pi AdNetwork ad to play each round
+- Option to unlock game permanently for 0 Pi
+- ✅ Sound effects for gameplay events (taps, matches, fails, background)
+- Mobile-optimized with smooth animations
+- Matches Droplink's modern and clean aesthetic
+
+---
+
+App Title: Memory Match
+Category: Puzzle & Logic
+
+Short Description:
+Test your memory with matching cards
+
+Detailed Description:
+Flip and match cards using memory skills. Levels grow with more card pairs and decreasing time.
+
+Features:
+- Infinite level or challenge progression (Level 1 to 9,999,999)
+- Game Over screen with Retry and Back to Menu options
+- Players must watch a Pi AdNetwork ad to play each round
+- Option to unlock game permanently for 0 Pi
+- ✅ Sound effects for gameplay events (taps, matches, fails, background)
+- Mobile-optimized with smooth animations
+- Matches Droplink's modern and clean aesthetic
+
+---
+
+App Title: Number Maze
+Category: Puzzle & Logic
+
+Short Description:
+Navigate through number sequences
+
+Detailed Description:
+Navigate a maze using number sequences that must add up or follow specific patterns.
+
+Features:
+- Infinite level or challenge progression (Level 1 to 9,999,999)
+- Game Over screen with Retry and Back to Menu options
+- Players must watch a Pi AdNetwork ad to play each round
+- Option to unlock game permanently for 0 Pi
+- ✅ Sound effects for gameplay events (taps, matches, fails, background)
+- Mobile-optimized with smooth animations
+- Matches Droplink's modern and clean aesthetic
+
+---
+
+App Title: Pi Wordle
+Category: Puzzle & Logic
+
+Short Description:
+Pi Network themed word puzzle
+
+Detailed Description:
+Guess the Pi-themed words in limited tries. Feedback after each attempt helps guide your next guess.
+
+Features:
+- Infinite level or challenge progression (Level 1 to 9,999,999)
+- Game Over screen with Retry and Back to Menu options
+- Players must watch a Pi AdNetwork ad to play each round
+- Option to unlock game permanently for 0 Pi
+- ✅ Sound effects for gameplay events (taps, matches, fails, background)
+- Mobile-optimized with smooth animations
+- Matches Droplink's modern and clean aesthetic
+
+---
+
+App Title: Sequence Grid
+Category: Puzzle & Logic
+
+Short Description:
+Pattern recognition challenge
+
+Detailed Description:
+Identify and complete the correct pattern in a grid of symbols, numbers, or colors.
+
+Features:
+- Infinite level or challenge progression (Level 1 to 9,999,999)
+- Game Over screen with Retry and Back to Menu options
+- Players must watch a Pi AdNetwork ad to play each round
+- Option to unlock game permanently for 0 Pi
+- ✅ Sound effects for gameplay events (taps, matches, fails, background)
+- Mobile-optimized with smooth animations
+- Matches Droplink's modern and clean aesthetic
+
+---
+
+App Title: Tile Flipper
+Category: Puzzle & Logic
+
+Short Description:
+Flip tiles to solve puzzles
+
+Detailed Description:
+Tap tiles to flip adjacent tiles. Match patterns or solve images to clear the level.
+
+Features:
+- Infinite level or challenge progression (Level 1 to 9,999,999)
+- Game Over screen with Retry and Back to Menu options
+- Players must watch a Pi AdNetwork ad to play each round
+- Option to unlock game permanently for 0 Pi
+- ✅ Sound effects for gameplay events (taps, matches, fails, background)
+- Mobile-optimized with smooth animations
+- Matches Droplink's modern and clean aesthetic
+
+---
+
+App Title: Word Guess
+Category: Puzzle & Logic
+
+Short Description:
+Guess the word from clues
+
+Detailed Description:
+Guess the correct word based on clues or scrambled letters. Infinite replay with randomized clues.
+
+Features:
+- Infinite level or challenge progression (Level 1 to 9,999,999)
+- Game Over screen with Retry and Back to Menu options
+- Players must watch a Pi AdNetwork ad to play each round
+- Option to unlock game permanently for 0 Pi
+- ✅ Sound effects for gameplay events (taps, matches, fails, background)
+- Mobile-optimized with smooth animations
+- Matches Droplink's modern and clean aesthetic
+
+---
+
+App Title: Droplink Dash
+Category: Action & Reflex
+
+Short Description:
+Fast-paced running adventure with your mascot
+
+Detailed Description:
+Run endlessly through various obstacles as the Droplink mascot. Collect Pi and power-ups.
+
+Features:
+- Infinite level or challenge progression (Level 1 to 9,999,999)
+- Game Over screen with Retry and Back to Menu options
+- Players must watch a Pi AdNetwork ad to play each round
+- Option to unlock game permanently for 0 Pi
+- ✅ Sound effects for gameplay events (taps, matches, fails, background)
+- Mobile-optimized with smooth animations
+- Matches Droplink's modern and clean aesthetic
+
+---
+
+App Title: Speed Tap
+Category: Action & Reflex
+
+Short Description:
+Tap as fast as you can to beat high scores
+
+Detailed Description:
+Tap rapidly in a limited time to achieve high scores. Speed increases with each level.
+
+Features:
+- Infinite level or challenge progression (Level 1 to 9,999,999)
+- Game Over screen with Retry and Back to Menu options
+- Players must watch a Pi AdNetwork ad to play each round
+- Option to unlock game permanently for 0 Pi
+- ✅ Sound effects for gameplay events (taps, matches, fails, background)
+- Mobile-optimized with smooth animations
+- Matches Droplink's modern and clean aesthetic
+
+---
+
+App Title: Bubble Pop
+Category: Action & Reflex
+
+Short Description:
+Pop colorful bubbles before they escape
+
+Detailed Description:
+Pop colorful bubbles as they float up. New levels add speed, decoys, and bonuses.
+
+Features:
+- Infinite level or challenge progression (Level 1 to 9,999,999)
+- Game Over screen with Retry and Back to Menu options
+- Players must watch a Pi AdNetwork ad to play each round
+- Option to unlock game permanently for 0 Pi
+- ✅ Sound effects for gameplay events (taps, matches, fails, background)
+- Mobile-optimized with smooth animations
+- Matches Droplink's modern and clean aesthetic
+
+---
