@@ -11,6 +11,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import SplashScreen from "@/components/SplashScreen";
 import Index from "./pages/Index";
 import PlayWithMascot from "./pages/PlayWithMascot";
+import GameWorkflow from "./pages/GameWorkflow";
 
 // Placeholder components for other pages
 const ComingSoonPage = ({ pageName }: { pageName: string }) => (
@@ -58,6 +59,7 @@ const App = () => {
                 {/* Main gaming workflow */}
                 <Route path="/" element={<Index />} />
                 <Route path="/play" element={<PlayWithMascot />} />
+                <Route path="/workflow" element={<GameWorkflow />} />
                 
                 {/* Redirect common routes to play */}
                 <Route path="/dashboard" element={<Navigate to="/play" replace />} />
