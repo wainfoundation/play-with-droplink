@@ -1,5 +1,8 @@
 
 import React from 'react';
+import CharacterEyes from './CharacterEyes';
+import CharacterMouth from './CharacterMouth';
+import CharacterDecorations from './CharacterDecorations';
 
 interface Character {
   id: string;
@@ -17,156 +20,6 @@ interface CharacterRendererProps {
 
 const CharacterRenderer: React.FC<CharacterRendererProps> = ({ character, size = 120 }) => {
   const gradientId = `${character.id}Gradient`;
-  
-  // Eye styles based on mood - fixed positioning to prevent jumping
-  const getEyes = (mood: string) => {
-    switch (mood) {
-      case 'excited':
-        return (
-          <>
-            <circle cx="80" cy="105" r="8" fill="#fff" />
-            <circle cx="120" cy="105" r="8" fill="#fff" />
-            <circle cx="80" cy="105" r="5" fill="#333" />
-            <circle cx="120" cy="105" r="5" fill="#333" />
-            <circle cx="82" cy="103" r="2" fill="#fff" />
-            <circle cx="122" cy="103" r="2" fill="#fff" />
-          </>
-        );
-      case 'calm':
-        return (
-          <>
-            <circle cx="80" cy="105" r="8" fill="#fff" />
-            <circle cx="120" cy="105" r="8" fill="#fff" />
-            <circle cx="80" cy="108" r="3" fill="#333" />
-            <circle cx="120" cy="108" r="3" fill="#333" />
-          </>
-        );
-      case 'sleepy':
-        return (
-          <>
-            <path d="M70 105 Q80 100 90 105" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
-            <path d="M110 105 Q120 100 130 105" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
-          </>
-        );
-      case 'hungry':
-        return (
-          <>
-            <circle cx="80" cy="105" r="8" fill="#fff" />
-            <circle cx="120" cy="105" r="8" fill="#fff" />
-            <circle cx="80" cy="105" r="6" fill="#333" />
-            <circle cx="120" cy="105" r="6" fill="#333" />
-            <circle cx="82" cy="103" r="2" fill="#fff" />
-            <circle cx="122" cy="103" r="2" fill="#fff" />
-          </>
-        );
-      case 'playful':
-        return (
-          <>
-            <circle cx="80" cy="105" r="8" fill="#fff" />
-            <circle cx="120" cy="105" r="8" fill="#fff" />
-            <circle cx="82" cy="106" r="4" fill="#333" />
-            <circle cx="118" cy="106" r="4" fill="#333" />
-            <circle cx="83" cy="104" r="1.5" fill="#fff" />
-            <circle cx="119" cy="104" r="1.5" fill="#fff" />
-          </>
-        );
-      case 'focused':
-        return (
-          <>
-            <circle cx="80" cy="105" r="8" fill="#fff" />
-            <circle cx="120" cy="105" r="8" fill="#fff" />
-            <circle cx="80" cy="105" r="4" fill="#333" />
-            <circle cx="120" cy="105" r="4" fill="#333" />
-          </>
-        );
-      default: // happy
-        return (
-          <>
-            <circle cx="80" cy="105" r="8" fill="#fff" />
-            <circle cx="120" cy="105" r="8" fill="#fff" />
-            <circle cx="80" cy="108" r="4" fill="#333" />
-            <circle cx="120" cy="108" r="4" fill="#333" />
-            <circle cx="82" cy="106" r="1.5" fill="#fff" />
-            <circle cx="122" cy="106" r="1.5" fill="#fff" />
-          </>
-        );
-    }
-  };
-
-  // Mouth styles based on mood
-  const getMouth = (mood: string) => {
-    switch (mood) {
-      case 'excited':
-        return (
-          <ellipse
-            cx="100"
-            cy="150"
-            rx="20"
-            ry="12"
-            fill="#333"
-          />
-        );
-      case 'calm':
-        return (
-          <path
-            d="M85 145 Q100 150 115 145"
-            stroke="#333"
-            strokeWidth="3"
-            fill="none"
-            strokeLinecap="round"
-          />
-        );
-      case 'sleepy':
-        return (
-          <circle
-            cx="100"
-            cy="148"
-            r="3"
-            fill="#333"
-          />
-        );
-      case 'hungry':
-        return (
-          <ellipse
-            cx="100"
-            cy="150"
-            rx="15"
-            ry="10"
-            fill="#333"
-          />
-        );
-      case 'playful':
-        return (
-          <path
-            d="M75 140 Q100 165 125 140"
-            stroke="#333"
-            strokeWidth="4"
-            fill="none"
-            strokeLinecap="round"
-          />
-        );
-      case 'focused':
-        return (
-          <path
-            d="M90 148 Q100 145 110 148"
-            stroke="#333"
-            strokeWidth="2"
-            fill="none"
-            strokeLinecap="round"
-          />
-        );
-      default: // happy
-        return (
-          <path
-            d="M80 140 Q100 155 120 140"
-            stroke="#333"
-            strokeWidth="4"
-            fill="none"
-            strokeLinecap="round"
-          />
-        );
-    }
-  };
   
   return (
     <svg width={size} height={size * 1.2} viewBox="0 0 200 240" className="animate-bounce-gentle">
@@ -196,33 +49,13 @@ const CharacterRenderer: React.FC<CharacterRendererProps> = ({ character, size =
       />
       
       {/* Eyes based on mood */}
-      {getEyes(character.mood)}
+      <CharacterEyes mood={character.mood} />
       
       {/* Mouth based on mood */}
-      {getMouth(character.mood)}
+      <CharacterMouth mood={character.mood} />
 
-      {/* Gender indicator (optional bow for female characters) */}
-      {character.gender === 'female' && (
-        <path
-          d="M85 45 Q100 35 115 45 Q100 55 85 45"
-          fill="#ff1493"
-          opacity="0.8"
-        />
-      )}
-
-      {/* Mood indicator - small icon based on mood */}
-      {character.mood === 'hungry' && (
-        <text x="140" y="80" fontSize="16" fill="#ff6b35">🍎</text>
-      )}
-      {character.mood === 'sleepy' && (
-        <text x="140" y="80" fontSize="16" fill="#6b73ff">💤</text>
-      )}
-      {character.mood === 'playful' && (
-        <text x="140" y="80" fontSize="16" fill="#ff6b6b">⚽</text>
-      )}
-      {character.mood === 'focused' && (
-        <text x="140" y="80" fontSize="16" fill="#4ecdc4">🎯</text>
-      )}
+      {/* Gender indicator and mood icons */}
+      <CharacterDecorations gender={character.gender} mood={character.mood} />
     </svg>
   );
 };
