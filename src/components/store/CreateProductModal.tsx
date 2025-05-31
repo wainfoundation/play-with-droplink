@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -10,12 +9,13 @@ import { toast } from '@/hooks/use-toast';
 import { Plus } from 'lucide-react';
 
 interface CreateProductModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onProductCreated: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
+  onProductCreated?: () => void;
 }
 
-const CreateProductModal = ({ isOpen, onClose, onProductCreated }: CreateProductModalProps) => {
+const CreateProductModal = ({ isOpen, onClose, onProductCreated }: CreateProductModalProps = {}) => {
+  const [internalOpen, setInternalOpen] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -24,6 +24,17 @@ const CreateProductModal = ({ isOpen, onClose, onProductCreated }: CreateProduct
     file: null as File | null
   });
   const [loading, setLoading] = useState(false);
+
+  const isControlled = isOpen !== undefined;
+  const modalOpen = isControlled ? isOpen : internalOpen;
+
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    } else {
+      setInternalOpen(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,8 +54,10 @@ const CreateProductModal = ({ isOpen, onClose, onProductCreated }: CreateProduct
         title: "Success",
         description: "Product created successfully!",
       });
-      onProductCreated();
-      onClose();
+      if (onProductCreated) {
+        onProductCreated();
+      }
+      handleClose();
     } catch (error) {
       console.error('Error creating product:', error);
       toast({
@@ -57,8 +70,98 @@ const CreateProductModal = ({ isOpen, onClose, onProductCreated }: CreateProduct
     }
   };
 
+  if (isControlled) {
+    return (
+      <Dialog open={modalOpen} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create New Product</DialogTitle>
+          </DialogHeader>
+          
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="title">Product Title *</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                placeholder="Enter product title"
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Describe your product"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="price">Price (Pi) *</Label>
+              <Input
+                id="price"
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.price}
+                onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
+                placeholder="0.00"
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="category">Category</Label>
+              <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ebook">eBook</SelectItem>
+                  <SelectItem value="course">Course</SelectItem>
+                  <SelectItem value="template">Template</SelectItem>
+                  <SelectItem value="software">Software</SelectItem>
+                  <SelectItem value="music">Music</SelectItem>
+                  <SelectItem value="art">Digital Art</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="file">Product File</Label>
+              <Input
+                id="file"
+                type="file"
+                onChange={(e) => setFormData(prev => ({ ...prev, file: e.target.files?.[0] || null }))}
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <Button type="submit" disabled={loading}>
+                {loading ? 'Creating...' : 'Create Product'}
+              </Button>
+              <Button type="button" variant="outline" onClick={handleClose}>
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={modalOpen} onOpenChange={setInternalOpen}>
+      <DialogTrigger asChild>
+        <Button>
+          <Plus className="h-4 w-4 mr-2" />
+          Create Product
+        </Button>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create New Product</DialogTitle>
@@ -130,7 +233,7 @@ const CreateProductModal = ({ isOpen, onClose, onProductCreated }: CreateProduct
             <Button type="submit" disabled={loading}>
               {loading ? 'Creating...' : 'Create Product'}
             </Button>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={handleClose}>
               Cancel
             </Button>
           </div>

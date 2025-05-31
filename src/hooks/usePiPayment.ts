@@ -1,107 +1,87 @@
 
-import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { useUser } from "@/context/UserContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useCallback } from 'react';
+import { toast } from '@/hooks/use-toast';
 
-// Updated pricing in Pi to match the new structure
-export const planPricing = {
-  starter: { monthly: 10, annual: 8 },
-  pro: { monthly: 15, annual: 12 },
-  premium: { monthly: 22, annual: 18 }
-};
+interface PaymentData {
+  amount: number;
+  memo: string;
+  metadata: any;
+  onReadyForServerApproval?: (paymentId: string) => void;
+  onReadyForServerCompletion?: (paymentId: string, txid: string) => void;
+  onCancel?: (paymentId: string) => void;
+  onError?: (error: Error, payment?: any) => void;
+}
 
-export function usePiPayment() {
-  const { toast } = useToast();
-  const { user, refreshUserData } = useUser();
-  const [processingPayment, setProcessingPayment] = useState(false);
+interface PaymentResult {
+  identifier: string;
+  user_uid: string;
+  amount: number;
+  memo: string;
+  metadata: any;
+  from_address: string;
+  to_address: string;
+  direction: 'user_to_app' | 'app_to_user';
+  created_at: string;
+  network: string;
+  status: { developer_approved: boolean; transaction_verified: boolean; developer_completed: boolean; cancelled: boolean; user_cancelled: boolean };
+  transaction: null | { txid: string; verified: boolean; _link: string };
+}
 
-  const handlePiLogin = async () => {
-    toast({
-      title: "Pi Network Integration Active",
-      description: "Ready for Pi Network payments and authentication",
-    });
-  };
+export const usePiPayment = () => {
+  const [loading, setLoading] = useState(false);
 
-  const handleSubscribe = async (plan: string, billingCycle: string) => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please connect with Pi Network to upgrade your plan",
-        variant: "destructive", 
-      });
-      return;
-    }
-    
-    setProcessingPayment(true);
-    
+  const createPayment = useCallback(async (paymentData: PaymentData): Promise<PaymentResult | null> => {
     try {
-      // Calculate pricing
-      const pricing = planPricing[plan as keyof typeof planPricing];
-      const amount = billingCycle === 'annual' ? pricing.annual * 12 : pricing.monthly;
-      
-      // Calculate expiration date
-      const expiresAt = new Date();
-      if (billingCycle === 'annual') {
-        expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-      } else {
-        expiresAt.setMonth(expiresAt.getMonth() + 1);
-      }
-      
-      // Create payment record
-      const { data: payment, error: paymentError } = await supabase
-        .from('payments')
-        .insert({
-          user_id: user.id,
-          amount,
-          currency: 'Pi',
-          status: 'completed',
-          memo: `${plan} Plan Subscription (${billingCycle})`
-        })
-        .select()
-        .single();
-        
-      if (paymentError) throw paymentError;
-      
-      // Create subscription record
-      const { error: subscriptionError } = await supabase
-        .from('subscriptions')
-        .insert({
-          user_id: user.id,
-          plan,
-          amount,
-          expires_at: expiresAt.toISOString(),
-          is_active: true,
-          payment_id: payment.id
-        });
-        
-      if (subscriptionError) throw subscriptionError;
-      
+      setLoading(true);
+
+      // TODO: Implement when payments table is properly set up
+      console.log('Pi payment feature not yet implemented', paymentData);
+
       toast({
-        title: "Subscription Activated!",
-        description: `Welcome to ${plan} plan! Your Pi Network features are now available.`,
+        title: "Feature Coming Soon",
+        description: "Pi payments will be available soon!",
       });
-      
-      // Refresh user data to show new subscription
-      setTimeout(() => {
-        refreshUserData();
-      }, 1000);
+
+      return null;
     } catch (error) {
-      console.error("Subscription error:", error);
+      console.error('Error creating payment:', error);
       toast({
-        title: "Subscription Failed",
-        description: "Unable to process Pi Network payment. Please try again.",
+        title: "Payment Error",
+        description: "Failed to create payment",
         variant: "destructive",
       });
+      return null;
     } finally {
-      setProcessingPayment(false);
+      setLoading(false);
     }
-  };
+  }, []);
+
+  const approvePayment = useCallback(async (paymentId: string) => {
+    try {
+      // TODO: Implement payment approval
+      console.log('Payment approval feature not yet implemented', paymentId);
+      return true;
+    } catch (error) {
+      console.error('Error approving payment:', error);
+      return false;
+    }
+  }, []);
+
+  const completePayment = useCallback(async (paymentId: string) => {
+    try {
+      // TODO: Implement payment completion
+      console.log('Payment completion feature not yet implemented', paymentId);
+      return true;
+    } catch (error) {
+      console.error('Error completing payment:', error);
+      return false;
+    }
+  }, []);
 
   return {
-    processingPayment,
-    handlePiLogin,
-    handleSubscribe,
-    planPricing
+    createPayment,
+    approvePayment,
+    completePayment,
+    loading
   };
-}
+};

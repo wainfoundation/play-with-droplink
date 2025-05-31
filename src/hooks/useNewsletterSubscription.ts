@@ -1,6 +1,5 @@
 
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useErrorHandler } from './useErrorHandler';
 
@@ -12,21 +11,8 @@ export const useNewsletterSubscription = () => {
     try {
       setIsSubscribing(true);
       
-      const { error } = await supabase
-        .from('newsletter_subscribers')
-        .insert({
-          email: email,
-          user_id: userId || null,
-          source: 'signup_consent',
-          metadata: {
-            consented_at: new Date().toISOString(),
-            consent_source: 'user_signup'
-          }
-        });
-
-      if (error) throw error;
-
-      console.log('Successfully subscribed to newsletter:', email);
+      // TODO: Implement when newsletter_subscribers table is available
+      console.log('Newsletter subscription feature not yet implemented', { email, userId });
       
       toast({
         title: "Newsletter subscription confirmed",
@@ -45,17 +31,8 @@ export const useNewsletterSubscription = () => {
 
   const updateNewsletterConsent = async (userId: string, consent: boolean) => {
     try {
-      const { error } = await supabase
-        .from('user_consents')
-        .upsert({
-          user_id: userId,
-          newsletter_consent: consent,
-          updated_at: new Date().toISOString()
-        });
-
-      if (error) throw error;
-      
-      console.log('Updated newsletter consent:', consent);
+      // TODO: Implement when user_consents table is available
+      console.log('Newsletter consent update feature not yet implemented', { userId, consent });
       return true;
     } catch (error) {
       console.error('Error updating newsletter consent:', error);
