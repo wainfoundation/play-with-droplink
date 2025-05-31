@@ -25,6 +25,7 @@ import GameEngine from '@/components/games/GameEngine';
 import GameUpgradeModal from '@/components/games/GameUpgradeModal';
 import PiBrowserCheck from '@/components/PiBrowserCheck';
 import PiAdsNetwork from '@/components/PiAdsNetwork';
+import InteractiveMascot from '@/components/mascot/InteractiveMascot';
 import { isRunningInPiBrowser } from '@/utils/pi-sdk';
 import { sounds, createBackgroundMusicController } from '@/utils/sounds';
 import { Button } from '@/components/ui/button';
@@ -98,104 +99,6 @@ const PlayWithMascot = () => {
     { name: "proud", eyes: "bright", mouth: "proud-smile", thought: "You're absolutely amazing! 🌟" },
     { name: "mischievous", eyes: "sly", mouth: "smirk", thought: "I have some fun games for you... 😏" }
   ];
-
-  // Mascot rendering functions
-  const renderMascotEyes = (eyeType: string) => {
-    const eyeProps = {
-      cx: "85",
-      cy: "80",
-      rx: "8",
-      ry: "12",
-      fill: "#000"
-    };
-
-    const rightEyeProps = {
-      cx: "115",
-      cy: "80",
-      rx: "8",
-      ry: "12",
-      fill: "#000"
-    };
-
-    switch (eyeType) {
-      case "happy":
-        return (
-          <>
-            <ellipse {...eyeProps} ry="6" />
-            <ellipse {...rightEyeProps} ry="6" />
-          </>
-        );
-      case "excited":
-        return (
-          <>
-            <ellipse {...eyeProps} ry="15" />
-            <ellipse {...rightEyeProps} ry="15" />
-          </>
-        );
-      case "sleepy":
-        return (
-          <>
-            <line x1="77" y1="80" x2="93" y2="80" stroke="#000" strokeWidth="3" />
-            <line x1="107" y1="80" x2="123" y2="80" stroke="#000" strokeWidth="3" />
-          </>
-        );
-      case "hearts":
-        return (
-          <>
-            <text x="85" y="85" fontSize="12" textAnchor="middle" fill="red">♥</text>
-            <text x="115" y="85" fontSize="12" textAnchor="middle" fill="red">♥</text>
-          </>
-        );
-      case "wide":
-        return (
-          <>
-            <ellipse {...eyeProps} rx="12" ry="15" />
-            <ellipse {...rightEyeProps} rx="12" ry="15" />
-          </>
-        );
-      case "wink":
-        return (
-          <>
-            <ellipse {...eyeProps} ry="6" />
-            <line x1="107" y1="80" x2="123" y2="80" stroke="#000" strokeWidth="3" />
-          </>
-        );
-      default:
-        return (
-          <>
-            <ellipse {...eyeProps} />
-            <ellipse {...rightEyeProps} />
-          </>
-        );
-    }
-  };
-
-  const renderMascotMouth = (mouthType: string) => {
-    switch (mouthType) {
-      case "smile":
-        return <path d="M 85 110 Q 100 125 115 110" stroke="#000" strokeWidth="3" fill="none" />;
-      case "big-smile":
-        return <path d="M 80 110 Q 100 130 120 110" stroke="#000" strokeWidth="3" fill="none" />;
-      case "neutral":
-        return <line x1="90" y1="115" x2="110" y2="115" stroke="#000" strokeWidth="2" />;
-      case "open":
-        return <ellipse cx="100" cy="115" rx="8" ry="12" fill="#000" />;
-      case "yawn":
-        return <ellipse cx="100" cy="115" rx="12" ry="15" fill="#000" />;
-      case "gentle-smile":
-        return <path d="M 87 112 Q 100 120 113 112" stroke="#000" strokeWidth="2" fill="none" />;
-      case "puzzled":
-        return <path d="M 85 115 Q 95 110 105 115 Q 110 120 115 115" stroke="#000" strokeWidth="2" fill="none" />;
-      case "grin":
-        return <path d="M 80 108 Q 100 128 120 108" stroke="#000" strokeWidth="3" fill="none" />;
-      case "proud-smile":
-        return <path d="M 82 108 Q 100 128 118 108" stroke="#000" strokeWidth="3" fill="none" />;
-      case "smirk":
-        return <path d="M 85 115 Q 95 120 110 112" stroke="#000" strokeWidth="2" fill="none" />;
-      default:
-        return <path d="M 85 110 Q 100 125 115 110" stroke="#000" strokeWidth="3" fill="none" />;
-    }
-  };
 
   // Game categories organized by category from database
   const organizeGamesByCategory = () => {
@@ -346,6 +249,10 @@ const PlayWithMascot = () => {
     setCurrentEmotion(0);
   };
 
+  const handleMoodChange = (mood: number) => {
+    setCurrentEmotion(mood);
+  };
+
   if (showPiBrowserCheck && !isRunningInPiBrowser()) {
     return (
       <PiBrowserCheck 
@@ -464,51 +371,21 @@ const PlayWithMascot = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             <div className="lg:col-span-1">
-              <div className="sticky top-4">
-                <div className="flex flex-col items-center">
-                  <div className="relative mb-6">
-                    <svg
-                      width="200"
-                      height="240"
-                      viewBox="0 0 200 240"
-                      className="animate-bounce-gentle"
-                    >
-                      <path
-                        d="M100 20 C60 60, 35 100, 35 140 C35 185, 65 220, 100 220 C135 220, 165 185, 165 140 C165 100, 140 60, 100 20 Z"
-                        fill="url(#playDropletGradient)"
-                        className="animate-pulse-gentle"
-                      />
-                      
-                      <defs>
-                        <linearGradient id="playDropletGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                          <stop offset="0%" stopColor="#00aaff" />
-                          <stop offset="50%" stopColor="#0099ee" />
-                          <stop offset="100%" stopColor="#0077cc" />
-                        </linearGradient>
-                      </defs>
-                      
-                      <ellipse
-                        cx="75"
-                        cy="70"
-                        rx="12"
-                        ry="18"
-                        fill="rgba(255, 255, 255, 0.6)"
-                        className="animate-shimmer"
-                      />
-                      
-                      {renderMascotEyes(emotions[currentEmotion].eyes)}
-                      {renderMascotMouth(emotions[currentEmotion].mouth)}
-                    </svg>
-                    
-                    <div className="absolute -right-4 -top-4 bg-white rounded-lg p-3 shadow-lg border-2 border-primary/20 max-w-xs animate-float">
-                      <p className="text-sm font-medium text-primary">
-                        {emotions[currentEmotion].thought}
-                      </p>
-                    </div>
-                  </div>
-
-                  <PiAdsNetwork placementId="gaming-sidebar" />
+              <div className="sticky top-4 space-y-6">
+                {/* Interactive Mascot */}
+                <InteractiveMascot 
+                  onMoodChange={handleMoodChange}
+                  soundEnabled={soundEnabled}
+                />
+                
+                {/* Thought Bubble */}
+                <div className="bg-white rounded-lg p-3 shadow-lg border-2 border-primary/20 max-w-xs mx-auto">
+                  <p className="text-sm font-medium text-primary text-center">
+                    {emotions[currentEmotion].thought}
+                  </p>
                 </div>
+
+                <PiAdsNetwork placementId="gaming-sidebar" />
               </div>
             </div>
 
@@ -593,11 +470,6 @@ const PlayWithMascot = () => {
             50% { opacity: 1; }
           }
           
-          @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-          }
-          
           .animate-bounce-gentle {
             animation: bounce-gentle 4s ease-in-out infinite;
           }
@@ -608,10 +480,6 @@ const PlayWithMascot = () => {
           
           .animate-shimmer {
             animation: shimmer 2.5s ease-in-out infinite;
-          }
-          
-          .animate-float {
-            animation: float 4s ease-in-out infinite;
           }
         `}
       </style>
