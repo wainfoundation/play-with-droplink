@@ -1,28 +1,23 @@
 
 import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
 import { HelmetProvider } from 'react-helmet-async'
 import SplashScreen from './components/SplashScreen.tsx'
 import Welcome from './pages/Welcome.tsx'
+import PlayWithMascot from './pages/PlayWithMascot.tsx'
 import { preloadPiSDK } from './utils/pi-sdk-loader'
 import PiLogger from './utils/pi-logger'
+import './index.css'
 
 const Root = () => {
-  const [showSplash, setShowSplash] = useState(true);
-  const [showWelcome, setShowWelcome] = useState(false);
+  const [currentPage, setCurrentPage] = useState<'splash' | 'welcome' | 'play'>('splash');
   
   const handleSplashComplete = () => {
-    setShowSplash(false);
-    // Always show welcome page after splash
-    setShowWelcome(true);
+    setCurrentPage('welcome');
   };
 
   const handleWelcomeComplete = () => {
-    setShowWelcome(false);
-    // Mark that user has seen welcome
-    localStorage.setItem('droplink_welcomed', 'true');
+    setCurrentPage('play');
   };
 
   useEffect(() => {
@@ -38,12 +33,14 @@ const Root = () => {
   return (
     <React.StrictMode>
       <HelmetProvider>
-        {showSplash ? (
+        {currentPage === 'splash' && (
           <SplashScreen onComplete={handleSplashComplete} />
-        ) : showWelcome ? (
+        )}
+        {currentPage === 'welcome' && (
           <Welcome onEnter={handleWelcomeComplete} />
-        ) : (
-          <App />
+        )}
+        {currentPage === 'play' && (
+          <PlayWithMascot />
         )}
       </HelmetProvider>
     </React.StrictMode>
