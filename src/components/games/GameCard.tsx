@@ -1,20 +1,18 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { LockIcon, PlayIcon, CoinsIcon, CrownIcon } from 'lucide-react';
+import { Lock, Play, ShoppingCart, Crown } from 'lucide-react';
 
 interface GameCardProps {
   game: {
     id: string;
     name: string;
-    category: string;
+    description?: string;
     difficulty: string;
     is_free: boolean;
     price_pi: number;
-    description?: string;
-    thumbnail_url?: string;
   };
   isLocked: boolean;
   userPlan: string;
@@ -31,153 +29,84 @@ const GameCard: React.FC<GameCardProps> = ({
   onPurchase,
   onUpgrade
 }) => {
-  const getGameLogo = (gameName: string, category: string) => {
-    // Generate emoji-based logos for games
-    const logoMap: Record<string, string> = {
-      // Puzzle games
-      'sudoku': '🔢',
-      'crossword': '📝',
-      'word search': '🔍',
-      'jigsaw puzzle': '🧩',
-      'sliding puzzle': '🎲',
-      'logic grid': '📊',
-      'number sequence': '🔢',
-      'pattern match': '🎨',
-      'memory tiles': '🧠',
-      'color code': '🌈',
-      
-      // Action games
-      'droplink dash': '💨',
-      'reflex test': '⚡',
-      'speed tap': '👆',
-      'reaction time': '⏱️',
-      'bubble pop': '🫧',
-      'catch the drop': '💧',
-      'dodge master': '🏃',
-      'quick draw': '🎯',
-      'finger fury': '✋',
-      'tap master': '👉',
-      
-      // Trivia games
-      'general knowledge': '🧠',
-      'science quiz': '🔬',
-      'history quiz': '📚',
-      'geography quiz': '🌍',
-      'sports trivia': '⚽',
-      'movie quiz': '🎬',
-      'music trivia': '🎵',
-      'tech quiz': '💻',
-      'nature quiz': '🌿',
-      'space trivia': '🚀',
-      
-      // Creative games
-      'color mixer': '🎨',
-      'pattern creator': '✨',
-      'music maker': '🎹',
-      'story builder': '📖',
-      'art gallery': '🖼️',
-      'design studio': '🎭',
-      'photo editor': '📸',
-      'avatar maker': '👤',
-      'emoji creator': '😊',
-      'badge designer': '🏆',
-      
-      // Infinite games
-      'endless runner': '🏃‍♂️',
-      'infinite jumper': '🦘',
-      'space explorer': '🛸',
-      'treasure hunt': '💎',
-      'survival mode': '🏕️',
-      'maze runner': '🌀',
-      'tower climb': '🏗️',
-      'ocean dive': '🌊',
-      'sky glider': '🪂',
-      'time traveler': '⏰'
-    };
-
-    // Try exact match first
-    const exactMatch = logoMap[game.name.toLowerCase()];
-    if (exactMatch) return exactMatch;
-
-    // Fallback to category-based logos
-    const categoryLogos: Record<string, string> = {
-      puzzle: '🧩',
-      action: '⚡',
-      trivia: '🧠',
-      creative: '🎨',
-      infinite: '♾️'
-    };
-
-    return categoryLogos[category] || '🎮';
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty.toLowerCase()) {
+      case 'easy': return 'bg-green-100 text-green-800';
+      case 'medium': return 'bg-yellow-100 text-yellow-800';
+      case 'hard': return 'bg-orange-100 text-orange-800';
+      case 'expert': return 'bg-red-100 text-red-800';
+      case 'insane': return 'bg-purple-100 text-purple-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
-  const logo = getGameLogo(game.name, game.category);
+  const getGameIcon = (gameName: string) => {
+    if (gameName.toLowerCase().includes('sudoku')) return '🧩';
+    if (gameName.toLowerCase().includes('block')) return '🧱';
+    if (gameName.toLowerCase().includes('color')) return '🎨';
+    if (gameName.toLowerCase().includes('memory')) return '🧠';
+    if (gameName.toLowerCase().includes('word')) return '📝';
+    return '🎮';
+  };
 
   return (
-    <Card className="relative overflow-hidden hover:shadow-lg transition-shadow group">
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
+    <Card className={`transition-all duration-200 hover:shadow-md ${isLocked ? 'opacity-75' : ''}`}>
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
-            <div className="text-2xl">{logo}</div>
-            <CardTitle className="text-sm font-medium">{game.name}</CardTitle>
+            <span className="text-2xl">{getGameIcon(game.name)}</span>
+            <div>
+              <CardTitle className="text-lg">{game.name}</CardTitle>
+              <div className="flex items-center gap-2 mt-1">
+                <Badge variant="outline" className={getDifficultyColor(game.difficulty)}>
+                  {game.difficulty}
+                </Badge>
+                {!game.is_free && (
+                  <Badge variant="secondary">
+                    π {game.price_pi}
+                  </Badge>
+                )}
+              </div>
+            </div>
           </div>
-          {isLocked && <LockIcon className="w-4 h-4 text-gray-400" />}
-          {userPlan === 'premium' && <CrownIcon className="w-4 h-4 text-yellow-500" />}
+          {isLocked && <Lock className="w-5 h-5 text-gray-400" />}
         </div>
-        <div className="flex items-center gap-2">
-          <Badge 
-            variant={
-              game.difficulty === 'Easy' ? 'default' : 
-              game.difficulty === 'Medium' ? 'secondary' : 
-              'destructive'
-            } 
-            className="text-xs"
-          >
-            {game.difficulty}
-          </Badge>
-          {!game.is_free && (
-            <Badge variant="outline" className="text-xs">
-              {game.price_pi} Pi
-            </Badge>
-          )}
-        </div>
-        {game.description && (
-          <p className="text-xs text-gray-600 mt-1">{game.description}</p>
-        )}
       </CardHeader>
       <CardContent className="pt-0">
+        <CardDescription className="mb-4 min-h-[3rem]">
+          {game.description || `A challenging ${game.difficulty.toLowerCase()} level ${game.name.toLowerCase()} game.`}
+        </CardDescription>
+        
         <div className="flex gap-2">
-          {isLocked ? (
-            game.price_pi > 0 ? (
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="flex-1"
-                onClick={() => onPurchase(game)}
-              >
-                <CoinsIcon className="w-3 h-3 mr-1" />
-                Buy {game.price_pi} Pi
-              </Button>
-            ) : (
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="flex-1"
-                onClick={onUpgrade}
-              >
-                <CrownIcon className="w-3 h-3 mr-1" />
-                Premium
-              </Button>
-            )
-          ) : (
-            <Button 
-              size="sm" 
-              className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-              onClick={() => onPlay(game)}
-            >
-              <PlayIcon className="w-3 h-3 mr-1" />
-              Play Now
+          {!isLocked ? (
+            <Button onClick={() => onPlay(game)} className="flex-1">
+              <Play className="w-4 h-4 mr-2" />
+              Play
             </Button>
+          ) : (
+            <>
+              {userPlan === 'free' && !game.is_free && (
+                <>
+                  <Button 
+                    onClick={() => onPurchase(game)} 
+                    variant="outline" 
+                    size="sm"
+                    className="flex-1"
+                  >
+                    <ShoppingCart className="w-4 h-4 mr-1" />
+                    π {game.price_pi}
+                  </Button>
+                  <Button 
+                    onClick={onUpgrade} 
+                    size="sm"
+                    className="flex-1"
+                  >
+                    <Crown className="w-4 h-4 mr-1" />
+                    Premium
+                  </Button>
+                </>
+              )}
+            </>
           )}
         </div>
       </CardContent>
