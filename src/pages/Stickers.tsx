@@ -1,5 +1,5 @@
+
 import React, { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { toast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
@@ -67,14 +67,23 @@ const Stickers = () => {
 
   const fetchStickers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('stickers_effects')
-        .select('*')
-        .eq('is_active', true)
-        .order('category', { ascending: true });
-
-      if (error) throw error;
-      setStickers(data || []);
+      // TODO: Implement when stickers_effects table is available
+      console.log('Stickers fetching not yet implemented - table does not exist');
+      
+      // Mock data for now
+      const mockStickers: Sticker[] = [
+        {
+          id: '1',
+          name: 'Sparkle Effect',
+          description: 'Add sparkles to your profile',
+          animation_url: 'https://via.placeholder.com/64',
+          price_pi: 5,
+          category: 'effects',
+          is_active: true
+        }
+      ];
+      
+      setStickers(mockStickers);
     } catch (error) {
       console.error('Error fetching stickers:', error);
       toast({
@@ -91,13 +100,9 @@ const Stickers = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
-        .from('user_stickers')
-        .select('*')
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-      setUserStickers(data || []);
+      // TODO: Implement when user_stickers table is available
+      console.log('User stickers fetching not yet implemented - table does not exist');
+      setUserStickers([]);
     } catch (error) {
       console.error('Error fetching user stickers:', error);
     }

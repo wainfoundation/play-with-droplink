@@ -3,14 +3,17 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
+interface TipData {
+  recipientId: string;
+  recipientUsername: string;
+  amount: number;
+  message: string;
+}
+
 export const usePiTipping = () => {
   const [loading, setLoading] = useState(false);
 
-  const sendTip = useCallback(async (
-    toUserId: string,
-    amount: number,
-    message?: string
-  ) => {
+  const sendTip = useCallback(async (tipData: TipData) => {
     try {
       setLoading(true);
 
@@ -25,9 +28,9 @@ export const usePiTipping = () => {
         .from('tips')
         .insert({
           from_user_id: user.id,
-          to_user_id: toUserId,
-          amount,
-          message: message || null
+          to_user_id: tipData.recipientId,
+          amount: tipData.amount,
+          message: tipData.message || null
         })
         .select()
         .single();
@@ -36,7 +39,7 @@ export const usePiTipping = () => {
 
       toast({
         title: "Tip Sent!",
-        description: `Successfully sent ${amount}π tip`,
+        description: `Successfully sent ${tipData.amount}π tip`,
       });
 
       return tip;
@@ -107,6 +110,7 @@ export const usePiTipping = () => {
     getTipsReceived,
     getTipsSent,
     getTotalReceived,
-    loading
+    loading,
+    isProcessing: loading
   };
 };

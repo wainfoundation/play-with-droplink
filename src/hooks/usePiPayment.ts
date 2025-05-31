@@ -115,6 +115,7 @@ export const usePiPayment = () => {
     approvePayment,
     completePayment,
     handleSubscribe,
-    loading
+    loading,
+    processingPayment: loading
   };
 };

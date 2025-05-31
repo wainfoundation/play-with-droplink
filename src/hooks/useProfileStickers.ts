@@ -8,9 +8,10 @@ export interface UserSticker {
   stickers_effects: any;
 }
 
-export const useProfileStickers = (userId?: string) => {
+export const useProfileStickers = (userId?: string, activeStickers: string[] = []) => {
   const [stickers, setStickers] = useState<UserSticker[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedStickers, setSelectedStickers] = useState<string[]>(activeStickers);
 
   const fetchUserStickers = useCallback(async () => {
     if (!userId) return;
@@ -51,11 +52,34 @@ export const useProfileStickers = (userId?: string) => {
     }
   }, []);
 
+  const toggleSticker = useCallback((stickerId: string) => {
+    setSelectedStickers(prev => 
+      prev.includes(stickerId) 
+        ? prev.filter(id => id !== stickerId)
+        : [...prev, stickerId]
+    );
+  }, []);
+
+  const saveChanges = useCallback(async () => {
+    // TODO: Implement save logic
+    console.log('Save changes not yet implemented');
+  }, []);
+
+  const clearAll = useCallback(() => {
+    setSelectedStickers([]);
+  }, []);
+
   return {
     stickers,
+    userStickers: stickers,
+    selectedStickers,
     loading,
+    displayStickers: stickers.filter(s => selectedStickers.includes(s.sticker_id)),
     fetchUserStickers,
     activateSticker,
-    deactivateSticker
+    deactivateSticker,
+    toggleSticker,
+    saveChanges,
+    clearAll
   };
 };

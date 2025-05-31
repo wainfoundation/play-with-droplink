@@ -107,13 +107,14 @@ export const useProfileData = (username?: string) => {
   };
 
   useEffect(() => {
-    if (username || user?.profile?.username) {
-      fetchProfile(username || user?.profile?.username);
+    if (username || user?.username) {
+      fetchProfile(username || user?.username);
     }
-  }, [username, user?.profile?.username]);
+  }, [username, user?.username]);
 
   return {
     profile,
+    profileData: profile,
     links,
     loading,
     error,
