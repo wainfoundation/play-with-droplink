@@ -4,7 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { helpArticles } from '@/data/helpArticles';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Clock, Tag } from 'lucide-react';
+import { ArrowLeft, Clock, Tag, Gamepad2 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
 const HelpArticleDetail = () => {
@@ -20,12 +20,20 @@ const HelpArticleDetail = () => {
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold mb-4">Article Not Found</h2>
         <p className="text-gray-600 mb-6">The help article you're looking for doesn't exist.</p>
-        <Link to="/help">
-          <Button>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Help
-          </Button>
-        </Link>
+        <div className="flex gap-4 justify-center">
+          <Link to="/help">
+            <Button>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Help
+            </Button>
+          </Link>
+          <Link to="/play">
+            <Button variant="outline">
+              <Gamepad2 className="w-4 h-4 mr-2" />
+              Back to Game
+            </Button>
+          </Link>
+        </div>
       </div>
     );
   }
@@ -39,12 +47,20 @@ const HelpArticleDetail = () => {
       
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
-          <Link to="/help">
-            <Button variant="ghost" className="mb-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Help
-            </Button>
-          </Link>
+          <div className="flex gap-4 mb-4">
+            <Link to="/help">
+              <Button variant="ghost">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Help
+              </Button>
+            </Link>
+            <Link to="/play">
+              <Button variant="outline">
+                <Gamepad2 className="w-4 h-4 mr-2" />
+                Back to Game
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <Card>

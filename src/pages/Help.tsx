@@ -1,179 +1,121 @@
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
-import SearchSection from "@/components/help/SearchSection";
-import CategoriesSection from "@/components/help/CategoriesSection";
-import PopularArticlesSection from "@/components/help/PopularArticlesSection";
-import FAQSection from "@/components/help/FAQSection";
-import ContactSupportSection from "@/components/help/ContactSupportSection";
-import SearchResults from "@/components/help/SearchResults";
-import { getFeaturedArticles } from "@/data/helpArticles";
-import { faqData } from "@/data/faqData";
-import { HelpCircle, Shield, FileText } from 'lucide-react';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import { Helmet } from 'react-helmet-async';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Search, BookOpen, MessageCircle, FileText, HelpCircle, Gamepad2, ArrowRight } from 'lucide-react';
+import { helpArticles } from '@/data/helpArticles';
+import SearchSection from '@/components/help/SearchSection';
+import PopularArticlesSection from '@/components/help/PopularArticlesSection';
+import CategoriesSection from '@/components/help/CategoriesSection';
+import ContactSupportSection from '@/components/help/ContactSupportSection';
+import GoToTop from '@/components/GoToTop';
 
 const Help = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const popularArticles = helpArticles.slice(0, 6);
   
-  const categories = [
-    {
-      name: "Getting Started",
-      icon: "🚀",
-      articles: [
-        { title: "Creating Your Gaming Account", slug: "creating-account" },
-        { title: "Setting Up Your Character", slug: "character-setup" },
-        { title: "Playing Your First Game", slug: "first-game" },
-        { title: "Understanding Game Categories", slug: "game-categories" },
-        { title: "Mobile vs Desktop Gaming", slug: "mobile-vs-desktop" }
-      ]
-    },
-    {
-      name: "Game Management",
-      icon: "🎮",
-      articles: [
-        { title: "Changing Your Gaming Character", slug: "change-character" },
-        { title: "Managing Game Preferences", slug: "game-preferences" },
-        { title: "Game Security & Fair Play", slug: "game-security" },
-        { title: "Resetting Game Progress", slug: "reset-progress" },
-        { title: "Multiple Character Profiles", slug: "multiple-characters" }
-      ]
-    },
-    {
-      name: "Customization & Characters",
-      icon: "🎨",
-      articles: [
-        { title: "Choosing Character Appearance", slug: "character-appearance" },
-        { title: "Custom Colors and Themes", slug: "custom-colors-themes" },
-        { title: "Character Moods and Personalities", slug: "character-moods" },
-        { title: "Unlocking Character Features", slug: "character-features" },
-        { title: "Character Animation Settings", slug: "character-animations" }
-      ]
-    },
-    {
-      name: "Pi Network Gaming",
-      icon: "π",
-      articles: [
-        { title: "Connecting Your Pi Wallet for Gaming", slug: "connecting-pi-wallet-gaming" },
-        { title: "Pi Payments for Premium Games", slug: "pi-payments-games" },
-        { title: "Pi Gaming Rewards System", slug: "pi-gaming-rewards" },
-        { title: "Pi Tips for Game Achievements", slug: "pi-tips-gaming" },
-        { title: "Pi Network Gaming Authentication", slug: "pi-network-gaming-auth" }
-      ]
-    },
-    {
-      name: "Game Analytics & Progress",
-      icon: "📊",
-      articles: [
-        { title: "Understanding Your Gaming Dashboard", slug: "gaming-analytics-guide" },
-        { title: "Game Score Tracking", slug: "game-score-tracking" },
-        { title: "Achievement Progress", slug: "achievement-progress" },
-        { title: "Gaming Performance Metrics", slug: "gaming-performance" },
-        { title: "Exporting Gaming Data", slug: "export-gaming-data" }
-      ]
-    },
-    {
-      name: "Subscriptions & Premium Games",
-      icon: "💳",
-      articles: [
-        { title: "Gaming Subscription Plans", slug: "gaming-subscription-plans" },
-        { title: "Premium Game Access", slug: "premium-game-access" },
-        { title: "Upgrading for More Games", slug: "upgrade-more-games" },
-        { title: "Gaming Subscription Cancellation", slug: "gaming-cancellation" },
-        { title: "Pi Payment Issues for Games", slug: "pi-payment-gaming-issues" }
-      ]
-    }
-  ];
-  
-  const popularArticles = getFeaturedArticles().map(article => ({
-    ...article,
-    title: article.title.replace("Droplink", "Play with Droplink Gaming"),
-    excerpt: article.excerpt.replace("link-in-bio", "gaming").replace("links", "games")
-  }));
-  
-  // Get sample FAQs focused on gaming
-  const gamingFaqs = [
-    {
-      question: "How do I start playing games with Droplink?",
-      answer: "Simply visit the Play with Droplink page, choose your character, and start playing from our collection of 50+ games across puzzle, action, trivia, and creative categories."
-    },
-    {
-      question: "What games are available for free?",
-      answer: "Free users can access basic puzzle games, simple action games, and limited trivia questions. Premium subscribers get access to all 50+ games including advanced puzzles, multiplayer modes, and exclusive creative tools."
-    },
-    {
-      question: "How do Pi payments work for gaming?",
-      answer: "You can use Pi cryptocurrency to unlock premium games, purchase hints, buy power-ups, and tip other players. All transactions are processed securely through the Pi Network."
-    },
-    {
-      question: "Can I play games on mobile?",
-      answer: "Yes! All games are optimized for mobile play with full-screen support when using Pi Browser on your mobile device."
-    },
-    {
-      question: "How do I earn Pi rewards from gaming?",
-      answer: "Complete daily challenges, achieve high scores, watch rewarded ads, and participate in community events to earn Pi rewards that are automatically added to your Pi wallet."
-    },
-    {
-      question: "What happens if I run out of hints during a game?",
-      answer: "When you run out of hints, you can watch a Pi Ad to get 3 more hints for free, or pay 1 Pi to continue playing immediately. This ensures fair gameplay while supporting the platform."
-    }
-  ];
-
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
-        <title>Gaming Help Center - Play with Droplink Support</title>
-        <meta name="description" content="Get comprehensive help with Play with Droplink gaming platform. Find tutorials, FAQs, guides, and support for all gaming features and Pi Network integration." />
-        <meta name="keywords" content="droplink gaming help, pi network gaming support, play with droplink tutorial, gaming documentation, pi payments gaming help" />
+        <title>Gaming Help Center - Play with Droplink</title>
+        <meta name="description" content="Get help with Play with Droplink gaming platform. Find guides, FAQs, and support for Pi Network gaming, payments, and account management." />
       </Helmet>
       
-      {/* Navigation Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex justify-end">
-            <nav className="flex items-center gap-6">
-              <Link 
-                to="/help" 
-                className="flex items-center gap-2 text-primary font-medium"
-              >
-                <HelpCircle className="w-4 h-4" />
-                Help
-              </Link>
-              <Link 
-                to="/privacy" 
-                className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors font-medium"
-              >
-                <Shield className="w-4 h-4" />
-                Privacy
-              </Link>
-              <Link 
-                to="/terms" 
-                className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors font-medium"
-              >
-                <FileText className="w-4 h-4" />
-                Terms
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Navbar />
       
-      <main className="flex-grow">
-        <SearchSection searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-        
-        <div className="container mx-auto px-4 py-8">
-          {searchQuery.trim() ? (
-            <SearchResults query={searchQuery} />
-          ) : (
-            <>
-              <CategoriesSection categories={categories} />
-              <PopularArticlesSection popularArticles={popularArticles} />
-              <FAQSection faqs={gamingFaqs} />
-            </>
-          )}
+      <main className="container mx-auto px-4 py-8 pt-24">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <div className="flex justify-center mb-6">
+              <Button variant="outline" asChild>
+                <Link to="/play" className="flex items-center gap-2">
+                  <Gamepad2 className="h-4 w-4" />
+                  Back to Game
+                </Link>
+              </Button>
+            </div>
+            <h1 className="text-4xl font-bold mb-4">Gaming Help Center</h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Get help with gaming, Pi Network integration, payments, and account management
+            </p>
+          </div>
+
+          {/* Search Section */}
+          <SearchSection />
+
+          {/* Quick Access Cards */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Link to="/faqs">
+                <CardContent className="p-6 text-center">
+                  <HelpCircle className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="font-semibold mb-2">Complete FAQ</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Comprehensive gaming questions and answers
+                  </p>
+                  <Badge variant="secondary">50+ Questions</Badge>
+                </CardContent>
+              </Link>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Link to="/contact">
+                <CardContent className="p-6 text-center">
+                  <MessageCircle className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="font-semibold mb-2">Gaming Support</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Get help from our gaming experts
+                  </p>
+                  <Badge variant="secondary">24/7 Available</Badge>
+                </CardContent>
+              </Link>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Link to="/help/article/connecting-pi-wallet-gaming">
+                <CardContent className="p-6 text-center">
+                  <BookOpen className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="font-semibold mb-2">Pi Wallet Guide</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Connect and use Pi for gaming
+                  </p>
+                  <Badge variant="secondary">Step-by-step</Badge>
+                </CardContent>
+              </Link>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Link to="/help/article/character-setup">
+                <CardContent className="p-6 text-center">
+                  <FileText className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="font-semibold mb-2">Character Setup</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Customize your gaming character
+                  </p>
+                  <Badge variant="secondary">Beginner Friendly</Badge>
+                </CardContent>
+              </Link>
+            </Card>
+          </div>
+
+          {/* Popular Articles */}
+          <PopularArticlesSection articles={popularArticles} />
+
+          {/* Categories */}
+          <CategoriesSection />
+
+          {/* Contact Support */}
+          <ContactSupportSection />
         </div>
-        
-        <ContactSupportSection />
       </main>
+      
+      <GoToTop />
+      <Footer />
     </div>
   );
 };
