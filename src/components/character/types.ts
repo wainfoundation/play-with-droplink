@@ -28,6 +28,7 @@ export interface CharacterStats {
   energy: number;
   cleanliness: number;
   hunger: number;
+  [key: string]: number; // Add index signature for Json compatibility
 }
 
 export interface PetInteraction {

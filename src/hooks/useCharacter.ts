@@ -36,10 +36,10 @@ export const useCharacter = () => {
           name: data.name,
           color: data.color,
           background: data.background,
-          accessories: data.accessories || [],
-          stats: data.stats || { happiness: 80, hunger: 60, cleanliness: 70, energy: 85 },
+          accessories: Array.isArray(data.accessories) ? data.accessories as string[] : [],
+          stats: (data.stats as CharacterStats) || { happiness: 80, hunger: 60, cleanliness: 70, energy: 85 },
           tutorial_completed: data.tutorial_completed || false,
-          unlocked_rooms: data.unlocked_rooms || ['bedroom'],
+          unlocked_rooms: Array.isArray(data.unlocked_rooms) ? data.unlocked_rooms as string[] : ['bedroom'],
           created_at: data.created_at,
           updated_at: data.updated_at
         };
@@ -63,10 +63,10 @@ export const useCharacter = () => {
         name: characterData.name,
         color: characterData.color,
         background: characterData.background,
-        accessories: characterData.accessories,
-        stats: characterData.stats,
+        accessories: characterData.accessories || [],
+        stats: characterData.stats || { happiness: 80, hunger: 60, cleanliness: 70, energy: 85 },
         tutorial_completed: characterData.tutorial_completed,
-        unlocked_rooms: characterData.unlocked_rooms,
+        unlocked_rooms: characterData.unlocked_rooms || ['bedroom'],
         updated_at: new Date().toISOString()
       };
 
@@ -96,10 +96,10 @@ export const useCharacter = () => {
           name: data.name,
           color: data.color,
           background: data.background,
-          accessories: data.accessories || [],
-          stats: data.stats || { happiness: 80, hunger: 60, cleanliness: 70, energy: 85 },
+          accessories: Array.isArray(data.accessories) ? data.accessories as string[] : [],
+          stats: (data.stats as CharacterStats) || { happiness: 80, hunger: 60, cleanliness: 70, energy: 85 },
           tutorial_completed: data.tutorial_completed || false,
-          unlocked_rooms: data.unlocked_rooms || ['bedroom'],
+          unlocked_rooms: Array.isArray(data.unlocked_rooms) ? data.unlocked_rooms as string[] : ['bedroom'],
           created_at: data.created_at,
           updated_at: data.updated_at
         };
