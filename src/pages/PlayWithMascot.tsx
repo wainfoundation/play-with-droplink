@@ -14,6 +14,7 @@ import StoreManager from '@/components/store/StoreManager';
 import RoomManager from '@/components/room/RoomManager';
 import BattleManager from '@/components/battles/BattleManager';
 import PlayWithMascotHeader from '@/components/games/PlayWithMascotHeader';
+import Navbar from '@/components/Navbar';
 import { isRunningInPiBrowser } from '@/utils/pi-sdk';
 import { sounds, createBackgroundMusicController } from '@/utils/sounds';
 import { CharacterCustomization, CharacterStats, ShopItem, PetInteraction } from '@/components/character/types';
@@ -223,21 +224,27 @@ const PlayWithMascot = () => {
 
   if (showPiBrowserCheck && !isRunningInPiBrowser()) {
     return (
-      <PiBrowserCheck 
-        showContinueOption={true}
-        onContinueAnyway={() => setShowPiBrowserCheck(false)}
-      />
+      <>
+        <Navbar />
+        <PiBrowserCheck 
+          showContinueOption={true}
+          onContinueAnyway={() => setShowPiBrowserCheck(false)}
+        />
+      </>
     );
   }
 
   if (gamesLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-lg text-gray-600">Loading games...</p>
+      <>
+        <Navbar />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-lg text-gray-600">Loading games...</p>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -248,6 +255,7 @@ const PlayWithMascot = () => {
         <Helmet>
           <title>{currentGame.name} - Play with Droplink</title>
         </Helmet>
+        <Navbar />
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">
           <div className="container mx-auto px-4">
             <GameEngine
@@ -276,6 +284,7 @@ const PlayWithMascot = () => {
         <Helmet>
           <title>Battle Arena - Play with Droplink</title>
         </Helmet>
+        <Navbar />
         <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 py-8">
           <div className="container mx-auto px-4">
             <div className="text-center">
@@ -301,6 +310,8 @@ const PlayWithMascot = () => {
         <meta name="description" content={`Play 50+ interactive games with your character ${character.name}, customize, battle, and explore rooms on Droplink!`} />
       </Helmet>
 
+      <Navbar />
+      
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">
         <div className="container mx-auto px-4">
           <PlayWithMascotHeader
