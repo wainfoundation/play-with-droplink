@@ -6,12 +6,11 @@ import { useToast } from '@/components/ui/use-toast';
 import { useCharacter } from '@/hooks/useCharacter';
 import Navbar from '@/components/Navbar';
 import { sounds, createBackgroundMusicController } from '@/utils/sounds';
-import CharacterDisplay from '@/components/character/CharacterDisplay';
+import CharacterHomeHeader from '@/components/character/CharacterHomeHeader';
+import CharacterTabContent from '@/components/character/CharacterTabContent';
 import CharacterNavigation from '@/components/character/CharacterNavigation';
-import CharacterRooms from '@/components/character/CharacterRooms';
-import CharacterShop from '@/components/character/CharacterShop';
 import CharacterStats from '@/components/character/CharacterStats';
-import CharacterMiniGames from '@/components/character/CharacterMiniGames';
+import { useCharacterInteractionHandler } from '@/components/character/CharacterInteractionHandler';
 
 const CharacterHome = () => {
   const { user, isLoggedIn } = useUser();
@@ -24,6 +23,13 @@ const CharacterHome = () => {
   const [musicController] = useState(() => createBackgroundMusicController());
   const [coins, setCoins] = useState(1125);
   const [level, setLevel] = useState(2);
+
+  const { handleCharacterInteraction } = useCharacterInteractionHandler({
+    character,
+    soundEnabled,
+    updateStats,
+    setCoins
+  });
 
   // Background music control
   useEffect(() => {
@@ -45,42 +51,6 @@ const CharacterHome = () => {
     }
   }, [isLoggedIn, character, characterLoading]);
 
-  const handleCharacterInteraction = async (type: string) => {
-    if (!character) return;
-
-    let newStats = { ...character.stats };
-    let coinsEarned = 0;
-
-    // Update stats based on interaction
-    if (type === 'feed') {
-      newStats.hunger = Math.min(100, newStats.hunger + 25);
-      newStats.happiness = Math.min(100, newStats.happiness + 10);
-      coinsEarned = 10;
-    } else if (type === 'play') {
-      newStats.happiness = Math.min(100, newStats.happiness + 20);
-      newStats.energy = Math.max(0, newStats.energy - 10);
-      coinsEarned = 15;
-    } else if (type === 'clean') {
-      newStats.cleanliness = Math.min(100, newStats.cleanliness + 30);
-      newStats.happiness = Math.min(100, newStats.happiness + 5);
-      coinsEarned = 8;
-    } else if (type === 'sleep') {
-      newStats.energy = Math.min(100, newStats.energy + 25);
-      newStats.happiness = Math.min(100, newStats.happiness + 5);
-      coinsEarned = 5;
-    }
-
-    await updateStats(newStats);
-    setCoins(prev => prev + coinsEarned);
-
-    if (soundEnabled) sounds.powerup();
-    
-    toast({
-      title: "Great!",
-      description: `Your ${character.name} enjoyed ${type}ing! +${coinsEarned} coins`,
-    });
-  };
-
   const handleRoomChange = (room: string) => {
     if (character?.unlocked_rooms.includes(room)) {
       setCurrentRoom(room);
@@ -99,6 +69,30 @@ const CharacterHome = () => {
     if (soundEnabled) {
       sounds.click();
     }
+  };
+
+  const handlePurchase = (item: any) => {
+    if (coins >= item.price) {
+      setCoins(prev => prev - item.price);
+      toast({
+        title: "Purchase Successful!",
+        description: `You bought ${item.name}!`,
+      });
+    } else {
+      toast({
+        title: "Not enough coins!",
+        description: "Complete more activities to earn coins!",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleGameComplete = (score: number) => {
+    setCoins(prev => prev + score);
+    toast({
+      title: "Great Job!",
+      description: `You earned ${score} coins!`,
+    });
   };
 
   if (characterLoading) {
@@ -142,87 +136,31 @@ const CharacterHome = () => {
       <div className="min-h-screen bg-gradient-to-b from-blue-100 via-purple-100 to-pink-100">
         <Navbar />
         
-        {/* Character Header */}
-        <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-4">
-          <div className="container mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="text-white">
-                <h1 className="text-2xl font-bold">{character.name}</h1>
-                <p className="text-purple-100">Level {level}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="bg-yellow-500 px-4 py-2 rounded-full text-white font-bold">
-                💰 {coins.toLocaleString()}
-              </div>
-              <button
-                onClick={toggleSound}
-                className="bg-white/20 p-2 rounded-full text-white hover:bg-white/30"
-              >
-                {soundEnabled ? '🔊' : '🔇'}
-              </button>
-            </div>
-          </div>
-        </div>
+        <CharacterHomeHeader
+          character={character}
+          level={level}
+          coins={coins}
+          soundEnabled={soundEnabled}
+          onToggleSound={toggleSound}
+        />
 
         {/* Main Content */}
         <div className="container mx-auto px-4 py-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Character Display */}
             <div className="lg:col-span-2">
-              {activeTab === 'home' && (
-                <CharacterDisplay
-                  character={character}
-                  currentRoom={currentRoom}
-                  onInteraction={handleCharacterInteraction}
-                  soundEnabled={soundEnabled}
-                />
-              )}
-              
-              {activeTab === 'rooms' && (
-                <CharacterRooms
-                  character={character}
-                  currentRoom={currentRoom}
-                  onRoomChange={handleRoomChange}
-                  onUnlockRoom={unlockRoom}
-                  userCoins={coins}
-                />
-              )}
-              
-              {activeTab === 'shop' && (
-                <CharacterShop
-                  character={character}
-                  userCoins={coins}
-                  onPurchase={(item) => {
-                    if (coins >= item.price) {
-                      setCoins(prev => prev - item.price);
-                      toast({
-                        title: "Purchase Successful!",
-                        description: `You bought ${item.name}!`,
-                      });
-                    } else {
-                      toast({
-                        title: "Not enough coins!",
-                        description: "Complete more activities to earn coins!",
-                        variant: "destructive"
-                      });
-                    }
-                  }}
-                />
-              )}
-              
-              {activeTab === 'games' && (
-                <CharacterMiniGames
-                  character={character}
-                  onGameComplete={(score) => {
-                    setCoins(prev => prev + score);
-                    toast({
-                      title: "Great Job!",
-                      description: `You earned ${score} coins!`,
-                    });
-                  }}
-                />
-              )}
+              <CharacterTabContent
+                activeTab={activeTab}
+                character={character}
+                currentRoom={currentRoom}
+                coins={coins}
+                soundEnabled={soundEnabled}
+                onInteraction={handleCharacterInteraction}
+                onRoomChange={handleRoomChange}
+                onUnlockRoom={unlockRoom}
+                onPurchase={handlePurchase}
+                onGameComplete={handleGameComplete}
+              />
             </div>
 
             {/* Sidebar */}
