@@ -13,27 +13,56 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
   const [welcomeTextVisible, setWelcomeTextVisible] = useState(false);
   const [buttonsVisible, setButtonsVisible] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showCharacterSelect, setShowCharacterSelect] = useState(false);
+  const [selectedCharacter, setSelectedCharacter] = useState('droplet');
   const [tutorialStep, setTutorialStep] = useState(0);
+
+  const characters = [
+    {
+      id: 'droplet',
+      name: 'Droplink',
+      description: 'The original water droplet mascot',
+      color: '#00aaff'
+    },
+    {
+      id: 'fire',
+      name: 'Flame',
+      description: 'A fiery companion for action games',
+      color: '#ff4444'
+    },
+    {
+      id: 'earth',
+      name: 'Rocky',
+      description: 'A sturdy earth-based character',
+      color: '#8B4513'
+    },
+    {
+      id: 'air',
+      name: 'Breeze',
+      description: 'A light and airy character',
+      color: '#87CEEB'
+    }
+  ];
 
   const tutorialSteps = [
     {
-      title: "Create Your Profile",
-      description: "Set up your Droplink profile with your bio, links, and social media accounts.",
+      title: "Welcome to Gaming!",
+      description: "Get ready to play amazing games with your chosen character companion.",
+      icon: "🎮"
+    },
+    {
+      title: "Choose Your Character",
+      description: "Select a character that will accompany you through your gaming journey.",
       icon: "👤"
     },
     {
-      title: "Add Your Links",
-      description: "Connect all your social media, websites, and important links in one place.",
-      icon: "🔗"
+      title: "Play & Earn",
+      description: "Play games, earn points, and have fun in the Pi Network gaming ecosystem.",
+      icon: "🏆"
     },
     {
-      title: "Accept Pi Payments",
-      description: "Enable Pi tipping and sell digital products directly from your profile.",
-      icon: "💰"
-    },
-    {
-      title: "Share Your Profile",
-      description: "Share your droplink.space/@username with the world and start earning!",
+      title: "Ready to Play!",
+      description: "Your gaming adventure with Droplink begins now!",
       icon: "🚀"
     }
   ];
@@ -51,7 +80,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
     };
   }, []);
 
-  const handleGoToHome = () => {
+  const handleGoToGaming = () => {
     if (onEnter) {
       onEnter();
     }
@@ -62,15 +91,24 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
     setTutorialStep(0);
   };
 
-  const handleSkipTutorial = () => {
-    handleGoToHome();
+  const handleSkipToCharacterSelect = () => {
+    setShowCharacterSelect(true);
+  };
+
+  const handleCharacterSelect = (characterId: string) => {
+    setSelectedCharacter(characterId);
+  };
+
+  const handleConfirmCharacter = () => {
+    localStorage.setItem('selectedCharacter', selectedCharacter);
+    handleGoToGaming();
   };
 
   const handleNextStep = () => {
     if (tutorialStep < tutorialSteps.length - 1) {
       setTutorialStep(tutorialStep + 1);
     } else {
-      handleGoToHome();
+      setShowCharacterSelect(true);
     }
   };
 
@@ -80,16 +118,145 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
     }
   };
 
-  const handleFinishTutorial = () => {
-    handleGoToHome();
+  const renderCharacter = (character: any, size: number = 120) => {
+    const gradientId = `${character.id}Gradient`;
+    
+    return (
+      <svg width={size} height={size * 1.2} viewBox="0 0 200 240" className="animate-bounce-gentle">
+        <defs>
+          <linearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor={character.color} />
+            <stop offset="50%" stopColor={character.color} stopOpacity="0.8" />
+            <stop offset="100%" stopColor={character.color} stopOpacity="0.6" />
+          </linearGradient>
+        </defs>
+        
+        {/* Character shape */}
+        <path
+          d="M100 20 C60 60, 35 100, 35 140 C35 185, 65 220, 100 220 C135 220, 165 185, 165 140 C165 100, 140 60, 100 20 Z"
+          fill={`url(#${gradientId})`}
+          className="animate-pulse-gentle"
+        />
+        
+        {/* Highlight */}
+        <ellipse
+          cx="75"
+          cy="70"
+          rx="12"
+          ry="18"
+          fill="rgba(255, 255, 255, 0.6)"
+          className="animate-shimmer"
+        />
+        
+        {/* Eyes */}
+        <circle cx="80" cy="105" r="8" fill="#fff" />
+        <circle cx="120" cy="105" r="8" fill="#fff" />
+        <circle cx="83" cy="108" r="4" fill="#333" className="animate-gentle-blink" />
+        <circle cx="123" cy="108" r="4" fill="#333" className="animate-gentle-blink" />
+        
+        {/* Smile */}
+        <path
+          d="M80 140 Q100 155 120 140"
+          stroke="#fff"
+          strokeWidth="4"
+          fill="none"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
   };
+
+  if (showCharacterSelect) {
+    return (
+      <>
+        <Helmet>
+          <title>Choose Your Gaming Character - Droplink</title>
+          <meta name="description" content="Choose your gaming companion for the Droplink gaming experience." />
+        </Helmet>
+        
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden">
+          {/* Background Effects */}
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-secondary/20 to-primary/20 rounded-full blur-3xl animate-pulse" />
+          
+          <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 text-center">
+            <div className="max-w-4xl mx-auto">
+              <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
+                Choose Your Gaming Character
+              </h1>
+              <p className="text-lg text-gray-600 mb-8">
+                Select a character to accompany you on your gaming adventure!
+              </p>
+              
+              {/* Character Selection Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                {characters.map((character) => (
+                  <div
+                    key={character.id}
+                    onClick={() => handleCharacterSelect(character.id)}
+                    className={`p-4 rounded-xl cursor-pointer transition-all duration-300 ${
+                      selectedCharacter === character.id
+                        ? 'bg-white border-4 border-primary shadow-lg scale-105'
+                        : 'bg-white/50 border-2 border-gray-200 hover:shadow-md hover:scale-102'
+                    }`}
+                  >
+                    <div className="flex flex-col items-center">
+                      {renderCharacter(character, 100)}
+                      <h3 className="font-semibold text-lg mt-2">{character.name}</h3>
+                      <p className="text-sm text-gray-600 mt-1">{character.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Selected Character Preview */}
+              <div className="bg-white rounded-xl p-6 mb-8 border-2 border-primary/20">
+                <h3 className="text-xl font-semibold mb-4">Your Gaming Companion:</h3>
+                <div className="flex items-center justify-center gap-4">
+                  {renderCharacter(characters.find(c => c.id === selectedCharacter)!, 80)}
+                  <div className="text-left">
+                    <h4 className="text-lg font-semibold">
+                      {characters.find(c => c.id === selectedCharacter)?.name}
+                    </h4>
+                    <p className="text-gray-600">
+                      {characters.find(c => c.id === selectedCharacter)?.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <Button 
+                  onClick={() => setShowCharacterSelect(false)}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Back
+                </Button>
+                
+                <Button 
+                  onClick={handleConfirmCharacter}
+                  className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 flex items-center gap-2"
+                >
+                  Start Gaming
+                  <Play className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   if (showTutorial) {
     return (
       <>
         <Helmet>
-          <title>Droplink Tutorial - Learn How to Get Started</title>
-          <meta name="description" content="Learn how to use Droplink to create your Pi Network profile and start earning." />
+          <title>Gaming Tutorial - Learn How to Play</title>
+          <meta name="description" content="Learn how to play games with Droplink and start your gaming adventure." />
         </Helmet>
         
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden">
@@ -143,16 +310,16 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
                   </Button>
                 ) : (
                   <Button 
-                    onClick={handleFinishTutorial}
+                    onClick={handleNextStep}
                     className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 flex items-center gap-2"
                   >
-                    Start Building
+                    Choose Character
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 )}
                 
                 <Button 
-                  onClick={handleSkipTutorial}
+                  onClick={handleSkipToCharacterSelect}
                   variant="ghost"
                   className="text-gray-500 hover:text-gray-700"
                 >
@@ -169,8 +336,8 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
   return (
     <>
       <Helmet>
-        <title>Welcome to Droplink - Your Pi Network Link Hub</title>
-        <meta name="description" content="Welcome to Droplink! Transform your Pi domain into a powerful business hub." />
+        <title>Welcome to Droplink Gaming - Your Pi Network Gaming Hub</title>
+        <meta name="description" content="Welcome to Droplink Gaming! Play games, earn Pi, and have fun with your character companions." />
       </Helmet>
       
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden">
@@ -195,55 +362,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
             mascotVisible ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-50 translate-y-10'
           }`}>
             <div className="relative mb-8">
-              <svg
-                width="200"
-                height="240"
-                viewBox="0 0 200 240"
-                className="animate-bounce-gentle"
-              >
-                {/* Droplet shape */}
-                <path
-                  d="M100 20 C60 60, 35 100, 35 140 C35 185, 65 220, 100 220 C135 220, 165 185, 165 140 C165 100, 140 60, 100 20 Z"
-                  fill="url(#welcomeDropletGradient)"
-                  className="animate-pulse-gentle"
-                />
-                
-                {/* Gradient definition */}
-                <defs>
-                  <linearGradient id="welcomeDropletGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#00aaff" />
-                    <stop offset="50%" stopColor="#0099ee" />
-                    <stop offset="100%" stopColor="#0077cc" />
-                  </linearGradient>
-                </defs>
-                
-                {/* Highlight */}
-                <ellipse
-                  cx="75"
-                  cy="70"
-                  rx="12"
-                  ry="18"
-                  fill="rgba(255, 255, 255, 0.6)"
-                  className="animate-shimmer"
-                />
-                
-                {/* Face */}
-                {/* Eyes */}
-                <circle cx="80" cy="110" r="6" fill="#fff" />
-                <circle cx="120" cy="110" r="6" fill="#fff" />
-                <circle cx="82" cy="112" r="3" fill="#333" className="animate-blink" />
-                <circle cx="122" cy="112" r="3" fill="#333" className="animate-blink" />
-                
-                {/* Smile */}
-                <path
-                  d="M80 140 Q100 160 120 140"
-                  stroke="#fff"
-                  strokeWidth="3"
-                  fill="none"
-                  strokeLinecap="round"
-                  className="animate-smile"
-                />
-              </svg>
+              {renderCharacter(characters[0], 200)}
             </div>
           </div>
 
@@ -253,15 +372,15 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
           }`}>
             <h1 className="text-4xl md:text-6xl font-bold mb-4">
               <span className="bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
-                Welcome to Droplink!
+                Welcome to Droplink Gaming!
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-2">
-              Your Pi Network Link Hub
+              Your Pi Network Gaming Hub
             </p>
             <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-              Transform your .pi domain into a powerful business hub with Pi payments, 
-              professional profiles, and seamless Pi Browser integration.
+              Play amazing games, earn rewards, and have fun with your character companions 
+              in the Pi Network gaming ecosystem.
             </p>
           </div>
 
@@ -279,13 +398,13 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
                 Start Tutorial
               </Button>
               <Button 
-                onClick={handleSkipTutorial}
+                onClick={handleSkipToCharacterSelect}
                 variant="outline" 
                 size="lg" 
                 className="hover:bg-blue-50 transition-colors text-lg px-8 py-4"
               >
                 <SkipForward className="mr-2 h-5 w-5" />
-                Skip Tutorial
+                Choose Character
               </Button>
             </div>
           </div>
@@ -304,7 +423,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
             50% { opacity: 0.8; }
           }
           
-          @keyframes blink {
+          @keyframes gentle-blink {
             0%, 90%, 100% { transform: scaleY(1); }
             95% { transform: scaleY(0.1); }
           }
@@ -312,11 +431,6 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
           @keyframes shimmer {
             0%, 100% { opacity: 0.6; }
             50% { opacity: 1; }
-          }
-          
-          @keyframes smile {
-            0%, 100% { stroke-dasharray: 0, 100; }
-            50% { stroke-dasharray: 30, 100; }
           }
           
           .animate-bounce-gentle {
@@ -327,16 +441,12 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
             animation: pulse-gentle 3s ease-in-out infinite;
           }
           
-          .animate-blink {
-            animation: blink 5s ease-in-out infinite;
+          .animate-gentle-blink {
+            animation: gentle-blink 5s ease-in-out infinite;
           }
           
           .animate-shimmer {
             animation: shimmer 2.5s ease-in-out infinite;
-          }
-          
-          .animate-smile {
-            animation: smile 4s ease-in-out infinite;
           }
           `}
         </style>
