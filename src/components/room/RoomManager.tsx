@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -45,7 +46,7 @@ const RoomManager: React.FC<RoomManagerProps> = ({ soundEnabled }) => {
     if (!user?.id) return;
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('rooms')
         .select('*')
         .eq('user_id', user.id)
@@ -69,7 +70,7 @@ const RoomManager: React.FC<RoomManagerProps> = ({ soundEnabled }) => {
     if (!user?.id || !newRoomName.trim()) return;
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('rooms')
         .insert([{
           user_id: user.id,
@@ -101,7 +102,7 @@ const RoomManager: React.FC<RoomManagerProps> = ({ soundEnabled }) => {
 
   const updateRoom = async (roomId: string, updates: Partial<Room>) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('rooms')
         .update(updates)
         .eq('id', roomId);
@@ -128,7 +129,7 @@ const RoomManager: React.FC<RoomManagerProps> = ({ soundEnabled }) => {
 
   const deleteRoom = async (roomId: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('rooms')
         .delete()
         .eq('id', roomId);

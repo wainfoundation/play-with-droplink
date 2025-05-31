@@ -81,7 +81,7 @@ const StoreManager: React.FC<StoreManagerProps> = ({ onPurchase, soundEnabled })
 
   const fetchStoreItems = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('store_items')
         .select('*')
         .eq('is_active', true)
@@ -105,13 +105,13 @@ const StoreManager: React.FC<StoreManagerProps> = ({ onPurchase, soundEnabled })
     if (!user?.id) return;
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_purchases')
         .select('item_id')
         .eq('user_id', user.id);
 
       if (error) throw error;
-      setUserPurchases(data?.map(p => p.item_id) || []);
+      setUserPurchases(data?.map((p: any) => p.item_id) || []);
     } catch (error) {
       console.error('Error fetching user purchases:', error);
     }
