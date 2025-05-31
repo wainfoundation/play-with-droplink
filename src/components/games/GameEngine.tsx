@@ -1,11 +1,13 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, RefreshCw, Trophy, Star, Heart } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Trophy, Star, Heart, Volume2, VolumeX } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { playSoundEffect, backgroundMusic } from '@/utils/sounds';
 import BlockConnectEngine from '@/components/games/engines/BlockConnectEngine';
 import ColorMergeEngine from '@/components/games/engines/ColorMergeEngine';
 import SudokuClassicEngine from '@/components/games/engines/SudokuClassicEngine';
@@ -44,6 +46,18 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
   const [timeLeft, setTimeLeft] = React.useState(60);
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [gameOver, setGameOver] = React.useState(false);
+  const [soundEnabled, setSoundEnabled] = React.useState(true);
+
+  // Start background music when component mounts
+  React.useEffect(() => {
+    if (soundEnabled) {
+      backgroundMusic.play('/sounds/background/gameplay-music.mp3');
+    }
+    
+    return () => {
+      backgroundMusic.stop();
+    };
+  }, [soundEnabled]);
 
   // Game timer
   React.useEffect(() => {
@@ -53,6 +67,9 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
           if (prev <= 1) {
             setGameOver(true);
             setIsPlaying(false);
+            if (soundEnabled) {
+              playSoundEffect('gameOver', 0.7);
+            }
             return 0;
           }
           return prev - 1;
@@ -60,7 +77,7 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
       }, 1000);
       return () => clearInterval(timer);
     }
-  }, [isPlaying, timeLeft]);
+  }, [isPlaying, timeLeft, soundEnabled]);
 
   const startGame = () => {
     setIsPlaying(true);
@@ -69,6 +86,11 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
     setLevel(1);
     setLives(3);
     setTimeLeft(60);
+    
+    if (soundEnabled) {
+      playSoundEffect('newLevel', 0.7);
+    }
+    
     initializeGameSpecific();
   };
 
@@ -198,6 +220,10 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
   const handleGameAction = (action: string, data?: any) => {
     if (!isPlaying) return;
 
+    if (soundEnabled) {
+      playSoundEffect('click', 0.3);
+    }
+
     switch (action) {
       case 'click':
         handleClick(data);
@@ -215,8 +241,16 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
 
   const handleClick = (data: any) => {
     setScore(prev => prev + 10);
+    
+    if (soundEnabled) {
+      playSoundEffect('collect', 0.5);
+    }
+    
     if (score > 0 && score % 100 === 0) {
       setLevel(prev => prev + 1);
+      if (soundEnabled) {
+        playSoundEffect('levelComplete', 0.8);
+      }
       toast({
         title: "Level Up!",
         description: `You've reached level ${level + 1}!`,
@@ -228,6 +262,9 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
     const question = gameState.questions?.[gameState.currentQuestion];
     if (question && answerIndex === question.correct) {
       setScore(prev => prev + 50);
+      if (soundEnabled) {
+        playSoundEffect('success', 0.6);
+      }
       setGameState(prev => ({
         ...prev,
         streak: prev.streak + 1,
@@ -235,6 +272,9 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
       }));
     } else {
       setLives(prev => prev - 1);
+      if (soundEnabled) {
+        playSoundEffect('error', 0.4);
+      }
       setGameState(prev => ({
         ...prev,
         streak: 0,
@@ -250,11 +290,19 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
   const handleMove = (direction: string) => {
     // Handle player movement for action games
     setScore(prev => prev + 1);
+    if (soundEnabled) {
+      playSoundEffect('collect', 0.3);
+    }
   };
 
   const endGame = () => {
     setIsPlaying(false);
     setGameOver(true);
+    
+    if (soundEnabled) {
+      playSoundEffect('gameOver', 0.7);
+    }
+    
     onGameComplete(score);
     
     toast({
@@ -472,7 +520,16 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
               <div className="text-lg">🎮</div>
               <span className="font-semibold text-sm">{game.name}</span>
             </div>
-            <Badge variant="outline" className="text-xs">{game.category}</Badge>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSoundEnabled(!soundEnabled)}
+              >
+                {soundEnabled ? <Volume2 className="h-3 w-3" /> : <VolumeX className="h-3 w-3" />}
+              </Button>
+              <Badge variant="outline" className="text-xs">{game.category}</Badge>
+            </div>
           </div>
 
           {/* Mobile Game Stats */}
@@ -535,7 +592,16 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
             <div className="text-2xl">🎮</div>
             {game.name}
           </CardTitle>
-          <Badge variant="outline">{game.category}</Badge>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSoundEnabled(!soundEnabled)}
+            >
+              {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            </Button>
+            <Badge variant="outline">{game.category}</Badge>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
