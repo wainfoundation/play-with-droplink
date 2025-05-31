@@ -20,21 +20,32 @@ interface UserProfile {
 
 interface UserContextType {
   user: UserProfile | null;
+  profile: UserProfile | null; // Added profile alias
   isLoggedIn: boolean;
   loading: boolean;
+  isAdmin: boolean; // Added isAdmin
+  showAds: boolean; // Added showAds
   refreshUser: () => Promise<void>;
+  refreshUserData: () => Promise<void>; // Added refreshUserData alias
+  setIsAdmin: (isAdmin: boolean) => void; // Added setIsAdmin
 }
 
 const UserContext = createContext<UserContextType>({
   user: null,
+  profile: null,
   isLoggedIn: false,
   loading: true,
+  isAdmin: false,
+  showAds: true,
   refreshUser: async () => {},
+  refreshUserData: async () => {},
+  setIsAdmin: () => {},
 });
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const refreshUser = async () => {
     try {
@@ -59,6 +70,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Calculate showAds based on user plan
+  const showAds = user?.plan === 'free' || !user?.plan;
+
   useEffect(() => {
     refreshUser();
 
@@ -68,6 +82,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           await refreshUser();
         } else if (event === 'SIGNED_OUT') {
           setUser(null);
+          setIsAdmin(false);
         }
       }
     );
@@ -79,9 +94,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <UserContext.Provider 
       value={{ 
         user, 
+        profile: user, // profile is an alias for user
         isLoggedIn: !!user, 
         loading,
-        refreshUser 
+        isAdmin,
+        showAds,
+        refreshUser,
+        refreshUserData: refreshUser, // refreshUserData is an alias for refreshUser
+        setIsAdmin
       }}
     >
       {children}

@@ -9,6 +9,69 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      career_applications: {
+        Row: {
+          additional_info: string | null
+          applicant_email: string
+          applicant_name: string
+          availability_date: string | null
+          cover_letter: string | null
+          created_at: string | null
+          id: string
+          linkedin_url: string | null
+          location: string | null
+          phone_number: string | null
+          portfolio_url: string | null
+          position_title: string
+          resume_url: string | null
+          salary_expectation: string | null
+          status: string | null
+          updated_at: string | null
+          work_authorization: string | null
+          years_experience: number | null
+        }
+        Insert: {
+          additional_info?: string | null
+          applicant_email: string
+          applicant_name: string
+          availability_date?: string | null
+          cover_letter?: string | null
+          created_at?: string | null
+          id?: string
+          linkedin_url?: string | null
+          location?: string | null
+          phone_number?: string | null
+          portfolio_url?: string | null
+          position_title: string
+          resume_url?: string | null
+          salary_expectation?: string | null
+          status?: string | null
+          updated_at?: string | null
+          work_authorization?: string | null
+          years_experience?: number | null
+        }
+        Update: {
+          additional_info?: string | null
+          applicant_email?: string
+          applicant_name?: string
+          availability_date?: string | null
+          cover_letter?: string | null
+          created_at?: string | null
+          id?: string
+          linkedin_url?: string | null
+          location?: string | null
+          phone_number?: string | null
+          portfolio_url?: string | null
+          position_title?: string
+          resume_url?: string | null
+          salary_expectation?: string | null
+          status?: string | null
+          updated_at?: string | null
+          work_authorization?: string | null
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
       game_sessions: {
         Row: {
           completed: boolean | null
@@ -125,6 +188,53 @@ export type Database = {
           },
           {
             foreignKeyName: "leaderboards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      links: {
+        Row: {
+          clicks: number | null
+          created_at: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          position: number | null
+          title: string
+          updated_at: string | null
+          url: string
+          user_id: string | null
+        }
+        Insert: {
+          clicks?: number | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          position?: number | null
+          title: string
+          updated_at?: string | null
+          url: string
+          user_id?: string | null
+        }
+        Update: {
+          clicks?: number | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          position?: number | null
+          title?: string
+          updated_at?: string | null
+          url?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "links_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"

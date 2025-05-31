@@ -4,14 +4,14 @@ import { useUser } from '@/context/UserContext';
 
 const MobilePreview = () => {
   const navigate = useNavigate();
-  const { profile, isLoggedIn } = useUser();
+  const { user, isLoggedIn } = useUser(); // Changed from profile to user
   
-  // Username from profile or demo username if not logged in
-  const displayUsername = profile?.username || "username";
+  // Username from user or demo username if not logged in
+  const displayUsername = user?.username || "username";
   
   const handleProfileClick = () => {
-    if (isLoggedIn && profile) {
-      navigate(`/u/${profile.username}`);
+    if (isLoggedIn && user) {
+      navigate(`/u/${user.username}`);
     } else {
       navigate('/signup');
     }
@@ -30,14 +30,14 @@ const MobilePreview = () => {
             <div className="p-6 flex flex-col items-center">
               <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border-2 border-primary">
                 <img 
-                  src={profile?.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${displayUsername}`}
+                  src={user?.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${displayUsername}`}
                   alt="Profile" 
                   className="w-full h-full object-cover"
                 />
               </div>
               <h3 className="text-lg font-bold mb-1">@{displayUsername}</h3>
               <p className="text-sm text-gray-500 mb-6">
-                {profile?.bio || "Digital creator & Pi pioneer"}
+                {user?.bio || "Digital creator & Pi pioneer"}
               </p>
               
               <div className="w-full space-y-3">

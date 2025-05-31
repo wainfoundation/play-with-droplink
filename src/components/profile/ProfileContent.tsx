@@ -126,7 +126,7 @@ const ProfileContent = ({
               visible={showQRCode}
             />
             
-            {/* Only show ads for starter plan users if they're logged in */}
+            {/* Only show ads for users with showAds enabled */}
             {showAds && (
               <div className="w-full mb-6">
                 <PiAdsNetwork placementId="profile-page" />
