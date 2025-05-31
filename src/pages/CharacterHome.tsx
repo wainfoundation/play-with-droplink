@@ -14,18 +14,17 @@ import CharacterCommunityPage from '@/components/character/CharacterCommunityPag
 const mockCharacter = {
   id: 'mock-1',
   name: 'Boo',
+  color: '#FFE4B5',
+  background: 'bedroom',
+  accessories: [],
   stats: {
+    happiness: 90,
     energy: 85,
-    food: 70,
-    health: 90,
-    water: 60
+    cleanliness: 70,
+    hunger: 60
   },
-  style: {
-    body_color: '#FFE4B5',
-    eye_type: 'happy',
-    accessory: null
-  },
-  rooms_unlocked: ['bedroom'],
+  tutorial_completed: true,
+  unlocked_rooms: ['bedroom'],
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString()
 };
