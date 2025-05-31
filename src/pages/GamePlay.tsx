@@ -16,7 +16,7 @@ import {
   Timer,
   Target
 } from 'lucide-react';
-import { showInterstitialAd } from '@/utils/pi-sdk';
+import { showInterstitialAdAdvanced } from '@/utils/pi-sdk';
 
 const GamePlay = () => {
   const [gameState, setGameState] = useState<'playing' | 'paused' | 'completed' | 'ad_break'>('playing');
@@ -63,7 +63,7 @@ const GamePlay = () => {
       setIsAdShowing(true);
       
       try {
-        await showInterstitialAd();
+        await showInterstitialAdAdvanced();
       } catch (error) {
         console.error('Ad failed to show:', error);
       } finally {
