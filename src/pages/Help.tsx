@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -16,7 +16,42 @@ import ContactSupportSection from '@/components/help/ContactSupportSection';
 import GoToTop from '@/components/GoToTop';
 
 const Help = () => {
+  const [searchQuery, setSearchQuery] = useState("");
   const popularArticles = helpArticles.slice(0, 6);
+  
+  // Create categories data for CategoriesSection
+  const categories = [
+    {
+      name: "Getting Started",
+      icon: "🚀",
+      articles: [
+        { title: "How to Connect Pi Wallet for Gaming", slug: "connecting-pi-wallet-gaming" },
+        { title: "Character Setup and Customization", slug: "character-setup" },
+        { title: "Game Controls and Interface", slug: "game-controls" },
+        { title: "Understanding Game Currency", slug: "game-currency" }
+      ]
+    },
+    {
+      name: "Pi Network Integration",
+      icon: "💰",
+      articles: [
+        { title: "Pi Payments in Games", slug: "pi-payments-games" },
+        { title: "Earning Pi Through Gaming", slug: "earning-pi-gaming" },
+        { title: "Pi Wallet Security", slug: "pi-wallet-security" },
+        { title: "Transaction History", slug: "transaction-history" }
+      ]
+    },
+    {
+      name: "Gameplay Features",
+      icon: "🎮",
+      articles: [
+        { title: "Multiplayer Gaming", slug: "multiplayer-gaming" },
+        { title: "Achievements and Rewards", slug: "achievements-rewards" },
+        { title: "Leaderboards", slug: "leaderboards" },
+        { title: "Daily Challenges", slug: "daily-challenges" }
+      ]
+    }
+  ];
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -46,7 +81,7 @@ const Help = () => {
           </div>
 
           {/* Search Section */}
-          <SearchSection />
+          <SearchSection searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
           {/* Quick Access Cards */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
@@ -104,10 +139,10 @@ const Help = () => {
           </div>
 
           {/* Popular Articles */}
-          <PopularArticlesSection articles={popularArticles} />
+          <PopularArticlesSection popularArticles={popularArticles} />
 
           {/* Categories */}
-          <CategoriesSection />
+          <CategoriesSection categories={categories} />
 
           {/* Contact Support */}
           <ContactSupportSection />
