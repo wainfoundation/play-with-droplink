@@ -31,7 +31,7 @@ export const useStore = () => {
 
   const fetchStoreItems = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('store_items')
         .select('*')
         .eq('is_active', true)
@@ -51,13 +51,13 @@ export const useStore = () => {
     if (!user?.id) return;
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_purchases')
         .select('item_id')
         .eq('user_id', user.id);
 
       if (error) throw error;
-      setUserPurchases(data?.map(p => p.item_id) || []);
+      setUserPurchases(data?.map((p: any) => p.item_id) || []);
     } catch (err) {
       console.error('Error fetching user purchases:', err);
     }
@@ -67,7 +67,7 @@ export const useStore = () => {
     if (!user?.id) throw new Error('User not logged in');
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('user_purchases')
         .insert([{
           user_id: user.id,

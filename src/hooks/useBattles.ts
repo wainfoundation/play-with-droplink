@@ -38,7 +38,8 @@ export const useBattles = () => {
     if (!user?.id) return;
 
     try {
-      const { data, error } = await supabase
+      // Using any to bypass TypeScript type checking for the new table
+      const { data, error } = await (supabase as any)
         .from('battles')
         .select('*')
         .or(`player1_id.eq.${user.id},player2_id.eq.${user.id}`)
@@ -81,7 +82,7 @@ export const useBattles = () => {
     try {
       const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
       
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('battles')
         .insert([{
           player1_id: user.id,
@@ -106,7 +107,7 @@ export const useBattles = () => {
     if (!user?.id) throw new Error('User not logged in');
 
     try {
-      const { data: existingBattle, error: fetchError } = await supabase
+      const { data: existingBattle, error: fetchError } = await (supabase as any)
         .from('battles')
         .select('*')
         .eq('room_code', roomCode.toUpperCase())
@@ -119,7 +120,7 @@ export const useBattles = () => {
         throw new Error('Cannot join your own battle');
       }
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('battles')
         .update({
           player2_id: user.id,
@@ -144,7 +145,7 @@ export const useBattles = () => {
         ? { player1_score: playerScore }
         : { player2_score: playerScore };
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('battles')
         .update(updates)
         .eq('id', battleId);
@@ -158,7 +159,7 @@ export const useBattles = () => {
 
   const completeBattle = async (battleId: string, winnerId: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('battles')
         .update({
           status: 'completed',

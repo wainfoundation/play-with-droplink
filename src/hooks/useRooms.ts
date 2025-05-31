@@ -32,7 +32,7 @@ export const useRooms = () => {
     if (!user?.id) return;
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('rooms')
         .select('*')
         .eq('user_id', user.id)
@@ -52,7 +52,7 @@ export const useRooms = () => {
     if (!user?.id) throw new Error('User not logged in');
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('rooms')
         .insert([{
           user_id: user.id,
@@ -76,7 +76,7 @@ export const useRooms = () => {
 
   const updateRoom = async (roomId: string, updates: Partial<Room>) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('rooms')
         .update(updates)
         .eq('id', roomId);
@@ -94,7 +94,7 @@ export const useRooms = () => {
 
   const deleteRoom = async (roomId: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('rooms')
         .delete()
         .eq('id', roomId);

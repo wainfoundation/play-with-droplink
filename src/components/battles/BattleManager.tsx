@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,9 +12,9 @@ import {
   UsersIcon,
   ClockIcon
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@/context/UserContext';
 import { useToast } from '@/components/ui/use-toast';
+import { useBattles } from '@/hooks/useBattles';
 
 interface Battle {
   id: string;
@@ -37,8 +37,7 @@ interface BattleManagerProps {
 const BattleManager: React.FC<BattleManagerProps> = ({ soundEnabled, onStartBattle }) => {
   const { user } = useUser();
   const { toast } = useToast();
-  const [battles, setBattles] = useState<Battle[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { battles, loading, createBattle, joinBattle } = useBattles();
   const [roomCode, setRoomCode] = useState('');
   const [selectedGameType, setSelectedGameType] = useState('quiz');
 
@@ -49,76 +48,14 @@ const BattleManager: React.FC<BattleManagerProps> = ({ soundEnabled, onStartBatt
     { id: 'math', name: 'Math Challenge', icon: '🔢' }
   ];
 
-  useEffect(() => {
-    if (user?.id) {
-      fetchBattles();
-      setupRealtimeSubscription();
-    }
-  }, [user]);
-
-  const fetchBattles = async () => {
+  const handleCreateBattle = async () => {
     if (!user?.id) return;
 
     try {
-      const { data, error } = await supabase
-        .from('battles')
-        .select('*')
-        .or(`player1_id.eq.${user.id},player2_id.eq.${user.id}`)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setBattles(data || []);
-    } catch (error) {
-      console.error('Error fetching battles:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const setupRealtimeSubscription = () => {
-    const channel = supabase
-      .channel('battles')
-      .on('postgres_changes', 
-        { 
-          event: '*', 
-          schema: 'public', 
-          table: 'battles' 
-        }, 
-        (payload) => {
-          console.log('Battle update:', payload);
-          fetchBattles();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  };
-
-  const createBattle = async () => {
-    if (!user?.id) return;
-
-    try {
-      const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-      
-      const { data, error } = await supabase
-        .from('battles')
-        .insert([{
-          player1_id: user.id,
-          game_type: selectedGameType,
-          status: 'waiting',
-          room_code: roomCode
-        }])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setBattles(prev => [data, ...prev]);
+      const battle = await createBattle(selectedGameType);
       toast({
         title: "Battle Created!",
-        description: `Room code: ${roomCode}. Share this with your opponent!`
+        description: `Room code: ${battle.room_code}. Share this with your opponent!`
       });
     } catch (error) {
       console.error('Error creating battle:', error);
@@ -130,46 +67,11 @@ const BattleManager: React.FC<BattleManagerProps> = ({ soundEnabled, onStartBatt
     }
   };
 
-  const joinBattle = async () => {
+  const handleJoinBattle = async () => {
     if (!user?.id || !roomCode.trim()) return;
 
     try {
-      const { data: existingBattle, error: fetchError } = await supabase
-        .from('battles')
-        .select('*')
-        .eq('room_code', roomCode.toUpperCase())
-        .eq('status', 'waiting')
-        .single();
-
-      if (fetchError) {
-        toast({
-          title: "Battle Not Found",
-          description: "No waiting battle found with that room code",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      if (existingBattle.player1_id === user.id) {
-        toast({
-          title: "Cannot Join",
-          description: "You cannot join your own battle",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      const { error: updateError } = await supabase
-        .from('battles')
-        .update({
-          player2_id: user.id,
-          status: 'active',
-          started_at: new Date().toISOString()
-        })
-        .eq('id', existingBattle.id);
-
-      if (updateError) throw updateError;
-
+      const battle = await joinBattle(roomCode);
       setRoomCode('');
       toast({
         title: "Battle Joined!",
@@ -177,12 +79,12 @@ const BattleManager: React.FC<BattleManagerProps> = ({ soundEnabled, onStartBatt
       });
 
       // Start the battle
-      onStartBattle({ ...existingBattle, player2_id: user.id, status: 'active' });
+      onStartBattle(battle);
     } catch (error) {
       console.error('Error joining battle:', error);
       toast({
         title: "Error",
-        description: "Failed to join battle",
+        description: error instanceof Error ? error.message : "Failed to join battle",
         variant: "destructive"
       });
     }
@@ -242,7 +144,7 @@ const BattleManager: React.FC<BattleManagerProps> = ({ soundEnabled, onStartBatt
               ))}
             </div>
           </div>
-          <Button onClick={createBattle} className="w-full">
+          <Button onClick={handleCreateBattle} className="w-full">
             Create Battle Room
           </Button>
         </CardContent>
@@ -263,9 +165,9 @@ const BattleManager: React.FC<BattleManagerProps> = ({ soundEnabled, onStartBatt
               placeholder="Enter room code..."
               value={roomCode}
               onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-              onKeyPress={(e) => e.key === 'Enter' && joinBattle()}
+              onKeyPress={(e) => e.key === 'Enter' && handleJoinBattle()}
             />
-            <Button onClick={joinBattle} disabled={!roomCode.trim()}>
+            <Button onClick={handleJoinBattle} disabled={!roomCode.trim()}>
               Join
             </Button>
           </div>
