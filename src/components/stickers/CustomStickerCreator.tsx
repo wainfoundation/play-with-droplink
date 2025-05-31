@@ -5,9 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 
-const CustomStickerCreator = () => {
+interface CustomStickerCreatorProps {
+  onClose?: () => void;
+  onStickerCreated?: () => void;
+}
+
+const CustomStickerCreator = ({ onClose, onStickerCreated }: CustomStickerCreatorProps) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -23,6 +28,13 @@ const CustomStickerCreator = () => {
         title: "Feature Coming Soon",
         description: "Custom sticker creation will be available soon!",
       });
+      
+      if (onStickerCreated) {
+        onStickerCreated();
+      }
+      if (onClose) {
+        onClose();
+      }
     } catch (error) {
       console.error('Error creating sticker:', error);
       toast({
@@ -74,9 +86,16 @@ const CustomStickerCreator = () => {
             />
           </div>
           
-          <Button type="submit" disabled={loading}>
-            {loading ? 'Creating...' : 'Create Sticker'}
-          </Button>
+          <div className="flex gap-2">
+            <Button type="submit" disabled={loading}>
+              {loading ? 'Creating...' : 'Create Sticker'}
+            </Button>
+            {onClose && (
+              <Button type="button" variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+            )}
+          </div>
         </form>
       </CardContent>
     </Card>

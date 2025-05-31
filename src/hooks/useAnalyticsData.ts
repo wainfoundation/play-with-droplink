@@ -30,7 +30,7 @@ export const useAnalyticsData = () => {
     if (!user) return;
 
     try {
-      // For now, use links table data as analytics placeholder
+      // Use links table data as analytics source
       const { data: links, error } = await supabase
         .from('links')
         .select('title, clicks, url, created_at')
@@ -71,5 +71,14 @@ export const useAnalyticsData = () => {
     }
   };
 
-  return { data, loading, refetch: fetchAnalyticsData };
+  // Return data properties directly for backward compatibility
+  return {
+    data,
+    loading,
+    isLoading: loading,
+    pageViews: data.totalViews,
+    linkClicks: data.totalClicks,
+    conversionRate: data.totalViews > 0 ? Math.round((data.totalClicks / data.totalViews) * 100) : 0,
+    refetch: fetchAnalyticsData
+  };
 };

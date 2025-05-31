@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 
 interface CustomSticker {
@@ -31,20 +30,9 @@ export const useCustomStickers = () => {
 
   const fetchCustomStickers = async () => {
     try {
-      let query = supabase.from('custom_stickers').select('*');
-      
-      if (user) {
-        // Get user's own stickers + public stickers
-        query = query.or(`user_id.eq.${user.id},is_public.eq.true`);
-      } else {
-        // Only public stickers for non-authenticated users
-        query = query.eq('is_public', true);
-      }
-
-      const { data, error } = await query.order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setCustomStickers(data || []);
+      // TODO: Implement when custom_stickers table is available
+      console.log('Custom stickers feature not yet implemented');
+      setCustomStickers([]);
     } catch (error) {
       console.error('Error fetching custom stickers:', error);
     } finally {
