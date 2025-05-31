@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -350,7 +349,7 @@ const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameCompl
             <Trophy className="w-4 h-4 text-yellow-500" />
             <span className="font-semibold">{score.toLocaleString()}</span>
             {showPiWarning && (
-              <AlertCircle className="w-4 h-4 text-yellow-500" title="Pi Browser required for ads" />
+              <AlertCircle className="w-4 h-4 text-yellow-500" />
             )}
           </div>
         </div>
