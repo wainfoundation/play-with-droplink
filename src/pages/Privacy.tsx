@@ -1,128 +1,142 @@
+
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import GoToTop from '@/components/GoToTop';
+import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const Privacy = () => {
+  const handleBack = () => {
+    window.history.back();
+  };
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       <Helmet>
-        <title>Privacy Policy - Droplink</title>
-        <meta name="description" content="Read our Privacy Policy to understand how we handle your data on Droplink." />
+        <title>Privacy Policy - Play with Droplink</title>
+        <meta name="description" content="Read our Privacy Policy to understand how we handle your data in Play with Droplink gaming platform." />
       </Helmet>
-      <Navbar />
       
-      <main className="flex-grow">
-        <section className="bg-gray-50 py-20">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto">
-              <h1 className="text-3xl font-bold text-gray-900 mb-6">Privacy Policy</h1>
-              
-              <p className="text-gray-700 mb-4">
-                Your privacy is important to us. It is Droplink's policy to respect your privacy regarding any information we may collect from you across our website, <a href="https://droplink.space" className="text-blue-500 hover:underline">https://droplink.space</a>, and other sites we own and operate.
-              </p>
-
-              <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">Information We Collect</h2>
-              <p className="text-gray-700 mb-4">
-                We collect information in the following ways:
-              </p>
-              <ul className="list-disc list-inside text-gray-700 mb-4">
-                <li>
-                  <strong>Information you directly provide to us:</strong> This includes your email address, username, and any other information you choose to provide when you register, create a profile, or contact us.
-                </li>
-                <li>
-                  <strong>Automatically collected information:</strong> We automatically collect certain information when you visit our website, such as your IP address, browser type, operating system, referring URLs, and browsing behavior.
-                </li>
-                <li>
-                  <strong>Information from third parties:</strong> We may receive information about you from third-party services, such as Pi Network, when you use their services in connection with our platform.
-                </li>
-              </ul>
-
-              <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">How We Use Your Information</h2>
-              <p className="text-gray-700 mb-4">
-                We use the information we collect for various purposes, including:
-              </p>
-              <ul className="list-disc list-inside text-gray-700 mb-4">
-                <li>
-                  Providing, maintaining, and improving our services.
-                </li>
-                <li>
-                  Personalizing your experience on our platform.
-                </li>
-                <li>
-                  Communicating with you, including responding to your inquiries and providing customer support.
-                </li>
-                <li>
-                  Sending you updates, newsletters, and promotional materials (you can opt-out at any time).
-                </li>
-                <li>
-                  Analyzing usage trends and patterns to optimize our platform.
-                </li>
-                <li>
-                  Preventing fraud, abuse, and other prohibited activities.
-                </li>
-              </ul>
-
-              <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">Sharing Your Information</h2>
-              <p className="text-gray-700 mb-4">
-                We may share your information with:
-              </p>
-              <ul className="list-disc list-inside text-gray-700 mb-4">
-                <li>
-                  <strong>Service providers:</strong> We share information with third-party service providers who help us operate, maintain, and improve our platform (e.g., hosting providers, analytics providers, email marketing providers).
-                </li>
-                <li>
-                  <strong>Pi Network:</strong> We may share information with Pi Network to facilitate your use of their services in connection with our platform.
-                </li>
-                <li>
-                  <strong>Legal authorities:</strong> We may disclose information to legal authorities if required by law or legal process.
-                </li>
-                <li>
-                  <strong>Business transfers:</strong> In the event of a merger, acquisition, or sale of all or a portion of our assets, your information may be transferred to the acquiring entity.
-                </li>
-              </ul>
-
-              <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">Data Security</h2>
-              <p className="text-gray-700 mb-4">
-                We take reasonable measures to protect your information from unauthorized access, use, or disclosure. However, no method of transmission over the internet or method of electronic storage is completely secure, so we cannot guarantee absolute security.
-              </p>
-
-              <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">Your Rights</h2>
-              <p className="text-gray-700 mb-4">
-                You have the following rights regarding your information:
-              </p>
-              <ul className="list-disc list-inside text-gray-700 mb-4">
-                <li>
-                  <strong>Access:</strong> You have the right to access the information we hold about you.
-                </li>
-                <li>
-                  <strong>Correction:</strong> You have the right to correct any inaccurate or incomplete information we hold about you.
-                </li>
-                <li>
-                  <strong>Deletion:</strong> You have the right to request the deletion of your information, subject to certain exceptions.
-                </li>
-                <li>
-                  <strong>Opt-out:</strong> You have the right to opt-out of receiving marketing communications from us.
-                </li>
-              </ul>
-
-              <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">Changes to This Privacy Policy</h2>
-              <p className="text-gray-700 mb-4">
-                We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new Privacy Policy on our website. You are advised to review this Privacy Policy periodically for any changes.
-              </p>
-
-              <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">Contact Us</h2>
-              <p className="text-gray-700 mb-4">
-                If you have any questions or concerns about this Privacy Policy, please contact us at <a href="mailto:support@droplink.space" className="text-blue-500 hover:underline">support@droplink.space</a>.
-              </p>
-            </div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-3xl mx-auto">
+          <div className="mb-6">
+            <Button variant="ghost" onClick={handleBack} className="mb-4">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Game
+            </Button>
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">Privacy Policy</h1>
+            <p className="text-gray-600">Last updated: {new Date().toLocaleDateString()}</p>
           </div>
-        </section>
-      </main>
-      
-      <Footer />
-      <GoToTop />
+          
+          <div className="bg-white rounded-lg shadow-sm p-8 space-y-6">
+            <p className="text-gray-700">
+              Your privacy is important to us. This Privacy Policy explains how Play with Droplink ("we," "our," or "us") collects, uses, and protects your information when you use our gaming platform.
+            </p>
+
+            <section>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Information We Collect</h2>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-medium text-gray-800 mb-2">Gaming Data</h3>
+                  <ul className="list-disc list-inside text-gray-700 space-y-1">
+                    <li>Game scores and progress</li>
+                    <li>Character selection and customization</li>
+                    <li>Gaming preferences and statistics</li>
+                    <li>In-game achievements and rewards</li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium text-gray-800 mb-2">Pi Network Integration</h3>
+                  <ul className="list-disc list-inside text-gray-700 space-y-1">
+                    <li>Pi Network username and profile information</li>
+                    <li>Pi payment transaction data for premium features</li>
+                    <li>Pi wallet address for gaming rewards and tips</li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium text-gray-800 mb-2">Technical Information</h3>
+                  <ul className="list-disc list-inside text-gray-700 space-y-1">
+                    <li>Device type and browser information</li>
+                    <li>Game performance and crash reports</li>
+                    <li>Usage analytics for game improvement</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">How We Use Your Information</h2>
+              <ul className="list-disc list-inside text-gray-700 space-y-2">
+                <li>Provide and maintain the gaming experience</li>
+                <li>Track your game progress and scores</li>
+                <li>Process Pi payments for premium games and features</li>
+                <li>Deliver gaming rewards and achievements</li>
+                <li>Improve game performance and add new features</li>
+                <li>Provide customer support for gaming issues</li>
+                <li>Prevent cheating and maintain fair gameplay</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Pi Network Integration</h2>
+              <p className="text-gray-700 mb-4">
+                Play with Droplink integrates with Pi Network to provide:
+              </p>
+              <ul className="list-disc list-inside text-gray-700 space-y-2">
+                <li>Secure authentication through Pi SDK</li>
+                <li>Pi-based payments for premium games</li>
+                <li>Gaming rewards distributed in Pi</li>
+                <li>Tip functionality between players</li>
+              </ul>
+              <p className="text-gray-700 mt-4">
+                Your Pi Network data is handled according to Pi Network's own privacy policies. We only access information necessary for gaming functionality.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Data Security</h2>
+              <p className="text-gray-700">
+                We implement appropriate security measures to protect your gaming data and Pi Network information. However, no method of transmission over the internet is 100% secure, and we cannot guarantee absolute security.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Your Rights</h2>
+              <ul className="list-disc list-inside text-gray-700 space-y-2">
+                <li>Access your gaming data and progress</li>
+                <li>Request deletion of your gaming account</li>
+                <li>Opt-out of data collection for analytics</li>
+                <li>Export your game achievements and scores</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Third-Party Services</h2>
+              <p className="text-gray-700">
+                Our gaming platform integrates with:
+              </p>
+              <ul className="list-disc list-inside text-gray-700 space-y-2">
+                <li><strong>Pi Network:</strong> For authentication and payments</li>
+                <li><strong>Pi Ad Network:</strong> For rewarded advertisements</li>
+                <li><strong>Analytics services:</strong> For improving game performance</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Changes to This Policy</h2>
+              <p className="text-gray-700">
+                We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new Privacy Policy within the gaming platform.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Contact Us</h2>
+              <p className="text-gray-700">
+                If you have any questions about this Privacy Policy or our gaming platform, please contact us through the in-game support system or Pi Network messaging.
+              </p>
+            </section>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
