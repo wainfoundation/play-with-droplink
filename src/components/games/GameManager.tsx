@@ -1,0 +1,136 @@
+
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  PuzzleIcon,
+  RocketIcon,
+  BrainIcon,
+  PaletteIcon,
+  InfinityIcon
+} from 'lucide-react';
+import GameCard from './GameCard';
+import InteractiveMascot from '@/components/mascot/InteractiveMascot';
+import PiAdsNetwork from '@/components/PiAdsNetwork';
+
+interface GameManagerProps {
+  games: any[];
+  userPlan: string;
+  purchasedGames: string[];
+  soundEnabled: boolean;
+  onGameClick: (game: any, category: string) => void;
+  onPurchaseGame: (game: any) => void;
+  onMoodChange: (mood: number) => void;
+}
+
+const GameManager: React.FC<GameManagerProps> = ({
+  games,
+  userPlan,
+  purchasedGames,
+  soundEnabled,
+  onGameClick,
+  onPurchaseGame,
+  onMoodChange
+}) => {
+  // Game categories organized by category from database
+  const organizeGamesByCategory = () => {
+    const categories = {
+      puzzle: {
+        name: "Puzzle & Logic",
+        icon: PuzzleIcon,
+        color: "bg-blue-500",
+        games: games.filter(game => game.category === 'puzzle')
+      },
+      action: {
+        name: "Action & Reflex", 
+        icon: RocketIcon,
+        color: "bg-red-500",
+        games: games.filter(game => game.category === 'action')
+      },
+      trivia: {
+        name: "Trivia & Quiz",
+        icon: BrainIcon,
+        color: "bg-green-500", 
+        games: games.filter(game => game.category === 'trivia')
+      },
+      creative: {
+        name: "Creative & Fun",
+        icon: PaletteIcon,
+        color: "bg-purple-500",
+        games: games.filter(game => game.category === 'creative')
+      },
+      infinite: {
+        name: "Infinite Games",
+        icon: InfinityIcon,
+        color: "bg-orange-500",
+        games: games.filter(game => game.category === 'infinite')
+      }
+    };
+    return categories;
+  };
+
+  const gameCategories = organizeGamesByCategory();
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="lg:col-span-1">
+        <div className="sticky top-4 space-y-6">
+          <InteractiveMascot 
+            onMoodChange={onMoodChange}
+            soundEnabled={soundEnabled}
+          />
+          <PiAdsNetwork placementId="gaming-sidebar" />
+        </div>
+      </div>
+
+      <div className="lg:col-span-2">
+        <Tabs defaultValue="puzzle" className="w-full">
+          <TabsList className="grid w-full grid-cols-5 mb-6">
+            {Object.entries(gameCategories).map(([key, category]) => (
+              <TabsTrigger key={key} value={key} className="flex items-center gap-1 text-xs">
+                <category.icon className="w-3 h-3" />
+                <span className="hidden sm:inline">{category.name.split(' ')[0]}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          {Object.entries(gameCategories).map(([key, category]) => (
+            <TabsContent key={key} value={key}>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <category.icon className="w-6 h-6" />
+                    {category.name}
+                  </CardTitle>
+                  <CardDescription>
+                    Choose from {category.games.length} amazing {category.name.toLowerCase()} games
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {category.games.map(game => {
+                      const isLocked = !game.is_free && userPlan === 'free' && !purchasedGames.includes(game.id);
+                      return (
+                        <GameCard
+                          key={game.id}
+                          game={game}
+                          isLocked={isLocked}
+                          userPlan={userPlan}
+                          onPlay={(game) => onGameClick(game, key)}
+                          onPurchase={() => onPurchaseGame(game)}
+                          onUpgrade={() => {}}
+                        />
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          ))}
+        </Tabs>
+      </div>
+    </div>
+  );
+};
+
+export default GameManager;
