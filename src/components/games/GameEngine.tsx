@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, RefreshCw, Trophy, Star, Heart } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 import BlockConnectEngine from '@/components/games/engines/BlockConnectEngine';
 import ColorMergeEngine from '@/components/games/engines/ColorMergeEngine';
 import SudokuClassicEngine from '@/components/games/engines/SudokuClassicEngine';
@@ -22,6 +22,8 @@ interface GameEngineProps {
 }
 
 const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete }) => {
+  const isMobile = useIsMobile();
+  
   // Check if we have a specific engine for this game
   if (game.id === 'block-connect') {
     return <BlockConnectEngine onBack={onBack} onGameComplete={onGameComplete} />;
@@ -455,6 +457,72 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
     </div>
   );
 
+  // Mobile full screen wrapper
+  if (isMobile) {
+    return (
+      <div className="fixed inset-0 z-50 bg-white">
+        <div className="flex flex-col h-full">
+          {/* Mobile Header */}
+          <div className="flex items-center justify-between p-4 border-b bg-white">
+            <Button variant="ghost" size="sm" onClick={onBack}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+            <div className="flex items-center gap-2">
+              <div className="text-lg">🎮</div>
+              <span className="font-semibold text-sm">{game.name}</span>
+            </div>
+            <Badge variant="outline" className="text-xs">{game.category}</Badge>
+          </div>
+
+          {/* Mobile Game Stats */}
+          <div className="grid grid-cols-4 gap-2 p-3 bg-gray-50 border-b">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-1">
+                <Trophy className="w-3 h-3 text-yellow-500" />
+                <span className="font-semibold text-sm">{score}</span>
+              </div>
+              <p className="text-xs text-gray-600">Score</p>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-1">
+                <Star className="w-3 h-3 text-blue-500" />
+                <span className="font-semibold text-sm">{level}</span>
+              </div>
+              <p className="text-xs text-gray-600">Level</p>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-1">
+                <Heart className="w-3 h-3 text-red-500" />
+                <span className="font-semibold text-sm">{lives}</span>
+              </div>
+              <p className="text-xs text-gray-600">Lives</p>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-1">
+                <span className="font-semibold text-sm">{timeLeft}s</span>
+              </div>
+              <p className="text-xs text-gray-600">Time</p>
+            </div>
+          </div>
+
+          {/* Time Progress Bar */}
+          {isPlaying && (
+            <div className="px-4 py-2 bg-gray-50">
+              <Progress value={(timeLeft / 60) * 100} className="h-1" />
+            </div>
+          )}
+
+          {/* Mobile Game Content */}
+          <div className="flex-1 overflow-auto p-4">
+            {renderGameContent()}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop version
   return (
     <Card className="max-w-2xl mx-auto">
       <CardHeader>

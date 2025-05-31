@@ -5,6 +5,7 @@ import { useUser } from '@/context/UserContext';
 import { useToast } from '@/components/ui/use-toast';
 import { useGames } from '@/hooks/useGames';
 import { usePiPayment } from '@/hooks/usePiPayment';
+import { useIsMobile } from '@/hooks/use-mobile';
 import GameEngine from '@/components/games/GameEngine';
 import PiBrowserCheck from '@/components/PiBrowserCheck';
 import CharacterDisplay from '@/components/games/CharacterDisplay';
@@ -18,6 +19,8 @@ const PlayWithMascot = () => {
   const { toast } = useToast();
   const { games, loading: gamesLoading } = useGames();
   const { handleSubscribe, loading: paymentLoading } = usePiPayment();
+  const isMobile = useIsMobile();
+  
   const [totalScore, setTotalScore] = useState(0);
   const [currentGame, setCurrentGame] = useState<any>(null);
   const [userPlan, setUserPlan] = useState('free');
@@ -209,15 +212,15 @@ const PlayWithMascot = () => {
     );
   }
 
-  // Show game engine if a game is selected
+  // Show game engine if a game is selected - mobile gets full screen
   if (currentGame) {
     return (
       <>
         <Helmet>
           <title>{currentGame.name} - Droplink Gaming</title>
         </Helmet>
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">
-          <div className="container mx-auto px-4">
+        <div className={isMobile ? "min-h-screen" : "min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8"}>
+          <div className={isMobile ? "" : "container mx-auto px-4"}>
             <GameEngine
               game={currentGame}
               onBack={handleBackToGames}

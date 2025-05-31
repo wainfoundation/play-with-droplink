@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Trophy, Star, Heart, RefreshCw, Clock, Zap, Users, Calendar } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 import SudokuBoard from '@/components/games/sudoku/SudokuBoard';
 import SudokuLeaderboard from '@/components/games/sudoku/SudokuLeaderboard';
 import SudokuDuelMode from '@/components/games/sudoku/SudokuDuelMode';
@@ -37,6 +38,8 @@ interface GameState {
 }
 
 const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGameComplete }) => {
+  const isMobile = useIsMobile();
+  
   const [gameState, setGameState] = useState<GameState>({
     board: [],
     solution: [],
@@ -344,32 +347,32 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
   };
 
   const renderGameStats = () => (
-    <div className="grid grid-cols-4 gap-4 mb-6">
+    <div className={`grid grid-cols-4 gap-${isMobile ? '2' : '4'} mb-${isMobile ? '4' : '6'}`}>
       <div className="text-center">
         <div className="flex items-center justify-center gap-1">
-          <Trophy className="w-4 h-4 text-yellow-500" />
-          <span className="font-semibold">{gameState.score}</span>
+          <Trophy className={`w-${isMobile ? '3' : '4'} h-${isMobile ? '3' : '4'} text-yellow-500`} />
+          <span className={`font-semibold ${isMobile ? 'text-sm' : ''}`}>{gameState.score}</span>
         </div>
         <p className="text-xs text-gray-600">Score</p>
       </div>
       <div className="text-center">
         <div className="flex items-center justify-center gap-1">
-          <Star className="w-4 h-4 text-blue-500" />
-          <span className="font-semibold">{gameState.level}</span>
+          <Star className={`w-${isMobile ? '3' : '4'} h-${isMobile ? '3' : '4'} text-blue-500`} />
+          <span className={`font-semibold ${isMobile ? 'text-sm' : ''}`}>{gameState.level}</span>
         </div>
         <p className="text-xs text-gray-600">Level</p>
       </div>
       <div className="text-center">
         <div className="flex items-center justify-center gap-1">
-          <Heart className="w-4 h-4 text-red-500" />
-          <span className="font-semibold">{gameState.lives}</span>
+          <Heart className={`w-${isMobile ? '3' : '4'} h-${isMobile ? '3' : '4'} text-red-500`} />
+          <span className={`font-semibold ${isMobile ? 'text-sm' : ''}`}>{gameState.lives}</span>
         </div>
         <p className="text-xs text-gray-600">Lives</p>
       </div>
       <div className="text-center">
         <div className="flex items-center justify-center gap-1">
-          <Clock className="w-4 h-4 text-green-500" />
-          <span className="font-semibold">{formatTime(gameState.time)}</span>
+          <Clock className={`w-${isMobile ? '3' : '4'} h-${isMobile ? '3' : '4'} text-green-500`} />
+          <span className={`font-semibold ${isMobile ? 'text-sm' : ''}`}>{formatTime(gameState.time)}</span>
         </div>
         <p className="text-xs text-gray-600">Time</p>
       </div>
@@ -377,10 +380,10 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
   );
 
   const renderGameControls = () => (
-    <div className="flex flex-wrap gap-2 mb-4">
+    <div className={`flex flex-wrap gap-2 mb-${isMobile ? '3' : '4'}`}>
       <Button
         variant="outline"
-        size="sm"
+        size={isMobile ? "sm" : "sm"}
         onClick={handleHint}
         disabled={gameState.gameBlocked}
         className={gameState.hints <= 0 ? 'border-red-300 text-red-600' : ''}
@@ -390,7 +393,7 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
       </Button>
       <Button
         variant="outline"
-        size="sm"
+        size={isMobile ? "sm" : "sm"}
         onClick={() => setGameState(prev => ({ ...prev, pencilMode: !prev.pencilMode }))}
         className={gameState.pencilMode ? 'bg-blue-100' : ''}
         disabled={gameState.gameBlocked}
@@ -399,7 +402,7 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
       </Button>
       <Button
         variant="outline"
-        size="sm"
+        size={isMobile ? "sm" : "sm"}
         onClick={() => {
           toast({ title: "Undo", description: "Last move undone!" });
         }}
@@ -411,12 +414,12 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
   );
 
   const renderNumberPad = () => (
-    <div className="grid grid-cols-5 gap-2 mt-4">
+    <div className={`grid grid-cols-5 gap-${isMobile ? '1' : '2'} mt-4`}>
       {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
         <Button
           key={num}
           variant="outline"
-          className="h-12 text-lg font-bold"
+          className={`h-${isMobile ? '10' : '12'} text-lg font-bold`}
           onClick={() => handleNumberInput(num)}
           disabled={!gameState.selectedCell || gameState.gameBlocked}
         >
@@ -425,7 +428,7 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
       ))}
       <Button
         variant="outline"
-        className="h-12 text-lg"
+        className={`h-${isMobile ? '10' : '12'} text-lg`}
         onClick={() => handleNumberInput(0)}
         disabled={!gameState.selectedCell || gameState.gameBlocked}
       >
@@ -468,6 +471,135 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
     </div>
   );
 
+  const renderMainContent = () => (
+    <div className={isMobile ? 'p-2' : ''}>
+      {gameState.gameBlocked && (
+        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-yellow-800 text-center font-medium">
+            ⚠️ Game Paused - You need more hints to continue!
+          </p>
+        </div>
+      )}
+
+      <Tabs value={gameState.gameMode} onValueChange={(value) => 
+        setGameState(prev => ({ ...prev, gameMode: value as any }))
+      }>
+        <TabsList className={`grid w-full grid-cols-4 ${isMobile ? 'text-xs' : ''}`}>
+          <TabsTrigger value="infinite">♾️ Infinite</TabsTrigger>
+          <TabsTrigger value="daily">📅 Daily</TabsTrigger>
+          <TabsTrigger value="leaderboard">🏆 Ranks</TabsTrigger>
+          <TabsTrigger value="duel">⚔️ Duel</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="infinite">
+          {renderGameStats()}
+          
+          {!gameState.isPlaying && !gameState.gameOver && renderStartScreen()}
+          {gameState.gameOver && renderGameOverScreen()}
+          
+          {gameState.isPlaying && (
+            <>
+              {renderGameControls()}
+              <div className="flex justify-center mb-4">
+                <SudokuBoard
+                  board={gameState.board}
+                  selectedCell={gameState.selectedCell}
+                  onCellClick={handleCellClick}
+                  theme={theme}
+                />
+              </div>
+              {renderNumberPad()}
+            </>
+          )}
+        </TabsContent>
+
+        <TabsContent value="daily">
+          <SudokuDailyChallenge />
+        </TabsContent>
+
+        <TabsContent value="leaderboard">
+          <SudokuLeaderboard />
+        </TabsContent>
+
+        <TabsContent value="duel">
+          <SudokuDuelMode />
+        </TabsContent>
+      </Tabs>
+
+      {/* Theme Selector */}
+      <div className={`flex justify-center gap-2 mt-${isMobile ? '4' : '6'}`}>
+        <Button
+          variant={theme === 'light' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setTheme('light')}
+        >
+          ☀️ Light
+        </Button>
+        <Button
+          variant={theme === 'dark' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setTheme('dark')}
+        >
+          🌙 Dark
+        </Button>
+        <Button
+          variant={theme === 'pi' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setTheme('pi')}
+        >
+          π Pi Style
+        </Button>
+      </div>
+    </div>
+  );
+
+  // Mobile full screen layout
+  if (isMobile) {
+    return (
+      <>
+        <div className="fixed inset-0 z-50 bg-white">
+          <div className="flex flex-col h-full">
+            {/* Mobile Header */}
+            <div className="flex items-center justify-between p-4 border-b bg-white">
+              <Button variant="ghost" size="sm" onClick={onBack}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+              <div className="flex items-center gap-2">
+                <div className="text-lg">🧩</div>
+                <span className="font-semibold text-sm">Sudoku Classic</span>
+              </div>
+              <Badge variant="outline" className="text-xs">{getDifficultyLevel(gameState.level)}</Badge>
+            </div>
+
+            {/* Mobile Game Content */}
+            <div className="flex-1 overflow-auto">
+              {renderMainContent()}
+            </div>
+          </div>
+        </div>
+
+        <HintsModal
+          isOpen={showHintsModal}
+          onClose={() => {
+            setShowHintsModal(false);
+            // If user closes without choosing, exit game
+            setGameState(prev => ({ 
+              ...prev, 
+              isPlaying: false, 
+              gameOver: true, 
+              gameBlocked: false 
+            }));
+          }}
+          onWatchAd={handleWatchAd}
+          onPayPi={handlePayPi}
+          isLoading={paymentLoading}
+        />
+      </>
+    );
+  }
+
+  // Desktop layout
   return (
     <>
       <Card className="max-w-4xl mx-auto">
@@ -485,81 +617,7 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
           </div>
         </CardHeader>
         <CardContent>
-          {gameState.gameBlocked && (
-            <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-yellow-800 text-center font-medium">
-                ⚠️ Game Paused - You need more hints to continue!
-              </p>
-            </div>
-          )}
-
-          <Tabs value={gameState.gameMode} onValueChange={(value) => 
-            setGameState(prev => ({ ...prev, gameMode: value as any }))
-          }>
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="infinite">♾️ Infinite</TabsTrigger>
-              <TabsTrigger value="daily">📅 Daily</TabsTrigger>
-              <TabsTrigger value="leaderboard">🏆 Ranks</TabsTrigger>
-              <TabsTrigger value="duel">⚔️ Duel</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="infinite">
-              {renderGameStats()}
-              
-              {!gameState.isPlaying && !gameState.gameOver && renderStartScreen()}
-              {gameState.gameOver && renderGameOverScreen()}
-              
-              {gameState.isPlaying && (
-                <>
-                  {renderGameControls()}
-                  <SudokuBoard
-                    board={gameState.board}
-                    selectedCell={gameState.selectedCell}
-                    onCellClick={handleCellClick}
-                    theme={theme}
-                  />
-                  {renderNumberPad()}
-                </>
-              )}
-            </TabsContent>
-
-            <TabsContent value="daily">
-              <SudokuDailyChallenge />
-            </TabsContent>
-
-            <TabsContent value="leaderboard">
-              <SudokuLeaderboard />
-            </TabsContent>
-
-            <TabsContent value="duel">
-              <SudokuDuelMode />
-            </TabsContent>
-          </Tabs>
-
-          {/* Theme Selector */}
-          <div className="flex justify-center gap-2 mt-6">
-            <Button
-              variant={theme === 'light' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setTheme('light')}
-            >
-              ☀️ Light
-            </Button>
-            <Button
-              variant={theme === 'dark' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setTheme('dark')}
-            >
-              🌙 Dark
-            </Button>
-            <Button
-              variant={theme === 'pi' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setTheme('pi')}
-            >
-              π Pi Style
-            </Button>
-          </div>
+          {renderMainContent()}
         </CardContent>
       </Card>
 
