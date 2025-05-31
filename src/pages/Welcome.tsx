@@ -160,12 +160,30 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
             50% { opacity: 1; }
           }
           
+          @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+          }
+          
+          @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+          
           .animate-bounce-gentle {
             animation: bounce-gentle 4s ease-in-out infinite;
           }
           
           .animate-shimmer {
             animation: shimmer 2.5s ease-in-out infinite;
+          }
+          
+          .animate-float {
+            animation: float 3s ease-in-out infinite;
+          }
+          
+          .animate-spin-slow {
+            animation: spin-slow 8s linear infinite;
           }
           `}
         </style>

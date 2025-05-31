@@ -5,35 +5,36 @@ export interface CharacterCustomization {
   color: string;
   clothes: string[];
   accessories: string[];
-  eyewear?: string;
-  hat?: string;
   background: string;
   room: string;
   created_at: string;
   updated_at: string;
 }
 
+export interface CharacterStats {
+  happiness: number;
+  hunger: number;
+  cleanliness: number;
+  energy: number;
+}
+
 export interface ShopItem {
   id: string;
   name: string;
-  type: 'color' | 'clothes' | 'accessory' | 'eyewear' | 'hat' | 'background' | 'room';
   price: number;
-  currency: 'pi' | 'ad';
-  preview_url?: string;
+  currency: 'coins' | 'pi';
+  category: 'hair' | 'clothes' | 'accessories' | 'decoration';
+  preview: string;
   description?: string;
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
-}
-
-export interface CharacterStats {
-  happiness: number;
-  energy: number;
-  cleanliness: number;
-  hunger: number;
 }
 
 export interface PetInteraction {
-  type: 'feed' | 'play' | 'clean' | 'rest';
-  timestamp: string;
-  happiness_gain: number;
-  energy_change: number;
+  type: 'feed' | 'play' | 'clean' | 'sleep';
+  effect: {
+    happiness?: number;
+    hunger?: number;
+    cleanliness?: number;
+    energy?: number;
+  };
+  coins_earned: number;
 }
