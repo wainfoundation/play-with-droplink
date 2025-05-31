@@ -1,4 +1,11 @@
+
 import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { ArrowLeft, RefreshCw, Trophy, Star, Heart } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 import BlockConnectEngine from '@/components/games/engines/BlockConnectEngine';
 import ColorMergeEngine from '@/components/games/engines/ColorMergeEngine';
 import SudokuClassicEngine from '@/components/games/engines/SudokuClassicEngine';
@@ -208,7 +215,7 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
     setScore(prev => prev + 10);
     if (score > 0 && score % 100 === 0) {
       setLevel(prev => prev + 1);
-      React.toast({
+      toast({
         title: "Level Up!",
         description: `You've reached level ${level + 1}!`,
       });
@@ -248,7 +255,7 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
     setGameOver(true);
     onGameComplete(score);
     
-    React.toast({
+    toast({
       title: "Game Complete!",
       description: `Final Score: ${score} points`,
     });
@@ -261,9 +268,9 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
           <div className="text-6xl mb-4">🎮</div>
           <h3 className="text-xl font-bold mb-2">{game.name}</h3>
           <p className="text-gray-600 mb-6">Ready to play? Click start to begin!</p>
-          <React.Button onClick={startGame} size="lg">
+          <Button onClick={startGame} size="lg">
             Start Game
-          </React.Button>
+          </Button>
         </div>
       );
     }
@@ -276,14 +283,14 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
           <p className="text-gray-600 mb-2">Final Score: {score}</p>
           <p className="text-gray-600 mb-6">Level Reached: {level}</p>
           <div className="flex gap-2 justify-center">
-            <React.Button onClick={startGame} variant="outline">
-              <React.RefreshCw className="w-4 h-4 mr-2" />
+            <Button onClick={startGame} variant="outline">
+              <RefreshCw className="w-4 h-4 mr-2" />
               Play Again
-            </React.Button>
-            <React.Button onClick={onBack}>
-              <React.ArrowLeft className="w-4 h-4 mr-2" />
+            </Button>
+            <Button onClick={onBack}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Games
-            </React.Button>
+            </Button>
           </div>
         </div>
       );
@@ -325,13 +332,13 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
         ) : (
           <div className="grid grid-cols-3 gap-2 max-w-xs mx-auto">
             {gameState.letters?.map((letter: string, i: number) => (
-              <React.Button
+              <Button
                 key={i}
                 variant="outline"
                 onClick={() => handleGameAction('click', { letter })}
               >
                 {letter}
-              </React.Button>
+              </Button>
             ))}
           </div>
         )}
@@ -345,13 +352,13 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
         <h3 className="text-lg font-semibold mb-4">Quick! Tap the targets!</h3>
         <div className="grid grid-cols-3 gap-4 max-w-xs mx-auto">
           {Array.from({ length: 9 }).map((_, i) => (
-            <React.Button
+            <Button
               key={i}
               className="h-16 w-16 rounded-full"
               onClick={() => handleGameAction('click', { target: i })}
             >
               🎯
-            </React.Button>
+            </Button>
           ))}
         </div>
       </div>
@@ -368,14 +375,14 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
           <h3 className="text-lg font-semibold mb-4">{question.question}</h3>
           <div className="grid grid-cols-1 gap-2 max-w-md mx-auto">
             {question.options.map((option: string, i: number) => (
-              <React.Button
+              <Button
                 key={i}
                 variant="outline"
                 onClick={() => handleAnswer(i)}
                 className="text-left justify-start"
               >
                 {String.fromCharCode(65 + i)}. {option}
-              </React.Button>
+              </Button>
             ))}
           </div>
         </div>
@@ -398,9 +405,9 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
         </div>
         <div className="flex gap-2 justify-center mt-4">
           {['🔴', '🟡', '🟢', '🔵', '🟣'].map((color, i) => (
-            <React.Button key={i} variant="outline" size="sm">
+            <Button key={i} variant="outline" size="sm">
               {color}
-            </React.Button>
+            </Button>
           ))}
         </div>
       </div>
@@ -422,11 +429,11 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
         </div>
         <div className="grid grid-cols-3 gap-2 max-w-xs mx-auto mt-4">
           <div></div>
-          <React.Button onClick={() => handleMove('up')}>⬆️</React.Button>
+          <Button onClick={() => handleMove('up')}>⬆️</Button>
           <div></div>
-          <React.Button onClick={() => handleMove('left')}>⬅️</React.Button>
-          <React.Button onClick={() => handleMove('down')}>⬇️</React.Button>
-          <React.Button onClick={() => handleMove('right')}>➡️</React.Button>
+          <Button onClick={() => handleMove('left')}>⬅️</Button>
+          <Button onClick={() => handleMove('down')}>⬇️</Button>
+          <Button onClick={() => handleMove('right')}>➡️</Button>
         </div>
       </div>
     </div>
@@ -436,53 +443,53 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
     <div className="space-y-4">
       <div className="text-center">
         <h3 className="text-lg font-semibold mb-4">Click to earn points!</h3>
-        <React.Button
+        <Button
           size="lg"
           onClick={() => handleGameAction('click')}
           className="text-2xl h-20 w-20 rounded-full"
         >
           🎯
-        </React.Button>
+        </Button>
         <p className="mt-4 text-gray-600">Keep clicking to increase your score!</p>
       </div>
     </div>
   );
 
   return (
-    <React.Card className="max-w-2xl mx-auto">
-      <React.CardHeader>
+    <Card className="max-w-2xl mx-auto">
+      <CardHeader>
         <div className="flex items-center justify-between">
-          <React.Button variant="ghost" onClick={onBack}>
-            <React.ArrowLeft className="w-4 h-4 mr-2" />
+          <Button variant="ghost" onClick={onBack}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
             Back
-          </React.Button>
-          <React.CardTitle className="flex items-center gap-2">
+          </Button>
+          <CardTitle className="flex items-center gap-2">
             <div className="text-2xl">🎮</div>
             {game.name}
-          </React.CardTitle>
-          <React.Badge variant="outline">{game.category}</React.Badge>
+          </CardTitle>
+          <Badge variant="outline">{game.category}</Badge>
         </div>
-      </React.CardHeader>
-      <React.CardContent>
+      </CardHeader>
+      <CardContent>
         {/* Game Stats */}
         <div className="grid grid-cols-4 gap-4 mb-6">
           <div className="text-center">
             <div className="flex items-center justify-center gap-1">
-              <React.Trophy className="w-4 h-4 text-yellow-500" />
+              <Trophy className="w-4 h-4 text-yellow-500" />
               <span className="font-semibold">{score}</span>
             </div>
             <p className="text-xs text-gray-600">Score</p>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center gap-1">
-              <React.Star className="w-4 h-4 text-blue-500" />
+              <Star className="w-4 h-4 text-blue-500" />
               <span className="font-semibold">{level}</span>
             </div>
             <p className="text-xs text-gray-600">Level</p>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center gap-1">
-              <React.Heart className="w-4 h-4 text-red-500" />
+              <Heart className="w-4 h-4 text-red-500" />
               <span className="font-semibold">{lives}</span>
             </div>
             <p className="text-xs text-gray-600">Lives</p>
@@ -498,14 +505,14 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
         {/* Time Progress Bar */}
         {isPlaying && (
           <div className="mb-6">
-            <React.Progress value={(timeLeft / 60) * 100} className="h-2" />
+            <Progress value={(timeLeft / 60) * 100} className="h-2" />
           </div>
         )}
 
         {/* Game Content */}
         {renderGameContent()}
-      </React.CardContent>
-    </React.Card>
+      </CardContent>
+    </Card>
   );
 };
 
