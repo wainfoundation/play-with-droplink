@@ -3,7 +3,6 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import Footer from '@/components/Footer';
 
 const Terms = () => {
   const handleBack = () => {
@@ -158,8 +157,6 @@ const Terms = () => {
           </div>
         </div>
       </div>
-      
-      <Footer />
     </div>
   );
 };

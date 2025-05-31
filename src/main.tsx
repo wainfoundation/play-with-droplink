@@ -2,26 +2,22 @@
 import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
 import { HelmetProvider } from 'react-helmet-async'
-import { BrowserRouter as Router } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import SplashScreen from './components/SplashScreen.tsx'
 import Welcome from './pages/Welcome.tsx'
-import App from './App.tsx'
+import PlayWithMascot from './pages/PlayWithMascot.tsx'
 import { preloadPiSDK } from './utils/pi-sdk-loader'
 import PiLogger from './utils/pi-logger'
 import './index.css'
 
-const queryClient = new QueryClient();
-
 const Root = () => {
-  const [currentPage, setCurrentPage] = useState<'splash' | 'welcome' | 'app'>('splash');
+  const [currentPage, setCurrentPage] = useState<'splash' | 'welcome' | 'play'>('splash');
   
   const handleSplashComplete = () => {
     setCurrentPage('welcome');
   };
 
   const handleWelcomeComplete = () => {
-    setCurrentPage('app');
+    setCurrentPage('play');
   };
 
   useEffect(() => {
@@ -36,21 +32,17 @@ const Root = () => {
   
   return (
     <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <HelmetProvider>
-          <Router>
-            {currentPage === 'splash' && (
-              <SplashScreen onComplete={handleSplashComplete} />
-            )}
-            {currentPage === 'welcome' && (
-              <Welcome onEnter={handleWelcomeComplete} />
-            )}
-            {currentPage === 'app' && (
-              <App />
-            )}
-          </Router>
-        </HelmetProvider>
-      </QueryClientProvider>
+      <HelmetProvider>
+        {currentPage === 'splash' && (
+          <SplashScreen onComplete={handleSplashComplete} />
+        )}
+        {currentPage === 'welcome' && (
+          <Welcome onEnter={handleWelcomeComplete} />
+        )}
+        {currentPage === 'play' && (
+          <PlayWithMascot />
+        )}
+      </HelmetProvider>
     </React.StrictMode>
   );
 };
