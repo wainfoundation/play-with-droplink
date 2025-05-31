@@ -1,4 +1,15 @@
 export const gamesData = [
+  // Enhanced Block Connect with all features
+  {
+    id: 'block-connect',
+    name: 'Block Connect',
+    category: 'puzzle',
+    difficulty: 'Easy',
+    is_free: true,
+    price_pi: 0,
+    description: 'Connect blocks through millions of levels! Watch ads to play, pay Pi for hints, unlock premium for ad-free gaming. Features infinite progression (1-9,999,999 levels), lives system, and sound effects.'
+  },
+  
   // Existing Puzzle Games
   {
     id: 'sudoku-classic',
@@ -20,15 +31,6 @@ export const gamesData = [
   },
   
   // New Block-based Puzzle Games
-  {
-    id: 'block-connect',
-    name: 'Block Connect',
-    category: 'puzzle',
-    difficulty: 'Easy',
-    is_free: true,
-    price_pi: 0,
-    description: 'Strategically connect puzzle blocks without overlap'
-  },
   {
     id: 'color-merge',
     name: 'Color Merge',

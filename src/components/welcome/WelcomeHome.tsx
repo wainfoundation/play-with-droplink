@@ -21,6 +21,13 @@ const WelcomeHome: React.FC<WelcomeHomeProps> = ({
   onStartTutorial,
   onSkipToCharacterSelect
 }) => {
+  // Create a special "let's play together" character for the welcome page
+  const playTogetherCharacter = {
+    ...characters[0],
+    mood: 'excited',
+    personality: "Let's play together!"
+  };
+
   return (
     <>
       <Helmet>
@@ -50,7 +57,14 @@ const WelcomeHome: React.FC<WelcomeHomeProps> = ({
             mascotVisible ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-50 translate-y-10'
           }`}>
             <div className="relative mb-8">
-              <CharacterRenderer character={characters[0]} size={200} />
+              <CharacterRenderer character={playTogetherCharacter} size={200} />
+              {/* Speech bubble */}
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-white rounded-lg px-4 py-2 shadow-lg border-2 border-primary/20 animate-bounce">
+                <div className="text-sm font-medium text-primary">Let's play together! 🎮</div>
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full">
+                  <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white"></div>
+                </div>
+              </div>
             </div>
           </div>
 
