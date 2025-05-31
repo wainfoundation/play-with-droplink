@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Home, File, DollarSign, HelpCircle, Users, MessageSquare, BarChart3, LogOut, LogIn, UserPlus, Gamepad2 } from "lucide-react";
+import { Menu, X, Home, HelpCircle, LogOut, LogIn, UserPlus, Gamepad2 } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -19,12 +19,8 @@ const MobileNavigation = () => {
 
   const navigationItems = [
     { name: "Home", path: "/", icon: Home },
-    { name: "Templates", path: "/templates", icon: File },
-    { name: "Pricing", path: "/pricing", icon: DollarSign },
     { name: "Play with Droplink", path: "/play", icon: Gamepad2 },
     { name: "Help", path: "/help", icon: HelpCircle },
-    { name: "Community", path: "/community", icon: Users },
-    { name: "Forums", path: "/forums", icon: MessageSquare },
   ];
 
   return (
@@ -56,22 +52,6 @@ const MobileNavigation = () => {
                 </Link>
               ))}
             </nav>
-
-            <Separator className="my-4 mx-4" />
-
-            {/* User-specific items */}
-            {user && (
-              <nav className="space-y-1 px-4">
-                <Link
-                  to="/admin"
-                  className="flex items-center gap-3 px-3 py-3 text-sm font-medium rounded-lg transition-colors hover:bg-accent hover:text-accent-foreground"
-                  onClick={() => setOpen(false)}
-                >
-                  <BarChart3 className="h-5 w-5" />
-                  Dashboard
-                </Link>
-              </nav>
-            )}
           </div>
 
           {/* Auth Section */}
@@ -85,7 +65,7 @@ const MobileNavigation = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{user.email}</p>
-                    <p className="text-xs text-muted-foreground">Account</p>
+                    <p className="text-xs text-muted-foreground">Gamer</p>
                   </div>
                 </div>
                 
