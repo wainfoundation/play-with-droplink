@@ -39,7 +39,7 @@ const NameImageBio = () => {
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      display_name: user?.display_name || "",
+      display_name: user?.email || "",
       bio: "",
     },
   });

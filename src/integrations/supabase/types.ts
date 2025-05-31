@@ -684,48 +684,6 @@ export type Database = {
           },
         ]
       }
-      user_characters: {
-        Row: {
-          accessories: Json | null
-          background: string
-          color: string
-          created_at: string
-          id: string
-          name: string
-          stats: Json | null
-          tutorial_completed: boolean | null
-          unlocked_rooms: Json | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          accessories?: Json | null
-          background?: string
-          color?: string
-          created_at?: string
-          id?: string
-          name?: string
-          stats?: Json | null
-          tutorial_completed?: boolean | null
-          unlocked_rooms?: Json | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          accessories?: Json | null
-          background?: string
-          color?: string
-          created_at?: string
-          id?: string
-          name?: string
-          stats?: Json | null
-          tutorial_completed?: boolean | null
-          unlocked_rooms?: Json | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       user_profiles: {
         Row: {
           avatar_url: string | null

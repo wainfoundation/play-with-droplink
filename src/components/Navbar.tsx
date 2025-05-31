@@ -15,7 +15,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu, Sparkles } from "lucide-react";
+import { Menu } from "lucide-react";
 import NavLogo from "@/components/navbar/NavLogo";
 import DesktopNavigation from "@/components/navbar/DesktopNavigation";
 import MobileNavigation from "@/components/navbar/MobileNavigation";
@@ -34,16 +34,6 @@ const Navbar = () => {
         
         <DesktopNavigation />
         <MobileNavigation />
-        
-        {/* Welcome Tour Button */}
-        <div className="flex items-center gap-2 ml-auto mr-4">
-          <Button variant="outline" size="sm" asChild>
-            <Link to="/welcome" className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4" />
-              <span className="hidden sm:inline">Welcome Tour</span>
-            </Link>
-          </Button>
-        </div>
         
         <UserMenu />
       </div>

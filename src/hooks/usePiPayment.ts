@@ -29,30 +29,8 @@ export const usePiPayment = () => {
   const createPayment = async (paymentData: PaymentData): Promise<PaymentResult> => {
     setLoading(true);
     try {
-      // Create placeholder callbacks for Pi payment
-      const callbacks = {
-        onReadyForServerApproval: (paymentId: string) => {
-          console.log('Payment ready for server approval:', paymentId);
-        },
-        onReadyForServerCompletion: (paymentId: string, txid: string) => {
-          console.log('Payment ready for server completion:', paymentId, txid);
-        },
-        onCancel: (paymentId: string) => {
-          console.log('Payment cancelled:', paymentId);
-        },
-        onError: (error: Error, payment?: any) => {
-          console.error('Payment error:', error, payment);
-        }
-      };
-
-      await createPiPayment(paymentData, callbacks);
-      
-      // Return a result object since createPiPayment is void
-      return {
-        identifier: `payment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        payment_id: `pi_${Date.now()}`,
-        transaction_id: undefined
-      };
+      const result = await createPiPayment(paymentData);
+      return result;
     } catch (error) {
       console.error('Payment creation failed:', error);
       throw error;
