@@ -1,747 +1,720 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Helmet } from 'react-helmet-async';
 import { 
-  Home, 
-  Gamepad2, 
-  Brain, 
-  MessageCircle, 
-  Trophy,
-  RefreshCw,
-  Star,
-  Heart,
-  Mic,
-  Send,
-  Dices,
-  Target,
-  Music,
-  Palette
+  GamepadIcon, 
+  BrainIcon, 
+  MessageSquareIcon, 
+  TrophyIcon, 
+  StarIcon, 
+  HeartIcon,
+  RefreshCwIcon,
+  SendIcon,
+  SparklesIcon,
+  ZapIcon,
+  SmileIcon,
+  PuzzleIcon
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 const PlayWithMascot = () => {
-  const [currentGame, setCurrentGame] = useState('welcome');
+  // Mascot emotions with different states
+  const emotions = [
+    { name: "happy", eyes: "happy", mouth: "smile", thought: "I'm so happy to play with you! 😊" },
+    { name: "excited", eyes: "excited", mouth: "big-smile", thought: "This is amazing! Let's play more! 🎉" },
+    { name: "thinking", eyes: "thinking", mouth: "neutral", thought: "Hmm... let me think about this 🤔" },
+    { name: "surprised", eyes: "wide", mouth: "open", thought: "Wow! That's incredible! 😲" },
+    { name: "sleepy", eyes: "sleepy", mouth: "yawn", thought: "I'm getting a bit sleepy... 😴" },
+    { name: "loving", eyes: "hearts", mouth: "gentle-smile", thought: "You're the best friend ever! 💕" },
+    { name: "confused", eyes: "crossed", mouth: "puzzled", thought: "I'm a bit confused... 🤨" },
+    { name: "playful", eyes: "wink", mouth: "grin", thought: "Let's have some fun! 😄" },
+    { name: "proud", eyes: "bright", mouth: "proud-smile", thought: "You did amazing! I'm so proud! 🌟" },
+    { name: "mischievous", eyes: "sly", mouth: "smirk", thought: "I have a fun idea... 😏" }
+  ];
+
+  const [currentEmotion, setCurrentEmotion] = useState(0);
+  const [gameMode, setGameMode] = useState('menu');
   const [score, setScore] = useState(0);
-  const [mascotMood, setMascotMood] = useState('happy');
-  const [userInput, setUserInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<{sender: string, message: string}[]>([]);
-  const [gameState, setGameState] = useState<any>({});
+  const [totalScore, setTotalScore] = useState(0);
 
-  // Enhanced emotions for mascot
-  const mascotEmotions = ['happy', 'excited', 'sad', 'sleepy', 'curious', 'thinking', 'laughing', 'surprised'];
-
-  // Word guessing game
-  const words = ['DROPLINK', 'PINETWORK', 'CREATOR', 'PROFILE', 'SOCIAL', 'TIPPING', 'BLOCKCHAIN', 'COMMUNITY'];
-  const [currentWord, setCurrentWord] = useState('');
-  const [guessedLetters, setGuessedLetters] = useState<string[]>([]);
+  // Word Guessing Game
+  const words = [
+    { word: "DROPLINK", hint: "Our platform name" },
+    { word: "MASCOT", hint: "A character that represents a brand" },
+    { word: "BLOCKCHAIN", hint: "Technology behind Pi Network" },
+    { word: "GAMES", hint: "What we're playing right now" },
+    { word: "COMMUNITY", hint: "People working together" },
+    { word: "INNOVATION", hint: "Creating new ideas" }
+  ];
+  
+  const [currentWord, setCurrentWord] = useState(0);
+  const [guessedLetters, setGuessedLetters] = useState([]);
   const [wrongGuesses, setWrongGuesses] = useState(0);
+  const [gameWon, setGameWon] = useState(false);
+  const [gameLost, setGameLost] = useState(false);
 
-  // Enhanced quiz questions
+  // Quiz Game
   const quizQuestions = [
     {
-      question: "What network powers Droplink?",
-      options: ["Bitcoin", "Pi Network", "Ethereum", "Solana"],
+      question: "What does Droplink help you create?",
+      options: ["Social Media Posts", "Professional Profile", "Shopping Cart", "Video Games"],
       correct: 1
+    },
+    {
+      question: "Which network powers Droplink?",
+      options: ["Bitcoin", "Ethereum", "Pi Network", "Dogecoin"],
+      correct: 2
     },
     {
       question: "What can you accept on Droplink?",
-      options: ["Pi Tips", "Donations", "Payments", "All of the above"],
-      correct: 3
-    },
-    {
-      question: "What type of profiles can you create?",
-      options: ["Professional", "Personal", "Business", "All of the above"],
-      correct: 3
-    },
-    {
-      question: "What is Pi Network's native currency?",
-      options: ["Bitcoin", "Pi Coin", "Ethereum", "USD"],
+      options: ["Only likes", "Pi payments", "Traditional payments only", "None of the above"],
       correct: 1
-    },
-    {
-      question: "Droplink helps creators with:",
-      options: ["Link sharing", "Pi payments", "Profile building", "All of the above"],
-      correct: 3
     }
   ];
+
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [quizScore, setQuizScore] = useState(0);
+  const [quizComplete, setQuizComplete] = useState(false);
 
-  // Memory game
-  const [memoryCards, setMemoryCards] = useState<{id: number, symbol: string, flipped: boolean, matched: boolean}[]>([]);
-  const [flippedCards, setFlippedCards] = useState<number[]>([]);
-  const [memoryScore, setMemoryScore] = useState(0);
+  // Memory Game
+  const [memoryCards, setMemoryCards] = useState([]);
+  const [flippedCards, setFlippedCards] = useState([]);
+  const [matchedCards, setMatchedCards] = useState([]);
+  const [memoryMoves, setMemoryMoves] = useState(0);
 
-  // Random emotion changes for mascot
-  useEffect(() => {
-    const emotionInterval = setInterval(() => {
-      if (currentGame === 'welcome' || currentGame === 'chat') {
-        const randomEmotion = mascotEmotions[Math.floor(Math.random() * mascotEmotions.length)];
-        setMascotMood(randomEmotion);
-      }
-    }, 8000);
-    return () => clearInterval(emotionInterval);
-  }, [currentGame]);
+  // Chat with Droplink
+  const [chatMessages, setChatMessages] = useState([
+    { sender: 'droplink', message: 'Hi there! I\'m Droplink, your friendly mascot! What would you like to talk about?' }
+  ]);
+  const [chatInput, setChatInput] = useState('');
 
-  useEffect(() => {
-    if (currentGame === 'word-guess') {
-      const randomWord = words[Math.floor(Math.random() * words.length)];
-      setCurrentWord(randomWord);
-      setGuessedLetters([]);
-      setWrongGuesses(0);
-    } else if (currentGame === 'memory') {
-      initializeMemoryGame();
+  // Emotion responses for chat
+  const chatResponses = [
+    "That's so interesting! Tell me more! 🤗",
+    "Wow, I never thought about it that way! 💭",
+    "You're so smart! I love learning from you! 🌟",
+    "That reminds me of something cool about Pi Network! 🚀",
+    "Haha, that's funny! You make me laugh! 😄",
+    "I'm so glad we can chat like this! 💙",
+    "You know what? You're absolutely right! ✨",
+    "That's a great point! I'll remember that! 🧠"
+  ];
+
+  const renderMascotEyes = (type) => {
+    switch (type) {
+      case "happy":
+        return (
+          <>
+            <path d="M70 100 Q80 95 90 100" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
+            <path d="M110 100 Q120 95 130 100" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
+          </>
+        );
+      case "excited":
+        return (
+          <>
+            <circle cx="80" cy="105" r="8" fill="#fff" />
+            <circle cx="120" cy="105" r="8" fill="#fff" />
+            <circle cx="80" cy="105" r="5" fill="#333" />
+            <circle cx="120" cy="105" r="5" fill="#333" />
+            <circle cx="82" cy="103" r="2" fill="#fff" />
+            <circle cx="122" cy="103" r="2" fill="#fff" />
+          </>
+        );
+      case "hearts":
+        return (
+          <>
+            <path d="M70 95 C70 90, 80 90, 80 95 C80 90, 90 90, 90 95 C90 105, 80 110, 80 110 C80 110, 70 105, 70 95 Z" fill="#ff69b4" />
+            <path d="M110 95 C110 90, 120 90, 120 95 C120 90, 130 90, 130 95 C130 105, 120 110, 120 110 C120 110, 110 105, 110 95 Z" fill="#ff69b4" />
+          </>
+        );
+      case "wide":
+        return (
+          <>
+            <circle cx="80" cy="105" r="12" fill="#fff" />
+            <circle cx="120" cy="105" r="12" fill="#fff" />
+            <circle cx="80" cy="105" r="8" fill="#333" />
+            <circle cx="120" cy="105" r="8" fill="#333" />
+          </>
+        );
+      case "sleepy":
+        return (
+          <>
+            <path d="M70 110 L90 110" stroke="#333" strokeWidth="3" strokeLinecap="round" />
+            <path d="M110 110 L130 110" stroke="#333" strokeWidth="3" strokeLinecap="round" />
+          </>
+        );
+      case "wink":
+        return (
+          <>
+            <circle cx="80" cy="105" r="8" fill="#fff" />
+            <circle cx="83" cy="108" r="4" fill="#333" />
+            <path d="M110 100 Q120 95 130 100" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
+          </>
+        );
+      default:
+        return (
+          <>
+            <circle cx="80" cy="105" r="8" fill="#fff" />
+            <circle cx="120" cy="105" r="8" fill="#fff" />
+            <circle cx="83" cy="108" r="4" fill="#333" className="animate-gentle-blink" />
+            <circle cx="123" cy="108" r="4" fill="#333" className="animate-gentle-blink" />
+          </>
+        );
     }
-  }, [currentGame]);
+  };
+
+  const renderMascotMouth = (type) => {
+    switch (type) {
+      case "big-smile":
+        return (
+          <path
+            d="M75 140 Q100 165 125 140"
+            stroke="#fff"
+            strokeWidth="4"
+            fill="none"
+            strokeLinecap="round"
+          />
+        );
+      case "open":
+        return (
+          <ellipse cx="100" cy="145" rx="12" ry="8" fill="#333" />
+        );
+      case "yawn":
+        return (
+          <ellipse cx="100" cy="145" rx="8" ry="12" fill="#333" />
+        );
+      case "grin":
+        return (
+          <path
+            d="M70 140 Q100 160 130 140"
+            stroke="#fff"
+            strokeWidth="4"
+            fill="none"
+            strokeLinecap="round"
+          />
+        );
+      case "neutral":
+        return (
+          <ellipse cx="100" cy="145" rx="6" ry="3" fill="#fff" />
+        );
+      default:
+        return (
+          <path
+            d="M80 140 Q100 155 120 140"
+            stroke="#fff"
+            strokeWidth="4"
+            fill="none"
+            strokeLinecap="round"
+          />
+        );
+    }
+  };
+
+  const changeMascotEmotion = (emotionName) => {
+    const emotionIndex = emotions.findIndex(e => e.name === emotionName);
+    if (emotionIndex !== -1) {
+      setCurrentEmotion(emotionIndex);
+    }
+  };
 
   const initializeMemoryGame = () => {
-    const symbols = ['🌟', '💎', '🎯', '🎮', '🎨', '🎵', '⚡', '🚀'];
+    const symbols = ['🎮', '🎯', '⭐', '💎', '🚀', '🎨', '🔥', '💡'];
     const cards = [...symbols, ...symbols].map((symbol, index) => ({
       id: index,
       symbol,
-      flipped: false,
-      matched: false
-    })).sort(() => Math.random() - 0.5);
-    setMemoryCards(cards);
+      isFlipped: false,
+      isMatched: false
+    }));
+    setMemoryCards(cards.sort(() => Math.random() - 0.5));
     setFlippedCards([]);
-    setMemoryScore(0);
+    setMatchedCards([]);
+    setMemoryMoves(0);
   };
 
-  const handleLetterGuess = (letter: string) => {
-    if (!guessedLetters.includes(letter)) {
-      const newGuessedLetters = [...guessedLetters, letter];
-      setGuessedLetters(newGuessedLetters);
-      
-      if (!currentWord.includes(letter)) {
-        setWrongGuesses(prev => prev + 1);
-        setMascotMood('sad');
-        setTimeout(() => setMascotMood('happy'), 2000);
-      } else {
-        setMascotMood('excited');
-        setScore(prev => prev + 5);
-        setTimeout(() => setMascotMood('happy'), 2000);
-      }
-    }
-  };
-
-  const handleQuizAnswer = (answerIndex: number) => {
-    if (answerIndex === quizQuestions[currentQuestion].correct) {
-      setQuizScore(prev => prev + 1);
-      setScore(prev => prev + 10);
-      setMascotMood('excited');
-    } else {
-      setMascotMood('sad');
-    }
-    
-    setTimeout(() => {
-      setMascotMood('happy');
-      if (currentQuestion < quizQuestions.length - 1) {
-        setCurrentQuestion(prev => prev + 1);
-      } else {
-        setCurrentGame('results');
-      }
-    }, 1500);
-  };
-
-  const handleMemoryCardClick = (cardId: number) => {
+  const handleMemoryCardClick = (cardId) => {
     if (flippedCards.length === 2) return;
-    
-    const newCards = memoryCards.map(card => 
-      card.id === cardId ? { ...card, flipped: true } : card
-    );
-    setMemoryCards(newCards);
-    
+    if (flippedCards.includes(cardId)) return;
+    if (matchedCards.includes(cardId)) return;
+
     const newFlippedCards = [...flippedCards, cardId];
     setFlippedCards(newFlippedCards);
-    
+
     if (newFlippedCards.length === 2) {
+      setMemoryMoves(prev => prev + 1);
       const [first, second] = newFlippedCards;
-      const firstCard = memoryCards.find(c => c.id === first);
-      const secondCard = memoryCards.find(c => c.id === second);
-      
-      if (firstCard?.symbol === secondCard?.symbol) {
-        setMascotMood('excited');
-        setMemoryScore(prev => prev + 1);
-        setScore(prev => prev + 15);
-        setTimeout(() => {
-          setMemoryCards(prev => prev.map(card => 
-            card.id === first || card.id === second ? { ...card, matched: true } : card
-          ));
-          setFlippedCards([]);
-          setMascotMood('happy');
-        }, 1000);
+      const firstCard = memoryCards.find(card => card.id === first);
+      const secondCard = memoryCards.find(card => card.id === second);
+
+      if (firstCard.symbol === secondCard.symbol) {
+        setMatchedCards(prev => [...prev, first, second]);
+        setFlippedCards([]);
+        changeMascotEmotion('proud');
+        if (matchedCards.length + 2 === memoryCards.length) {
+          setScore(prev => prev + 100);
+          setTotalScore(prev => prev + 100);
+        }
       } else {
-        setMascotMood('thinking');
         setTimeout(() => {
-          setMemoryCards(prev => prev.map(card => 
-            card.id === first || card.id === second ? { ...card, flipped: false } : card
-          ));
           setFlippedCards([]);
-          setMascotMood('happy');
+          changeMascotEmotion('thinking');
         }, 1000);
       }
     }
   };
 
-  const handleChatSubmit = () => {
-    if (!userInput.trim()) return;
-    
-    const newMessages = [...chatMessages, { sender: 'user', message: userInput }];
-    setChatMessages(newMessages);
-    
-    setMascotMood('thinking');
-    
-    // Simulate mascot responses
-    setTimeout(() => {
-      const responses = [
-        "That's really interesting! Tell me more! 😊",
-        "I love learning new things from you! 🌟",
-        "Wow, you're so creative! Keep sharing! 🎨",
-        "That made me smile! What else is on your mind? 😄",
-        "I'm here to listen and play! What's your favorite game? 🎮",
-        "You're awesome! Want to try a different activity? ⚡",
-        "Thanks for chatting with me! I enjoy our conversations! 💙",
-        "That's fascinating! I'm always curious about new ideas! 🤔"
-      ];
-      
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      setChatMessages(prev => [...prev, { sender: 'mascot', message: randomResponse }]);
-      setMascotMood('happy');
-      setScore(prev => prev + 3);
-    }, 1500);
-    
-    setUserInput('');
-  };
+  const handleChatSend = () => {
+    if (!chatInput.trim()) return;
 
-  const renderMascot = () => {
-    const getMascotExpression = () => {
-      switch (mascotMood) {
-        case 'excited':
-          return {
-            eyes: (
-              <>
-                <circle cx="120" cy="165" r="9" fill="#fff" />
-                <circle cx="180" cy="165" r="9" fill="#fff" />
-                <circle cx="120" cy="165" r="6" fill="#333" />
-                <circle cx="180" cy="165" r="6" fill="#333" />
-              </>
-            ),
-            mouth: (
-              <path
-                d="M115 210 Q150 250 185 210"
-                stroke="#fff"
-                strokeWidth="4.5"
-                fill="none"
-                strokeLinecap="round"
-              />
-            ),
-            thought: "Awesome! 🎉"
-          };
-        case 'sad':
-          return {
-            eyes: (
-              <>
-                <path d="M110 160 Q120 165 130 160" stroke="#333" strokeWidth="3" fill="none" />
-                <path d="M170 160 Q180 165 190 160" stroke="#333" strokeWidth="3" fill="none" />
-              </>
-            ),
-            mouth: (
-              <path
-                d="M120 230 Q150 210 180 230"
-                stroke="#fff"
-                strokeWidth="4.5"
-                fill="none"
-                strokeLinecap="round"
-              />
-            ),
-            thought: "Oops! Try again! 🤔"
-          };
-        case 'sleepy':
-          return {
-            eyes: (
-              <>
-                <path d="M110 165 L130 165" stroke="#333" strokeWidth="3" strokeLinecap="round" />
-                <path d="M170 165 L190 165" stroke="#333" strokeWidth="3" strokeLinecap="round" />
-              </>
-            ),
-            mouth: (
-              <ellipse cx="150" cy="220" rx="8" ry="3" fill="#fff" />
-            ),
-            thought: "I'm sleepy... 😴"
-          };
-        case 'curious':
-          return {
-            eyes: (
-              <>
-                <circle cx="120" cy="165" r="9" fill="#fff" />
-                <circle cx="180" cy="165" r="9" fill="#fff" />
-                <circle cx="118" cy="163" r="5" fill="#333" />
-                <circle cx="182" cy="163" r="5" fill="#333" />
-              </>
-            ),
-            mouth: (
-              <ellipse cx="150" cy="220" rx="12" ry="6" fill="#fff" />
-            ),
-            thought: "What's that? 🤨"
-          };
-        case 'thinking':
-          return {
-            eyes: (
-              <>
-                <circle cx="120" cy="165" r="9" fill="#fff" />
-                <circle cx="180" cy="165" r="9" fill="#fff" />
-                <circle cx="125" cy="165" r="4" fill="#333" />
-                <circle cx="175" cy="165" r="4" fill="#333" />
-              </>
-            ),
-            mouth: (
-              <ellipse cx="150" cy="220" rx="8" ry="4" fill="#fff" />
-            ),
-            thought: "Hmm... 🤔"
-          };
-        case 'laughing':
-          return {
-            eyes: (
-              <>
-                <path d="M110 155 Q120 150 130 155" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
-                <path d="M170 155 Q180 150 190 155" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
-              </>
-            ),
-            mouth: (
-              <path
-                d="M110 210 Q150 260 190 210"
-                stroke="#fff"
-                strokeWidth="5"
-                fill="none"
-                strokeLinecap="round"
-              />
-            ),
-            thought: "Haha! 😂"
-          };
-        case 'surprised':
-          return {
-            eyes: (
-              <>
-                <circle cx="120" cy="165" r="12" fill="#fff" />
-                <circle cx="180" cy="165" r="12" fill="#fff" />
-                <circle cx="120" cy="165" r="8" fill="#333" />
-                <circle cx="180" cy="165" r="8" fill="#333" />
-              </>
-            ),
-            mouth: (
-              <ellipse cx="150" cy="220" rx="15" ry="12" fill="#fff" />
-            ),
-            thought: "Wow! 😲"
-          };
-        default:
-          return {
-            eyes: (
-              <>
-                <circle cx="120" cy="165" r="9" fill="#fff" />
-                <circle cx="180" cy="165" r="9" fill="#fff" />
-                <circle cx="123" cy="168" r="4.5" fill="#333" />
-                <circle cx="183" cy="168" r="4.5" fill="#333" />
-              </>
-            ),
-            mouth: (
-              <path
-                d="M120 210 Q150 240 180 210"
-                stroke="#fff"
-                strokeWidth="4.5"
-                fill="none"
-                strokeLinecap="round"
-              />
-            ),
-            thought: "Let's play together! 😊"
-          };
+    const newMessages = [
+      ...chatMessages,
+      { sender: 'user', message: chatInput },
+      { 
+        sender: 'droplink', 
+        message: chatResponses[Math.floor(Math.random() * chatResponses.length)]
       }
-    };
-
-    const expression = getMascotExpression();
-
-    return (
-      <div className="flex justify-center mb-6">
-        <svg width="300" height="360" viewBox="0 0 300 360" className="animate-bounce-gentle">
-          {/* Droplet shape */}
-          <path
-            d="M150 30 C90 90, 52.5 150, 52.5 210 C52.5 277.5, 97.5 330, 150 330 C202.5 330, 247.5 277.5, 247.5 210 C247.5 150, 210 90, 150 30 Z"
-            fill="url(#mascotGradient)"
-            className="animate-pulse-gentle"
-          />
-          
-          <defs>
-            <linearGradient id="mascotGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#00aaff" />
-              <stop offset="50%" stopColor="#0099ee" />
-              <stop offset="100%" stopColor="#0077cc" />
-            </linearGradient>
-          </defs>
-          
-          {/* Highlight */}
-          <ellipse cx="112.5" cy="105" rx="18" ry="27" fill="rgba(255, 255, 255, 0.6)" />
-          
-          {/* Face */}
-          {expression.eyes}
-          {expression.mouth}
-          
-          {/* Thought bubble */}
-          <g className="animate-float">
-            <path
-              d="M200 60 Q200 40 220 40 L280 40 Q300 40 300 60 L300 100 Q300 120 280 120 L240 120 L220 140 L240 120 L220 120 Q200 120 200 100 Z"
-              fill="#fff"
-              stroke="#0099ee"
-              strokeWidth="2"
-              className="drop-shadow-md"
-            />
-            <text x="250" y="80" textAnchor="middle" className="text-xs font-medium fill-primary">
-              {expression.thought}
-            </text>
-          </g>
-        </svg>
-      </div>
-    );
+    ];
+    setChatMessages(newMessages);
+    setChatInput('');
+    changeMascotEmotion('happy');
   };
 
-  const renderWordGuessGame = () => {
-    const displayWord = currentWord
-      .split('')
-      .map(letter => guessedLetters.includes(letter) ? letter : '_')
-      .join(' ');
+  const startWordGame = () => {
+    setGameMode('word');
+    setGuessedLetters([]);
+    setWrongGuesses(0);
+    setGameWon(false);
+    setGameLost(false);
+    changeMascotEmotion('excited');
+  };
+
+  const startQuiz = () => {
+    setGameMode('quiz');
+    setCurrentQuestion(0);
+    setQuizScore(0);
+    setQuizComplete(false);
+    setSelectedAnswer(null);
+    changeMascotEmotion('thinking');
+  };
+
+  const startMemoryGame = () => {
+    setGameMode('memory');
+    initializeMemoryGame();
+    changeMascotEmotion('excited');
+  };
+
+  const startChat = () => {
+    setGameMode('chat');
+    changeMascotEmotion('happy');
+  };
+
+  const guessLetter = (letter) => {
+    if (guessedLetters.includes(letter)) return;
     
-    const isWon = currentWord.split('').every(letter => guessedLetters.includes(letter));
-    const isLost = wrongGuesses >= 6;
-
-    return (
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="h-6 w-6" />
-            Guess the Word!
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="text-center">
-            <div className="text-3xl font-mono tracking-wider mb-4">{displayWord}</div>
-            <p className="text-sm text-muted-foreground">Wrong guesses: {wrongGuesses}/6</p>
-          </div>
-
-          {!isWon && !isLost && (
-            <div className="grid grid-cols-6 gap-2">
-              {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(letter => (
-                <Button
-                  key={letter}
-                  variant={guessedLetters.includes(letter) ? "secondary" : "outline"}
-                  size="sm"
-                  onClick={() => handleLetterGuess(letter)}
-                  disabled={guessedLetters.includes(letter)}
-                >
-                  {letter}
-                </Button>
-              ))}
-            </div>
-          )}
-
-          {(isWon || isLost) && (
-            <div className="text-center space-y-4">
-              <p className="text-lg">
-                {isWon ? '🎉 Congratulations! You won!' : '😔 Game over! The word was: ' + currentWord}
-              </p>
-              <Button onClick={() => setCurrentGame('word-guess')}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Play Again
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    );
-  };
-
-  const renderMemoryGame = () => {
-    const allMatched = memoryCards.every(card => card.matched);
+    const newGuessedLetters = [...guessedLetters, letter];
+    setGuessedLetters(newGuessedLetters);
     
-    return (
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="h-6 w-6" />
-            Memory Match
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">Matches: {memoryScore}/8</p>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-4 gap-3">
-            {memoryCards.map(card => (
-              <Button
-                key={card.id}
-                variant={card.flipped || card.matched ? "default" : "outline"}
-                className="aspect-square text-2xl"
-                onClick={() => handleMemoryCardClick(card.id)}
-                disabled={card.matched || card.flipped}
-              >
-                {card.flipped || card.matched ? card.symbol : '?'}
-              </Button>
-            ))}
-          </div>
-          
-          {allMatched && (
-            <div className="text-center space-y-4">
-              <p className="text-lg">🎉 Amazing! You matched all pairs!</p>
-              <Button onClick={() => setCurrentGame('memory')}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Play Again
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    );
+    if (!words[currentWord].word.includes(letter)) {
+      setWrongGuesses(prev => prev + 1);
+      changeMascotEmotion('confused');
+      if (wrongGuesses + 1 >= 6) {
+        setGameLost(true);
+        changeMascotEmotion('sleepy');
+      }
+    } else {
+      changeMascotEmotion('happy');
+      // Check if word is complete
+      const wordComplete = words[currentWord].word
+        .split('')
+        .every(l => newGuessedLetters.includes(l));
+      
+      if (wordComplete) {
+        setGameWon(true);
+        setScore(prev => prev + 50);
+        setTotalScore(prev => prev + 50);
+        changeMascotEmotion('proud');
+      }
+    }
   };
 
-  const renderChatGame = () => {
-    return (
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageCircle className="h-6 w-6" />
-            Talk to Droplink
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="h-64 overflow-y-auto border rounded-lg p-4 space-y-2">
-            {chatMessages.length === 0 && (
-              <p className="text-muted-foreground text-center">Start a conversation with me! 😊</p>
-            )}
-            {chatMessages.map((msg, index) => (
-              <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`rounded-lg px-3 py-2 max-w-[80%] ${
-                  msg.sender === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                }`}>
-                  {msg.message}
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          <div className="flex gap-2">
-            <Textarea
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              placeholder="Tell me something..."
-              className="min-h-[60px]"
-              onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleChatSubmit())}
-            />
-            <Button onClick={handleChatSubmit} size="icon" className="self-end">
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  };
-
-  const renderQuizGame = () => {
-    const question = quizQuestions[currentQuestion];
+  const answerQuiz = (answerIndex) => {
+    setSelectedAnswer(answerIndex);
     
-    return (
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageCircle className="h-6 w-6" />
-            Droplink Quiz
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Question {currentQuestion + 1} of {quizQuestions.length}
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="text-lg font-medium">{question.question}</div>
-          
-          <div className="space-y-3">
-            {question.options.map((option, index) => (
-              <Button
-                key={index}
-                variant="outline"
-                className="w-full text-left justify-start"
-                onClick={() => handleQuizAnswer(index)}
-              >
-                {option}
-              </Button>
-            ))}
-          </div>
-          
-          <div className="text-center">
-            <Badge variant="secondary">Score: {quizScore}/{quizQuestions.length}</Badge>
-          </div>
-        </CardContent>
-      </Card>
-    );
+    if (answerIndex === quizQuestions[currentQuestion].correct) {
+      setQuizScore(prev => prev + 1);
+      changeMascotEmotion('proud');
+    } else {
+      changeMascotEmotion('confused');
+    }
+    
+    setTimeout(() => {
+      if (currentQuestion + 1 < quizQuestions.length) {
+        setCurrentQuestion(prev => prev + 1);
+        setSelectedAnswer(null);
+        changeMascotEmotion('thinking');
+      } else {
+        setQuizComplete(true);
+        setScore(prev => prev + quizScore * 25);
+        setTotalScore(prev => prev + quizScore * 25);
+        changeMascotEmotion('happy');
+      }
+    }, 1500);
   };
-
-  const renderGameMenu = () => (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-      <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setCurrentGame('word-guess')}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="h-6 w-6 text-primary" />
-            Word Guessing
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">Guess Droplink-related words letter by letter!</p>
-        </CardContent>
-      </Card>
-
-      <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setCurrentGame('quiz')}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageCircle className="h-6 w-6 text-primary" />
-            Droplink Quiz
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">Test your knowledge about Droplink and Pi Network!</p>
-        </CardContent>
-      </Card>
-
-      <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setCurrentGame('memory')}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="h-6 w-6 text-primary" />
-            Memory Match
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">Match pairs of symbols and test your memory!</p>
-        </CardContent>
-      </Card>
-
-      <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setCurrentGame('chat')}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Mic className="h-6 w-6 text-primary" />
-            Talk to Droplink
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">Have a conversation with our friendly mascot!</p>
-        </CardContent>
-      </Card>
-
-      <Card className="cursor-pointer hover:shadow-lg transition-shadow opacity-75">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Dices className="h-6 w-6 text-muted-foreground" />
-            Random Fun
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">Coming soon! Random games and activities!</p>
-        </CardContent>
-      </Card>
-
-      <Card className="cursor-pointer hover:shadow-lg transition-shadow opacity-75">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Music className="h-6 w-6 text-muted-foreground" />
-            Music Game
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">Coming soon! Musical challenges with Droplink!</p>
-        </CardContent>
-      </Card>
-    </div>
-  );
-
-  const renderResults = () => (
-    <Card className="max-w-2xl mx-auto text-center">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-center gap-2">
-          <Trophy className="h-6 w-6 text-yellow-500" />
-          Quiz Complete!
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="text-2xl font-bold">Final Score: {quizScore}/{quizQuestions.length}</div>
-        <div className="space-y-2">
-          <Button onClick={() => { setCurrentGame('quiz'); setCurrentQuestion(0); setQuizScore(0); }}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Try Again
-          </Button>
-          <Button variant="outline" onClick={() => setCurrentGame('welcome')}>
-            <Home className="h-4 w-4 mr-2" />
-            Back to Games
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
 
   return (
     <>
       <Helmet>
-        <title>Play with Droplink Mascot - Interactive Games & Activities</title>
-        <meta name="description" content="Have fun with the Droplink mascot! Play word guessing games, take quizzes, chat, and enjoy interactive activities." />
+        <title>Play with Droplink - Interactive Games & Fun Activities</title>
+        <meta name="description" content="Play interactive games with the Droplink mascot! Word guessing, quizzes, memory games, and chat activities." />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8 px-4">
-        {/* Header */}
-        <div className="max-w-6xl mx-auto mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <Link to="/" className="flex items-center gap-2 text-primary hover:text-primary/80">
-              <Home className="h-5 w-5" />
-              Back to Home
-            </Link>
-            <div className="flex items-center gap-4">
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <Star className="h-4 w-4" />
-                Score: {score}
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">
+        <div className="container mx-auto px-4">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
+              Play with Droplink!
+            </h1>
+            <p className="text-lg text-gray-600 mb-6">
+              Have fun with our interactive mascot and exciting games!
+            </p>
+            
+            {/* Score Display */}
+            <div className="flex justify-center gap-4 mb-6">
+              <Badge variant="secondary" className="text-lg px-4 py-2">
+                <TrophyIcon className="w-5 h-5 mr-2" />
+                Session Score: {score}
+              </Badge>
+              <Badge variant="outline" className="text-lg px-4 py-2">
+                <StarIcon className="w-5 h-5 mr-2" />
+                Total Score: {totalScore}
               </Badge>
             </div>
           </div>
 
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
-              Play with Droplink!
-            </h1>
-            <p className="text-xl text-muted-foreground">
-              Have fun with our friendly mascot through interactive games and activities
-            </p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            {/* Mascot Display */}
+            <div className="flex flex-col items-center">
+              <div className="relative mb-6">
+                <svg
+                  width="200"
+                  height="240"
+                  viewBox="0 0 200 240"
+                  className="animate-bounce-gentle"
+                >
+                  {/* Droplet shape */}
+                  <path
+                    d="M100 20 C60 60, 35 100, 35 140 C35 185, 65 220, 100 220 C135 220, 165 185, 165 140 C165 100, 140 60, 100 20 Z"
+                    fill="url(#playDropletGradient)"
+                    className="animate-pulse-gentle"
+                  />
+                  
+                  <defs>
+                    <linearGradient id="playDropletGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor="#00aaff" />
+                      <stop offset="50%" stopColor="#0099ee" />
+                      <stop offset="100%" stopColor="#0077cc" />
+                    </linearGradient>
+                  </defs>
+                  
+                  {/* Highlight */}
+                  <ellipse
+                    cx="75"
+                    cy="70"
+                    rx="12"
+                    ry="18"
+                    fill="rgba(255, 255, 255, 0.6)"
+                    className="animate-shimmer"
+                  />
+                  
+                  {/* Face */}
+                  {renderMascotEyes(emotions[currentEmotion].eyes)}
+                  {renderMascotMouth(emotions[currentEmotion].mouth)}
+                </svg>
+                
+                {/* Thought bubble */}
+                <div className="absolute -right-4 -top-4 bg-white rounded-lg p-3 shadow-lg border-2 border-primary/20 max-w-xs animate-float">
+                  <p className="text-sm font-medium text-primary">
+                    {emotions[currentEmotion].thought}
+                  </p>
+                </div>
+              </div>
+
+              {/* Emotion Buttons */}
+              <div className="grid grid-cols-5 gap-2 mb-6">
+                {emotions.slice(0, 10).map((emotion, index) => (
+                  <Button
+                    key={emotion.name}
+                    variant={currentEmotion === index ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentEmotion(index)}
+                    className="text-xs"
+                  >
+                    {emotion.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Game Area */}
+            <div className="space-y-6">
+              {gameMode === 'menu' && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <GamepadIcon className="w-6 h-6" />
+                      Choose Your Game!
+                    </CardTitle>
+                    <CardDescription>
+                      Pick a fun activity to play with Droplink
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <Button onClick={startWordGame} className="w-full justify-start gap-3" size="lg">
+                      <PuzzleIcon className="w-5 h-5" />
+                      Word Guessing Game
+                    </Button>
+                    <Button onClick={startQuiz} className="w-full justify-start gap-3" size="lg" variant="outline">
+                      <BrainIcon className="w-5 h-5" />
+                      Droplink Quiz
+                    </Button>
+                    <Button onClick={startMemoryGame} className="w-full justify-start gap-3" size="lg" variant="outline">
+                      <ZapIcon className="w-5 h-5" />
+                      Memory Match
+                    </Button>
+                    <Button onClick={startChat} className="w-full justify-start gap-3" size="lg" variant="outline">
+                      <MessageSquareIcon className="w-5 h-5" />
+                      Talk to Droplink
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+
+              {gameMode === 'word' && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <span>Word Guessing Game</span>
+                      <Button onClick={() => setGameMode('menu')} variant="outline" size="sm">
+                        Back to Menu
+                      </Button>
+                    </CardTitle>
+                    <CardDescription>
+                      Hint: {words[currentWord].hint}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Word Display */}
+                    <div className="text-center">
+                      <div className="text-3xl font-bold mb-4 tracking-wider">
+                        {words[currentWord].word
+                          .split('')
+                          .map(letter => guessedLetters.includes(letter) ? letter : '_')
+                          .join(' ')}
+                      </div>
+                      <p className="text-sm text-gray-600">Wrong guesses: {wrongGuesses}/6</p>
+                    </div>
+
+                    {/* Alphabet */}
+                    <div className="grid grid-cols-6 gap-2">
+                      {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(letter => (
+                        <Button
+                          key={letter}
+                          variant={guessedLetters.includes(letter) ? "secondary" : "outline"}
+                          size="sm"
+                          onClick={() => guessLetter(letter)}
+                          disabled={guessedLetters.includes(letter) || gameWon || gameLost}
+                        >
+                          {letter}
+                        </Button>
+                      ))}
+                    </div>
+
+                    {/* Game Status */}
+                    {gameWon && (
+                      <div className="text-center p-4 bg-green-100 rounded-lg">
+                        <p className="text-green-800 font-bold">🎉 You won! +50 points!</p>
+                        <Button onClick={startWordGame} className="mt-2">
+                          <RefreshCwIcon className="w-4 h-4 mr-2" />
+                          Play Again
+                        </Button>
+                      </div>
+                    )}
+
+                    {gameLost && (
+                      <div className="text-center p-4 bg-red-100 rounded-lg">
+                        <p className="text-red-800 font-bold">😔 Game Over! The word was: {words[currentWord].word}</p>
+                        <Button onClick={startWordGame} className="mt-2">
+                          <RefreshCwIcon className="w-4 h-4 mr-2" />
+                          Try Again
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {gameMode === 'quiz' && !quizComplete && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <span>Droplink Quiz</span>
+                      <Button onClick={() => setGameMode('menu')} variant="outline" size="sm">
+                        Back to Menu
+                      </Button>
+                    </CardTitle>
+                    <CardDescription>
+                      Question {currentQuestion + 1} of {quizQuestions.length}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <h3 className="text-lg font-semibold">{quizQuestions[currentQuestion].question}</h3>
+                    <div className="space-y-2">
+                      {quizQuestions[currentQuestion].options.map((option, index) => (
+                        <Button
+                          key={index}
+                          variant={
+                            selectedAnswer === index
+                              ? index === quizQuestions[currentQuestion].correct
+                                ? "default"
+                                : "destructive"
+                              : "outline"
+                          }
+                          className="w-full justify-start"
+                          onClick={() => answerQuiz(index)}
+                          disabled={selectedAnswer !== null}
+                        >
+                          {option}
+                        </Button>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {gameMode === 'quiz' && quizComplete && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Quiz Complete!</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-center space-y-4">
+                    <div className="text-3xl font-bold text-primary">
+                      {quizScore}/{quizQuestions.length}
+                    </div>
+                    <p className="text-gray-600">
+                      You earned {quizScore * 25} points!
+                    </p>
+                    <div className="flex gap-2 justify-center">
+                      <Button onClick={startQuiz}>
+                        <RefreshCwIcon className="w-4 h-4 mr-2" />
+                        Play Again
+                      </Button>
+                      <Button onClick={() => setGameMode('menu')} variant="outline">
+                        Back to Menu
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {gameMode === 'memory' && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <span>Memory Match</span>
+                      <Button onClick={() => setGameMode('menu')} variant="outline" size="sm">
+                        Back to Menu
+                      </Button>
+                    </CardTitle>
+                    <CardDescription>
+                      Moves: {memoryMoves} | Matches: {matchedCards.length / 2}/8
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-4 gap-2">
+                      {memoryCards.map(card => (
+                        <Button
+                          key={card.id}
+                          variant="outline"
+                          className="aspect-square text-2xl"
+                          onClick={() => handleMemoryCardClick(card.id)}
+                          disabled={matchedCards.includes(card.id)}
+                        >
+                          {flippedCards.includes(card.id) || matchedCards.includes(card.id)
+                            ? card.symbol
+                            : '?'
+                          }
+                        </Button>
+                      ))}
+                    </div>
+                    
+                    {matchedCards.length === memoryCards.length && (
+                      <div className="text-center mt-4 p-4 bg-green-100 rounded-lg">
+                        <p className="text-green-800 font-bold">🎉 Perfect! +100 points!</p>
+                        <Button onClick={startMemoryGame} className="mt-2">
+                          <RefreshCwIcon className="w-4 h-4 mr-2" />
+                          Play Again
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {gameMode === 'chat' && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <span>Talk to Droplink</span>
+                      <Button onClick={() => setGameMode('menu')} variant="outline" size="sm">
+                        Back to Menu
+                      </Button>
+                    </CardTitle>
+                    <CardDescription>
+                      Have a conversation with your friendly mascot!
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="h-60 overflow-y-auto border rounded-lg p-4 space-y-3">
+                      {chatMessages.map((msg, index) => (
+                        <div
+                          key={index}
+                          className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
+                          <div
+                            className={`max-w-xs p-3 rounded-lg ${
+                              msg.sender === 'user'
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-secondary text-secondary-foreground'
+                            }`}
+                          >
+                            {msg.message}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Input
+                        value={chatInput}
+                        onChange={(e) => setChatInput(e.target.value)}
+                        placeholder="Type your message..."
+                        onKeyPress={(e) => e.key === 'Enter' && handleChatSend()}
+                      />
+                      <Button onClick={handleChatSend}>
+                        <SendIcon className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </div>
         </div>
-
-        {/* Mascot */}
-        {renderMascot()}
-
-        {/* Game Content */}
-        <div className="max-w-6xl mx-auto">
-          {currentGame === 'welcome' && renderGameMenu()}
-          {currentGame === 'word-guess' && renderWordGuessGame()}
-          {currentGame === 'quiz' && renderQuizGame()}
-          {currentGame === 'memory' && renderMemoryGame()}
-          {currentGame === 'chat' && renderChatGame()}
-          {currentGame === 'results' && renderResults()}
-        </div>
-
-        {/* Navigation */}
-        {currentGame !== 'welcome' && (
-          <div className="max-w-6xl mx-auto mt-8 text-center">
-            <Button
-              variant="outline"
-              onClick={() => setCurrentGame('welcome')}
-              className="mr-4"
-            >
-              <Gamepad2 className="h-4 w-4 mr-2" />
-              All Games
-            </Button>
-          </div>
-        )}
 
         <style>
           {`
@@ -756,6 +729,16 @@ const PlayWithMascot = () => {
             50% { opacity: 0.8; }
           }
           
+          @keyframes gentle-blink {
+            0%, 85%, 100% { opacity: 1; }
+            90%, 95% { opacity: 0.1; }
+          }
+          
+          @keyframes shimmer {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+          }
+          
           @keyframes float {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-8px); }
@@ -767,6 +750,14 @@ const PlayWithMascot = () => {
           
           .animate-pulse-gentle {
             animation: pulse-gentle 3s ease-in-out infinite;
+          }
+          
+          .animate-gentle-blink {
+            animation: gentle-blink 6s ease-in-out infinite;
+          }
+          
+          .animate-shimmer {
+            animation: shimmer 2.5s ease-in-out infinite;
           }
           
           .animate-float {
