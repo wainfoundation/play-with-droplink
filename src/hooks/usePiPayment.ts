@@ -27,6 +27,12 @@ interface PaymentResult {
   transaction: null | { txid: string; verified: boolean; _link: string };
 }
 
+export const planPricing = {
+  starter: { monthly: 10, annual: 8 },
+  pro: { monthly: 15, annual: 12 },
+  premium: { monthly: 22, annual: 18 }
+};
+
 export const usePiPayment = () => {
   const [loading, setLoading] = useState(false);
 
@@ -78,10 +84,37 @@ export const usePiPayment = () => {
     }
   }, []);
 
+  const handleSubscribe = useCallback(async (plan: string, billingCycle: string) => {
+    try {
+      setLoading(true);
+      
+      // TODO: Implement subscription handling
+      console.log('Subscription feature not yet implemented', { plan, billingCycle });
+      
+      toast({
+        title: "Feature Coming Soon",
+        description: "Subscription payments will be available soon!",
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error handling subscription:', error);
+      toast({
+        title: "Subscription Error",
+        description: "Failed to process subscription",
+        variant: "destructive",
+      });
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     createPayment,
     approvePayment,
     completePayment,
+    handleSubscribe,
     loading
   };
 };

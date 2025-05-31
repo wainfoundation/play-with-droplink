@@ -1,104 +1,72 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
-import { getUserSubscription } from '@/services/subscriptionService';
+import { useUser } from '@/context/UserContext';
 
-export const useSubscription = (user: any) => {
-  const [subscription, setSubscription] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export interface Subscription {
+  id: string;
+  user_id: string;
+  plan: string;
+  amount: number;
+  is_active: boolean;
+  expires_at: string;
+  created_at: string;
+  updated_at: string;
+}
 
-  const fetchSubscription = async () => {
-    if (!user) {
-      setSubscription(null);
-      setIsLoading(false);
-      return;
-    }
+export const useSubscription = () => {
+  const { user } = useUser();
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchSubscription = useCallback(async () => {
+    if (!user?.id) return;
 
     try {
-      setIsLoading(true);
-      const subscriptionData = await getUserSubscription(user.id);
+      setLoading(true);
       
-      // Check if subscription is expired but still marked as active
-      if (subscriptionData && subscriptionData.is_active) {
-        const expiresAt = new Date(subscriptionData.expires_at);
-        const now = new Date();
-        
-        if (now > expiresAt) {
-          console.log("Subscription has expired, updating status in database");
-          // Subscription has expired, update the is_active flag
-          await supabase
-            .from('subscriptions')
-            .update({ is_active: false })
-            .eq('id', subscriptionData.id);
-          
-          subscriptionData.is_active = false;
-          
-          // Notify the user that their subscription has expired
-          toast({
-            title: "Subscription Expired",
-            description: "Your subscription has expired. Some features may be limited.",
-            variant: "destructive",
-          });
-        }
-      }
-      
-      setSubscription(subscriptionData);
+      // TODO: Implement when subscriptions table is available
+      console.log('Subscriptions feature not yet implemented for user:', user.id);
+      setSubscription(null);
     } catch (error) {
-      console.error("Error fetching subscription:", error);
+      console.error('Error fetching subscription:', error);
+      setSubscription(null);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  };
+  }, [user?.id]);
+
+  const createSubscription = useCallback(async (plan: string, amount: number) => {
+    try {
+      // TODO: Implement when subscriptions table is available
+      console.log('Create subscription feature not yet implemented', { plan, amount });
+      return null;
+    } catch (error) {
+      console.error('Error creating subscription:', error);
+      return null;
+    }
+  }, []);
+
+  const cancelSubscription = useCallback(async () => {
+    try {
+      // TODO: Implement when subscriptions table is available
+      console.log('Cancel subscription feature not yet implemented');
+      return false;
+    } catch (error) {
+      console.error('Error cancelling subscription:', error);
+      return false;
+    }
+  }, []);
 
   useEffect(() => {
     fetchSubscription();
-    
-    // Set up an interval to periodically check subscription status
-    const checkInterval = setInterval(() => {
-      if (user && subscription?.is_active) {
-        fetchSubscription();
-      }
-    }, 60 * 60 * 1000); // Check every hour
-    
-    return () => clearInterval(checkInterval);
-  }, [user]);
-
-  const cancelSubscription = async (): Promise<boolean> => {
-    try {
-      if (!user) {
-        throw new Error("No user is logged in");
-      }
-      
-      const { error } = await supabase.functions.invoke('cancel-subscription', {
-        body: { user_id: user.id }
-      });
-      
-      if (error) throw error;
-      
-      await fetchSubscription();
-      
-      toast({
-        title: "Subscription Cancelled",
-        description: "Your subscription has been cancelled successfully",
-      });
-      
-      return true;
-    } catch (error) {
-      console.error("Error cancelling subscription:", error);
-      toast({
-        title: "Error",
-        description: "Failed to cancel subscription",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
+  }, [fetchSubscription]);
 
   return {
     subscription,
-    isLoading,
+    loading,
+    createSubscription,
     cancelSubscription,
-    refreshSubscription: fetchSubscription
+    refetch: fetchSubscription
   };
 };

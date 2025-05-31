@@ -1,97 +1,61 @@
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
-interface UserSticker {
+export interface UserSticker {
   id: string;
   sticker_id: string;
-  stickers_effects: {
-    id: string;
-    name: string;
-    animation_url: string;
-    category: string;
-  };
+  stickers_effects: any;
 }
 
-export const useProfileStickers = (userId: string, activeStickers: string[] = []) => {
-  const [userStickers, setUserStickers] = useState<UserSticker[]>([]);
-  const [selectedStickers, setSelectedStickers] = useState<string[]>(activeStickers);
-  const [loading, setLoading] = useState(true);
+export const useProfileStickers = (userId?: string) => {
+  const [stickers, setStickers] = useState<UserSticker[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetchUserStickers();
-  }, [userId]);
+  const fetchUserStickers = useCallback(async () => {
+    if (!userId) return;
 
-  useEffect(() => {
-    setSelectedStickers(activeStickers);
-  }, [activeStickers]);
-
-  const fetchUserStickers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('user_stickers')
-        .select(`
-          id,
-          sticker_id,
-          stickers_effects (
-            id,
-            name,
-            animation_url,
-            category
-          )
-        `)
-        .eq('user_id', userId);
-
-      if (error) throw error;
-      setUserStickers(data || []);
+      setLoading(true);
+      
+      // TODO: Implement when user_stickers table is available
+      console.log('User stickers feature not yet implemented for user:', userId);
+      setStickers([]);
     } catch (error) {
       console.error('Error fetching user stickers:', error);
+      setStickers([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
-  const updateActiveStickers = async (stickers: string[]) => {
+  const activateSticker = useCallback(async (stickerId: string) => {
     try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({ active_sticker_ids: stickers })
-        .eq('id', userId);
-
-      if (error) throw error;
-      setSelectedStickers(stickers);
+      // TODO: Implement when user_stickers table is available
+      console.log('Sticker activation feature not yet implemented', stickerId);
+      return false;
     } catch (error) {
-      console.error('Error updating active stickers:', error);
+      console.error('Error activating sticker:', error);
+      return false;
     }
-  };
+  }, []);
 
-  const toggleSticker = (stickerId: string) => {
-    const newSelection = selectedStickers.includes(stickerId)
-      ? selectedStickers.filter(id => id !== stickerId)
-      : [...selectedStickers, stickerId];
-    
-    setSelectedStickers(newSelection);
-  };
-
-  const saveChanges = () => {
-    updateActiveStickers(selectedStickers);
-  };
-
-  const clearAll = () => {
-    setSelectedStickers([]);
-  };
-
-  const displayStickers = userStickers.filter(us => 
-    selectedStickers.includes(us.sticker_id)
-  );
+  const deactivateSticker = useCallback(async (stickerId: string) => {
+    try {
+      // TODO: Implement when user_stickers table is available
+      console.log('Sticker deactivation feature not yet implemented', stickerId);
+      return false;
+    } catch (error) {
+      console.error('Error deactivating sticker:', error);
+      return false;
+    }
+  }, []);
 
   return {
-    userStickers,
-    selectedStickers,
+    stickers,
     loading,
-    displayStickers,
-    toggleSticker,
-    saveChanges,
-    clearAll
+    fetchUserStickers,
+    activateSticker,
+    deactivateSticker
   };
 };

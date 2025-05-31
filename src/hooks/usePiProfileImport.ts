@@ -1,104 +1,104 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
 interface PiProfileData {
-  avatar: string;
-  bio: string;
-  links: Array<{ title: string; url: string }>;
-  username: string;
+  avatar?: string;
+  bio?: string;
+  links?: Array<{
+    title: string;
+    url: string;
+    platform?: string;
+  }>;
 }
 
 export const usePiProfileImport = () => {
-  const [isImporting, setIsImporting] = useState(false);
-  const [importedData, setImportedData] = useState<PiProfileData | null>(null);
+  const [importing, setImporting] = useState(false);
 
-  const importPiProfile = async (username: string): Promise<PiProfileData | null> => {
+  const importFromPiProfile = useCallback(async (username: string): Promise<PiProfileData | null> => {
     try {
-      setIsImporting(true);
-      
-      // Get current session for authentication
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        throw new Error('Authentication required');
-      }
+      setImporting(true);
 
-      const { data, error } = await supabase.functions.invoke('import-pi-profile', {
-        body: { username },
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-        }
-      });
+      // TODO: Implement when Pi profile import service is available
+      console.log('Pi profile import feature not yet implemented for username:', username);
 
-      if (error) {
-        console.error('Import function error:', error);
-        throw new Error(error.message || 'Failed to import Pi profile');
-      }
-
-      if (!data.success) {
-        throw new Error(data.error || 'Import failed');
-      }
-
-      setImportedData(data.data);
-      
       toast({
-        title: "Profile imported successfully",
-        description: `Imported ${data.data.links.length} links from Pi profile`,
+        title: "Feature Coming Soon",
+        description: "Pi profile import will be available soon!",
       });
 
-      return data.data;
+      return null;
     } catch (error) {
-      console.error('Pi profile import error:', error);
+      console.error('Error importing Pi profile:', error);
       toast({
-        title: "Import failed",
-        description: error instanceof Error ? error.message : "Failed to import Pi profile",
+        title: "Import Error",
+        description: "Failed to import Pi profile",
         variant: "destructive",
       });
       return null;
     } finally {
-      setIsImporting(false);
+      setImporting(false);
     }
-  };
+  }, []);
 
-  const savePiProfileData = async (data: PiProfileData, userId: string) => {
+  const saveImportedData = useCallback(async (profileData: PiProfileData) => {
     try {
-      const { error } = await supabase
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        throw new Error('Must be logged in to save profile data');
+      }
+
+      // Update user profile with imported data using only existing fields
+      const { error: updateError } = await supabase
         .from('user_profiles')
         .update({
-          imported_pi_avatar: data.avatar,
-          imported_pi_bio: data.bio,
-          imported_pi_links: data.links,
-          pi_profile_last_synced: new Date().toISOString()
+          avatar_url: profileData.avatar,
+          bio: profileData.bio,
+          updated_at: new Date().toISOString()
         })
-        .eq('id', userId);
+        .eq('id', user.id);
 
-      if (error) {
-        throw error;
+      if (updateError) throw updateError;
+
+      // Create links if provided
+      if (profileData.links && profileData.links.length > 0) {
+        const linksToInsert = profileData.links.map(link => ({
+          user_id: user.id,
+          title: link.title,
+          url: link.url,
+          icon: '🔗',
+          position: 0,
+          is_active: true
+        }));
+
+        const { error: linksError } = await supabase
+          .from('links')
+          .insert(linksToInsert);
+
+        if (linksError) throw linksError;
       }
 
       toast({
-        title: "Profile data saved",
-        description: "Pi profile data has been saved to your Droplink profile",
+        title: "Import Successful",
+        description: "Profile data imported successfully",
       });
 
       return true;
     } catch (error) {
-      console.error('Save error:', error);
+      console.error('Error saving imported data:', error);
       toast({
-        title: "Save failed",
-        description: "Failed to save Pi profile data",
+        title: "Save Error",
+        description: "Failed to save imported data",
         variant: "destructive",
       });
       return false;
     }
-  };
+  }, []);
 
   return {
-    isImporting,
-    importedData,
-    importPiProfile,
-    savePiProfileData,
-    setImportedData
+    importFromPiProfile,
+    saveImportedData,
+    importing
   };
 };

@@ -1,188 +1,124 @@
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-
-interface Link {
-  id: string;
-  title: string;
-  url: string;
-  icon: string;
-  clicks: number;
-  type?: "featured" | "social" | "regular";
-}
-
-interface PiLink {
-  title: string;
-  url: string;
-}
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useUser } from '@/context/UserContext';
 
 interface ProfileData {
   id: string;
   username: string;
-  display_name: string | null;
-  bio: string | null;
-  avatar_url: string | null;
-  imported_pi_avatar?: string | null;
-  imported_pi_bio?: string | null;
-  imported_pi_links?: PiLink[] | null;
-  pi_profile_last_synced?: string | null;
-  active_sticker_ids?: string[] | null;
-  links: Link[];
+  display_name: string;
+  bio?: string;
+  avatar_url?: string;
+  pi_wallet_address?: string;
+  pi_domain?: string;
+  custom_domain?: string;
+  plan: string;
+  created_at: string;
+  updated_at: string;
 }
 
-export const useProfileData = (username: string | undefined) => {
+export const useProfileData = (username?: string) => {
+  const { user } = useUser();
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [links, setLinks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+
+  const fetchProfile = async (targetUsername?: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const profileUsername = targetUsername || username;
+      
+      if (!profileUsername) {
+        throw new Error('Username is required');
+      }
+
+      // Fetch user profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('username', profileUsername)
+        .single();
+
+      if (profileError) {
+        if (profileError.code === 'PGRST116') {
+          throw new Error('Profile not found');
+        }
+        throw profileError;
+      }
+
+      if (!profileData) {
+        throw new Error('Profile not found');
+      }
+
+      setProfile(profileData);
+
+      // Fetch user links
+      const { data: linksData, error: linksError } = await supabase
+        .from('links')
+        .select('*')
+        .eq('user_id', profileData.id)
+        .eq('is_active', true)
+        .order('position', { ascending: true });
+
+      if (linksError) {
+        console.error('Error fetching links:', linksError);
+        setLinks([]);
+      } else {
+        setLinks(linksData || []);
+      }
+
+      // TODO: Fetch analytics when analytics table is available
+      console.log('Analytics fetching not yet implemented - table does not exist');
+
+      return profileData;
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      setError(error instanceof Error ? error.message : 'Unknown error');
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateProfile = async (updates: Partial<ProfileData>) => {
+    try {
+      if (!profile) return false;
+
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', profile.id);
+
+      if (error) throw error;
+
+      // Update local state
+      setProfile(prev => prev ? { ...prev, ...updates } : null);
+      return true;
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      return false;
+    }
+  };
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        setLoading(true);
-        
-        if (!username) {
-          setError("User not found");
-          setLoading(false);
-          return;
-        }
-        
-        // Fetch profile data including imported Pi data and active stickers
-        const { data: profileData, error: profileError } = await supabase
-          .from('user_profiles')
-          .select(`
-            *,
-            imported_pi_avatar,
-            imported_pi_bio,
-            imported_pi_links,
-            pi_profile_last_synced,
-            active_sticker_ids
-          `)
-          .eq('username', username)
-          .maybeSingle();
-        
-        if (profileError || !profileData) {
-          setError("User profile not found");
-          setLoading(false);
-          return;
-        }
-        
-        // Fetch links data
-        const { data: linksData, error: linksError } = await supabase
-          .from('links')
-          .select('*')
-          .eq('user_id', profileData.id)
-          .eq('is_active', true)
-          .order('position', { ascending: true });
-        
-        if (linksError) {
-          console.error("Failed to fetch links:", linksError);
-        }
-        
-        // Track page view for this profile visit
-        const { error: analyticsError } = await supabase
-          .from('analytics')
-          .insert({
-            user_id: profileData.id,
-            page_view: true,
-            referrer: document.referrer,
-            user_agent: navigator.userAgent,
-          });
-        
-        if (analyticsError) {
-          console.error("Failed to track page view:", analyticsError);
-        }
-        
-        // Process links to categorize them
-        const processedLinks = linksData ? linksData.map(link => {
-          let type: "featured" | "social" | "regular" | undefined = undefined;
-          
-          if (
-            link.url.includes('instagram.com') ||
-            link.url.includes('twitter.com') ||
-            link.url.includes('facebook.com') ||
-            link.url.includes('linkedin.com') ||
-            link.url.includes('youtube.com') ||
-            link.icon?.toLowerCase() === 'instagram' ||
-            link.icon?.toLowerCase() === 'twitter' ||
-            link.icon?.toLowerCase() === 'facebook' ||
-            link.icon?.toLowerCase() === 'linkedin' ||
-            link.icon?.toLowerCase() === 'youtube'
-          ) {
-            type = "social";
-          } else if (linksData.indexOf(link) < 2) {
-            type = "featured";
-          } else {
-            type = "regular";
-          }
-          
-          return { ...link, type };
-        }) : [];
+    if (username || user?.profile?.username) {
+      fetchProfile(username || user?.profile?.username);
+    }
+  }, [username, user?.profile?.username]);
 
-        // Add imported Pi links if available
-        let importedPiLinks: PiLink[] = [];
-        
-        if (profileData.imported_pi_links) {
-          try {
-            if (typeof profileData.imported_pi_links === 'string') {
-              importedPiLinks = JSON.parse(profileData.imported_pi_links);
-            } else if (Array.isArray(profileData.imported_pi_links)) {
-              importedPiLinks = profileData.imported_pi_links as unknown as PiLink[];
-            }
-          } catch (error) {
-            console.error('Error parsing imported Pi links:', error);
-            importedPiLinks = [];
-          }
-        }
-        
-        const piLinksWithType = importedPiLinks.map((link: PiLink, index: number) => ({
-          id: `pi-${index}`,
-          title: link.title,
-          url: link.url,
-          icon: "π",
-          clicks: 0,
-          type: "regular" as const,
-          isPiImported: true
-        }));
-        
-        const defaultLinks = [
-          { id: 'default-1', title: "Tip in Pi", url: "#tip-in-pi", icon: "💰", clicks: 0 },
-        ];
-        
-        const allLinks = [...processedLinks, ...piLinksWithType];
-        
-        // Properly handle active_sticker_ids JSONB conversion
-        let activeStickerIds: string[] = [];
-        if (profileData.active_sticker_ids) {
-          try {
-            if (typeof profileData.active_sticker_ids === 'string') {
-              activeStickerIds = JSON.parse(profileData.active_sticker_ids);
-            } else if (Array.isArray(profileData.active_sticker_ids)) {
-              activeStickerIds = profileData.active_sticker_ids as unknown as string[];
-            }
-          } catch (error) {
-            console.error('Error parsing active sticker IDs:', error);
-            activeStickerIds = [];
-          }
-        }
-        
-        setProfileData({
-          ...profileData,
-          imported_pi_links: importedPiLinks,
-          active_sticker_ids: activeStickerIds,
-          links: allLinks.length > 0 ? allLinks : defaultLinks,
-        });
-        
-        setLoading(false);
-        
-      } catch (err) {
-        console.error("Failed to fetch profile:", err);
-        setError("Failed to load profile");
-        setLoading(false);
-      }
-    };
-    
-    fetchUserProfile();
-  }, [username]);
-
-  return { loading, error, profileData };
+  return {
+    profile,
+    links,
+    loading,
+    error,
+    fetchProfile,
+    updateProfile,
+    refetch: () => fetchProfile(username)
+  };
 };
