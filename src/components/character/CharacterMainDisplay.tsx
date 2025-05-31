@@ -37,15 +37,6 @@ const CharacterMainDisplay: React.FC<CharacterMainDisplayProps> = ({
     onRoomChange(rooms[newIndex].id);
   };
 
-  const getCharacterMood = () => {
-    const avgStats = (character.stats.happiness + character.stats.hunger + character.stats.cleanliness + character.stats.energy) / 4;
-    if (avgStats >= 80) return '😄';
-    if (avgStats >= 60) return '😊';
-    if (avgStats >= 40) return '😐';
-    if (avgStats >= 20) return '😟';
-    return '😢';
-  };
-
   return (
     <div className="flex-1 relative">
       {/* Room Background */}
@@ -94,12 +85,63 @@ const CharacterMainDisplay: React.FC<CharacterMainDisplayProps> = ({
           <span className="text-2xl">▶</span>
         </Button>
 
-        {/* Character in center */}
+        {/* Droplink Character in center */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
-            {/* Character */}
-            <div className="text-8xl mb-4 animate-bounce" style={{ filter: 'drop-shadow(4px 4px 8px rgba(0,0,0,0.3))' }}>
-              {getCharacterMood()}
+            {/* Droplink Water Character */}
+            <div className="mb-4 animate-bounce" style={{ filter: 'drop-shadow(4px 4px 8px rgba(0,0,0,0.3))' }}>
+              <svg
+                width="120"
+                height="144"
+                viewBox="0 0 200 240"
+                className="mx-auto"
+              >
+                <defs>
+                  <linearGradient id="characterGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor={character.color} />
+                    <stop offset="50%" stopColor={character.color} />
+                    <stop offset="100%" stopColor="#0077cc" />
+                  </linearGradient>
+                </defs>
+                
+                {/* Character Body */}
+                <path
+                  d="M100 20 C60 60, 35 100, 35 140 C35 185, 65 220, 100 220 C135 220, 165 185, 165 140 C165 100, 140 60, 100 20 Z"
+                  fill="url(#characterGradient)"
+                  className="transition-all duration-300"
+                />
+                
+                {/* Highlight */}
+                <ellipse
+                  cx="75"
+                  cy="70"
+                  rx="12"
+                  ry="18"
+                  fill="rgba(255, 255, 255, 0.6)"
+                />
+                
+                {/* Eyes */}
+                <circle cx="80" cy="110" r="6" fill="#fff" />
+                <circle cx="120" cy="110" r="6" fill="#fff" />
+                <circle cx="82" cy="112" r="3" fill="#333" />
+                <circle cx="122" cy="112" r="3" fill="#333" />
+                <circle cx="83" cy="111" r="1" fill="#fff" />
+                <circle cx="123" cy="111" r="1" fill="#fff" />
+                
+                {/* Smile */}
+                <path
+                  d="M80 140 Q100 155 120 140"
+                  stroke="#fff"
+                  strokeWidth="3"
+                  fill="none"
+                  strokeLinecap="round"
+                />
+
+                {/* Accessories */}
+                {character.accessories.includes('hat') && (
+                  <ellipse cx="100" cy="30" rx="30" ry="10" fill="#8B4513" />
+                )}
+              </svg>
             </div>
             
             {/* Character Name */}

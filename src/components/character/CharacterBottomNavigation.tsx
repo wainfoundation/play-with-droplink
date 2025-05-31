@@ -14,10 +14,10 @@ const CharacterBottomNavigation: React.FC<CharacterBottomNavigationProps> = ({
   const navItems = [
     { 
       id: 'home', 
-      icon: '😊', 
       label: 'Boo',
       bgColor: 'bg-yellow-500',
-      activeBg: 'bg-yellow-600'
+      activeBg: 'bg-yellow-600',
+      character: true
     },
     { 
       id: 'style', 
@@ -60,9 +60,56 @@ const CharacterBottomNavigation: React.FC<CharacterBottomNavigationProps> = ({
                 }
               `}
             >
-              <span className={`text-2xl ${isActive ? 'animate-bounce' : ''}`}>
-                {item.icon}
-              </span>
+              {item.character ? (
+                <div className={`${isActive ? 'animate-bounce' : ''}`}>
+                  <svg
+                    width="24"
+                    height="29"
+                    viewBox="0 0 200 240"
+                    className="mx-auto"
+                  >
+                    <defs>
+                      <linearGradient id="navCharacterGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="#FFE4B5" />
+                        <stop offset="50%" stopColor="#FFE4B5" />
+                        <stop offset="100%" stopColor="#0077cc" />
+                      </linearGradient>
+                    </defs>
+                    
+                    <path
+                      d="M100 20 C60 60, 35 100, 35 140 C35 185, 65 220, 100 220 C135 220, 165 185, 165 140 C165 100, 140 60, 100 20 Z"
+                      fill="url(#navCharacterGradient)"
+                    />
+                    
+                    <ellipse
+                      cx="75"
+                      cy="70"
+                      rx="12"
+                      ry="18"
+                      fill="rgba(255, 255, 255, 0.6)"
+                    />
+                    
+                    <circle cx="80" cy="110" r="6" fill="#fff" />
+                    <circle cx="120" cy="110" r="6" fill="#fff" />
+                    <circle cx="82" cy="112" r="3" fill="#333" />
+                    <circle cx="122" cy="112" r="3" fill="#333" />
+                    <circle cx="83" cy="111" r="1" fill="#fff" />
+                    <circle cx="123" cy="111" r="1" fill="#fff" />
+                    
+                    <path
+                      d="M80 140 Q100 155 120 140"
+                      stroke="#fff"
+                      strokeWidth="3"
+                      fill="none"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </div>
+              ) : (
+                <span className={`text-2xl ${isActive ? 'animate-bounce' : ''}`}>
+                  {item.icon}
+                </span>
+              )}
               <span className="text-xs font-bold">{item.label}</span>
               {item.id === 'games' && (
                 <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center animate-pulse">
