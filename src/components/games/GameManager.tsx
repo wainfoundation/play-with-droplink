@@ -3,11 +3,11 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  PuzzleIcon,
-  RocketIcon,
   BrainIcon,
-  PaletteIcon,
-  InfinityIcon
+  MessageCircleIcon,
+  ZapIcon,
+  MicIcon,
+  DiceIcon
 } from 'lucide-react';
 import GameCard from './GameCard';
 import InteractiveMascot from '@/components/mascot/InteractiveMascot';
@@ -32,40 +32,83 @@ const GameManager: React.FC<GameManagerProps> = ({
   onPurchaseGame,
   onMoodChange
 }) => {
-  // Game categories organized by category from database
+  // Game categories organized like the reference image
   const organizeGamesByCategory = () => {
     const categories = {
-      puzzle: {
-        name: "Puzzle & Logic",
-        icon: PuzzleIcon,
-        color: "bg-blue-500",
-        games: games.filter(game => game.category === 'puzzle')
-      },
-      action: {
-        name: "Action & Reflex", 
-        icon: RocketIcon,
-        color: "bg-red-500",
-        games: games.filter(game => game.category === 'action')
-      },
-      trivia: {
-        name: "Trivia & Quiz",
+      wordguessing: {
+        name: "Word Guessing",
         icon: BrainIcon,
-        color: "bg-green-500", 
-        games: games.filter(game => game.category === 'trivia')
+        color: "bg-blue-500",
+        description: "Guess Droplink-related words letter by letter!",
+        games: games.filter(game => 
+          game.name.toLowerCase().includes('word') || 
+          game.name.toLowerCase().includes('guess') ||
+          game.name.toLowerCase().includes('hangman') ||
+          game.category === 'puzzle'
+        ).slice(0, 5)
       },
-      creative: {
-        name: "Creative & Fun",
-        icon: PaletteIcon,
+      droplinkquiz: {
+        name: "Droplink Quiz", 
+        icon: MessageCircleIcon,
         color: "bg-purple-500",
-        games: games.filter(game => game.category === 'creative')
+        description: "Test your knowledge about Droplink and Pi Network!",
+        games: games.filter(game => 
+          game.name.toLowerCase().includes('quiz') || 
+          game.name.toLowerCase().includes('trivia') ||
+          game.category === 'trivia'
+        ).slice(0, 5)
       },
-      infinite: {
-        name: "Infinite Games",
-        icon: InfinityIcon,
+      memorymatch: {
+        name: "Memory Match",
+        icon: ZapIcon,
+        color: "bg-green-500", 
+        description: "Match pairs of symbols and test your memory!",
+        games: games.filter(game => 
+          game.name.toLowerCase().includes('memory') || 
+          game.name.toLowerCase().includes('match') ||
+          game.name.toLowerCase().includes('pairs')
+        ).slice(0, 5)
+      },
+      talktodroplink: {
+        name: "Talk to Droplink",
+        icon: MicIcon,
         color: "bg-orange-500",
-        games: games.filter(game => game.category === 'infinite')
+        description: "Have a conversation with our friendly mascot!",
+        games: games.filter(game => 
+          game.name.toLowerCase().includes('chat') || 
+          game.name.toLowerCase().includes('talk') ||
+          game.name.toLowerCase().includes('conversation')
+        ).slice(0, 3)
+      },
+      randomfun: {
+        name: "Random Fun",
+        icon: DiceIcon,
+        color: "bg-pink-500",
+        description: "50+ amazing games to keep you entertained!",
+        games: games.filter(game => {
+          // Get all remaining games not in other categories
+          const usedGameIds = new Set();
+          
+          // Add games from other categories to the used set
+          games.filter(g => 
+            g.name.toLowerCase().includes('word') || 
+            g.name.toLowerCase().includes('guess') ||
+            g.name.toLowerCase().includes('hangman') ||
+            g.name.toLowerCase().includes('quiz') || 
+            g.name.toLowerCase().includes('trivia') ||
+            g.name.toLowerCase().includes('memory') || 
+            g.name.toLowerCase().includes('match') ||
+            g.name.toLowerCase().includes('pairs') ||
+            g.name.toLowerCase().includes('chat') || 
+            g.name.toLowerCase().includes('talk') ||
+            g.name.toLowerCase().includes('conversation')
+          ).forEach(g => usedGameIds.add(g.id));
+          
+          return !usedGameIds.has(game.id);
+        })
       }
     };
+    
     return categories;
   };
 
@@ -84,12 +127,14 @@ const GameManager: React.FC<GameManagerProps> = ({
       </div>
 
       <div className="lg:col-span-2">
-        <Tabs defaultValue="puzzle" className="w-full">
+        <Tabs defaultValue="wordguessing" className="w-full">
           <TabsList className="grid w-full grid-cols-5 mb-6">
             {Object.entries(gameCategories).map(([key, category]) => (
               <TabsTrigger key={key} value={key} className="flex items-center gap-1 text-xs">
                 <category.icon className="w-3 h-3" />
-                <span className="hidden sm:inline">{category.name.split(' ')[0]}</span>
+                <span className="hidden sm:inline">
+                  {key === 'randomfun' ? 'Fun' : category.name.split(' ')[0]}
+                </span>
               </TabsTrigger>
             ))}
           </TabsList>
@@ -101,28 +146,49 @@ const GameManager: React.FC<GameManagerProps> = ({
                   <CardTitle className="flex items-center gap-2">
                     <category.icon className="w-6 h-6" />
                     {category.name}
+                    {key === 'randomfun' && (
+                      <span className="text-sm bg-pink-100 text-pink-600 px-2 py-1 rounded-full">
+                        50+ Games
+                      </span>
+                    )}
                   </CardTitle>
                   <CardDescription>
-                    Choose from {category.games.length} amazing {category.name.toLowerCase()} games
+                    {category.description}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {category.games.map(game => {
-                      const isLocked = !game.is_free && userPlan === 'free' && !purchasedGames.includes(game.id);
-                      return (
-                        <GameCard
-                          key={game.id}
-                          game={game}
-                          isLocked={isLocked}
-                          userPlan={userPlan}
-                          onPlay={(game) => onGameClick(game, key)}
-                          onPurchase={() => onPurchaseGame(game)}
-                          onUpgrade={() => {}}
-                        />
-                      );
-                    })}
-                  </div>
+                  {category.games.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <category.icon className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>Coming Soon!</p>
+                      <p className="text-sm">More {category.name.toLowerCase()} games will be added.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {category.games.map(game => {
+                        const isLocked = !game.is_free && userPlan === 'free' && !purchasedGames.includes(game.id);
+                        return (
+                          <GameCard
+                            key={game.id}
+                            game={game}
+                            isLocked={isLocked}
+                            userPlan={userPlan}
+                            onPlay={(game) => onGameClick(game, key)}
+                            onPurchase={() => onPurchaseGame(game)}
+                            onUpgrade={() => {}}
+                          />
+                        );
+                      })}
+                    </div>
+                  )}
+                  
+                  {key === 'randomfun' && category.games.length > 0 && (
+                    <div className="mt-6 text-center">
+                      <p className="text-sm text-gray-600">
+                        🎮 {category.games.length} games available • More being added daily!
+                      </p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
