@@ -1,8 +1,6 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import CTA from "@/components/CTA";
 import { Helmet } from "react-helmet-async";
 import SearchSection from "@/components/help/SearchSection";
 import CategoriesSection from "@/components/help/CategoriesSection";
@@ -12,7 +10,6 @@ import ContactSupportSection from "@/components/help/ContactSupportSection";
 import SearchResults from "@/components/help/SearchResults";
 import { getFeaturedArticles } from "@/data/helpArticles";
 import { faqData } from "@/data/faqData";
-import GoToTop from '@/components/GoToTop';
 import { HelpCircle, Shield, FileText } from 'lucide-react';
 
 const Help = () => {
@@ -23,83 +20,110 @@ const Help = () => {
       name: "Getting Started",
       icon: "🚀",
       articles: [
-        { title: "Creating Your Droplink Account", slug: "creating-account" },
-        { title: "Setting Up Your Profile", slug: "profile-setup" },
-        { title: "Adding Your First Links", slug: "adding-links" },
-        { title: "Understanding the Dashboard", slug: "dashboard-overview" },
-        { title: "Mobile App vs. Web Platform", slug: "app-vs-web" }
+        { title: "Creating Your Gaming Account", slug: "creating-account" },
+        { title: "Setting Up Your Character", slug: "character-setup" },
+        { title: "Playing Your First Game", slug: "first-game" },
+        { title: "Understanding Game Categories", slug: "game-categories" },
+        { title: "Mobile vs Desktop Gaming", slug: "mobile-vs-desktop" }
       ]
     },
     {
-      name: "Account Management",
-      icon: "👤",
+      name: "Game Management",
+      icon: "🎮",
       articles: [
-        { title: "Changing Your Username", slug: "change-username" },
-        { title: "Managing Email Preferences", slug: "email-preferences" },
-        { title: "Account Security Best Practices", slug: "security-best-practices" },
-        { title: "Deleting Your Account", slug: "delete-account" },
-        { title: "Managing Multiple Profiles", slug: "multiple-profiles" }
+        { title: "Changing Your Gaming Character", slug: "change-character" },
+        { title: "Managing Game Preferences", slug: "game-preferences" },
+        { title: "Game Security & Fair Play", slug: "game-security" },
+        { title: "Resetting Game Progress", slug: "reset-progress" },
+        { title: "Multiple Character Profiles", slug: "multiple-characters" }
       ]
     },
     {
-      name: "Customization",
+      name: "Customization & Characters",
       icon: "🎨",
       articles: [
-        { title: "Choosing a Theme", slug: "choosing-theme" },
-        { title: "Custom Colors and Fonts", slug: "custom-colors-fonts" },
-        { title: "Adding Profile Photos", slug: "profile-photos" },
-        { title: "Link Appearance Options", slug: "link-appearance" },
-        { title: "Custom Domain Setup", slug: "custom-domain" }
+        { title: "Choosing Character Appearance", slug: "character-appearance" },
+        { title: "Custom Colors and Themes", slug: "custom-colors-themes" },
+        { title: "Character Moods and Personalities", slug: "character-moods" },
+        { title: "Unlocking Character Features", slug: "character-features" },
+        { title: "Character Animation Settings", slug: "character-animations" }
       ]
     },
     {
-      name: "Pi Network Integration",
+      name: "Pi Network Gaming",
       icon: "π",
       articles: [
-        { title: "Connecting Your Pi Wallet", slug: "connecting-pi-wallet" },
-        { title: "Setting Up Pi Payments", slug: "pi-payments-setup" },
-        { title: "Pi Transaction Fees", slug: "pi-transaction-fees" },
-        { title: "Pi Tips and Donations", slug: "pi-tips-donations" },
-        { title: "Pi Network Authentication", slug: "pi-network-auth" }
+        { title: "Connecting Your Pi Wallet for Gaming", slug: "connecting-pi-wallet-gaming" },
+        { title: "Pi Payments for Premium Games", slug: "pi-payments-games" },
+        { title: "Pi Gaming Rewards System", slug: "pi-gaming-rewards" },
+        { title: "Pi Tips for Game Achievements", slug: "pi-tips-gaming" },
+        { title: "Pi Network Gaming Authentication", slug: "pi-network-gaming-auth" }
       ]
     },
     {
-      name: "Analytics & Insights",
+      name: "Game Analytics & Progress",
       icon: "📊",
       articles: [
-        { title: "Understanding Your Dashboard", slug: "analytics-guide" },
-        { title: "Traffic Sources", slug: "traffic-sources" },
-        { title: "Link Performance", slug: "link-performance" },
-        { title: "Audience Demographics", slug: "audience-demographics" },
-        { title: "Exporting Analytics Data", slug: "export-analytics" }
+        { title: "Understanding Your Gaming Dashboard", slug: "gaming-analytics-guide" },
+        { title: "Game Score Tracking", slug: "game-score-tracking" },
+        { title: "Achievement Progress", slug: "achievement-progress" },
+        { title: "Gaming Performance Metrics", slug: "gaming-performance" },
+        { title: "Exporting Gaming Data", slug: "export-gaming-data" }
       ]
     },
     {
-      name: "Billing & Subscription",
+      name: "Subscriptions & Premium Games",
       icon: "💳",
       articles: [
-        { title: "Subscription Plans", slug: "subscription-plans" },
-        { title: "Payment Methods", slug: "payment-methods" },
-        { title: "Upgrading or Downgrading", slug: "upgrade-downgrade" },
-        { title: "Cancellation & Refunds", slug: "cancellation-refunds" },
-        { title: "Pi Payment Issues", slug: "pi-payment-issues" }
+        { title: "Gaming Subscription Plans", slug: "gaming-subscription-plans" },
+        { title: "Premium Game Access", slug: "premium-game-access" },
+        { title: "Upgrading for More Games", slug: "upgrade-more-games" },
+        { title: "Gaming Subscription Cancellation", slug: "gaming-cancellation" },
+        { title: "Pi Payment Issues for Games", slug: "pi-payment-gaming-issues" }
       ]
     }
   ];
   
-  const popularArticles = getFeaturedArticles();
+  const popularArticles = getFeaturedArticles().map(article => ({
+    ...article,
+    title: article.title.replace("Droplink", "Play with Droplink Gaming"),
+    description: article.description.replace("link-in-bio", "gaming").replace("links", "games")
+  }));
   
-  // Get sample FAQs from multiple categories
-  const faqs = faqData.slice(0, 3).flatMap(category => 
-    category.questions.slice(0, 2)
-  );
+  // Get sample FAQs focused on gaming
+  const gamingFaqs = [
+    {
+      question: "How do I start playing games with Droplink?",
+      answer: "Simply visit the Play with Droplink page, choose your character, and start playing from our collection of 50+ games across puzzle, action, trivia, and creative categories."
+    },
+    {
+      question: "What games are available for free?",
+      answer: "Free users can access basic puzzle games, simple action games, and limited trivia questions. Premium subscribers get access to all 50+ games including advanced puzzles, multiplayer modes, and exclusive creative tools."
+    },
+    {
+      question: "How do Pi payments work for gaming?",
+      answer: "You can use Pi cryptocurrency to unlock premium games, purchase hints, buy power-ups, and tip other players. All transactions are processed securely through the Pi Network."
+    },
+    {
+      question: "Can I play games on mobile?",
+      answer: "Yes! All games are optimized for mobile play with full-screen support when using Pi Browser on your mobile device."
+    },
+    {
+      question: "How do I earn Pi rewards from gaming?",
+      answer: "Complete daily challenges, achieve high scores, watch rewarded ads, and participate in community events to earn Pi rewards that are automatically added to your Pi wallet."
+    },
+    {
+      question: "What happens if I run out of hints during a game?",
+      answer: "When you run out of hints, you can watch a Pi Ad to get 3 more hints for free, or pay 1 Pi to continue playing immediately. This ensures fair gameplay while supporting the platform."
+    }
+  ];
 
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
-        <title>Help Center - Droplink Support & Documentation</title>
-        <meta name="description" content="Get comprehensive help with using Droplink, the Pi Network link-in-bio platform. Find tutorials, FAQs, guides, and support for all features." />
-        <meta name="keywords" content="droplink help, pi network support, link in bio tutorial, droplink documentation, pi payments help" />
+        <title>Gaming Help Center - Play with Droplink Support</title>
+        <meta name="description" content="Get comprehensive help with Play with Droplink gaming platform. Find tutorials, FAQs, guides, and support for all gaming features and Pi Network integration." />
+        <meta name="keywords" content="droplink gaming help, pi network gaming support, play with droplink tutorial, gaming documentation, pi payments gaming help" />
       </Helmet>
       
       {/* Navigation Header */}
@@ -133,7 +157,6 @@ const Help = () => {
         </div>
       </header>
       
-      <Navbar />
       <main className="flex-grow">
         <SearchSection searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         
@@ -144,16 +167,13 @@ const Help = () => {
             <>
               <CategoriesSection categories={categories} />
               <PopularArticlesSection popularArticles={popularArticles} />
-              <FAQSection faqs={faqs} />
+              <FAQSection faqs={gamingFaqs} />
             </>
           )}
         </div>
         
         <ContactSupportSection />
-        <CTA />
       </main>
-      <GoToTop />
-      <Footer />
     </div>
   );
 };
