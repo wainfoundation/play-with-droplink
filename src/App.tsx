@@ -30,24 +30,24 @@ function App() {
     }
   }, []);
 
-  if (currentPage === 'splash') {
-    return <SplashScreen onComplete={handleSplashComplete} />;
-  }
-
-  if (currentPage === 'welcome') {
-    return <Welcome onEnter={handleWelcomeComplete} />;
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <Routes>
-          <Route path="/" element={<Play />} />
-          <Route path="/play" element={<Play />} />
-          <Route path="/help" element={<Help />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-        </Routes>
+        {currentPage === 'splash' && (
+          <SplashScreen onComplete={handleSplashComplete} />
+        )}
+        {currentPage === 'welcome' && (
+          <Welcome onEnter={handleWelcomeComplete} />
+        )}
+        {currentPage === 'app' && (
+          <Routes>
+            <Route path="/" element={<Play />} />
+            <Route path="/play" element={<Play />} />
+            <Route path="/help" element={<Help />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+          </Routes>
+        )}
       </Router>
     </QueryClientProvider>
   );
