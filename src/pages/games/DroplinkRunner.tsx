@@ -436,7 +436,7 @@ const DroplinkRunner = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <RewardedAdButton
-                      reward={{ type: "life", amount: 1, description: "Watch ad for free life" }}
+                      reward={{ type: "pi", amount: 1, description: "Watch ad for free life" }}
                       onAdComplete={handleAdReward}
                       onAdError={(error) => console.error('Ad error:', error)}
                       buttonText="Watch Ad for Life"
