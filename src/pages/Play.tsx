@@ -4,10 +4,10 @@ import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/context/UserContext';
-import { GameEngine } from '@/components/games/GameEngine';
-import { AllGames } from '@/components/games/AllGames';
-import { LivesSystem } from '@/components/games/LivesSystem';
-import { DroplinkButton } from '@/components/games/DroplinkButton';
+import GameEngine from '@/components/games/GameEngine';
+import AllGames from '@/components/games/AllGames';
+import LivesSystem from '@/components/games/LivesSystem';
+import DroplinkButton from '@/components/games/DroplinkButton';
 import { Play as PlayIcon, ArrowLeft } from 'lucide-react';
 
 const Play: React.FC = () => {
