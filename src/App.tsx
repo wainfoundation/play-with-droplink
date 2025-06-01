@@ -10,6 +10,7 @@ import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
 import SudokuInfinite from "@/pages/games/SudokuInfinite";
 import DroplinkRunner from "@/pages/games/DroplinkRunner";
+import { GameManagerProvider } from "@/components/games/GameManager";
 
 const queryClient = new QueryClient();
 
@@ -28,37 +29,42 @@ function App() {
     // Check if user has already completed onboarding
     const hasCompletedOnboarding = localStorage.getItem('selectedCharacter');
     if (hasCompletedOnboarding) {
-      setCurrentPage('app');
+      // Add a small delay to show splash briefly even for returning users
+      setTimeout(() => {
+        setCurrentPage('app');
+      }, 1000);
     }
   }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        {currentPage === 'splash' && (
-          <SplashScreen onComplete={handleSplashComplete} />
-        )}
-        {currentPage === 'welcome' && (
-          <Welcome onEnter={handleWelcomeComplete} />
-        )}
-        {currentPage === 'app' && (
-          <Routes>
-            <Route path="/" element={<Play />} />
-            <Route path="/play" element={<Play />} />
-            <Route path="/help" element={<Help />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/terms" element={<Terms />} />
-            {/* Game Routes */}
-            <Route path="/game/sudoku-infinite" element={<SudokuInfinite />} />
-            <Route path="/game/droplink-runner" element={<DroplinkRunner />} />
-            <Route path="/game/block-connect" element={<SudokuInfinite />} />
-            <Route path="/game/word-puzzle" element={<SudokuInfinite />} />
-            <Route path="/game/target-rush" element={<DroplinkRunner />} />
-            <Route path="/game/quick-tap" element={<DroplinkRunner />} />
-            <Route path="/game/pi-collector" element={<DroplinkRunner />} />
-          </Routes>
-        )}
-      </Router>
+      <GameManagerProvider>
+        <Router>
+          {currentPage === 'splash' && (
+            <SplashScreen onComplete={handleSplashComplete} />
+          )}
+          {currentPage === 'welcome' && (
+            <Welcome onEnter={handleWelcomeComplete} />
+          )}
+          {currentPage === 'app' && (
+            <Routes>
+              <Route path="/" element={<Play />} />
+              <Route path="/play" element={<Play />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              {/* Game Routes */}
+              <Route path="/game/sudoku-infinite" element={<SudokuInfinite />} />
+              <Route path="/game/droplink-runner" element={<DroplinkRunner />} />
+              <Route path="/game/block-connect" element={<SudokuInfinite />} />
+              <Route path="/game/word-puzzle" element={<SudokuInfinite />} />
+              <Route path="/game/target-rush" element={<DroplinkRunner />} />
+              <Route path="/game/quick-tap" element={<DroplinkRunner />} />
+              <Route path="/game/pi-collector" element={<DroplinkRunner />} />
+            </Routes>
+          )}
+        </Router>
+      </GameManagerProvider>
     </QueryClientProvider>
   );
 }
