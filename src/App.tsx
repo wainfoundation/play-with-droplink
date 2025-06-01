@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { UserProvider } from "@/context/UserContext";
+import SplashWrapper from "@/components/welcome/SplashWrapper";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import LoginPage from "./pages/LoginPage";
@@ -23,17 +24,19 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/login-page" element={<LoginPage />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/signup-page" element={<SignupPage />} />
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/play" element={<PlayWithMascot />} />
-            </Routes>
-          </BrowserRouter>
+          <SplashWrapper>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/login-page" element={<LoginPage />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/signup-page" element={<SignupPage />} />
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/play" element={<PlayWithMascot />} />
+              </Routes>
+            </BrowserRouter>
+          </SplashWrapper>
         </TooltipProvider>
       </UserProvider>
     </QueryClientProvider>

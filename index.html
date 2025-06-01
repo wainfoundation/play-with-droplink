@@ -1,51 +1,43 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" href="/mascot-favicon.svg" type="image/svg+xml" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <!-- Primary Meta Tags -->
-    <title>Play with Droplink | Drop All Your Links</title>
-    <meta name="title" content="Play with Droplink | Drop All Your Links" />
-    <meta name="description" content="Play with Droplink helps Pi Network creators, entrepreneurs, influencers, and developers monetize and manage their digital presence using Pi tips, Pi Ads, and .pi domains." />
-    <meta name="keywords" content="Droplink, Pi Network, link-in-bio, creators, Pi payments, Pi Ads, .pi domains, games" />
-    <meta name="author" content="Droplink Team" />
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.droplink.space/" />
-    <meta property="og:title" content="Play with Droplink | Drop All Your Links" />
-    <meta property="og:description" content="Play with Droplink helps Pi Network creators, entrepreneurs, influencers, and developers monetize and manage their digital presence using Pi tips, Pi Ads, and .pi domains." />
-    <meta property="og:image" content="https://www.droplink.space/assets/droplink-preview.png" />
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://www.droplink.space/" />
-    <meta property="twitter:title" content="Play with Droplink | Drop All Your Links" />
-    <meta property="twitter:description" content="Play with Droplink helps Pi Network creators, entrepreneurs, influencers, and developers monetize and manage their digital presence using Pi tips, Pi Ads, and .pi domains." />
-    <meta property="twitter:image" content="https://www.droplink.space/assets/droplink-preview.png" />
-    
-    <!-- Favicon - Updated to use mascot -->
-    <link rel="icon" href="/mascot-favicon.svg" type="image/svg+xml">
-    <link rel="alternate icon" href="/lovable-uploads/2c117775-cd88-4aec-819b-0723e4f0dbe5.png" type="image/png">
+    <title>Play with Droplink - Your Pi Network Gaming Hub</title>
+    <meta name="description" content="Experience the joy of gaming and pet care in the Pi Network ecosystem. Play games, earn Pi coins, and take care of your adorable pet droplet!" />
     
     <!-- Pi Network App Manifest -->
-    <link rel="manifest" href="/pi-app-manifest.json">
+    <link rel="manifest" href="/pi-app-manifest.json" />
     
-    <!-- Modern Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Sora:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#00BFFF" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Play with Droplink" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Play with Droplink - Your Pi Network Gaming Hub" />
+    <meta property="og:description" content="Experience the joy of gaming and pet care in the Pi Network ecosystem. Play games, earn Pi coins, and take care of your adorable pet droplet!" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/lovable-uploads/fd8498db-0cee-4181-93de-ba692558b37a.png" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Play with Droplink - Your Pi Network Gaming Hub" />
+    <meta name="twitter:description" content="Experience the joy of gaming and pet care in the Pi Network ecosystem. Play games, earn Pi coins, and take care of your adorable pet droplet!" />
+    <meta name="twitter:image" content="/lovable-uploads/fd8498db-0cee-4181-93de-ba692558b37a.png" />
     
     <!-- Pi Network SDK -->
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <!-- No script initialization here - we'll do it in React -->
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/mascot-favicon.svg" as="image" type="image/svg+xml" />
   </head>
-
   <body>
     <div id="root"></div>
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
+    <script src="https://cdn.gpteng.co/gptengineer.js" defer></script>
   </body>
 </html>
