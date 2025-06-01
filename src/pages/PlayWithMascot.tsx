@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
@@ -13,8 +12,10 @@ import PiBrowserCheck from '@/components/PiBrowserCheck';
 import CharacterDisplay from '@/components/games/CharacterDisplay';
 import GameCategories from '@/components/games/GameCategories';
 import PremiumCTA from '@/components/games/PremiumCTA';
+import AllGames from '@/components/games/AllGames';
 import { isRunningInPiBrowser } from '@/utils/pi-sdk';
-import { HelpCircle, Shield, FileText, Crown } from 'lucide-react';
+import { HelpCircle, Shield, FileText, Crown, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const PlayWithMascot = () => {
   const { user, isLoggedIn } = useUser();
@@ -26,9 +27,9 @@ const PlayWithMascot = () => {
   
   const [totalScore, setTotalScore] = useState(0);
   const [currentGame, setCurrentGame] = useState<any>(null);
-  const [purchasedGames, setPurchasedGames] = useState<string[]>([]);
   const [showPiBrowserCheck, setShowPiBrowserCheck] = useState(true);
   const [selectedCharacter, setSelectedCharacter] = useState<any>(null);
+  const [showAllGames, setShowAllGames] = useState(false);
 
   const isPremium = plan === 'premium';
 
@@ -75,6 +76,23 @@ const PlayWithMascot = () => {
       setTotalScore(user.total_score);
     }
   }, [user]);
+
+  const handleGameSelect = (game: any) => {
+    setCurrentGame({ ...game, category: game.category || 'general' });
+    setShowAllGames(false);
+    toast({
+      title: `Starting ${game.name}`,
+      description: isPremium ? "Enjoy ad-free gaming!" : "Get ready to play!",
+    });
+  };
+
+  const handleViewAllGames = () => {
+    setShowAllGames(true);
+  };
+
+  const handleBackFromAllGames = () => {
+    setShowAllGames(false);
+  };
 
   const handleGameClick = (game: any, category: string) => {
     // Premium users can access all games
@@ -229,7 +247,7 @@ const PlayWithMascot = () => {
     );
   }
 
-  // Show game engine if a game is selected - mobile gets full screen
+  // Show game engine if a game is selected
   if (currentGame) {
     return (
       <>
@@ -242,6 +260,35 @@ const PlayWithMascot = () => {
               game={currentGame}
               onBack={handleBackToGames}
               onGameComplete={handleGameComplete}
+            />
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Show AllGames component if requested
+  if (showAllGames) {
+    return (
+      <>
+        <Helmet>
+          <title>All Games - Droplink Gaming</title>
+        </Helmet>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">
+          <div className="container mx-auto px-4">
+            <div className="mb-6">
+              <Button 
+                onClick={handleBackFromAllGames}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Game Hub
+              </Button>
+            </div>
+            <AllGames 
+              onGameSelect={handleGameSelect}
+              onUpgradeToPremium={handleUpgradeToPremium}
             />
           </div>
         </div>
@@ -285,6 +332,18 @@ const PlayWithMascot = () => {
                 onUpgradeToPremium={handleUpgradeToPremium}
               />
             )}
+
+            {/* View All Games Button */}
+            <div className="mb-6">
+              <Button 
+                onClick={handleViewAllGames}
+                size="lg"
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3"
+              >
+                <Crown className="w-5 h-5 mr-2" />
+                View All {games.length} Games
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
@@ -303,9 +362,9 @@ const PlayWithMascot = () => {
             <GameCategories
               games={games}
               userPlan={plan}
-              purchasedGames={purchasedGames}
-              onGameClick={handleGameClick}
-              onPurchaseGame={handlePurchaseGame}
+              purchasedGames={[]}
+              onGameClick={handleGameSelect}
+              onPurchaseGame={() => {}}
               onUpgradeToPremium={handleUpgradeToPremium}
               isPremium={isPremium}
               canAccessAllGames={canAccessAllGames}
