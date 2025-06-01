@@ -12,40 +12,29 @@ interface CharacterSelectionProps {
   onCharacterSelect: (characterId: string) => void;
   onBack: () => void;
   onConfirm: () => void;
-  characters?: Array<{
-    id: string;
-    name: string;
-    gender: string;
-    color: string;
-    mood: string;
-    personality: string;
-  }>;
 }
 
 const CharacterSelection: React.FC<CharacterSelectionProps> = ({
   selectedCharacter,
   onCharacterSelect,
   onBack,
-  onConfirm,
-  characters: propsCharacters
+  onConfirm
 }) => {
-  const [charactersWithRandomNames, setCharactersWithRandomNames] = useState(propsCharacters || characters);
+  const [charactersWithRandomNames, setCharactersWithRandomNames] = useState(characters);
 
   useEffect(() => {
     // Reset used names and generate new random names for all characters
     resetUsedNames();
-    const baseCharacters = propsCharacters || characters;
-    const updatedCharacters = baseCharacters.map(character => ({
+    const updatedCharacters = characters.map(character => ({
       ...character,
       name: generateRandomName()
     }));
     setCharactersWithRandomNames(updatedCharacters);
-  }, [propsCharacters]);
+  }, []);
 
   const handleGenerateNewNames = () => {
     resetUsedNames();
-    const baseCharacters = propsCharacters || characters;
-    const updatedCharacters = baseCharacters.map(character => ({
+    const updatedCharacters = characters.map(character => ({
       ...character,
       name: generateRandomName()
     }));

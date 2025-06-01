@@ -143,42 +143,6 @@ export type Database = {
           },
         ]
       }
-      droplinks: {
-        Row: {
-          created_at: string
-          game_id: string | null
-          id: string
-          level: number | null
-          link: string
-          score: number | null
-          type: string
-          unique_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          game_id?: string | null
-          id?: string
-          level?: number | null
-          link: string
-          score?: number | null
-          type: string
-          unique_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          game_id?: string | null
-          id?: string
-          level?: number | null
-          link?: string
-          score?: number | null
-          type?: string
-          unique_id?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       forum_categories: {
         Row: {
           color: string | null
@@ -771,8 +735,6 @@ export type Database = {
           display_name: string | null
           games_played: number | null
           id: string
-          last_life_regen: string | null
-          lives: number | null
           pi_domain: string | null
           pi_wallet_address: string | null
           plan: string | null
@@ -788,8 +750,6 @@ export type Database = {
           display_name?: string | null
           games_played?: number | null
           id: string
-          last_life_regen?: string | null
-          lives?: number | null
           pi_domain?: string | null
           pi_wallet_address?: string | null
           plan?: string | null
@@ -805,8 +765,6 @@ export type Database = {
           display_name?: string | null
           games_played?: number | null
           id?: string
-          last_life_regen?: string | null
-          lives?: number | null
           pi_domain?: string | null
           pi_wallet_address?: string | null
           plan?: string | null
@@ -821,18 +779,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      add_user_life: {
-        Args: { user_id: string }
-        Returns: undefined
-      }
-      regenerate_life: {
-        Args: { user_id: string }
-        Returns: undefined
-      }
-      use_user_lives: {
-        Args: { user_id: string; amount?: number }
-        Returns: undefined
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never

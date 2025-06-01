@@ -1,4 +1,37 @@
 export const gamesData = [
+  // Enhanced Block Connect with all features
+  {
+    id: 'block-connect',
+    name: 'Block Connect',
+    category: 'puzzle',
+    difficulty: 'Easy',
+    is_free: true,
+    price_pi: 0,
+    description: 'Connect blocks through millions of levels! Watch ads to play, pay Pi for hints, unlock premium for ad-free gaming. Features infinite progression (1-9,999,999 levels), lives system, and sound effects.'
+  },
+  
+  // Enhanced Daily Crossword with all features
+  {
+    id: 'daily-crossword',
+    name: 'Daily Crossword',
+    category: 'puzzle',
+    difficulty: 'Hard',
+    is_free: true,
+    price_pi: 0,
+    description: 'Solve fresh crossword puzzles daily! Infinite levels (1-9,999,999), daily challenges, duel mode, Pi hints, lives system, and leaderboards. Watch ads to play or pay Pi for premium features.'
+  },
+  
+  // NEW Enhanced Color Merge with all features
+  {
+    id: 'color-merge',
+    name: 'Color Merge',
+    category: 'puzzle',
+    difficulty: 'Easy',
+    is_free: true,
+    price_pi: 0,
+    description: 'Blend colors to solve puzzles through infinite levels (1-9,999,999)! Pay 1π for hints, 2π to skip levels. Features lives system, daily challenges, leaderboards, and calming sound effects. Perfect for training creativity and logic!'
+  },
+  
   // Existing Puzzle Games
   {
     id: 'sudoku-classic',
@@ -20,24 +53,6 @@ export const gamesData = [
   },
   
   // New Block-based Puzzle Games
-  {
-    id: 'block-connect',
-    name: 'Block Connect',
-    category: 'puzzle',
-    difficulty: 'Easy',
-    is_free: true,
-    price_pi: 0,
-    description: 'Strategically connect puzzle blocks without overlap'
-  },
-  {
-    id: 'color-merge',
-    name: 'Color Merge',
-    category: 'puzzle',
-    difficulty: 'Easy',
-    is_free: true,
-    price_pi: 0,
-    description: 'Merge colors to match the target combination'
-  },
   {
     id: 'logic-flow',
     name: 'Logic Flow',

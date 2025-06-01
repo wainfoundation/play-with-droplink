@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -8,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Search } from "lucide-react";
-import { faqData, searchFAQs } from "@/data/faqData";
+import { ArrowLeft, Search, Gamepad2 } from "lucide-react";
+import { completeFaqData, searchCompleteFAQs } from "@/data/completeFaqData";
 import GoToTop from '@/components/GoToTop';
 
 const AllFaqs = () => {
@@ -17,18 +18,18 @@ const AllFaqs = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   
   const filteredFAQs = searchQuery.trim() 
-    ? searchFAQs(searchQuery)
+    ? searchCompleteFAQs(searchQuery)
     : selectedCategory 
-    ? faqData.find(cat => cat.name === selectedCategory)?.questions || []
+    ? completeFaqData.find(cat => cat.name === selectedCategory)?.questions || []
     : [];
 
-  const displayFAQs = searchQuery.trim() || selectedCategory ? filteredFAQs : faqData;
+  const displayFAQs = searchQuery.trim() || selectedCategory ? filteredFAQs : completeFaqData;
 
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
-        <title>Frequently Asked Questions - Droplink Help</title>
-        <meta name="description" content="Find answers to all your questions about using Droplink, the Pi Network link-in-bio platform." />
+        <title>Gaming FAQ - Complete Guide | Play with Droplink</title>
+        <meta name="description" content="Find answers to all your questions about gaming with Droplink, Pi Network integration, payments, and gameplay features." />
       </Helmet>
       
       <Navbar />
@@ -37,16 +38,24 @@ const AllFaqs = () => {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <Button variant="ghost" asChild className="mb-4">
-              <Link to="/help" className="flex items-center gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                Back to Help Center
-              </Link>
-            </Button>
+            <div className="flex gap-4 mb-4">
+              <Button variant="ghost" asChild>
+                <Link to="/help" className="flex items-center gap-2">
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to Help Center
+                </Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/play" className="flex items-center gap-2">
+                  <Gamepad2 className="h-4 w-4" />
+                  Back to Game
+                </Link>
+              </Button>
+            </div>
             
-            <h1 className="text-4xl font-bold mb-4">Frequently Asked Questions</h1>
+            <h1 className="text-4xl font-bold mb-4">Gaming FAQ</h1>
             <p className="text-xl text-muted-foreground">
-              Find answers to common questions about Droplink and Pi Network integration
+              Complete guide to gaming with Droplink and Pi Network integration
             </p>
           </div>
 
@@ -57,7 +66,7 @@ const AllFaqs = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="text"
-                  placeholder="Search FAQs..."
+                  placeholder="Search gaming FAQs..."
                   className="pl-10"
                   value={searchQuery}
                   onChange={(e) => {
@@ -80,7 +89,7 @@ const AllFaqs = () => {
                 >
                   All Categories
                 </Button>
-                {faqData.map((category) => (
+                {completeFaqData.map((category) => (
                   <Button
                     key={category.name}
                     variant={selectedCategory === category.name ? "default" : "outline"}
@@ -141,7 +150,7 @@ const AllFaqs = () => {
           ) : (
             /* Category View */
             <div className="space-y-6">
-              {faqData.map((category) => (
+              {completeFaqData.map((category) => (
                 <Card key={category.name}>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-3">
@@ -175,14 +184,14 @@ const AllFaqs = () => {
               <div className="text-center">
                 <h3 className="text-xl font-semibold mb-4">Still have questions?</h3>
                 <p className="text-muted-foreground mb-6">
-                  Can't find the answer you're looking for? Our support team is here to help.
+                  Can't find the answer you're looking for? Our gaming support team is here to help.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button asChild>
-                    <Link to="/contact">Contact Support</Link>
+                    <Link to="/contact">Contact Gaming Support</Link>
                   </Button>
                   <Button variant="outline" asChild>
-                    <Link to="/community">Join Community</Link>
+                    <Link to="/play">Continue Playing</Link>
                   </Button>
                 </div>
               </div>
@@ -191,6 +200,7 @@ const AllFaqs = () => {
         </div>
       </main>
       
+      <GoToTop />
       <Footer />
     </div>
   );

@@ -119,7 +119,6 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
           onCharacterSelect={handleCharacterSelect}
           onBack={handleBackToWelcome}
           onConfirm={handleConfirmCharacter}
-          characters={charactersWithRandomNames}
         />
         <WelcomeStyles />
       </>

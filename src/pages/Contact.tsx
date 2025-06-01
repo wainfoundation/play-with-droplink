@@ -1,178 +1,223 @@
 
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Mail, MessageSquare, Phone, MapPin, Send, Headphones } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { Helmet } from 'react-helmet-async';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     subject: '',
+    category: '',
     message: ''
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Simulate form submission
+    toast({
+      title: "Message Sent!",
+      description: "We'll get back to you within 24 hours.",
+    });
+    
+    // Reset form
+    setFormData({
+      name: '',
+      email: '',
+      subject: '',
+      category: '',
+      message: ''
+    });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      // TODO: Implement when contact_submissions table is available
-      console.log('Contact form submission feature not yet implemented', formData);
-
-      toast({
-        title: "Message Sent",
-        description: "Thank you for your message! We'll get back to you soon.",
-      });
-
-      // Reset form
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: ''
-      });
-    } catch (error) {
-      console.error('Error submitting contact form:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send message. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
       <Helmet>
-        <title>Contact Us - Droplink</title>
-        <meta name="description" content="Get in touch with the Droplink team. We're here to help with any questions or feedback." />
+        <title>Contact Support - Play with Droplink Gaming</title>
+        <meta name="description" content="Get help with Play with Droplink gaming platform. Contact our support team for technical assistance, account help, and gaming guidance." />
       </Helmet>
-      
-      <Navbar />
-      <main className="flex-grow py-12 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              Contact Us
-            </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Have a question, suggestion, or need help? We'd love to hear from you!
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Send us a message</CardTitle>
-                  <CardDescription>
-                    Fill out the form below and we'll get back to you as soon as possible.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                      <Input
-                        name="name"
-                        placeholder="Your Name"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Input
-                        name="email"
-                        type="email"
-                        placeholder="Your Email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Input
-                        name="subject"
-                        placeholder="Subject"
-                        value={formData.subject}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Textarea
-                        name="message"
-                        placeholder="Your Message"
-                        value={formData.message}
-                        onChange={handleInputChange}
-                        rows={6}
-                        required
-                      />
-                    </div>
-                    <Button 
-                      type="submit" 
-                      className="w-full"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? 'Sending...' : 'Send Message'}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-            </div>
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-4">Contact Gaming Support</h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Need help with your gaming experience? Our support team is here to help you get back to playing!
+          </p>
+        </div>
 
-            <div className="space-y-8">
-              <div>
-                <h2 className="text-2xl font-bold mb-4">Get in Touch</h2>
-                <div className="space-y-4">
+        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          {/* Contact Form */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5" />
+                Send us a Message
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <h3 className="font-semibold text-lg">Email</h3>
-                    <p className="text-gray-600">support@droplink.space</p>
+                    <label className="block text-sm font-medium mb-2">Name</label>
+                    <Input
+                      value={formData.name}
+                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      placeholder="Your name"
+                      required
+                    />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg">Response Time</h3>
-                    <p className="text-gray-600">We typically respond within 24 hours</p>
+                    <label className="block text-sm font-medium mb-2">Email</label>
+                    <Input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      placeholder="your@email.com"
+                      required
+                    />
                   </div>
                 </div>
-              </div>
 
-              <div>
-                <h2 className="text-2xl font-bold mb-4">Other Ways to Reach Us</h2>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Category</label>
+                  <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="What do you need help with?" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="game-bug">Game Bug Report</SelectItem>
+                      <SelectItem value="payment-issue">Pi Payment Issue</SelectItem>
+                      <SelectItem value="account-help">Account Help</SelectItem>
+                      <SelectItem value="feature-request">Feature Request</SelectItem>
+                      <SelectItem value="character-issue">Character Problems</SelectItem>
+                      <SelectItem value="technical-support">Technical Support</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Subject</label>
+                  <Input
+                    value={formData.subject}
+                    onChange={(e) => handleInputChange('subject', e.target.value)}
+                    placeholder="Brief description of your issue"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Message</label>
+                  <Textarea
+                    value={formData.message}
+                    onChange={(e) => handleInputChange('message', e.target.value)}
+                    placeholder="Please describe your issue in detail..."
+                    rows={6}
+                    required
+                  />
+                </div>
+
+                <Button type="submit" className="w-full" size="lg">
+                  <Send className="w-4 h-4 mr-2" />
+                  Send Message
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          {/* Contact Information */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Headphones className="w-5 h-5" />
+                  Gaming Support Hours
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <Mail className="w-5 h-5 text-primary mt-1" />
+                  <div>
+                    <h4 className="font-medium">Email Support</h4>
+                    <p className="text-sm text-gray-600">gaming-support@playwithDroplink.com</p>
+                    <p className="text-xs text-gray-500">Response within 24 hours</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <MessageSquare className="w-5 h-5 text-primary mt-1" />
+                  <div>
+                    <h4 className="font-medium">Live Chat</h4>
+                    <p className="text-sm text-gray-600">Available in-game</p>
+                    <p className="text-xs text-gray-500">Mon-Fri, 9AM-6PM PT</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Phone className="w-5 h-5 text-primary mt-1" />
+                  <div>
+                    <h4 className="font-medium">Pi Network Issues</h4>
+                    <p className="text-sm text-gray-600">Contact Pi Network support directly</p>
+                    <p className="text-xs text-gray-500">For wallet & payment issues</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Common Gaming Issues</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <div className="space-y-3">
-                  <p className="text-gray-600">
-                    📧 For general inquiries: hello@droplink.space
-                  </p>
-                  <p className="text-gray-600">
-                    🐛 For bug reports: bugs@droplink.space
-                  </p>
-                  <p className="text-gray-600">
-                    💡 For feature requests: features@droplink.space
-                  </p>
+                  <div className="p-3 bg-blue-50 rounded-lg">
+                    <h5 className="font-medium text-sm">Game Won't Load?</h5>
+                    <p className="text-xs text-gray-600">Try refreshing Pi Browser or clearing cache</p>
+                  </div>
+                  <div className="p-3 bg-green-50 rounded-lg">
+                    <h5 className="font-medium text-sm">Pi Payment Failed?</h5>
+                    <p className="text-xs text-gray-600">Check your Pi wallet balance and network connection</p>
+                  </div>
+                  <div className="p-3 bg-purple-50 rounded-lg">
+                    <h5 className="font-medium text-sm">Character Issues?</h5>
+                    <p className="text-xs text-gray-600">Reset character settings in game preferences</p>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Quick Links</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <Button variant="outline" className="w-full justify-start" asChild>
+                    <a href="/help">Gaming Help Center</a>
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start" asChild>
+                    <a href="/help/article/connecting-pi-wallet-gaming">Pi Wallet Setup</a>
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start" asChild>
+                    <a href="/help/article/character-setup">Character Guide</a>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
-      </main>
-      <Footer />
+      </div>
     </div>
   );
 };

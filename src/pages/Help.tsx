@@ -1,157 +1,154 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import CTA from "@/components/CTA";
-import { Helmet } from "react-helmet-async";
-import SearchSection from "@/components/help/SearchSection";
-import CategoriesSection from "@/components/help/CategoriesSection";
-import PopularArticlesSection from "@/components/help/PopularArticlesSection";
-import FAQSection from "@/components/help/FAQSection";
-import ContactSupportSection from "@/components/help/ContactSupportSection";
-import SearchResults from "@/components/help/SearchResults";
-import { getFeaturedArticles } from "@/data/helpArticles";
-import { faqData } from "@/data/faqData";
+
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import { Helmet } from 'react-helmet-async';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Search, BookOpen, MessageCircle, FileText, HelpCircle, Gamepad2, ArrowRight } from 'lucide-react';
+import { helpArticles } from '@/data/helpArticles';
+import SearchSection from '@/components/help/SearchSection';
+import PopularArticlesSection from '@/components/help/PopularArticlesSection';
+import CategoriesSection from '@/components/help/CategoriesSection';
+import ContactSupportSection from '@/components/help/ContactSupportSection';
 import GoToTop from '@/components/GoToTop';
-import { HelpCircle, Shield, FileText } from 'lucide-react';
 
 const Help = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const popularArticles = helpArticles.slice(0, 6);
   
+  // Create categories data for CategoriesSection
   const categories = [
     {
       name: "Getting Started",
       icon: "🚀",
       articles: [
-        { title: "Creating Your Droplink Account", slug: "creating-account" },
-        { title: "Setting Up Your Profile", slug: "profile-setup" },
-        { title: "Adding Your First Links", slug: "adding-links" },
-        { title: "Understanding the Dashboard", slug: "dashboard-overview" },
-        { title: "Mobile App vs. Web Platform", slug: "app-vs-web" }
-      ]
-    },
-    {
-      name: "Account Management",
-      icon: "👤",
-      articles: [
-        { title: "Changing Your Username", slug: "change-username" },
-        { title: "Managing Email Preferences", slug: "email-preferences" },
-        { title: "Account Security Best Practices", slug: "security-best-practices" },
-        { title: "Deleting Your Account", slug: "delete-account" },
-        { title: "Managing Multiple Profiles", slug: "multiple-profiles" }
-      ]
-    },
-    {
-      name: "Customization",
-      icon: "🎨",
-      articles: [
-        { title: "Choosing a Theme", slug: "choosing-theme" },
-        { title: "Custom Colors and Fonts", slug: "custom-colors-fonts" },
-        { title: "Adding Profile Photos", slug: "profile-photos" },
-        { title: "Link Appearance Options", slug: "link-appearance" },
-        { title: "Custom Domain Setup", slug: "custom-domain" }
+        { title: "How to Connect Pi Wallet for Gaming", slug: "connecting-pi-wallet-gaming" },
+        { title: "Character Setup and Customization", slug: "character-setup" },
+        { title: "Game Controls and Interface", slug: "game-controls" },
+        { title: "Understanding Game Currency", slug: "game-currency" }
       ]
     },
     {
       name: "Pi Network Integration",
-      icon: "π",
+      icon: "💰",
       articles: [
-        { title: "Connecting Your Pi Wallet", slug: "connecting-pi-wallet" },
-        { title: "Setting Up Pi Payments", slug: "pi-payments-setup" },
-        { title: "Pi Transaction Fees", slug: "pi-transaction-fees" },
-        { title: "Pi Tips and Donations", slug: "pi-tips-donations" },
-        { title: "Pi Network Authentication", slug: "pi-network-auth" }
+        { title: "Pi Payments in Games", slug: "pi-payments-games" },
+        { title: "Earning Pi Through Gaming", slug: "earning-pi-gaming" },
+        { title: "Pi Wallet Security", slug: "pi-wallet-security" },
+        { title: "Transaction History", slug: "transaction-history" }
       ]
     },
     {
-      name: "Analytics & Insights",
-      icon: "📊",
+      name: "Gameplay Features",
+      icon: "🎮",
       articles: [
-        { title: "Understanding Your Dashboard", slug: "analytics-guide" },
-        { title: "Traffic Sources", slug: "traffic-sources" },
-        { title: "Link Performance", slug: "link-performance" },
-        { title: "Audience Demographics", slug: "audience-demographics" },
-        { title: "Exporting Analytics Data", slug: "export-analytics" }
-      ]
-    },
-    {
-      name: "Billing & Subscription",
-      icon: "💳",
-      articles: [
-        { title: "Subscription Plans", slug: "subscription-plans" },
-        { title: "Payment Methods", slug: "payment-methods" },
-        { title: "Upgrading or Downgrading", slug: "upgrade-downgrade" },
-        { title: "Cancellation & Refunds", slug: "cancellation-refunds" },
-        { title: "Pi Payment Issues", slug: "pi-payment-issues" }
+        { title: "Multiplayer Gaming", slug: "multiplayer-gaming" },
+        { title: "Achievements and Rewards", slug: "achievements-rewards" },
+        { title: "Leaderboards", slug: "leaderboards" },
+        { title: "Daily Challenges", slug: "daily-challenges" }
       ]
     }
   ];
   
-  const popularArticles = getFeaturedArticles();
-  
-  // Get sample FAQs from multiple categories
-  const faqs = faqData.slice(0, 3).flatMap(category => 
-    category.questions.slice(0, 2)
-  );
-
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
-        <title>Help Center - Droplink Support & Documentation</title>
-        <meta name="description" content="Get comprehensive help with using Droplink, the Pi Network link-in-bio platform. Find tutorials, FAQs, guides, and support for all features." />
-        <meta name="keywords" content="droplink help, pi network support, link in bio tutorial, droplink documentation, pi payments help" />
+        <title>Gaming Help Center - Play with Droplink</title>
+        <meta name="description" content="Get help with Play with Droplink gaming platform. Find guides, FAQs, and support for Pi Network gaming, payments, and account management." />
       </Helmet>
       
-      {/* Navigation Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex justify-end">
-            <nav className="flex items-center gap-6">
-              <Link 
-                to="/help" 
-                className="flex items-center gap-2 text-primary font-medium"
-              >
-                <HelpCircle className="w-4 h-4" />
-                Help
-              </Link>
-              <Link 
-                to="/privacy" 
-                className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors font-medium"
-              >
-                <Shield className="w-4 h-4" />
-                Privacy
-              </Link>
-              <Link 
-                to="/terms" 
-                className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors font-medium"
-              >
-                <FileText className="w-4 h-4" />
-                Terms
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
-      
       <Navbar />
-      <main className="flex-grow">
-        <SearchSection searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-        
-        <div className="container mx-auto px-4 py-8">
-          {searchQuery.trim() ? (
-            <SearchResults query={searchQuery} />
-          ) : (
-            <>
-              <CategoriesSection categories={categories} />
-              <PopularArticlesSection popularArticles={popularArticles} />
-              <FAQSection faqs={faqs} />
-            </>
-          )}
+      
+      <main className="container mx-auto px-4 py-8 pt-24">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <div className="flex justify-center mb-6">
+              <Button variant="outline" asChild>
+                <Link to="/play" className="flex items-center gap-2">
+                  <Gamepad2 className="h-4 w-4" />
+                  Back to Game
+                </Link>
+              </Button>
+            </div>
+            <h1 className="text-4xl font-bold mb-4">Gaming Help Center</h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Get help with gaming, Pi Network integration, payments, and account management
+            </p>
+          </div>
+
+          {/* Search Section */}
+          <SearchSection searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+
+          {/* Quick Access Cards */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Link to="/faqs">
+                <CardContent className="p-6 text-center">
+                  <HelpCircle className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="font-semibold mb-2">Complete FAQ</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Comprehensive gaming questions and answers
+                  </p>
+                  <Badge variant="secondary">50+ Questions</Badge>
+                </CardContent>
+              </Link>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Link to="/contact">
+                <CardContent className="p-6 text-center">
+                  <MessageCircle className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="font-semibold mb-2">Gaming Support</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Get help from our gaming experts
+                  </p>
+                  <Badge variant="secondary">24/7 Available</Badge>
+                </CardContent>
+              </Link>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Link to="/help/article/connecting-pi-wallet-gaming">
+                <CardContent className="p-6 text-center">
+                  <BookOpen className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="font-semibold mb-2">Pi Wallet Guide</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Connect and use Pi for gaming
+                  </p>
+                  <Badge variant="secondary">Step-by-step</Badge>
+                </CardContent>
+              </Link>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Link to="/help/article/character-setup">
+                <CardContent className="p-6 text-center">
+                  <FileText className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="font-semibold mb-2">Character Setup</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Customize your gaming character
+                  </p>
+                  <Badge variant="secondary">Beginner Friendly</Badge>
+                </CardContent>
+              </Link>
+            </Card>
+          </div>
+
+          {/* Popular Articles */}
+          <PopularArticlesSection popularArticles={popularArticles} />
+
+          {/* Categories */}
+          <CategoriesSection categories={categories} />
+
+          {/* Contact Support */}
+          <ContactSupportSection />
         </div>
-        
-        <ContactSupportSection />
-        <CTA />
       </main>
+      
       <GoToTop />
       <Footer />
     </div>
