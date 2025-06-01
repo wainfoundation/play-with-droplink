@@ -1,57 +1,43 @@
 
-import React, { useState, useEffect } from "react";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import SplashScreen from "@/components/SplashScreen";
-import Welcome from "@/pages/Welcome";
-import PlayWithMascot from "@/pages/PlayWithMascot";
-import Help from "@/pages/Help";
-import HelpArticle from "@/pages/HelpArticle";
-import AllFaqs from "@/pages/AllFaqs";
-import Contact from "@/pages/Contact";
-import Privacy from "@/pages/Privacy";
-import Terms from "@/pages/Terms";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from 'react-helmet-async';
+import { UserProvider } from "@/context/UserContext";
+import Index from "./pages/Index";
+import Login from "./pages/Login";
+import LoginPage from "./pages/LoginPage";
+import Signup from "./pages/Signup";
+import SignupPage from "./pages/SignupPage";
+import AuthPage from "./pages/AuthPage";
+import PlayWithMascot from "./pages/PlayWithMascot";
 
 const queryClient = new QueryClient();
 
-function App() {
-  const [currentPage, setCurrentPage] = useState<'splash' | 'welcome' | 'app'>('splash');
-  
-  const handleSplashComplete = () => {
-    setCurrentPage('welcome');
-  };
-
-  const handleWelcomeComplete = () => {
-    setCurrentPage('app');
-  };
-
-  // Show splash screen first
-  if (currentPage === 'splash') {
-    return <SplashScreen onComplete={handleSplashComplete} />;
-  }
-
-  // Show welcome screen next
-  if (currentPage === 'welcome') {
-    return <Welcome onEnter={handleWelcomeComplete} />;
-  }
-
-  // Show main app with routing
-  return (
+const App = () => (
+  <HelmetProvider>
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<PlayWithMascot />} />
-          <Route path="/play" element={<PlayWithMascot />} />
-          <Route path="/help" element={<Help />} />
-          <Route path="/help/article/:slug" element={<HelpArticle />} />
-          <Route path="/faqs" element={<AllFaqs />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-        </Routes>
-      </Router>
+      <UserProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/login-page" element={<LoginPage />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/signup-page" element={<SignupPage />} />
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/play" element={<PlayWithMascot />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </UserProvider>
     </QueryClientProvider>
-  );
-}
+  </HelmetProvider>
+);
 
 export default App;
