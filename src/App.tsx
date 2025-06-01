@@ -1,56 +1,37 @@
-
-import React, { useState, useEffect } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import SplashScreen from "@/components/SplashScreen";
-import Welcome from "@/pages/Welcome";
-import PlayWithMascot from "@/pages/PlayWithMascot";
-import Help from "@/pages/Help";
-import HelpArticle from "@/pages/HelpArticle";
-import AllFaqs from "@/pages/AllFaqs";
-import Contact from "@/pages/Contact";
-import Privacy from "@/pages/Privacy";
-import Terms from "@/pages/Terms";
-
-const queryClient = new QueryClient();
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Index from './pages/Index';
+import Play from './pages/Play';
+import Auth from './pages/Auth';
+import Pricing from './pages/Pricing';
+import Help from './pages/Help';
+import NotFound from './pages/NotFound';
+import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/toaster"
+import { UserProvider } from '@/context/UserContext';
+import { QueryClient } from '@tanstack/react-query';
+import DroplinkRedirect from './pages/DroplinkRedirect';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<'splash' | 'welcome' | 'app'>('splash');
-  
-  const handleSplashComplete = () => {
-    setCurrentPage('welcome');
-  };
-
-  const handleWelcomeComplete = () => {
-    setCurrentPage('app');
-  };
-
-  // Show splash screen first
-  if (currentPage === 'splash') {
-    return <SplashScreen onComplete={handleSplashComplete} />;
-  }
-
-  // Show welcome screen next
-  if (currentPage === 'welcome') {
-    return <Welcome onEnter={handleWelcomeComplete} />;
-  }
-
-  // Show main app with routing
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<PlayWithMascot />} />
-          <Route path="/play" element={<PlayWithMascot />} />
-          <Route path="/help" element={<Help />} />
-          <Route path="/help/article/:slug" element={<HelpArticle />} />
-          <Route path="/faqs" element={<AllFaqs />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-        </Routes>
-      </Router>
-    </QueryClientProvider>
+    <BrowserRouter>
+      <QueryClient>
+        <UserProvider>
+          <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/play" element={<Play />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="*" element={<NotFound />} />
+              <Route path="/droplink/:id" element={<DroplinkRedirect />} />
+            </Routes>
+            <Toaster />
+          </ThemeProvider>
+        </UserProvider>
+      </QueryClient>
+    </BrowserRouter>
   );
 }
 
