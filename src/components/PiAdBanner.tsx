@@ -2,18 +2,20 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Pi, Eye, Gift } from "lucide-react";
+import { Pi, Eye, Gift, X } from "lucide-react";
 import { isRunningInPiBrowser, showInterstitialAdAdvanced } from "@/utils/pi-sdk";
 import { toast } from "@/hooks/use-toast";
 
 interface PiAdBannerProps {
   onAdComplete?: () => void;
+  onClose?: () => void;
   rewardAmount?: number;
   className?: string;
 }
 
 const PiAdBanner = ({ 
   onAdComplete, 
+  onClose,
   rewardAmount = 0.1, 
   className = "" 
 }: PiAdBannerProps) => {
@@ -80,7 +82,17 @@ const PiAdBanner = ({
   if (!isPiBrowser) {
     return (
       <Card className={`border-orange-200 bg-orange-50 ${className}`}>
-        <CardContent className="p-4 text-center">
+        <CardContent className="p-4 text-center relative">
+          {onClose && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="absolute top-2 right-2 h-6 w-6 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
           <div className="flex items-center justify-center gap-2 text-orange-600 mb-2">
             <Pi className="h-5 w-5" />
             <span className="font-medium">Pi Browser Required</span>
@@ -103,7 +115,17 @@ const PiAdBanner = ({
 
   return (
     <Card className={`border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5 ${className}`}>
-      <CardContent className="p-4">
+      <CardContent className="p-4 relative">
+        {onClose && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="absolute top-2 right-2 h-6 w-6 p-0"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        )}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full">
