@@ -12,7 +12,21 @@ import PetCareGame from '@/components/games/PetCareGame';
 import CharacterRenderer from '@/components/welcome/CharacterRenderer';
 import { characters } from '@/components/welcome/characterData';
 
+// Reorder games array to put pet-care first
 const games = [
+  {
+    id: 'pet-care',
+    name: 'My Pet Droplet',
+    category: 'pet-care',
+    difficulty: 'easy',
+    description: 'Take care of your adorable pet droplet! Feed, clean, play, and watch it grow.',
+    emoji: '🐾',
+    color: 'from-pink-400 to-purple-600',
+    features: ['Pet Care', 'Pi Shop', 'Mini Games', 'Leveling'],
+    estimatedTime: '∞',
+    isNew: true,
+    isFeatured: true
+  },
   {
     id: 'block-connect',
     name: 'Block Connect',
@@ -96,18 +110,6 @@ const games = [
     features: ['Infinite', 'Running', 'Obstacles'],
     estimatedTime: '∞',
     isNew: false
-  },
-  {
-    id: 'pet-care',
-    name: 'My Pet Droplet',
-    category: 'pet-care',
-    difficulty: 'easy',
-    description: 'Take care of your adorable pet droplet! Feed, clean, play, and watch it grow.',
-    emoji: '🐾',
-    color: 'from-pink-400 to-purple-600',
-    features: ['Pet Care', 'Pi Shop', 'Mini Games', 'Leveling'],
-    estimatedTime: '∞',
-    isNew: true
   }
 ];
 
@@ -125,6 +127,19 @@ const PlayWithMascot: React.FC<PlayWithMascotProps> = () => {
   });
 
   const isMobile = useIsMobile();
+
+  // Load selected character from localStorage on component mount
+  useEffect(() => {
+    const savedCharacter = localStorage.getItem('selectedCharacter');
+    if (savedCharacter) {
+      try {
+        const parsedCharacter = JSON.parse(savedCharacter);
+        setSelectedCharacter(parsedCharacter);
+      } catch (error) {
+        console.log('Error parsing saved character, using default');
+      }
+    }
+  }, []);
 
   const handleGameSelect = (game: any) => {
     if (game.id === 'pet-care') {
@@ -160,7 +175,7 @@ const PlayWithMascot: React.FC<PlayWithMascotProps> = () => {
           <title>My Pet Droplet - Play with Droplink</title>
           <meta name="description" content="Take care of your adorable pet droplet in this cute pet care game!" />
         </Helmet>
-        <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 p-4">
+        <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 p-2 md:p-4">
           <PetCareGame onBack={handleBackToGames} />
         </div>
       </>
@@ -174,7 +189,7 @@ const PlayWithMascot: React.FC<PlayWithMascotProps> = () => {
           <title>{selectedGame.name} - Play with Droplink</title>
           <meta name="description" content={`Play ${selectedGame.name} - ${selectedGame.description}`} />
         </Helmet>
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-2 md:p-4">
           <GameEngine 
             game={selectedGame} 
             onBack={handleBackToGames}
@@ -193,61 +208,96 @@ const PlayWithMascot: React.FC<PlayWithMascotProps> = () => {
       </Helmet>
       
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-        {/* Header */}
-        <div className="container mx-auto px-4 py-6">
+        {/* Mobile-optimized Header */}
+        <div className="container mx-auto px-2 md:px-4 py-4 md:py-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
+            className="text-center mb-6 md:mb-8"
           >
-            <div className="flex items-center justify-center gap-4 mb-4">
-              <CharacterRenderer character={selectedCharacter} size={80} />
+            <div className="flex items-center justify-center gap-2 md:gap-4 mb-4">
+              <CharacterRenderer character={selectedCharacter} size={isMobile ? 60 : 80} />
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                  Play with Droplink
+                <h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  Play with {selectedCharacter.name}
                 </h1>
-                <p className="text-gray-600 mt-2">Choose your adventure and have fun!</p>
+                <p className="text-gray-600 mt-1 md:mt-2 text-sm md:text-base">Choose your adventure and have fun!</p>
               </div>
             </div>
           </motion.div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {/* Featured Pet Care Card - Mobile First */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mb-6 md:mb-8"
+          >
+            <Card className="bg-gradient-to-r from-pink-100 to-purple-100 border-pink-200 overflow-hidden">
+              <CardContent className="p-4 md:p-6">
+                <div className="flex flex-col md:flex-row items-center gap-4">
+                  <div className="text-4xl md:text-6xl">🐾</div>
+                  <div className="flex-1 text-center md:text-left">
+                    <h3 className="text-lg md:text-xl font-bold mb-2">My Pet Droplet!</h3>
+                    <p className="text-gray-600 mb-3 text-sm md:text-base">
+                      Experience the joy of pet care with your very own adorable droplet companion! 
+                      Feed, clean, play, and watch your pet grow with love and care.
+                    </p>
+                    <div className="flex flex-wrap justify-center md:justify-start gap-2">
+                      <Badge className="bg-pink-500 text-xs">Pet Care</Badge>
+                      <Badge className="bg-purple-500 text-xs">Pi Shop</Badge>
+                      <Badge className="bg-blue-500 text-xs">Mini Games</Badge>
+                    </div>
+                  </div>
+                  <Button 
+                    size={isMobile ? "default" : "lg"}
+                    onClick={() => handleGameSelect({ id: 'pet-care' })}
+                    className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 w-full md:w-auto"
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Start Caring
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Stats Cards - Mobile Optimized */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-6 md:mb-8">
             <Card>
-              <CardContent className="p-4 text-center">
-                <Gamepad2 className="w-8 h-8 mx-auto mb-2 text-blue-500" />
-                <div className="font-bold text-xl">{gameStats.gamesPlayed}</div>
-                <div className="text-sm text-gray-600">Games Played</div>
+              <CardContent className="p-3 md:p-4 text-center">
+                <Gamepad2 className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2 text-blue-500" />
+                <div className="font-bold text-lg md:text-xl">{gameStats.gamesPlayed}</div>
+                <div className="text-xs md:text-sm text-gray-600">Games Played</div>
               </CardContent>
             </Card>
             
             <Card>
-              <CardContent className="p-4 text-center">
-                <Trophy className="w-8 h-8 mx-auto mb-2 text-yellow-500" />
-                <div className="font-bold text-xl">{gameStats.highScore}</div>
-                <div className="text-sm text-gray-600">High Score</div>
+              <CardContent className="p-3 md:p-4 text-center">
+                <Trophy className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2 text-yellow-500" />
+                <div className="font-bold text-lg md:text-xl">{gameStats.highScore}</div>
+                <div className="text-xs md:text-sm text-gray-600">High Score</div>
               </CardContent>
             </Card>
             
             <Card>
-              <CardContent className="p-4 text-center">
-                <Star className="w-8 h-8 mx-auto mb-2 text-purple-500" />
-                <div className="font-bold text-xl">{gameStats.totalScore}</div>
-                <div className="text-sm text-gray-600">Total Score</div>
+              <CardContent className="p-3 md:p-4 text-center">
+                <Star className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2 text-purple-500" />
+                <div className="font-bold text-lg md:text-xl">{gameStats.totalScore}</div>
+                <div className="text-xs md:text-sm text-gray-600">Total Score</div>
               </CardContent>
             </Card>
             
             <Card>
-              <CardContent className="p-4 text-center">
-                <Clock className="w-8 h-8 mx-auto mb-2 text-green-500" />
-                <div className="font-bold text-xl">{Math.floor(gameStats.timeSpent / 60)}m</div>
-                <div className="text-sm text-gray-600">Time Played</div>
+              <CardContent className="p-3 md:p-4 text-center">
+                <Clock className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2 text-green-500" />
+                <div className="font-bold text-lg md:text-xl">{Math.floor(gameStats.timeSpent / 60)}m</div>
+                <div className="text-xs md:text-sm text-gray-600">Time Played</div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Games Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Games Grid - Mobile First */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {games.map((game, index) => (
               <motion.div
                 key={game.id}
@@ -255,22 +305,29 @@ const PlayWithMascot: React.FC<PlayWithMascotProps> = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="h-full cursor-pointer hover:shadow-lg transition-all duration-300 group">
+                <Card className={`h-full cursor-pointer hover:shadow-lg transition-all duration-300 group ${
+                  game.isFeatured ? 'ring-2 ring-pink-200' : ''
+                }`}>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <div className={`text-4xl p-3 rounded-lg bg-gradient-to-r ${game.color}`}>
+                      <div className={`text-3xl md:text-4xl p-2 md:p-3 rounded-lg bg-gradient-to-r ${game.color}`}>
                         {game.emoji}
                       </div>
                       <div className="flex flex-col items-end gap-1">
                         {game.isNew && (
-                          <Badge variant="secondary" className="bg-green-100 text-green-800">
+                          <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
                             NEW
                           </Badge>
                         )}
-                        <Badge variant="outline">{game.category}</Badge>
+                        {game.isFeatured && (
+                          <Badge className="bg-pink-500 text-xs">
+                            FEATURED
+                          </Badge>
+                        )}
+                        <Badge variant="outline" className="text-xs">{game.category}</Badge>
                       </div>
                     </div>
-                    <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                    <CardTitle className="text-lg md:text-xl group-hover:text-primary transition-colors">
                       {game.name}
                     </CardTitle>
                   </CardHeader>
@@ -292,13 +349,13 @@ const PlayWithMascot: React.FC<PlayWithMascotProps> = () => {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <Clock className="w-4 h-4" />
-                          <span>{game.estimatedTime}</span>
+                          <span className="text-xs">{game.estimatedTime}</span>
                         </div>
                         <div className="flex items-center gap-1">
                           {[...Array(3)].map((_, i) => (
                             <Star
                               key={i}
-                              className={`w-4 h-4 ${
+                              className={`w-3 h-3 md:w-4 md:h-4 ${
                                 i < (game.difficulty === 'easy' ? 1 : game.difficulty === 'medium' ? 2 : 3)
                                   ? 'text-yellow-400 fill-current'
                                   : 'text-gray-300'
@@ -309,7 +366,7 @@ const PlayWithMascot: React.FC<PlayWithMascotProps> = () => {
                       </div>
                       
                       <Button 
-                        className="w-full group-hover:scale-105 transition-transform"
+                        className="w-full group-hover:scale-105 transition-transform text-sm"
                         onClick={() => handleGameSelect(game)}
                       >
                         {game.id === 'pet-care' ? (
@@ -330,42 +387,6 @@ const PlayWithMascot: React.FC<PlayWithMascotProps> = () => {
               </motion.div>
             ))}
           </div>
-
-          {/* Special Pet Care Highlight */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.5 }}
-            className="mt-8"
-          >
-            <Card className="bg-gradient-to-r from-pink-100 to-purple-100 border-pink-200">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="text-6xl">🐾</div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold mb-2">New: My Pet Droplet!</h3>
-                    <p className="text-gray-600 mb-3">
-                      Experience the joy of pet care with your very own adorable droplet companion! 
-                      Feed, clean, play, and watch your pet grow with love and care.
-                    </p>
-                    <div className="flex gap-2">
-                      <Badge className="bg-pink-500">Pet Care</Badge>
-                      <Badge className="bg-purple-500">Pi Shop</Badge>
-                      <Badge className="bg-blue-500">Mini Games</Badge>
-                    </div>
-                  </div>
-                  <Button 
-                    size="lg"
-                    onClick={() => handleGameSelect({ id: 'pet-care' })}
-                    className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Start Caring
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
         </div>
       </div>
     </>

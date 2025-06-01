@@ -572,6 +572,33 @@ export type Database = {
           },
         ]
       }
+      pet_actions: {
+        Row: {
+          action_type: string
+          created_at: string
+          experience_gained: number | null
+          id: string
+          pi_coins_spent: number | null
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          experience_gained?: number | null
+          id?: string
+          pi_coins_spent?: number | null
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          experience_gained?: number | null
+          id?: string
+          pi_coins_spent?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       pi_payments: {
         Row: {
           amount: number
@@ -757,6 +784,60 @@ export type Database = {
           stats?: Json | null
           tutorial_completed?: boolean | null
           unlocked_rooms?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_pet_data: {
+        Row: {
+          cleanliness: number
+          created_at: string
+          current_mood: string
+          energy: number
+          experience: number
+          experience_to_next: number
+          happiness: number
+          hunger: number
+          id: string
+          last_played: string | null
+          level: number
+          pet_name: string
+          pi_coins: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cleanliness?: number
+          created_at?: string
+          current_mood?: string
+          energy?: number
+          experience?: number
+          experience_to_next?: number
+          happiness?: number
+          hunger?: number
+          id?: string
+          last_played?: string | null
+          level?: number
+          pet_name?: string
+          pi_coins?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cleanliness?: number
+          created_at?: string
+          current_mood?: string
+          energy?: number
+          experience?: number
+          experience_to_next?: number
+          happiness?: number
+          hunger?: number
+          id?: string
+          last_played?: string | null
+          level?: number
+          pet_name?: string
+          pi_coins?: number
           updated_at?: string
           user_id?: string
         }
