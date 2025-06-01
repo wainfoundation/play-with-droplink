@@ -87,9 +87,9 @@ const Play = () => {
         <meta name="description" content="Play interactive games with Droplink! Choose from puzzle games, action games, trivia, and creative activities." />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
         {/* Header */}
-        <div className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-10">
+        <div className="bg-white shadow-sm border-b sticky top-0 z-10">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <Link 
@@ -117,36 +117,38 @@ const Play = () => {
           </div>
 
           {/* Game Categories */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
             {gameCategories.map((category) => (
-              <Card key={category.id} className="transition-all duration-200 hover:shadow-lg border-2 hover:border-blue-200">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-xl">
-                    <category.icon className="w-6 h-6 text-blue-600" />
+              <Card key={category.id} className="bg-white shadow-lg transition-all duration-200 hover:shadow-xl border-2 hover:border-blue-200">
+                <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50">
+                  <CardTitle className="flex items-center gap-3 text-xl text-gray-800">
+                    <div className={`p-2 rounded-lg ${category.color}`}>
+                      <category.icon className="w-6 h-6 text-white" />
+                    </div>
                     {category.name}
                   </CardTitle>
                   <CardDescription className="text-gray-600">
                     Choose from {category.games.length} {category.name.toLowerCase()} games
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
+                <CardContent className="p-6 bg-white">
+                  <div className="space-y-4">
                     {category.games.map((game) => (
                       <div
                         key={game.id}
-                        className={`flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-all cursor-pointer ${
-                          selectedGame === game.id ? 'bg-blue-50 border-blue-300' : 'border-gray-200'
+                        className={`flex items-center justify-between p-4 border-2 rounded-xl hover:bg-gray-50 transition-all cursor-pointer ${
+                          selectedGame === game.id ? 'bg-blue-50 border-blue-300 shadow-md' : 'border-gray-200 hover:border-gray-300'
                         }`}
                         onClick={() => handleGameClick(game.id, game.name)}
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="text-2xl">🎮</div>
+                        <div className="flex items-center gap-4">
+                          <div className="text-3xl">🎮</div>
                           <div>
-                            <h4 className="font-medium text-gray-900">{game.name}</h4>
+                            <h4 className="font-semibold text-gray-900 mb-1">{game.name}</h4>
                             <p className="text-sm text-gray-600 mb-2">{game.description}</p>
                             <Badge 
                               variant="outline" 
-                              className={getDifficultyColor(game.difficulty)}
+                              className={`${getDifficultyColor(game.difficulty)} text-xs font-medium`}
                             >
                               {game.difficulty}
                             </Badge>
@@ -156,16 +158,16 @@ const Play = () => {
                           variant={selectedGame === game.id ? "default" : "outline"}
                           size="sm"
                           disabled={selectedGame === game.id}
-                          className="min-w-[80px]"
+                          className="min-w-[90px] shadow-sm"
                         >
                           {selectedGame === game.id ? (
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-2">
                               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                               Loading
                             </div>
                           ) : (
                             <>
-                              <PlayIcon className="w-4 h-4 mr-1" />
+                              <PlayIcon className="w-4 h-4 mr-2" />
                               Play
                             </>
                           )}
@@ -180,18 +182,18 @@ const Play = () => {
         </div>
 
         {/* Footer */}
-        <footer className="mt-16 border-t bg-white/50 backdrop-blur-sm">
+        <footer className="mt-16 border-t bg-white shadow-sm">
           <div className="container mx-auto px-4 py-8">
             <div className="flex flex-col md:flex-row justify-center items-center gap-6">
               <Link 
                 to="/privacy" 
-                className="text-gray-600 hover:text-blue-600 transition-colors"
+                className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
               >
                 Privacy Policy
               </Link>
               <Link 
                 to="/terms" 
-                className="text-gray-600 hover:text-blue-600 transition-colors"
+                className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
               >
                 Terms of Service
               </Link>
