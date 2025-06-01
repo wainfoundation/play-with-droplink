@@ -1,85 +1,177 @@
 
-# Droplink - Pi Network Application
+# 🎮 Play with Droplink
 
-## Overview
+**Play with Droplink** is a Pi Network-powered virtual gaming world where users can play 50+ interactive games, care for a digital mascot (like Pou), and earn or spend **Droplink Coins** for fun cosmetic upgrades, game access, and in-game items. Built into the Pi ecosystem, users can watch Pi Ads or pay with Pi to unlock deeper experiences.
 
-Droplink is a comprehensive link-in-bio platform built for the Pi Network ecosystem. It allows users to create beautiful, customizable profile pages with multiple links that can be shared through a single URL, making it perfect for Pi Network pioneers who want to share their content, products, or services.
+---
 
-## Features
+## 🌟 Highlights - My Pet Droplet Game! 🐾
+- 🧩 50+ Games across 4 categories
+- 🐾 Mascot system like Pou or Talking Tom
+- 🧢 Accessory shop for upgrades & outfits
+- 🪙 Earn/Spend Droplink Coins (via Pi Ads or Pi Payments)
+- 💳 Premium subscription (10 Pi/month)
+- 🕹️ One-time paid mini-games (using Droplink Coins)
 
-- **Multiple Links**: Add unlimited links to your profile
-- **Pi Network Integration**: Native Pi authentication and payment support
-- **Link Analytics**: Track clicks and visitor data
-- **Custom Themes**: Personalize your profile with custom themes and styles
-- **Subscription Plans**: Free, Starter, Pro, and Premium tiers with increasing capabilities
-- **Pi Payments**: Accept Pi payments for products and services
-- **Profile QR Code**: Generate QR codes for offline traffic
+---
 
-## Pi Network Integration
+## 🧠 Game Categories
 
-This application features full Pi Network integration:
+### 🧩 Puzzle & Logic
+- Pi Wordle
+- Logic Flow
+- Memory Match
+- Word Guess
+- Match 3
+- Tile Flipper
 
-### Authentication
+### 🚀 Action & Reflex
+- Droplink Runner
+- Tap the Drop
+- Jump & Catch
+- Pi Dash
+- Avoid the Spike
 
-Users can authenticate with Pi Network using the Pi Browser. The authentication flow is handled by the Pi SDK and allows users to authenticate with their Pi Network accounts.
+### 🧠 Trivia & Quiz
+- Emoji Quiz
+- Typing Speed Test
+- Fact or Fake
+- Pi Trivia Tower
 
-### Payments
+### 🎨 Creative & Fun
+- Droplink Dress Up
+- Paint Pi
+- Mascot Builder
+- Fortune Teller
 
-The application supports Pi payments for subscriptions and products. The payment flow is integrated with the Pi SDK and allows users to make payments using Pi cryptocurrency.
+---
 
-## Getting Started
+## 🔁 Infinite Replay Games
 
-### Prerequisites
+Games with increasing difficulty and leaderboard support:
+- Infinite Quiz
+- Endless Memory Match
+- Pattern Repeat
+- Pi Galaxy Shooter
+- Typing Chain
 
-- Node.js & npm - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-- Pi Browser (for testing Pi Network features)
+---
 
-### Local Development
+## 🐾 Droplink Mascot
 
-```sh
-# Step 1: Clone the repository
-git clone https://github.com/ReimagineTruth/drop-link-v2.git
+Take care of your personal Droplink character like a virtual pet!
 
-# Step 2: Navigate to the project directory
-cd droplink
+- Feed, dress, clean, and interact with the mascot
+- Decorate its room with accessories
+- Use Droplink Coins to enhance appearance and room themes
+- Travel from mascot room to game lobby, shop, and challenges
 
-# Step 3: Install the necessary dependencies
-npm install
+---
 
-# Step 4: Start the development server
-npm run dev
-```
+## 🪙 Droplink Coin System
 
-### Pi Network SDK Integration
+**Droplink Coin** is the in-game currency used to unlock paid features, cosmetic items, and special content.
 
-The application uses the Pi Network SDK for authentication and payments. Key integration points:
+### 🎥 How to Earn Coins
+- **1 Pi Ad watched = 1 Coin**
+- **1 Pi payment = 10 Coins**
+- **Daily bonuses** for premium users
 
-1. **SDK Initialization**: The Pi SDK is initialized in the application with proper sandbox/production mode detection.
-2. **Authentication**: Users can sign in using their Pi Network accounts.
-3. **Payments**: The application supports Pi payments for subscriptions and features.
+### 🛍️ What Coins Can Be Used For
+- Buy accessories (glasses, hats, outfits)
+- Unlock character moods, emotes, voices
+- Decorate mascot rooms (furniture, wallpapers)
+- Buy entry to special one-time paid games
+- Purchase background themes or animations
 
-### Environment Variables
+> 🛑 **Note**: Droplink Coin is **not a cryptocurrency**. It is a virtual in-game currency used **only** within the Play with Droplink platform.
 
-Create a `.env` file with the following variables:
+---
 
-```
-VITE_PI_API_KEY=your_pi_api_key
-VITE_PI_SANDBOX=true  # Set to false for production
-```
+## 💎 Premium Subscription – 10 Pi/month
 
-## Deployment
+Unlock the full experience:
 
-1. Build the project:
-```sh
-npm run build
-```
+- Access all 50+ games
+- Remove Pi AdNetwork (100% ad-free)
+- Play all difficulty levels (Easy → Extreme)
+- Early access to new games and features
+- Premium badge and exclusive leaderboard tier
+- Daily Droplink Coin bonuses
 
-2. Deploy using your preferred hosting service or directly through Lovable by clicking on Share -> Publish.
+**Subscription Flow:**
+```js
+Pi.createPayment({
+  amount: 10,
+  memo: "Droplink Premium Game Pass",
+  metadata: { type: "subscription" }
+});
+````
 
-## License
+---
 
-This project is licensed under the PiOS License - see the LICENSE file for details.
+## 🕹️ Paid One-Time Games
 
-## Support
+These special games are **unlocked forever** once purchased using Droplink Coins.
 
-For support or questions, contact us at mrwainorganization@gmail.com
+| Game Name             | Price (Coins) | Equivalent in Pi | Description                      |
+| --------------------- | ------------- | ---------------- | -------------------------------- |
+| Pi Chess              | 50 Coins      | 5 Pi             | Classic chess with Pi style      |
+| Droplink Dash Extreme | 75 Coins      | 7.5 Pi           | Hardcore reflex-based runner     |
+| Puzzle Builder Pro    | 60 Coins      | 6 Pi             | Design, solve, and share puzzles |
+| Build-a-Mascot        | 80 Coins      | 8 Pi             | Deep character customization     |
+| Pi Boss Challenge     | 100 Coins     | 10 Pi            | Elite battle challenge           |
+| Ultimate Quiz Battle  | 90 Coins      | 9 Pi             | Test your trivia under pressure  |
+
+---
+
+## 🧭 App Structure & Workflow
+
+* **Splash Page**: 🎮 Play with Droplink branding
+* **Welcome Page**: Introduction, tutorial, and entry to playhouse
+* **Playhouse**: Virtual mascot room, game zone access, coin wallet
+* **Game Lobby**: Filter and select from 50+ games
+* **Accessory Store**: Buy and equip items using Droplink Coins
+* **Coin Wallet**: View and earn coins via ads or Pi
+* **Subscription Page**: Upgrade to Premium
+* **Paid Games Page**: Buy one-time access with Droplink Coins
+* **Profile Page**: Customize avatar, view progress
+* **Leaderboard & Achievements**: Compete and rank with other players
+
+---
+
+## 🔐 Technology & Integration
+
+* **Frontend**: Lovable visual builder
+* **Auth**: `Pi.authenticate()`
+* **Ads**: Pi AdNetwork integration
+* **Payments**: `Pi.createPayment()` for coin and subscription purchase
+* **Backend**: Supabase or Firebase for user data and coin balance
+* **Domain**: `https://play.droplink.space`
+
+---
+
+## ⚠️ Legal & Usage Notice
+
+* **Droplink Coin is not a tradable currency**.
+* It is solely for in-app purchases, cosmetic upgrades, and game access.
+* All Pi transactions comply with Pi Network developer policies.
+* No real-world monetary exchange or crypto trading allowed within the app.
+
+---
+
+## 📍 Project Credits
+
+* Developed under the **Droplink Ecosystem**
+* Powered by the **Pi Network** infrastructure
+* Created using **Lovable**, Pi SDK, and Supabase
+
+---
+
+## 📣 Contact
+
+For inquiries, partnership, or feedback:
+📧 Email: [support@droplink.space](mailto:support@laydroplink.space)
+🌐 Site: [https://playdroplink.space](https://playdroplink.space)
+
+
