@@ -27,7 +27,7 @@ export class DroplinkService {
       const link = `${baseUrl}/droplink/${uniqueId}`;
 
       const { error } = await supabase
-        .from('droplinks' as any)
+        .from('droplinks')
         .insert({
           user_id: data.userId,
           type,
@@ -70,7 +70,7 @@ export class DroplinkService {
   } | null> {
     try {
       const { data, error } = await supabase
-        .from('droplinks' as any)
+        .from('droplinks')
         .select('*')
         .eq('unique_id', uniqueId)
         .single();
@@ -101,7 +101,9 @@ export class DroplinkService {
   private static async rewardInviter(userId: string): Promise<void> {
     try {
       // Add a life to the inviter's account
-      const { error } = await supabase.rpc('add_user_life', { user_id: userId });
+      const { error } = await supabase.rpc('add_user_life', { 
+        user_id: userId as any 
+      });
       if (error) throw error;
 
       toast({

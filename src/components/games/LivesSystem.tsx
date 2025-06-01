@@ -42,13 +42,13 @@ const LivesSystem: React.FC<LivesSystemProps> = ({ onLivesChange }) => {
 
       if (error) throw error;
 
-      const currentLives = (data as any)?.lives || 5;
+      const currentLives = data?.lives || 5;
       setLives(currentLives);
       onLivesChange?.(currentLives);
 
       // Calculate next life time if not at max
       if (currentLives < 5) {
-        const lastRegen = new Date((data as any)?.last_life_regen || Date.now());
+        const lastRegen = new Date(data?.last_life_regen || Date.now());
         const nextLife = new Date(lastRegen.getTime() + 30 * 60 * 1000); // 30 minutes
         setNextLifeTime(nextLife);
       }
@@ -77,7 +77,9 @@ const LivesSystem: React.FC<LivesSystemProps> = ({ onLivesChange }) => {
     if (!user?.id || lives >= 5) return;
 
     try {
-      const { error } = await supabase.rpc('regenerate_life', { user_id: user.id });
+      const { error } = await supabase.rpc('regenerate_life', { 
+        user_id: user.id as any 
+      });
       if (error) throw error;
 
       const newLives = Math.min(lives + 1, 5);
@@ -106,7 +108,9 @@ const LivesSystem: React.FC<LivesSystemProps> = ({ onLivesChange }) => {
 
     try {
       // Simulate ad watching for now
-      const { error } = await supabase.rpc('add_user_life', { user_id: user.id });
+      const { error } = await supabase.rpc('add_user_life', { 
+        user_id: user.id as any 
+      });
       if (error) throw error;
 
       const newLives = Math.min(lives + 1, 5);
@@ -132,7 +136,7 @@ const LivesSystem: React.FC<LivesSystemProps> = ({ onLivesChange }) => {
 
     try {
       const { error } = await supabase.rpc('use_user_lives', { 
-        user_id: user.id, 
+        user_id: user.id as any, 
         amount 
       });
       if (error) throw error;
