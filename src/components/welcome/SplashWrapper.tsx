@@ -15,6 +15,7 @@ const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
   const [mascotVisible, setMascotVisible] = useState(false);
   const [welcomeTextVisible, setWelcomeTextVisible] = useState(false);
   const [buttonsVisible, setButtonsVisible] = useState(false);
+  const [selectedCharacter, setSelectedCharacter] = useState('droplet-blue');
 
   // Check if user has already completed the welcome flow
   useEffect(() => {
@@ -43,8 +44,19 @@ const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
     setCurrentStep('character');
   };
 
-  const handleCharacterSelected = () => {
+  const handleCharacterSelect = (characterId: string) => {
+    setSelectedCharacter(characterId);
+  };
+
+  const handleCharacterConfirm = () => {
+    // Save selected character to localStorage
+    const selectedCharacterData = { id: selectedCharacter };
+    localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacterData));
     setCurrentStep('tutorial');
+  };
+
+  const handleCharacterBack = () => {
+    setCurrentStep('welcome');
   };
 
   const handleTutorialComplete = () => {
@@ -80,8 +92,10 @@ const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
   if (currentStep === 'character') {
     return (
       <CharacterSelection
-        onCharacterSelected={handleCharacterSelected}
-        onSkip={handleSkipWelcome}
+        selectedCharacter={selectedCharacter}
+        onCharacterSelect={handleCharacterSelect}
+        onBack={handleCharacterBack}
+        onConfirm={handleCharacterConfirm}
       />
     );
   }
