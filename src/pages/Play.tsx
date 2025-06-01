@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { 
   PuzzleIcon,
@@ -10,9 +10,42 @@ import {
 import PlayHeader from '@/components/play/PlayHeader';
 import PlayFooter from '@/components/play/PlayFooter';
 import GameCategoryCard from '@/components/play/GameCategoryCard';
+import CharacterCompanion from '@/components/play/CharacterCompanion';
 
 const Play = () => {
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
+  const [selectedCharacter, setSelectedCharacter] = useState<any>(null);
+
+  useEffect(() => {
+    // Load selected character from localStorage
+    const savedCharacter = localStorage.getItem('selectedCharacter');
+    if (savedCharacter) {
+      try {
+        setSelectedCharacter(JSON.parse(savedCharacter));
+      } catch (error) {
+        console.error('Error parsing saved character:', error);
+        // Set default character if parsing fails
+        setSelectedCharacter({
+          id: 'droplet-blue-happy',
+          name: 'Droplink',
+          gender: 'male',
+          color: '#00aaff',
+          mood: 'happy',
+          personality: 'Cheerful and optimistic'
+        });
+      }
+    } else {
+      // Set default character if none selected
+      setSelectedCharacter({
+        id: 'droplet-blue-happy',
+        name: 'Droplink',
+        gender: 'male',
+        color: '#00aaff',
+        mood: 'happy',
+        personality: 'Cheerful and optimistic'
+      });
+    }
+  }, []);
 
   const gameCategories = [
     {
@@ -68,35 +101,61 @@ const Play = () => {
     }, 1000);
   };
 
+  if (!selectedCharacter) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-lg text-gray-600">Loading your gaming companion...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <Helmet>
-        <title>Play Games - Droplink Gaming</title>
-        <meta name="description" content="Play interactive games with Droplink! Choose from puzzle games, action games, trivia, and creative activities." />
+        <title>Play Games with {selectedCharacter.name} - Droplink Gaming</title>
+        <meta name="description" content={`Play interactive games with your companion ${selectedCharacter.name}! Choose from puzzle games, action games, trivia, and creative activities.`} />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
         <PlayHeader />
 
-        {/* Main Content */}
+        {/* Hero Section with Character */}
         <div className="container mx-auto px-4 py-8">
           <div className="text-center mb-8">
-            <h2 className="text-4xl font-bold mb-4 text-gray-900">Choose Your Game</h2>
-            <p className="text-lg text-gray-600">
-              Select from our collection of interactive games and activities
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Gaming with {selectedCharacter.name}
+            </h2>
+            <p className="text-lg text-gray-600 mb-8">
+              Your gaming companion is ready for adventure!
             </p>
           </div>
 
-          {/* Game Categories */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {gameCategories.map((category) => (
-              <GameCategoryCard
-                key={category.id}
-                category={category}
+          {/* Character and Games Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+            {/* Character Companion Sidebar */}
+            <div className="lg:col-span-1">
+              <CharacterCompanion 
+                character={selectedCharacter}
                 selectedGame={selectedGame}
-                onGameClick={handleGameClick}
               />
-            ))}
+            </div>
+
+            {/* Game Categories */}
+            <div className="lg:col-span-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {gameCategories.map((category) => (
+                  <GameCategoryCard
+                    key={category.id}
+                    category={category}
+                    selectedGame={selectedGame}
+                    onGameClick={handleGameClick}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 

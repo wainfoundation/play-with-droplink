@@ -31,19 +31,19 @@ const GameCategoryCard: React.FC<GameCategoryCardProps> = ({
   onGameClick 
 }) => {
   return (
-    <Card className="bg-white shadow-lg transition-all duration-200 hover:shadow-xl border-2 hover:border-blue-200">
-      <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50">
+    <Card className="bg-white/80 backdrop-blur-sm shadow-lg transition-all duration-300 hover:shadow-xl border-2 hover:border-blue-300 h-fit">
+      <CardHeader className="bg-gradient-to-r from-gray-50/80 to-blue-50/80 backdrop-blur-sm">
         <CardTitle className="flex items-center gap-3 text-xl text-gray-800">
-          <div className={`p-2 rounded-lg ${category.color}`}>
+          <div className={`p-3 rounded-xl ${category.color} shadow-lg`}>
             <category.icon className="w-6 h-6 text-white" />
           </div>
           {category.name}
         </CardTitle>
         <CardDescription className="text-gray-600">
-          Choose from {category.games.length} {category.name.toLowerCase()} games
+          Choose from {category.games.length} exciting {category.name.toLowerCase()} games
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-6 bg-white">
+      <CardContent className="p-6 bg-white/50 backdrop-blur-sm">
         <div className="space-y-4">
           {category.games.map((game) => (
             <GameItem
