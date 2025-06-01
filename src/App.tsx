@@ -10,7 +10,6 @@ import Terms from './pages/Terms';
 import NotFound from './pages/NotFound';
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
-import { UserProvider } from '@/context/UserContext';
 
 const queryClient = new QueryClient();
 
@@ -19,18 +18,16 @@ function App() {
     <HelmetProvider>
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>
-          <UserProvider>
-            <ThemeProvider defaultTheme="light" storageKey="gaming-app-theme">
-              <Routes>
-                <Route path="/" element={<Welcome />} />
-                <Route path="/play" element={<Play />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <Toaster />
-            </ThemeProvider>
-          </UserProvider>
+          <ThemeProvider defaultTheme="light" storageKey="gaming-app-theme">
+            <Routes>
+              <Route path="/" element={<Welcome />} />
+              <Route path="/play" element={<Play />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Toaster />
+          </ThemeProvider>
         </QueryClientProvider>
       </BrowserRouter>
     </HelmetProvider>
