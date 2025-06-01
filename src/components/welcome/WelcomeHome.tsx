@@ -28,11 +28,15 @@ const WelcomeHome: React.FC<WelcomeHomeProps> = ({
     personality: "Let's play together!"
   };
 
+  const handlePlayNow = () => {
+    window.location.href = '/play';
+  };
+
   return (
     <>
       <Helmet>
-        <title>Welcome to Droplink Gaming - Your Pi Network Gaming Hub</title>
-        <meta name="description" content="Welcome to Droplink Gaming! Play games, earn Pi, and have fun with your character companions." />
+        <title>Welcome to Gaming Hub - Your Pi Network Gaming Platform</title>
+        <meta name="description" content="Welcome to Gaming Hub! Play games, earn Pi, and have fun with your character companions." />
       </Helmet>
       
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden">
@@ -74,11 +78,11 @@ const WelcomeHome: React.FC<WelcomeHomeProps> = ({
           }`}>
             <h1 className="text-4xl md:text-6xl font-bold mb-4">
               <span className="bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
-                Welcome to Play with Droplink!
+                Welcome to Gaming Hub!
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-2">
-              Your Pi Network Gaming Hub
+              Your Pi Network Gaming Platform
             </p>
             <p className="text-lg text-gray-500 max-w-2xl mx-auto">
               Play amazing games, earn rewards, and have fun with your character companions 
@@ -92,21 +96,21 @@ const WelcomeHome: React.FC<WelcomeHomeProps> = ({
           }`}>
             <div className="flex flex-col sm:flex-row gap-4 mt-8">
               <Button 
-                onClick={onStartTutorial}
+                onClick={handlePlayNow}
                 size="lg" 
                 className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 transform transition hover:scale-105 duration-200 text-lg px-8 py-4"
               >
                 <Play className="mr-2 h-5 w-5" />
-                Start Tutorial
+                Play Now
               </Button>
               <Button 
-                onClick={onSkipToCharacterSelect}
+                onClick={onStartTutorial}
                 variant="outline" 
                 size="lg" 
                 className="hover:bg-blue-50 transition-colors text-lg px-8 py-4"
               >
                 <SkipForward className="mr-2 h-5 w-5" />
-                Choose Character
+                Tutorial
               </Button>
             </div>
           </div>
