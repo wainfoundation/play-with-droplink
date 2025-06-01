@@ -13,7 +13,7 @@ import { Play as PlayIcon, ArrowLeft } from 'lucide-react';
 const Play: React.FC = () => {
   const { user, isLoggedIn } = useUser();
   const [searchParams] = useSearchParams();
-  const [selectedGame, setSelectedGame] = useState<string | null>(null);
+  const [selectedGame, setSelectedGame] = useState<any | null>(null);
   const [lives, setLives] = useState(5);
 
   // Check for game parameters from URL (from droplinks)
@@ -23,12 +23,33 @@ const Play: React.FC = () => {
     const challenge = searchParams.get('challenge');
     
     if (gameId) {
-      setSelectedGame(gameId);
+      // Create a basic game object from the gameId
+      const gameFromId = {
+        id: gameId,
+        name: gameId.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        category: 'puzzle',
+        difficulty: 'medium'
+      };
+      setSelectedGame(gameFromId);
     }
   }, [searchParams]);
 
   const handleBackToGames = () => {
     setSelectedGame(null);
+  };
+
+  const handleGameSelect = (game: any) => {
+    setSelectedGame(game);
+  };
+
+  const handleUpgradeToPremium = () => {
+    // Navigate to pricing or show upgrade modal
+    window.location.href = '/pricing';
+  };
+
+  const handleGameComplete = (score: number) => {
+    console.log('Game completed with score:', score);
+    // Handle game completion logic here
   };
 
   if (!isLoggedIn) {
@@ -72,7 +93,7 @@ const Play: React.FC = () => {
             {selectedGame && (
               <DroplinkButton 
                 type="invite" 
-                gameId={selectedGame}
+                gameId={selectedGame.id}
               />
             )}
             <LivesSystem onLivesChange={setLives} />
@@ -82,13 +103,16 @@ const Play: React.FC = () => {
         {selectedGame ? (
           <div className="space-y-6">
             <GameEngine 
-              gameId={selectedGame}
-              lives={lives}
-              onLivesChange={setLives}
+              game={selectedGame}
+              onBack={handleBackToGames}
+              onGameComplete={handleGameComplete}
             />
           </div>
         ) : (
-          <AllGames onGameSelect={setSelectedGame} />
+          <AllGames 
+            onGameSelect={handleGameSelect}
+            onUpgradeToPremium={handleUpgradeToPremium}
+          />
         )}
       </div>
     </div>
