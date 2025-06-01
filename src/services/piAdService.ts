@@ -1,5 +1,5 @@
 
-import { showRewardedAdAdvanced, showInterstitialAdAdvanced, isAdReady, requestAd, isAdNetworkSupported, initPiNetwork } from "@/utils/pi-sdk";
+import { showRewardedAdAdvanced, showInterstitialAdAdvanced, isAdReady, requestAd } from "@/utils/pi-sdk";
 import { toast } from "@/hooks/use-toast";
 
 export interface AdReward {
@@ -17,33 +17,17 @@ interface AdServiceConfig {
 class PiAdService {
   private config: AdServiceConfig = {};
   private isInitialized = false;
-  private adNetworkSupported = false;
 
   async initialize(config: AdServiceConfig): Promise<boolean> {
     this.config = config;
     
     try {
-      // First initialize Pi Network
-      const piInitialized = initPiNetwork();
-      if (!piInitialized) {
+      if (!window.Pi?.Ads) {
         this.config.onAdNotSupported?.();
         return false;
       }
-
-      // Check if ad network is supported
-      this.adNetworkSupported = await isAdNetworkSupported();
-      
-      if (!this.adNetworkSupported) {
-        console.log("Ad network not supported in this Pi Browser version");
-        this.config.onAdNotSupported?.();
-        return false;
-      }
-
-      // Cache the status
-      localStorage.setItem("pi_ads_enabled", "true");
       
       this.isInitialized = true;
-      console.log("Pi Ad Service initialized successfully");
       return true;
     } catch (error) {
       console.error("Failed to initialize Pi Ad Service:", error);
@@ -53,36 +37,18 @@ class PiAdService {
   }
 
   async showRewardedAd(reward: AdReward): Promise<boolean> {
-    if (!this.isInitialized || !this.adNetworkSupported) {
-      this.config.onAdError?.("Ad service not ready");
+    if (!this.isInitialized) {
+      this.config.onAdError?.("Ad service not initialized");
       return false;
     }
 
     try {
-      // Check if ad is ready
-      const ready = await isAdReady("rewarded");
-      
-      if (!ready) {
-        console.log("Requesting rewarded ad...");
-        const requestResult = await requestAd("rewarded");
-        
-        if (requestResult.result === "ADS_NOT_SUPPORTED") {
-          this.config.onAdNotSupported?.();
-          return false;
-        }
-        
-        if (requestResult.result !== "AD_LOADED") {
-          this.config.onAdError?.("Ad not available");
-          return false;
-        }
-      }
-
       const result = await showRewardedAdAdvanced();
       
       if (result.success) {
         this.config.onReward?.(reward);
         toast({
-          title: "Reward Earned! 🎉",
+          title: "Reward Earned!",
           description: `You earned ${reward.amount} ${reward.type} for watching the ad.`,
         });
         return true;
@@ -98,23 +64,12 @@ class PiAdService {
   }
 
   async showInterstitialAd(): Promise<boolean> {
-    if (!this.isInitialized || !this.adNetworkSupported) {
-      this.config.onAdError?.("Ad service not ready");
+    if (!this.isInitialized) {
+      this.config.onAdError?.("Ad service not initialized");
       return false;
     }
 
     try {
-      const ready = await isAdReady("interstitial");
-      
-      if (!ready) {
-        console.log("Requesting interstitial ad...");
-        const requestResult = await requestAd("interstitial");
-        
-        if (requestResult.result !== "AD_LOADED") {
-          return false;
-        }
-      }
-
       return await showInterstitialAdAdvanced();
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown ad error";
@@ -124,7 +79,7 @@ class PiAdService {
   }
 
   async isAdAvailable(adType: "interstitial" | "rewarded"): Promise<boolean> {
-    if (!this.isInitialized || !this.adNetworkSupported) {
+    if (!this.isInitialized) {
       return false;
     }
 
@@ -137,7 +92,7 @@ class PiAdService {
   }
 
   async preloadAd(adType: "interstitial" | "rewarded"): Promise<boolean> {
-    if (!this.isInitialized || !this.adNetworkSupported) {
+    if (!this.isInitialized) {
       return false;
     }
 
@@ -149,14 +104,6 @@ class PiAdService {
       return false;
     }
   }
-
-  getAdNetworkStatus(): boolean {
-    return this.adNetworkSupported;
-  }
-
-  isServiceReady(): boolean {
-    return this.isInitialized && this.adNetworkSupported;
-  }
 }
 
 // Export singleton instance
@@ -166,6 +113,6 @@ export const piAdService = new PiAdService();
 export const initializePiAds = (config: AdServiceConfig) => piAdService.initialize(config);
 export const showRewardedAd = (reward: AdReward) => piAdService.showRewardedAd(reward);
 export const showInterstitialAd = () => piAdService.showInterstitialAd();
-export const isAdServiceReady = () => piAdService.isServiceReady();
+export const isAdServiceReady = () => piAdService['isInitialized'];
 
 export default piAdService;

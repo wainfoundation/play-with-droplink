@@ -1,14 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Check, X } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { Badge } from '@/components/ui/badge';
-import { playSoundEffect } from '@/utils/sounds';
-import DroplinkButton from '@/components/games/DroplinkButton';
-import LivesSystem from '@/components/games/LivesSystem';
-import GameStats from '@/components/games/GameStats';
-import InfiniteLevelGenerator from '@/components/games/InfiniteLevelGenerator';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { ArrowLeft, RefreshCw, Trophy } from 'lucide-react';
+import { showRewardedAd } from '@/services/piAdService';
+import { toast } from '@/hooks/use-toast';
 
 interface BlockConnectEngineProps {
   onBack: () => void;
@@ -16,160 +13,161 @@ interface BlockConnectEngineProps {
 }
 
 const BlockConnectEngine: React.FC<BlockConnectEngineProps> = ({ onBack, onGameComplete }) => {
-  const { toast } = useToast();
-  const [grid, setGrid] = useState<number[][]>([]);
-  const [selectedBlocks, setSelectedBlocks] = useState<number[][]>([]);
+  const [level, setLevel] = useState(1);
   const [score, setScore] = useState(0);
-  const [gameFinished, setGameFinished] = useState(false);
-  const [currentLevel, setCurrentLevel] = useState(0);
-  const [infiniteLevels] = useState(true);
-  const [lives, setLives] = useState(5);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
+  const [adWatched, setAdWatched] = useState(false);
+  const [grid, setGrid] = useState<number[][]>([]);
+  const [connections, setConnections] = useState<string[]>([]);
+  const [selectedBlock, setSelectedBlock] = useState<{x: number, y: number} | null>(null);
+  const [timeLeft, setTimeLeft] = useState(60);
 
-  // Generate infinite level on mount and level change
+  const gridSize = Math.min(4 + Math.floor(level / 5), 8);
+  const targetConnections = Math.max(3, Math.floor(level * 1.5));
+
   useEffect(() => {
-    generateLevel();
-  }, [currentLevel]);
+    if (isPlaying && timeLeft > 0) {
+      const timer = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            endGame();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [isPlaying, timeLeft]);
 
-  const generateLevel = () => {
-    const config = InfiniteLevelGenerator.generateLevelConfig('block-connect', currentLevel);
-    const generatedGrid = InfiniteLevelGenerator.generateBlockGrid(config);
-    setGrid(generatedGrid);
-    setSelectedBlocks([]);
-    setScore(currentLevel * 100); // Bonus points for reaching higher levels
+  const generateGrid = () => {
+    const newGrid = Array(gridSize).fill(null).map(() => 
+      Array(gridSize).fill(null).map(() => Math.floor(Math.random() * 4) + 1)
+    );
+    setGrid(newGrid);
   };
 
-  const handleBlockClick = (row: number, col: number) => {
-    const blockValue = grid[row][col];
-
-    if (selectedBlocks.length === 0) {
-      // First block selected
-      setSelectedBlocks([[row, col]]);
-    } else {
-      const [lastRow, lastCol] = selectedBlocks[selectedBlocks.length - 1];
-
-      if (row === lastRow && col === lastCol) {
-        // Deselect the block if it's clicked again
-        setSelectedBlocks([]);
-      } else if (
-        grid[row][col] === grid[lastRow][lastCol] &&
-        isAdjacent(row, col, lastRow, lastCol)
-      ) {
-        // Valid connection
-        setSelectedBlocks([...selectedBlocks, [row, col]]);
-        playSoundEffect('collect', 0.4);
-      } else {
-        // Invalid connection - reset selection
-        setSelectedBlocks([[row, col]]);
-        playSoundEffect('error', 0.3);
+  const startLevel = async () => {
+    if (!adWatched) {
+      try {
+        const success = await showRewardedAd({
+          type: "pi",
+          amount: 0.01,
+          description: "Block Connect level unlock"
+        });
+        
+        if (!success) {
+          toast({
+            title: "Ad Required",
+            description: "Please watch an ad to start the level",
+            variant: "destructive"
+          });
+          return;
+        }
+        setAdWatched(true);
+      } catch (error) {
+        toast({
+          title: "Ad Error", 
+          description: "Unable to show ad. Try again later.",
+          variant: "destructive"
+        });
+        return;
       }
     }
+
+    setIsPlaying(true);
+    setGameOver(false);
+    setConnections([]);
+    setSelectedBlock(null);
+    setTimeLeft(60 + Math.floor(level / 3) * 10);
+    generateGrid();
   };
 
-  const isAdjacent = (row1: number, col1: number, row2: number, col2: number): boolean => {
-    const dx = Math.abs(row1 - row2);
-    const dy = Math.abs(col1 - col2);
-    return (dx <= 1 && dy <= 1) && !(dx === 0 && dy === 0);
-  };
+  const handleBlockClick = (x: number, y: number) => {
+    if (!isPlaying) return;
 
-  const clearConnectedBlocks = () => {
-    if (selectedBlocks.length < 3) {
-      toast({
-        title: "Not enough blocks!",
-        description: "Connect at least 3 blocks to clear them.",
-        variant: "destructive",
-      });
-      playSoundEffect('error', 0.3);
-      return;
-    }
-
-    // Clear blocks and update score
-    let newGrid = grid.map(row => [...row]);
-    selectedBlocks.forEach(([row, col]) => {
-      newGrid[row][col] = -1; // Mark as cleared
-    });
-    setGrid(newGrid);
-
-    // Animate clearing
-    setTimeout(() => {
-      setGrid(prevGrid => prevGrid.map(row => row.map(block => (block === -1 ? 0 : block))));
-      setSelectedBlocks([]);
-      const points = selectedBlocks.length * 10;
-      setScore(prevScore => prevScore + points);
-      playSoundEffect('success', 0.5);
-      toast({
-        title: "Blocks Cleared! 🎉",
-        description: `+${points} points!`,
-      });
-      checkLevelComplete();
-    }, 500);
-  };
-
-  const checkLevelComplete = () => {
-    const remainingBlocks = grid.flat().filter(block => block !== 0);
-    if (remainingBlocks.length === 0) {
-      handleLevelComplete();
+    if (!selectedBlock) {
+      setSelectedBlock({x, y});
+    } else {
+      const distance = Math.abs(selectedBlock.x - x) + Math.abs(selectedBlock.y - y);
+      if (distance === 1 && grid[selectedBlock.x][selectedBlock.y] === grid[x][y]) {
+        const connectionKey = `${Math.min(selectedBlock.x, x)},${Math.min(selectedBlock.y, y)}-${Math.max(selectedBlock.x, x)},${Math.max(selectedBlock.y, y)}`;
+        
+        if (!connections.includes(connectionKey)) {
+          const newConnections = [...connections, connectionKey];
+          setConnections(newConnections);
+          setScore(prev => prev + 10 * level);
+          
+          if (newConnections.length >= targetConnections) {
+            completeLevel();
+          }
+        }
+      }
+      setSelectedBlock(null);
     }
   };
 
-  const handleLevelComplete = () => {
-    const levelBonus = currentLevel * 10;
-    const newScore = score + levelBonus;
-    setScore(newScore);
+  const completeLevel = () => {
+    setIsPlaying(false);
+    const levelBonus = level * 50;
+    const timeBonus = timeLeft * 2;
+    const totalScore = levelBonus + timeBonus;
+    setScore(prev => prev + totalScore);
     
     toast({
-      title: `Level ${currentLevel} Complete! 🎉`,
-      description: `+${levelBonus} bonus points! Moving to level ${currentLevel + 1}`,
+      title: "Level Complete!",
+      description: `Level ${level} completed! +${totalScore} points`,
     });
     
-    setTimeout(() => {
-      setCurrentLevel(prev => prev + 1);
-    }, 1500);
-  };
-
-  const useLive = () => {
-    if (lives <= 0) {
-      // Game over
-      setGameFinished(true);
-      onGameComplete(score);
-      return false;
-    }
+    setLevel(prev => prev + 1);
+    setAdWatched(false);
     
-    setLives(prev => prev - 1);
-    return true;
+    if (level % 10 === 0) {
+      onGameComplete(score + totalScore);
+    }
   };
 
-  const renderBlock = (row: number, col: number) => {
-    const isSelected = selectedBlocks.some(
-      ([selectedRow, selectedCol]) => selectedRow === row && selectedCol === col
-    );
-    const isLastSelected =
-      selectedBlocks.length > 0 &&
-      selectedBlocks[selectedBlocks.length - 1][0] === row &&
-      selectedBlocks[selectedBlocks.length - 1][1] === col;
+  const endGame = () => {
+    setIsPlaying(false);
+    setGameOver(true);
+    onGameComplete(score);
+  };
 
-    let blockClass = "w-8 h-8 border border-gray-300 flex items-center justify-center cursor-pointer transition-all duration-200";
-    if (grid[row][col] === 0) {
-      blockClass += " bg-transparent"; // Cleared block
-    } else {
-      blockClass += " bg-blue-100 hover:bg-blue-200";
-    }
-    if (isSelected) {
-      blockClass += " ring-2 ring-blue-500";
-    }
-    if (isLastSelected) {
-      blockClass += " ring-4 ring-blue-700";
-    }
+  const resetGame = () => {
+    setLevel(1);
+    setScore(0);
+    setGameOver(false);
+    setAdWatched(false);
+    setConnections([]);
+    setSelectedBlock(null);
+  };
 
+  if (gameOver) {
     return (
-      <div
-        key={`${row}-${col}`}
-        className={blockClass}
-        onClick={() => handleBlockClick(row, col)}
-      >
-        {grid[row][col] > 0 && grid[row][col]}
-      </div>
+      <Card className="max-w-md mx-auto">
+        <CardHeader>
+          <CardTitle className="text-center">🎮 Game Over!</CardTitle>
+        </CardHeader>
+        <CardContent className="text-center space-y-4">
+          <div className="space-y-2">
+            <p className="text-lg font-semibold">Final Score: {score}</p>
+            <p className="text-sm text-gray-600">Level Reached: {level}</p>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={resetGame} variant="outline" className="flex-1">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Retry
+            </Button>
+            <Button onClick={onBack} className="flex-1">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     );
-  };
+  }
 
   return (
     <Card className="max-w-2xl mx-auto">
@@ -180,46 +178,70 @@ const BlockConnectEngine: React.FC<BlockConnectEngineProps> = ({ onBack, onGameC
             Back
           </Button>
           <CardTitle className="flex items-center gap-2">
-            <div className="text-2xl">🧱</div>
-            Block Connect
-            {infiniteLevels && <Badge variant="secondary">∞</Badge>}
+            🧩 Block Connect - Level {level}
           </CardTitle>
-          <DroplinkButton 
-            type="level" 
-            gameId="block-connect" 
-            level={currentLevel}
-            score={score}
-          />
+          <div className="flex items-center gap-2">
+            <Trophy className="w-4 h-4 text-yellow-500" />
+            <span className="font-semibold">{score}</span>
+          </div>
         </div>
       </CardHeader>
-      
-      <CardContent>
-        <GameStats 
-          score={score}
-          level={currentLevel}
-          totalLevels={9999999}
-          className="mb-4"
-        />
-        
-        <LivesSystem 
-          onLivesChange={setLives}
-        />
-        
-        <div className="grid gap-1 mt-4">
-          {grid.map((row, rowIndex) => (
-            <div key={rowIndex} className="flex">
-              {row.map((_, colIndex) => renderBlock(rowIndex, colIndex))}
+      <CardContent className="space-y-4">
+        {isPlaying && (
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>Connections: {connections.length}/{targetConnections}</span>
+              <span>Time: {timeLeft}s</span>
             </div>
-          ))}
-        </div>
+            <Progress value={(connections.length / targetConnections) * 100} className="h-2" />
+          </div>
+        )}
 
-        <Button
-          onClick={clearConnectedBlocks}
-          disabled={selectedBlocks.length < 2}
-          className="mt-4 w-full"
-        >
-          Clear Blocks ({selectedBlocks.length})
-        </Button>
+        {!isPlaying && !gameOver && (
+          <div className="text-center space-y-4">
+            <div className="text-4xl mb-4">🧩</div>
+            <h3 className="text-lg font-semibold">Block Connect - Level {level}</h3>
+            <p className="text-sm text-gray-600">
+              Connect {targetConnections} matching adjacent blocks to complete the level!
+            </p>
+            <Button onClick={startLevel} size="lg">
+              {adWatched ? 'Start Level' : 'Watch Ad to Play'}
+            </Button>
+          </div>
+        )}
+
+        {isPlaying && (
+          <div className="space-y-4">
+            <div className="grid gap-1 mx-auto" style={{
+              gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
+              maxWidth: '320px'
+            }}>
+              {grid.map((row, x) =>
+                row.map((value, y) => (
+                  <button
+                    key={`${x}-${y}`}
+                    onClick={() => handleBlockClick(x, y)}
+                    className={`
+                      w-8 h-8 rounded border-2 text-xs font-bold transition-all
+                      ${selectedBlock?.x === x && selectedBlock?.y === y 
+                        ? 'border-blue-500 bg-blue-100' 
+                        : 'border-gray-300 hover:border-blue-300'}
+                      ${value === 1 ? 'bg-red-400' :
+                        value === 2 ? 'bg-blue-400' :
+                        value === 3 ? 'bg-green-400' : 'bg-yellow-400'}
+                      text-white
+                    `}
+                  >
+                    {value}
+                  </button>
+                ))
+              )}
+            </div>
+            <p className="text-center text-sm text-gray-600">
+              Select two adjacent blocks with the same number to connect them
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,14 +7,11 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Trophy, Star, Heart, RefreshCw, Clock, Zap, Users, Calendar } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { useIsMobile } from '@/hooks/use-mobile';
 import SudokuBoard from '@/components/games/sudoku/SudokuBoard';
 import SudokuLeaderboard from '@/components/games/sudoku/SudokuLeaderboard';
 import SudokuDuelMode from '@/components/games/sudoku/SudokuDuelMode';
 import SudokuDailyChallenge from '@/components/games/sudoku/SudokuDailyChallenge';
-import HintsModal from '@/components/games/sudoku/HintsModal';
 import { generateSudokuPuzzle, validateSudokuMove, checkSudokuComplete } from '@/utils/sudokuGenerator';
-import { usePiPayment } from '@/hooks/usePiPayment';
 
 interface SudokuClassicEngineProps {
   onBack: () => void;
@@ -34,12 +32,9 @@ interface GameState {
   selectedCell: { row: number; col: number } | null;
   pencilMode: boolean;
   mistakes: number;
-  gameBlocked: boolean;
 }
 
 const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGameComplete }) => {
-  const isMobile = useIsMobile();
-  
   const [gameState, setGameState] = useState<GameState>({
     board: [],
     solution: [],
@@ -53,24 +48,21 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
     gameOver: false,
     selectedCell: null,
     pencilMode: false,
-    mistakes: 0,
-    gameBlocked: false
+    mistakes: 0
   });
 
   const [theme, setTheme] = useState<'light' | 'dark' | 'pi'>('light');
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [showHintsModal, setShowHintsModal] = useState(false);
-  const { createPayment, loading: paymentLoading } = usePiPayment();
 
   // Timer effect
   useEffect(() => {
-    if (gameState.isPlaying && !gameState.gameOver && !gameState.gameBlocked) {
+    if (gameState.isPlaying && !gameState.gameOver) {
       const timer = setInterval(() => {
         setGameState(prev => ({ ...prev, time: prev.time + 1 }));
       }, 1000);
       return () => clearInterval(timer);
     }
-  }, [gameState.isPlaying, gameState.gameOver, gameState.gameBlocked]);
+  }, [gameState.isPlaying, gameState.gameOver]);
 
   // Load saved game on mount
   useEffect(() => {
@@ -117,7 +109,6 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
       solution: solution,
       isPlaying: true,
       gameOver: false,
-      gameBlocked: false,
       selectedCell: null,
       time: 0,
       mistakes: 0,
@@ -125,6 +116,7 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
     }));
 
     if (soundEnabled) {
+      // Play start sound
       console.log('🎵 Game start sound');
     }
 
@@ -135,7 +127,7 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
   }, [gameState.level, soundEnabled]);
 
   const handleCellClick = (row: number, col: number) => {
-    if (!gameState.isPlaying || gameState.gameOver || gameState.gameBlocked) return;
+    if (!gameState.isPlaying || gameState.gameOver) return;
     
     setGameState(prev => ({
       ...prev,
@@ -148,7 +140,7 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
   };
 
   const handleNumberInput = (number: number) => {
-    if (!gameState.selectedCell || !gameState.isPlaying || gameState.gameBlocked) return;
+    if (!gameState.selectedCell || !gameState.isPlaying) return;
     
     const { row, col } = gameState.selectedCell;
     
@@ -235,17 +227,10 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
   };
 
   const handleHint = () => {
-    if (gameState.hints <= 0) {
-      // Block the game and show hints modal
-      setGameState(prev => ({ ...prev, gameBlocked: true }));
-      setShowHintsModal(true);
-      return;
-    }
-
-    if (!gameState.selectedCell) {
+    if (gameState.hints <= 0 || !gameState.selectedCell) {
       toast({
-        title: "Select a Cell",
-        description: "Please select a cell first to get a hint.",
+        title: "No Hints Available",
+        description: "Watch an ad or pay 1 Pi for more hints!",
         variant: "destructive",
       });
       return;
@@ -270,52 +255,6 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
     });
   };
 
-  const handleWatchAd = () => {
-    // Grant 3 hints after watching ad
-    setGameState(prev => ({
-      ...prev,
-      hints: prev.hints + 3,
-      gameBlocked: false
-    }));
-    
-    setShowHintsModal(false);
-    
-    toast({
-      title: "Ad Reward Received!",
-      description: "You got 3 more hints! Thanks for watching.",
-    });
-  };
-
-  const handlePayPi = async () => {
-    try {
-      await createPayment({
-        amount: 1,
-        memo: "Sudoku Hints - 3 hints purchase",
-        metadata: { type: "sudoku_hints", hints: 3 }
-      });
-
-      // Grant 3 hints after payment
-      setGameState(prev => ({
-        ...prev,
-        hints: prev.hints + 3,
-        gameBlocked: false
-      }));
-      
-      setShowHintsModal(false);
-      
-      toast({
-        title: "Payment Successful!",
-        description: "You got 3 more hints! Happy gaming!",
-      });
-    } catch (error) {
-      toast({
-        title: "Payment Failed",
-        description: "Unable to process payment. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
   const handleRetryWithAd = () => {
     // Simulate watching an ad
     toast({
@@ -328,7 +267,6 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
         ...prev,
         lives: 3,
         gameOver: false,
-        gameBlocked: false,
         isPlaying: true,
         mistakes: 0
       }));
@@ -347,32 +285,32 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
   };
 
   const renderGameStats = () => (
-    <div className={`grid grid-cols-4 gap-${isMobile ? '2' : '4'} mb-${isMobile ? '4' : '6'}`}>
+    <div className="grid grid-cols-4 gap-4 mb-6">
       <div className="text-center">
         <div className="flex items-center justify-center gap-1">
-          <Trophy className={`w-${isMobile ? '3' : '4'} h-${isMobile ? '3' : '4'} text-yellow-500`} />
-          <span className={`font-semibold ${isMobile ? 'text-sm' : ''}`}>{gameState.score}</span>
+          <Trophy className="w-4 h-4 text-yellow-500" />
+          <span className="font-semibold">{gameState.score}</span>
         </div>
         <p className="text-xs text-gray-600">Score</p>
       </div>
       <div className="text-center">
         <div className="flex items-center justify-center gap-1">
-          <Star className={`w-${isMobile ? '3' : '4'} h-${isMobile ? '3' : '4'} text-blue-500`} />
-          <span className={`font-semibold ${isMobile ? 'text-sm' : ''}`}>{gameState.level}</span>
+          <Star className="w-4 h-4 text-blue-500" />
+          <span className="font-semibold">{gameState.level}</span>
         </div>
         <p className="text-xs text-gray-600">Level</p>
       </div>
       <div className="text-center">
         <div className="flex items-center justify-center gap-1">
-          <Heart className={`w-${isMobile ? '3' : '4'} h-${isMobile ? '3' : '4'} text-red-500`} />
-          <span className={`font-semibold ${isMobile ? 'text-sm' : ''}`}>{gameState.lives}</span>
+          <Heart className="w-4 h-4 text-red-500" />
+          <span className="font-semibold">{gameState.lives}</span>
         </div>
         <p className="text-xs text-gray-600">Lives</p>
       </div>
       <div className="text-center">
         <div className="flex items-center justify-center gap-1">
-          <Clock className={`w-${isMobile ? '3' : '4'} h-${isMobile ? '3' : '4'} text-green-500`} />
-          <span className={`font-semibold ${isMobile ? 'text-sm' : ''}`}>{formatTime(gameState.time)}</span>
+          <Clock className="w-4 h-4 text-green-500" />
+          <span className="font-semibold">{formatTime(gameState.time)}</span>
         </div>
         <p className="text-xs text-gray-600">Time</p>
       </div>
@@ -380,33 +318,31 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
   );
 
   const renderGameControls = () => (
-    <div className={`flex flex-wrap gap-2 mb-${isMobile ? '3' : '4'}`}>
+    <div className="flex flex-wrap gap-2 mb-4">
       <Button
         variant="outline"
-        size={isMobile ? "sm" : "sm"}
+        size="sm"
         onClick={handleHint}
-        disabled={gameState.gameBlocked}
-        className={gameState.hints <= 0 ? 'border-red-300 text-red-600' : ''}
+        disabled={gameState.hints <= 0}
       >
         <Zap className="w-4 h-4 mr-1" />
         Hint ({gameState.hints})
       </Button>
       <Button
         variant="outline"
-        size={isMobile ? "sm" : "sm"}
+        size="sm"
         onClick={() => setGameState(prev => ({ ...prev, pencilMode: !prev.pencilMode }))}
         className={gameState.pencilMode ? 'bg-blue-100' : ''}
-        disabled={gameState.gameBlocked}
       >
         ✏️ Pencil
       </Button>
       <Button
         variant="outline"
-        size={isMobile ? "sm" : "sm"}
+        size="sm"
         onClick={() => {
+          // Undo last move
           toast({ title: "Undo", description: "Last move undone!" });
         }}
-        disabled={gameState.gameBlocked}
       >
         ↶ Undo
       </Button>
@@ -414,23 +350,23 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
   );
 
   const renderNumberPad = () => (
-    <div className={`grid grid-cols-5 gap-${isMobile ? '1' : '2'} mt-4`}>
+    <div className="grid grid-cols-5 gap-2 mt-4">
       {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
         <Button
           key={num}
           variant="outline"
-          className={`h-${isMobile ? '10' : '12'} text-lg font-bold`}
+          className="h-12 text-lg font-bold"
           onClick={() => handleNumberInput(num)}
-          disabled={!gameState.selectedCell || gameState.gameBlocked}
+          disabled={!gameState.selectedCell}
         >
           {num}
         </Button>
       ))}
       <Button
         variant="outline"
-        className={`h-${isMobile ? '10' : '12'} text-lg`}
+        className="h-12 text-lg"
         onClick={() => handleNumberInput(0)}
-        disabled={!gameState.selectedCell || gameState.gameBlocked}
+        disabled={!gameState.selectedCell}
       >
         Clear
       </Button>
@@ -471,173 +407,91 @@ const SudokuClassicEngine: React.FC<SudokuClassicEngineProps> = ({ onBack, onGam
     </div>
   );
 
-  const renderMainContent = () => (
-    <div className={isMobile ? 'p-2' : ''}>
-      {gameState.gameBlocked && (
-        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-yellow-800 text-center font-medium">
-            ⚠️ Game Paused - You need more hints to continue!
-          </p>
+  return (
+    <Card className="max-w-4xl mx-auto">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" onClick={onBack}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          <CardTitle className="flex items-center gap-2">
+            <div className="text-2xl">🧩</div>
+            Sudoku Classic
+          </CardTitle>
+          <Badge variant="outline">{getDifficultyLevel(gameState.level)}</Badge>
         </div>
-      )}
+      </CardHeader>
+      <CardContent>
+        <Tabs value={gameState.gameMode} onValueChange={(value) => 
+          setGameState(prev => ({ ...prev, gameMode: value as any }))
+        }>
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="infinite">♾️ Infinite</TabsTrigger>
+            <TabsTrigger value="daily">📅 Daily</TabsTrigger>
+            <TabsTrigger value="leaderboard">🏆 Ranks</TabsTrigger>
+            <TabsTrigger value="duel">⚔️ Duel</TabsTrigger>
+          </TabsList>
 
-      <Tabs value={gameState.gameMode} onValueChange={(value) => 
-        setGameState(prev => ({ ...prev, gameMode: value as any }))
-      }>
-        <TabsList className={`grid w-full grid-cols-4 ${isMobile ? 'text-xs' : ''}`}>
-          <TabsTrigger value="infinite">♾️ Infinite</TabsTrigger>
-          <TabsTrigger value="daily">📅 Daily</TabsTrigger>
-          <TabsTrigger value="leaderboard">🏆 Ranks</TabsTrigger>
-          <TabsTrigger value="duel">⚔️ Duel</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="infinite">
-          {renderGameStats()}
-          
-          {!gameState.isPlaying && !gameState.gameOver && renderStartScreen()}
-          {gameState.gameOver && renderGameOverScreen()}
-          
-          {gameState.isPlaying && (
-            <>
-              {renderGameControls()}
-              <div className="flex justify-center mb-4">
+          <TabsContent value="infinite">
+            {renderGameStats()}
+            
+            {!gameState.isPlaying && !gameState.gameOver && renderStartScreen()}
+            {gameState.gameOver && renderGameOverScreen()}
+            
+            {gameState.isPlaying && (
+              <>
+                {renderGameControls()}
                 <SudokuBoard
                   board={gameState.board}
                   selectedCell={gameState.selectedCell}
                   onCellClick={handleCellClick}
                   theme={theme}
                 />
-              </div>
-              {renderNumberPad()}
-            </>
-          )}
-        </TabsContent>
+                {renderNumberPad()}
+              </>
+            )}
+          </TabsContent>
 
-        <TabsContent value="daily">
-          <SudokuDailyChallenge />
-        </TabsContent>
+          <TabsContent value="daily">
+            <SudokuDailyChallenge />
+          </TabsContent>
 
-        <TabsContent value="leaderboard">
-          <SudokuLeaderboard />
-        </TabsContent>
+          <TabsContent value="leaderboard">
+            <SudokuLeaderboard />
+          </TabsContent>
 
-        <TabsContent value="duel">
-          <SudokuDuelMode />
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="duel">
+            <SudokuDuelMode />
+          </TabsContent>
+        </Tabs>
 
-      {/* Theme Selector */}
-      <div className={`flex justify-center gap-2 mt-${isMobile ? '4' : '6'}`}>
-        <Button
-          variant={theme === 'light' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setTheme('light')}
-        >
-          ☀️ Light
-        </Button>
-        <Button
-          variant={theme === 'dark' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setTheme('dark')}
-        >
-          🌙 Dark
-        </Button>
-        <Button
-          variant={theme === 'pi' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setTheme('pi')}
-        >
-          π Pi Style
-        </Button>
-      </div>
-    </div>
-  );
-
-  // Mobile full screen layout
-  if (isMobile) {
-    return (
-      <>
-        <div className="fixed inset-0 z-50 bg-white">
-          <div className="flex flex-col h-full">
-            {/* Mobile Header */}
-            <div className="flex items-center justify-between p-4 border-b bg-white">
-              <Button variant="ghost" size="sm" onClick={onBack}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
-              </Button>
-              <div className="flex items-center gap-2">
-                <div className="text-lg">🧩</div>
-                <span className="font-semibold text-sm">Sudoku Classic</span>
-              </div>
-              <Badge variant="outline" className="text-xs">{getDifficultyLevel(gameState.level)}</Badge>
-            </div>
-
-            {/* Mobile Game Content */}
-            <div className="flex-1 overflow-auto">
-              {renderMainContent()}
-            </div>
-          </div>
+        {/* Theme Selector */}
+        <div className="flex justify-center gap-2 mt-6">
+          <Button
+            variant={theme === 'light' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setTheme('light')}
+          >
+            ☀️ Light
+          </Button>
+          <Button
+            variant={theme === 'dark' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setTheme('dark')}
+          >
+            🌙 Dark
+          </Button>
+          <Button
+            variant={theme === 'pi' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setTheme('pi')}
+          >
+            π Pi Style
+          </Button>
         </div>
-
-        <HintsModal
-          isOpen={showHintsModal}
-          onClose={() => {
-            setShowHintsModal(false);
-            // If user closes without choosing, exit game
-            setGameState(prev => ({ 
-              ...prev, 
-              isPlaying: false, 
-              gameOver: true, 
-              gameBlocked: false 
-            }));
-          }}
-          onWatchAd={handleWatchAd}
-          onPayPi={handlePayPi}
-          isLoading={paymentLoading}
-        />
-      </>
-    );
-  }
-
-  // Desktop layout
-  return (
-    <>
-      <Card className="max-w-4xl mx-auto">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <Button variant="ghost" onClick={onBack}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-            <CardTitle className="flex items-center gap-2">
-              <div className="text-2xl">🧩</div>
-              Sudoku Classic
-            </CardTitle>
-            <Badge variant="outline">{getDifficultyLevel(gameState.level)}</Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {renderMainContent()}
-        </CardContent>
-      </Card>
-
-      <HintsModal
-        isOpen={showHintsModal}
-        onClose={() => {
-          setShowHintsModal(false);
-          // If user closes without choosing, exit game
-          setGameState(prev => ({ 
-            ...prev, 
-            isPlaying: false, 
-            gameOver: true, 
-            gameBlocked: false 
-          }));
-        }}
-        onWatchAd={handleWatchAd}
-        onPayPi={handlePayPi}
-        isLoading={paymentLoading}
-      />
-    </>
+      </CardContent>
+    </Card>
   );
 };
 

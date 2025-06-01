@@ -1,19 +1,11 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Trophy, AlertCircle, Crown } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { ArrowLeft, RefreshCw, Trophy } from 'lucide-react';
+import { showRewardedAd } from '@/services/piAdService';
 import { toast } from '@/hooks/use-toast';
-import { playSoundEffect } from '@/utils/sounds';
-import { useColorMergeGame } from '@/hooks/useColorMergeGame';
-import { initializePiAds, showRewardedAd, showInterstitialAd, isAdServiceReady } from '@/services/piAdService';
-import { isRunningInPiBrowser } from '@/utils/pi-sdk';
-import { useUserPlan } from '@/hooks/useUserPlan';
-import ColorMergeStats from '@/components/games/color-merge/ColorMergeStats';
-import ColorMergeStartScreen from '@/components/games/color-merge/ColorMergeStartScreen';
-import ColorMergeGameOver from '@/components/games/color-merge/ColorMergeGameOver';
-import ColorMergeGameplay from '@/components/games/color-merge/ColorMergeGameplay';
 
 interface ColorMergeEngineProps {
   onBack: () => void;
@@ -21,139 +13,62 @@ interface ColorMergeEngineProps {
 }
 
 const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameComplete }) => {
-  const [adServiceReady, setAdServiceReady] = useState(false);
-  const [showPiWarning, setShowPiWarning] = useState(false);
-  
-  // Get user plan to determine ad behavior
-  const { plan, showAds, canAccessAllGames } = useUserPlan();
-  const isPremium = plan === 'premium';
+  const [level, setLevel] = useState(1);
+  const [score, setScore] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
+  const [adWatched, setAdWatched] = useState(false);
+  const [targetColor, setTargetColor] = useState({ r: 0, g: 0, b: 0 });
+  const [currentColor, setCurrentColor] = useState({ r: 255, g: 255, b: 255 });
+  const [availableColors, setAvailableColors] = useState<{r: number, g: number, b: number}[]>([]);
+  const [timeLeft, setTimeLeft] = useState(45);
+  const [mergeAccuracy, setMergeAccuracy] = useState(0);
 
-  const {
-    level,
-    score,
-    lives,
-    isPlaying,
-    gameOver,
-    adWatched,
-    targetColor,
-    currentColor,
-    availableColors,
-    timeLeft,
-    mergeAccuracy,
-    movesUsed,
-    totalMoves,
-    hintsUsed,
-    soundEnabled,
-    showHint,
-    hintColor,
-    setIsPlaying,
-    setTimeLeft,
-    setAdWatched,
-    setHintsUsed,
-    setShowHint,
-    setHintColor,
-    setSoundEnabled,
-    generateLevel,
-    mergeColor,
-    endGame,
-    resetGame,
-    findBestNextColor,
-    colorToHex,
-    setCurrentColor,
-  } = useColorMergeGame();
-
-  // Initialize Pi Ads only for free users
   useEffect(() => {
-    if (!showAds || isPremium) {
-      setAdServiceReady(false);
-      return;
-    }
-
-    const initAds = async () => {
-      const isPiBrowser = isRunningInPiBrowser();
-      
-      if (!isPiBrowser) {
-        setShowPiWarning(true);
-        return;
-      }
-
-      try {
-        const initialized = await initializePiAds({
-          onReward: (reward) => {
-            if (soundEnabled) {
-              playSoundEffect('piPayment', 0.8);
-            }
-            toast({
-              title: "Ad Reward Earned! 🎉",
-              description: `You earned ${reward.amount} ${reward.type}!`,
-            });
-          },
-          onAdError: (error) => {
-            console.error("Ad service error:", error);
-            toast({
-              title: "Ad Error",
-              description: error,
-              variant: "destructive",
-            });
-          },
-          onAdNotSupported: () => {
-            setShowPiWarning(true);
-            toast({
-              title: "Ads Not Supported",
-              description: "Please update your Pi Browser to access ads.",
-              variant: "destructive",
-            });
+    if (isPlaying && timeLeft > 0) {
+      const timer = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            endGame();
+            return 0;
           }
+          return prev - 1;
         });
-
-        setAdServiceReady(initialized);
-      } catch (error) {
-        console.error("Failed to initialize Pi Ads:", error);
-        setShowPiWarning(true);
-      }
-    };
-
-    initAds();
-  }, [soundEnabled, showAds, isPremium]);
-
-  // Handle game completion milestone
-  useEffect(() => {
-    if (level % 100 === 0 && level > 1) {
-      onGameComplete(score);
+      }, 1000);
+      return () => clearInterval(timer);
     }
-  }, [level, score, onGameComplete]);
+  }, [isPlaying, timeLeft]);
+
+  const generateLevel = () => {
+    // Generate target color
+    const target = {
+      r: Math.floor(Math.random() * 256),
+      g: Math.floor(Math.random() * 256),
+      b: Math.floor(Math.random() * 256)
+    };
+    setTargetColor(target);
+    
+    // Generate available colors to mix
+    const numColors = Math.min(3 + Math.floor(level / 3), 6);
+    const colors = [];
+    for (let i = 0; i < numColors; i++) {
+      colors.push({
+        r: Math.floor(Math.random() * 256),
+        g: Math.floor(Math.random() * 256),
+        b: Math.floor(Math.random() * 256)
+      });
+    }
+    setAvailableColors(colors);
+    setCurrentColor({ r: 255, g: 255, b: 255 });
+  };
 
   const startLevel = async () => {
-    // Premium users skip ad requirements
-    if (isPremium) {
-      setIsPlaying(true);
-      setTimeLeft(60 + Math.floor(level / 10) * 10);
-      setShowHint(false);
-      setHintColor(null);
-      generateLevel();
-      
-      if (soundEnabled) {
-        playSoundEffect('newLevel', 0.7);
-      }
-      return;
-    }
-
-    // Free users need to watch ads after level 1
-    if (!adWatched && level > 1) {
-      if (!adServiceReady) {
-        toast({
-          title: "Ad Service Not Ready",
-          description: "Please ensure you're using Pi Browser with ad support",
-          variant: "destructive"
-        });
-        return;
-      }
-
+    if (!adWatched) {
       try {
         const success = await showRewardedAd({
           type: "pi",
           amount: 0.01,
-          description: `Color Merge level ${level} unlock`
+          description: "Color Merge level unlock"
         });
         
         if (!success) {
@@ -176,232 +91,102 @@ const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameCompl
     }
 
     setIsPlaying(true);
-    setTimeLeft(60 + Math.floor(level / 10) * 10);
-    setShowHint(false);
-    setHintColor(null);
+    setGameOver(false);
+    setTimeLeft(45 + Math.floor(level / 2) * 5);
+    setMergeAccuracy(0);
     generateLevel();
+  };
+
+  const mergeColor = (mixColor: {r: number, g: number, b: number}) => {
+    if (!isPlaying) return;
+
+    // Simple color mixing (average)
+    const newColor = {
+      r: Math.floor((currentColor.r + mixColor.r) / 2),
+      g: Math.floor((currentColor.g + mixColor.g) / 2),
+      b: Math.floor((currentColor.b + mixColor.b) / 2)
+    };
+    setCurrentColor(newColor);
     
-    if (soundEnabled) {
-      playSoundEffect('newLevel', 0.7);
-    }
-
-    // Show interstitial ad every 5 levels for free users
-    if (!isPremium && level > 1 && level % 5 === 0 && adServiceReady) {
-      setTimeout(async () => {
-        await showInterstitialAd();
-      }, 1000);
+    // Calculate accuracy
+    const accuracy = calculateColorAccuracy(newColor, targetColor);
+    setMergeAccuracy(accuracy);
+    
+    if (accuracy >= 85) {
+      completeLevel();
     }
   };
 
-  const retryWithAd = async () => {
-    // Premium users can retry without ads
-    if (isPremium) {
-      resetGame();
-      if (soundEnabled) {
-        playSoundEffect('gainLife', 0.7);
-      }
-      toast({
-        title: "Lives Restored! ❤️",
-        description: "Premium retry activated!",
-      });
-      return;
-    }
-
-    if (!adServiceReady) {
-      toast({
-        title: "Ad Service Not Ready",
-        description: "Please ensure you're using Pi Browser with ad support",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      const success = await showRewardedAd({
-        type: "pi",
-        amount: 0.02,
-        description: "Color Merge retry with extra life"
-      });
-      
-      if (success) {
-        resetGame();
-        setAdWatched(true);
-        
-        if (soundEnabled) {
-          playSoundEffect('gainLife', 0.7);
-        }
-        
-        toast({
-          title: "Lives Restored! ❤️",
-          description: "You got another chance!",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Ad Error",
-        description: "Unable to show retry ad",
-        variant: "destructive"
-      });
-    }
+  const calculateColorAccuracy = (current: {r: number, g: number, b: number}, target: {r: number, g: number, b: number}) => {
+    const rDiff = Math.abs(current.r - target.r);
+    const gDiff = Math.abs(current.g - target.g);
+    const bDiff = Math.abs(current.b - target.b);
+    const totalDiff = rDiff + gDiff + bDiff;
+    const maxDiff = 765; // Maximum possible difference (255 * 3)
+    return Math.max(0, Math.floor((1 - totalDiff / maxDiff) * 100));
   };
 
-  const buyHint = async () => {
-    // Premium users get hints without ads
-    if (isPremium) {
-      const bestColor = findBestNextColor();
-      setHintColor(bestColor);
-      setShowHint(true);
-      setHintsUsed(prev => prev + 1);
-      
-      if (soundEnabled) {
-        playSoundEffect('piPayment', 0.8);
-      }
-      
-      toast({
-        title: "Premium Hint! 💡",
-        description: "The best color choice is highlighted",
-      });
-      
-      setTimeout(() => {
-        setShowHint(false);
-        setHintColor(null);
-      }, 5000);
-      return;
-    }
-
-    if (!adServiceReady) {
-      toast({
-        title: "Watch Ad for Hint",
-        description: "Ads not available - try the hint anyway!",
-        variant: "destructive"
-      });
-      provideFreeHint();
-      return;
-    }
-
-    try {
-      const success = await showRewardedAd({
-        type: "points",
-        amount: 1,
-        description: "Color Merge hint - show next move"
-      });
-
-      if (success) {
-        const bestColor = findBestNextColor();
-        setHintColor(bestColor);
-        setShowHint(true);
-        setHintsUsed(prev => prev + 1);
-        
-        if (soundEnabled) {
-          playSoundEffect('piPayment', 0.8);
-        }
-        
-        toast({
-          title: "Hint Purchased! 💡",
-          description: "The best color choice is highlighted",
-        });
-        
-        setTimeout(() => {
-          setShowHint(false);
-          setHintColor(null);
-        }, 5000);
-      }
-    } catch (error) {
-      toast({
-        title: "Ad Error",
-        description: "Unable to show ad for hint",
-        variant: "destructive"
-      });
-      provideFreeHint();
-    }
-  };
-
-  const provideFreeHint = () => {
-    const bestColor = findBestNextColor();
-    setHintColor(bestColor);
-    setShowHint(true);
-    setHintsUsed(prev => prev + 1);
+  const completeLevel = () => {
+    setIsPlaying(false);
+    const levelBonus = level * 100;
+    const timeBonus = timeLeft * 3;
+    const accuracyBonus = mergeAccuracy * 2;
+    const totalScore = levelBonus + timeBonus + accuracyBonus;
+    setScore(prev => prev + totalScore);
     
     toast({
-      title: "Free Hint! 💡",
-      description: "The best color choice is highlighted",
+      title: "Perfect Match!",
+      description: `Level ${level} completed! +${totalScore} points`,
     });
     
-    setTimeout(() => {
-      setShowHint(false);
-      setHintColor(null);
-    }, 3000);
-  };
-
-  const skipLevel = async () => {
-    // Premium users can skip without ads
-    if (isPremium) {
-      if (soundEnabled) {
-        playSoundEffect('piPayment', 0.8);
-      }
-      
-      toast({
-        title: "Level Skipped! ⏭️",
-        description: `Premium skip to level ${level + 1}`,
-      });
-      return;
-    }
-
-    if (!adServiceReady) {
-      toast({
-        title: "Skip Not Available",
-        description: "Ad service required for level skip",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      const success = await showRewardedAd({
-        type: "pi",
-        amount: 0.05,
-        description: "Color Merge skip level"
-      });
-
-      if (success) {
-        if (soundEnabled) {
-          playSoundEffect('piPayment', 0.8);
-        }
-        
-        toast({
-          title: "Level Skipped! ⏭️",
-          description: `Moved to level ${level + 1}`,
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Skip Failed",
-        description: "Unable to process level skip",
-        variant: "destructive"
-      });
+    setLevel(prev => prev + 1);
+    setAdWatched(false);
+    
+    if (level % 5 === 0) {
+      onGameComplete(score + totalScore);
     }
   };
 
-  const handleResetColor = () => {
-    setCurrentColor({ r: 255, g: 255, b: 255 });
+  const endGame = () => {
+    setIsPlaying(false);
+    setGameOver(true);
+    onGameComplete(score);
+  };
+
+  const resetGame = () => {
+    setLevel(1);
+    setScore(0);
+    setGameOver(false);
+    setAdWatched(false);
+    setMergeAccuracy(0);
+  };
+
+  const colorToHex = (color: {r: number, g: number, b: number}) => {
+    return `rgb(${color.r}, ${color.g}, ${color.b})`;
   };
 
   if (gameOver) {
     return (
       <Card className="max-w-md mx-auto">
         <CardHeader>
-          <ColorMergeGameOver
-            score={score}
-            level={level}
-            hintsUsed={hintsUsed}
-            soundEnabled={soundEnabled}
-            setSoundEnabled={setSoundEnabled}
-            onRetryWithAd={retryWithAd}
-            onResetGame={resetGame}
-            onBack={onBack}
-            isPremium={isPremium}
-          />
+          <CardTitle className="text-center">🎨 Game Over!</CardTitle>
         </CardHeader>
+        <CardContent className="text-center space-y-4">
+          <div className="space-y-2">
+            <p className="text-lg font-semibold">Final Score: {score}</p>
+            <p className="text-sm text-gray-600">Level Reached: {level}</p>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={resetGame} variant="outline" className="flex-1">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Retry
+            </Button>
+            <Button onClick={onBack} className="flex-1">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+          </div>
+        </CardContent>
       </Card>
     );
   }
@@ -415,72 +200,83 @@ const ColorMergeEngine: React.FC<ColorMergeEngineProps> = ({ onBack, onGameCompl
             Back
           </Button>
           <CardTitle className="flex items-center gap-2">
-            🎨 Color Merge
-            <Badge variant="outline">Level {level.toLocaleString()}</Badge>
-            {isPremium && (
-              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white">
-                <Crown className="w-3 h-3 mr-1" />
-                Premium
-              </Badge>
-            )}
+            🎨 Color Merge - Level {level}
           </CardTitle>
           <div className="flex items-center gap-2">
             <Trophy className="w-4 h-4 text-yellow-500" />
-            <span className="font-semibold">{score.toLocaleString()}</span>
-            {showPiWarning && !isPremium && (
-              <AlertCircle className="w-4 h-4 text-yellow-500" />
-            )}
+            <span className="font-semibold">{score}</span>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {showPiWarning && !isPremium && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-            <div className="flex items-center gap-2 text-yellow-800">
-              <AlertCircle className="w-4 h-4" />
-              <span className="text-sm font-medium">
-                Pi Browser recommended for full ad experience
-              </span>
+        {isPlaying && (
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>Accuracy: {mergeAccuracy}%</span>
+              <span>Time: {timeLeft}s</span>
             </div>
+            <Progress value={mergeAccuracy} className="h-2" />
           </div>
         )}
 
-        <ColorMergeStats
-          lives={lives}
-          movesUsed={movesUsed}
-          totalMoves={totalMoves}
-          timeLeft={timeLeft}
-          hintsUsed={hintsUsed}
-          mergeAccuracy={mergeAccuracy}
-          level={level}
-          soundEnabled={soundEnabled}
-          setSoundEnabled={setSoundEnabled}
-          isPlaying={isPlaying}
-        />
-
         {!isPlaying && !gameOver && (
-          <ColorMergeStartScreen
-            level={level}
-            adWatched={adWatched}
-            onStartLevel={startLevel}
-            isPremium={isPremium}
-          />
+          <div className="text-center space-y-4">
+            <div className="text-4xl mb-4">🎨</div>
+            <h3 className="text-lg font-semibold">Color Merge - Level {level}</h3>
+            <p className="text-sm text-gray-600">
+              Mix colors to match the target! Get 85% accuracy to pass.
+            </p>
+            <Button onClick={startLevel} size="lg">
+              {adWatched ? 'Start Level' : 'Watch Ad to Play'}
+            </Button>
+          </div>
         )}
 
         {isPlaying && (
-          <ColorMergeGameplay
-            targetColor={targetColor}
-            currentColor={currentColor}
-            availableColors={availableColors}
-            showHint={showHint}
-            hintColor={hintColor}
-            colorToHex={colorToHex}
-            onMergeColor={mergeColor}
-            onResetColor={handleResetColor}
-            onBuyHint={buyHint}
-            onSkipLevel={skipLevel}
-            isPremium={isPremium}
-          />
+          <div className="space-y-6">
+            {/* Target and Current Colors */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <p className="text-sm font-medium mb-2">Target Color</p>
+                <div 
+                  className="w-20 h-20 mx-auto rounded-lg border-2 border-gray-300"
+                  style={{ backgroundColor: colorToHex(targetColor) }}
+                ></div>
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-medium mb-2">Your Color</p>
+                <div 
+                  className="w-20 h-20 mx-auto rounded-lg border-2 border-gray-300"
+                  style={{ backgroundColor: colorToHex(currentColor) }}
+                ></div>
+              </div>
+            </div>
+
+            {/* Available Colors */}
+            <div className="text-center">
+              <p className="text-sm font-medium mb-3">Mix with these colors:</p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {availableColors.map((color, index) => (
+                  <button
+                    key={index}
+                    onClick={() => mergeColor(color)}
+                    className="w-12 h-12 rounded-lg border-2 border-gray-300 hover:border-blue-400 transition-all hover:scale-105"
+                    style={{ backgroundColor: colorToHex(color) }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="text-center">
+              <Button 
+                onClick={() => setCurrentColor({ r: 255, g: 255, b: 255 })}
+                variant="outline"
+                size="sm"
+              >
+                Reset Color
+              </Button>
+            </div>
+          </div>
         )}
       </CardContent>
     </Card>

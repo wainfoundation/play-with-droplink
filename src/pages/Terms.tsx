@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, HelpCircle, Shield, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Footer from '@/components/Footer';
 
 const Terms = () => {
   const handleBack = () => {
@@ -106,7 +107,7 @@ const Terms = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibled text-gray-900 mb-4">5. Pi Network Integration</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Pi Network Integration</h2>
               <p className="text-gray-700 mb-4">
                 Our platform integrates with Pi Network for:
               </p>
@@ -122,7 +123,7 @@ const Terms = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Subscription and Payments</h2>
+              <h2 className="text-2xl font-semibled text-gray-900 mb-4">6. Subscription and Payments</h2>
               <p className="text-gray-700 mb-4">
                 Our gaming platform offers different subscription tiers:
               </p>
@@ -188,6 +189,8 @@ const Terms = () => {
           </div>
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 };

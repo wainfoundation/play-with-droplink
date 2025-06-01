@@ -19,7 +19,6 @@ interface GameCardProps {
   onPlay: (game: any) => void;
   onPurchase: (game: any) => void;
   onUpgrade: () => void;
-  isPremium?: boolean;
 }
 
 const GameCard: React.FC<GameCardProps> = ({
@@ -28,8 +27,7 @@ const GameCard: React.FC<GameCardProps> = ({
   userPlan,
   onPlay,
   onPurchase,
-  onUpgrade,
-  isPremium = false
+  onUpgrade
 }) => {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
@@ -52,30 +50,20 @@ const GameCard: React.FC<GameCardProps> = ({
   };
 
   return (
-    <Card className={`transition-all duration-200 hover:shadow-md ${isLocked ? 'opacity-75' : ''} ${isPremium && !game.is_free ? 'ring-2 ring-yellow-400 ring-opacity-50' : ''}`}>
+    <Card className={`transition-all duration-200 hover:shadow-md ${isLocked ? 'opacity-75' : ''}`}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
             <span className="text-2xl">{getGameIcon(game.name)}</span>
             <div>
-              <CardTitle className="text-lg flex items-center gap-2">
-                {game.name}
-                {isPremium && !game.is_free && (
-                  <Crown className="w-4 h-4 text-yellow-500" />
-                )}
-              </CardTitle>
+              <CardTitle className="text-lg">{game.name}</CardTitle>
               <div className="flex items-center gap-2 mt-1">
                 <Badge variant="outline" className={getDifficultyColor(game.difficulty)}>
                   {game.difficulty}
                 </Badge>
-                {!game.is_free && !isPremium && (
+                {!game.is_free && (
                   <Badge variant="secondary">
                     π {game.price_pi}
-                  </Badge>
-                )}
-                {isPremium && !game.is_free && (
-                  <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white">
-                    Premium Unlocked
                   </Badge>
                 )}
               </div>
@@ -87,14 +75,13 @@ const GameCard: React.FC<GameCardProps> = ({
       <CardContent className="pt-0">
         <CardDescription className="mb-4 min-h-[3rem]">
           {game.description || `A challenging ${game.difficulty.toLowerCase()} level ${game.name.toLowerCase()} game.`}
-          {isPremium && !game.is_free && " Premium access - No ads!"}
         </CardDescription>
         
         <div className="flex gap-2">
-          {!isLocked || isPremium ? (
+          {!isLocked ? (
             <Button onClick={() => onPlay(game)} className="flex-1">
               <Play className="w-4 h-4 mr-2" />
-              {isPremium && !game.is_free ? 'Play Premium' : 'Play'}
+              Play
             </Button>
           ) : (
             <>
@@ -112,7 +99,7 @@ const GameCard: React.FC<GameCardProps> = ({
                   <Button 
                     onClick={onUpgrade} 
                     size="sm"
-                    className="flex-1 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600"
+                    className="flex-1"
                   >
                     <Crown className="w-4 h-4 mr-1" />
                     Premium

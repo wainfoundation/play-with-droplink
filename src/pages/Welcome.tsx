@@ -7,6 +7,10 @@ import WelcomeStyles from '@/components/welcome/WelcomeStyles';
 import { characters } from '@/components/welcome/characterData';
 import { generateRandomName, resetUsedNames } from '@/utils/nameGenerator';
 
+interface WelcomeProps {
+  onEnter?: () => void;
+}
+
 const tutorialSteps = [
   {
     title: "Welcome to Gaming!",
@@ -30,7 +34,7 @@ const tutorialSteps = [
   }
 ];
 
-const Welcome: React.FC = () => {
+const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
   const [mascotVisible, setMascotVisible] = useState(false);
   const [welcomeTextVisible, setWelcomeTextVisible] = useState(false);
   const [buttonsVisible, setButtonsVisible] = useState(false);
@@ -62,7 +66,9 @@ const Welcome: React.FC = () => {
   }, []);
 
   const handleGoToGaming = () => {
-    window.location.href = '/play';
+    if (onEnter) {
+      onEnter();
+    }
   };
 
   const handleStartTutorial = () => {

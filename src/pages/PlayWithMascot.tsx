@@ -5,34 +5,25 @@ import { useUser } from '@/context/UserContext';
 import { useToast } from '@/components/ui/use-toast';
 import { useGames } from '@/hooks/useGames';
 import { usePiPayment } from '@/hooks/usePiPayment';
-import { useUserPlan } from '@/hooks/useUserPlan';
-import { useIsMobile } from '@/hooks/use-mobile';
 import GameEngine from '@/components/games/GameEngine';
 import PiBrowserCheck from '@/components/PiBrowserCheck';
 import CharacterDisplay from '@/components/games/CharacterDisplay';
 import GameCategories from '@/components/games/GameCategories';
 import PremiumCTA from '@/components/games/PremiumCTA';
-import AllGames from '@/components/games/AllGames';
 import { isRunningInPiBrowser } from '@/utils/pi-sdk';
-import { HelpCircle, Shield, FileText, Crown, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { HelpCircle, Shield, FileText } from 'lucide-react';
 
 const PlayWithMascot = () => {
   const { user, isLoggedIn } = useUser();
   const { toast } = useToast();
   const { games, loading: gamesLoading } = useGames();
   const { handleSubscribe, loading: paymentLoading } = usePiPayment();
-  const { plan, canAccessAllGames, showAds } = useUserPlan();
-  const isMobile = useIsMobile();
-  
   const [totalScore, setTotalScore] = useState(0);
   const [currentGame, setCurrentGame] = useState<any>(null);
+  const [userPlan, setUserPlan] = useState('free');
+  const [purchasedGames, setPurchasedGames] = useState<string[]>([]);
   const [showPiBrowserCheck, setShowPiBrowserCheck] = useState(true);
   const [selectedCharacter, setSelectedCharacter] = useState<any>(null);
-  const [showAllGames, setShowAllGames] = useState(false);
-  const [purchasedGames, setPurchasedGames] = useState<string[]>([]);
-
-  const isPremium = plan === 'premium';
 
   // Check Pi Browser on component mount
   useEffect(() => {
@@ -50,6 +41,7 @@ const PlayWithMascot = () => {
         setSelectedCharacter(JSON.parse(savedCharacter));
       } catch (error) {
         console.error('Error parsing saved character:', error);
+        // Set default character
         setSelectedCharacter({
           id: 'droplet-blue-happy',
           name: 'Droplink',
@@ -60,6 +52,7 @@ const PlayWithMascot = () => {
         });
       }
     } else {
+      // Set default character
       setSelectedCharacter({
         id: 'droplet-blue-happy',
         name: 'Droplink',
@@ -71,46 +64,21 @@ const PlayWithMascot = () => {
     }
   }, []);
 
-  // Set user score from user data
+  // Set user plan from user data
   useEffect(() => {
+    if (user?.plan) {
+      setUserPlan(user.plan);
+    }
     if (user?.total_score) {
       setTotalScore(user.total_score);
     }
   }, [user]);
 
-  const handleGameSelect = (game: any) => {
-    setCurrentGame({ ...game, category: game.category || 'general' });
-    setShowAllGames(false);
-    toast({
-      title: `Starting ${game.name}`,
-      description: isPremium ? "Enjoy ad-free gaming!" : "Get ready to play!",
-    });
-  };
-
-  const handleViewAllGames = () => {
-    setShowAllGames(true);
-  };
-
-  const handleBackFromAllGames = () => {
-    setShowAllGames(false);
-  };
-
   const handleGameClick = (game: any, category: string) => {
-    // Premium users can access all games
-    if (isPremium || canAccessAllGames) {
-      setCurrentGame({ ...game, category });
-      toast({
-        title: `Starting ${game.name}`,
-        description: isPremium ? "Enjoy ad-free gaming!" : "Get ready to play!",
-      });
-      return;
-    }
-
-    // Free users need to check game access
-    if (!game.is_free && !purchasedGames.includes(game.id)) {
+    if (!game.is_free && userPlan === 'free' && !purchasedGames.includes(game.id)) {
       toast({
         title: "Premium Required",
-        description: `${game.name} requires Premium subscription (10π/month) or individual purchase.`,
+        description: `${game.name} requires a Premium subscription or individual purchase.`,
         variant: "destructive",
       });
       return;
@@ -186,10 +154,7 @@ const PlayWithMascot = () => {
 
     try {
       await handleSubscribe('premium', 'monthly');
-      toast({
-        title: "Premium Activated! 👑",
-        description: "Welcome to ad-free gaming with all games unlocked!",
-      });
+      setUserPlan('premium');
     } catch (error) {
       console.error('Premium upgrade failed:', error);
     }
@@ -209,23 +174,19 @@ const PlayWithMascot = () => {
   };
 
   const handleAdReward = (reward: any) => {
-    if (!isPremium) {
-      setTotalScore(prev => prev + 10);
-      toast({
-        title: "Ad Reward Earned!",
-        description: `You earned ${reward.amount} ${reward.type} for watching an ad!`,
-      });
-    }
+    setTotalScore(prev => prev + 10);
+    toast({
+      title: "Ad Reward Earned!",
+      description: `You earned ${reward.amount} ${reward.type} for watching an ad!`,
+    });
   };
 
   const handleAdError = (error: string) => {
-    if (!isPremium) {
-      toast({
-        title: "Ad Error",
-        description: error,
-        variant: "destructive",
-      });
-    }
+    toast({
+      title: "Ad Error",
+      description: error,
+      variant: "destructive",
+    });
   };
 
   if (showPiBrowserCheck && !isRunningInPiBrowser()) {
@@ -255,41 +216,12 @@ const PlayWithMascot = () => {
         <Helmet>
           <title>{currentGame.name} - Droplink Gaming</title>
         </Helmet>
-        <div className={isMobile ? "min-h-screen" : "min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8"}>
-          <div className={isMobile ? "" : "container mx-auto px-4"}>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">
+          <div className="container mx-auto px-4">
             <GameEngine
               game={currentGame}
               onBack={handleBackToGames}
               onGameComplete={handleGameComplete}
-            />
-          </div>
-        </div>
-      </>
-    );
-  }
-
-  // Show AllGames component if requested
-  if (showAllGames) {
-    return (
-      <>
-        <Helmet>
-          <title>All Games - Droplink Gaming</title>
-        </Helmet>
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8">
-          <div className="container mx-auto px-4">
-            <div className="mb-6">
-              <Button 
-                onClick={handleBackFromAllGames}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back to Game Hub
-              </Button>
-            </div>
-            <AllGames 
-              onGameSelect={handleGameSelect}
-              onUpgradeToPremium={handleUpgradeToPremium}
             />
           </div>
         </div>
@@ -308,43 +240,20 @@ const PlayWithMascot = () => {
         <div className="container mx-auto px-4">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
-                Play with Droplink
-              </h1>
-              {isPremium && (
-                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full flex items-center gap-1 text-sm font-semibold">
-                  <Crown className="w-4 h-4" />
-                  Premium
-                </div>
-              )}
-            </div>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
+              Play with Droplink
+            </h1>
             <p className="text-lg text-gray-600 mb-6">
               {games.length}+ interactive games with your gaming companion
-              {isPremium && " - Ad-free experience!"}
             </p>
             
             {/* Premium CTA for Free Users */}
-            {!isPremium && (
-              <PremiumCTA
-                userPlan={plan}
-                gamesCount={games.length}
-                paymentLoading={paymentLoading}
-                onUpgradeToPremium={handleUpgradeToPremium}
-              />
-            )}
-
-            {/* View All Games Button */}
-            <div className="mb-6">
-              <Button 
-                onClick={handleViewAllGames}
-                size="lg"
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3"
-              >
-                <Crown className="w-5 h-5 mr-2" />
-                View All {games.length} Games
-              </Button>
-            </div>
+            <PremiumCTA
+              userPlan={userPlan}
+              gamesCount={games.length}
+              paymentLoading={paymentLoading}
+              onUpgradeToPremium={handleUpgradeToPremium}
+            />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
@@ -352,7 +261,7 @@ const PlayWithMascot = () => {
             <CharacterDisplay
               selectedCharacter={selectedCharacter}
               totalScore={totalScore}
-              userPlan={plan}
+              userPlan={userPlan}
               paymentLoading={paymentLoading}
               onUpgradeToPremium={handleUpgradeToPremium}
               onAdReward={handleAdReward}
@@ -362,13 +271,11 @@ const PlayWithMascot = () => {
             {/* Games Area */}
             <GameCategories
               games={games}
-              userPlan={plan}
+              userPlan={userPlan}
               purchasedGames={purchasedGames}
-              onGameClick={handleGameSelect}
+              onGameClick={handleGameClick}
               onPurchaseGame={handlePurchaseGame}
               onUpgradeToPremium={handleUpgradeToPremium}
-              isPremium={isPremium}
-              canAccessAllGames={canAccessAllGames}
             />
           </div>
         </div>

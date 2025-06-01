@@ -21,22 +21,11 @@ const WelcomeHome: React.FC<WelcomeHomeProps> = ({
   onStartTutorial,
   onSkipToCharacterSelect
 }) => {
-  // Create a special "let's play together" character for the welcome page
-  const playTogetherCharacter = {
-    ...characters[0],
-    mood: 'excited',
-    personality: "Let's play together!"
-  };
-
-  const handlePlayNow = () => {
-    window.location.href = '/play';
-  };
-
   return (
     <>
       <Helmet>
-        <title>Welcome to Gaming Hub - Your Pi Network Gaming Platform</title>
-        <meta name="description" content="Welcome to Gaming Hub! Play games, earn Pi, and have fun with your character companions." />
+        <title>Welcome to Droplink Gaming - Your Pi Network Gaming Hub</title>
+        <meta name="description" content="Welcome to Droplink Gaming! Play games, earn Pi, and have fun with your character companions." />
       </Helmet>
       
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden">
@@ -61,14 +50,7 @@ const WelcomeHome: React.FC<WelcomeHomeProps> = ({
             mascotVisible ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-50 translate-y-10'
           }`}>
             <div className="relative mb-8">
-              <CharacterRenderer character={playTogetherCharacter} size={200} />
-              {/* Speech bubble */}
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-white rounded-lg px-4 py-2 shadow-lg border-2 border-primary/20 animate-bounce">
-                <div className="text-sm font-medium text-primary">Let's play together! 🎮</div>
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full">
-                  <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white"></div>
-                </div>
-              </div>
+              <CharacterRenderer character={characters[0]} size={200} />
             </div>
           </div>
 
@@ -78,11 +60,11 @@ const WelcomeHome: React.FC<WelcomeHomeProps> = ({
           }`}>
             <h1 className="text-4xl md:text-6xl font-bold mb-4">
               <span className="bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent">
-                Welcome to Gaming Hub!
+                Welcome to Play with Droplink!
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-2">
-              Your Pi Network Gaming Platform
+              Your Pi Network Gaming Hub
             </p>
             <p className="text-lg text-gray-500 max-w-2xl mx-auto">
               Play amazing games, earn rewards, and have fun with your character companions 
@@ -96,21 +78,21 @@ const WelcomeHome: React.FC<WelcomeHomeProps> = ({
           }`}>
             <div className="flex flex-col sm:flex-row gap-4 mt-8">
               <Button 
-                onClick={handlePlayNow}
+                onClick={onStartTutorial}
                 size="lg" 
                 className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 transform transition hover:scale-105 duration-200 text-lg px-8 py-4"
               >
                 <Play className="mr-2 h-5 w-5" />
-                Play Now
+                Start Tutorial
               </Button>
               <Button 
-                onClick={onStartTutorial}
+                onClick={onSkipToCharacterSelect}
                 variant="outline" 
                 size="lg" 
                 className="hover:bg-blue-50 transition-colors text-lg px-8 py-4"
               >
                 <SkipForward className="mr-2 h-5 w-5" />
-                Tutorial
+                Choose Character
               </Button>
             </div>
           </div>

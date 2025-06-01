@@ -1,16 +1,14 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, RefreshCw, Trophy, Star, Heart, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Trophy, Star, Heart } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { playSoundEffect, backgroundMusic } from '@/utils/sounds';
 import BlockConnectEngine from '@/components/games/engines/BlockConnectEngine';
 import ColorMergeEngine from '@/components/games/engines/ColorMergeEngine';
 import SudokuClassicEngine from '@/components/games/engines/SudokuClassicEngine';
-import TriviaEngine from '@/components/games/engines/TriviaEngine';
 
 interface GameEngineProps {
   game: {
@@ -24,8 +22,6 @@ interface GameEngineProps {
 }
 
 const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete }) => {
-  const isMobile = useIsMobile();
-  
   // Check if we have a specific engine for this game
   if (game.id === 'block-connect') {
     return <BlockConnectEngine onBack={onBack} onGameComplete={onGameComplete} />;
@@ -39,11 +35,6 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
     return <SudokuClassicEngine onBack={onBack} onGameComplete={onGameComplete} />;
   }
 
-  // Handle all trivia games with the TriviaEngine
-  if (game.category === 'trivia') {
-    return <TriviaEngine gameId={game.id} onBack={onBack} onGameComplete={onGameComplete} />;
-  }
-
   const [gameState, setGameState] = React.useState<any>({});
   const [score, setScore] = React.useState(0);
   const [level, setLevel] = React.useState(1);
@@ -51,18 +42,6 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
   const [timeLeft, setTimeLeft] = React.useState(60);
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [gameOver, setGameOver] = React.useState(false);
-  const [soundEnabled, setSoundEnabled] = React.useState(true);
-
-  // Start background music when component mounts
-  React.useEffect(() => {
-    if (soundEnabled) {
-      backgroundMusic.play('/sounds/background/gameplay-music.mp3');
-    }
-    
-    return () => {
-      backgroundMusic.stop();
-    };
-  }, [soundEnabled]);
 
   // Game timer
   React.useEffect(() => {
@@ -72,9 +51,6 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
           if (prev <= 1) {
             setGameOver(true);
             setIsPlaying(false);
-            if (soundEnabled) {
-              playSoundEffect('gameOver', 0.7);
-            }
             return 0;
           }
           return prev - 1;
@@ -82,7 +58,7 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
       }, 1000);
       return () => clearInterval(timer);
     }
-  }, [isPlaying, timeLeft, soundEnabled]);
+  }, [isPlaying, timeLeft]);
 
   const startGame = () => {
     setIsPlaying(true);
@@ -91,11 +67,6 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
     setLevel(1);
     setLives(3);
     setTimeLeft(60);
-    
-    if (soundEnabled) {
-      playSoundEffect('newLevel', 0.7);
-    }
-    
     initializeGameSpecific();
   };
 
@@ -106,6 +77,9 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
         break;
       case 'action':
         initializeActionGame();
+        break;
+      case 'trivia':
+        initializeTriviaGame();
         break;
       case 'creative':
         initializeCreativeGame();
@@ -145,6 +119,15 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
       bullets: [],
       obstacles: [],
       speed: 1
+    });
+  };
+
+  const initializeTriviaGame = () => {
+    setGameState({
+      currentQuestion: 0,
+      questions: generateTriviaQuestions(),
+      answers: [],
+      streak: 0
     });
   };
 
@@ -195,12 +178,23 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
     }));
   };
 
+  const generateTriviaQuestions = () => {
+    return [
+      {
+        question: "What is the capital of France?",
+        options: ["London", "Berlin", "Paris", "Madrid"],
+        correct: 2
+      },
+      {
+        question: "What is 2 + 2?",
+        options: ["3", "4", "5", "6"],
+        correct: 1
+      }
+    ];
+  };
+
   const handleGameAction = (action: string, data?: any) => {
     if (!isPlaying) return;
-
-    if (soundEnabled) {
-      playSoundEffect('click', 0.3);
-    }
 
     switch (action) {
       case 'click':
@@ -219,16 +213,8 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
 
   const handleClick = (data: any) => {
     setScore(prev => prev + 10);
-    
-    if (soundEnabled) {
-      playSoundEffect('collect', 0.5);
-    }
-    
     if (score > 0 && score % 100 === 0) {
       setLevel(prev => prev + 1);
-      if (soundEnabled) {
-        playSoundEffect('levelComplete', 0.8);
-      }
       toast({
         title: "Level Up!",
         description: `You've reached level ${level + 1}!`,
@@ -240,9 +226,6 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
     const question = gameState.questions?.[gameState.currentQuestion];
     if (question && answerIndex === question.correct) {
       setScore(prev => prev + 50);
-      if (soundEnabled) {
-        playSoundEffect('success', 0.6);
-      }
       setGameState(prev => ({
         ...prev,
         streak: prev.streak + 1,
@@ -250,9 +233,6 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
       }));
     } else {
       setLives(prev => prev - 1);
-      if (soundEnabled) {
-        playSoundEffect('error', 0.4);
-      }
       setGameState(prev => ({
         ...prev,
         streak: 0,
@@ -268,19 +248,11 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
   const handleMove = (direction: string) => {
     // Handle player movement for action games
     setScore(prev => prev + 1);
-    if (soundEnabled) {
-      playSoundEffect('collect', 0.3);
-    }
   };
 
   const endGame = () => {
     setIsPlaying(false);
     setGameOver(true);
-    
-    if (soundEnabled) {
-      playSoundEffect('gameOver', 0.7);
-    }
-    
     onGameComplete(score);
     
     toast({
@@ -330,6 +302,8 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
         return renderPuzzleGame();
       case 'action':
         return renderActionGame();
+      case 'trivia':
+        return renderTriviaGame();
       case 'creative':
         return renderCreativeGame();
       case 'infinite':
@@ -390,6 +364,31 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
       </div>
     </div>
   );
+
+  const renderTriviaGame = () => {
+    const question = gameState.questions?.[gameState.currentQuestion];
+    if (!question) return <div>Loading question...</div>;
+
+    return (
+      <div className="space-y-4">
+        <div className="text-center">
+          <h3 className="text-lg font-semibold mb-4">{question.question}</h3>
+          <div className="grid grid-cols-1 gap-2 max-w-md mx-auto">
+            {question.options.map((option: string, i: number) => (
+              <Button
+                key={i}
+                variant="outline"
+                onClick={() => handleAnswer(i)}
+                className="text-left justify-start"
+              >
+                {String.fromCharCode(65 + i)}. {option}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const renderCreativeGame = () => (
     <div className="space-y-4">
@@ -456,81 +455,6 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
     </div>
   );
 
-  // Mobile full screen wrapper
-  if (isMobile) {
-    return (
-      <div className="fixed inset-0 z-50 bg-white">
-        <div className="flex flex-col h-full">
-          {/* Mobile Header */}
-          <div className="flex items-center justify-between p-4 border-b bg-white">
-            <Button variant="ghost" size="sm" onClick={onBack}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-            <div className="flex items-center gap-2">
-              <div className="text-lg">🎮</div>
-              <span className="font-semibold text-sm">{game.name}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSoundEnabled(!soundEnabled)}
-              >
-                {soundEnabled ? <Volume2 className="h-3 w-3" /> : <VolumeX className="h-3 w-3" />}
-              </Button>
-              <Badge variant="outline" className="text-xs">{game.category}</Badge>
-            </div>
-          </div>
-
-          {/* Mobile Game Stats */}
-          <div className="grid grid-cols-4 gap-2 p-3 bg-gray-50 border-b">
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1">
-                <Trophy className="w-3 h-3 text-yellow-500" />
-                <span className="font-semibold text-sm">{score}</span>
-              </div>
-              <p className="text-xs text-gray-600">Score</p>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1">
-                <Star className="w-3 h-3 text-blue-500" />
-                <span className="font-semibold text-sm">{level}</span>
-              </div>
-              <p className="text-xs text-gray-600">Level</p>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1">
-                <Heart className="w-3 h-3 text-red-500" />
-                <span className="font-semibold text-sm">{lives}</span>
-              </div>
-              <p className="text-xs text-gray-600">Lives</p>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1">
-                <span className="font-semibold text-sm">{timeLeft}s</span>
-              </div>
-              <p className="text-xs text-gray-600">Time</p>
-            </div>
-          </div>
-
-          {/* Time Progress Bar */}
-          {isPlaying && (
-            <div className="px-4 py-2 bg-gray-50">
-              <Progress value={(timeLeft / 60) * 100} className="h-1" />
-            </div>
-          )}
-
-          {/* Mobile Game Content */}
-          <div className="flex-1 overflow-auto p-4">
-            {renderGameContent()}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Desktop version
   return (
     <Card className="max-w-2xl mx-auto">
       <CardHeader>
@@ -543,16 +467,7 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
             <div className="text-2xl">🎮</div>
             {game.name}
           </CardTitle>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSoundEnabled(!soundEnabled)}
-            >
-              {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-            </Button>
-            <Badge variant="outline">{game.category}</Badge>
-          </div>
+          <Badge variant="outline">{game.category}</Badge>
         </div>
       </CardHeader>
       <CardContent>

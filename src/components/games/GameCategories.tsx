@@ -18,8 +18,6 @@ interface GameCategoriesProps {
   onGameClick: (game: any, category: string) => void;
   onPurchaseGame: (game: any) => void;
   onUpgradeToPremium: () => void;
-  isPremium?: boolean;
-  canAccessAllGames?: boolean;
 }
 
 const GameCategories: React.FC<GameCategoriesProps> = ({
@@ -28,9 +26,7 @@ const GameCategories: React.FC<GameCategoriesProps> = ({
   purchasedGames,
   onGameClick,
   onPurchaseGame,
-  onUpgradeToPremium,
-  isPremium = false,
-  canAccessAllGames = false
+  onUpgradeToPremium
 }) => {
   const organizeGamesByCategory = () => {
     const categories = {
@@ -89,22 +85,15 @@ const GameCategories: React.FC<GameCategoriesProps> = ({
                 <CardTitle className="flex items-center gap-2">
                   <category.icon className="w-6 h-6" />
                   {category.name}
-                  {isPremium && (
-                    <span className="text-sm bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full">
-                      All Unlocked
-                    </span>
-                  )}
                 </CardTitle>
                 <CardDescription>
                   Choose from {category.games.length} amazing {category.name.toLowerCase()} games
-                  {isPremium && " - All premium games included!"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {category.games.map(game => {
-                    // Premium users can access all games
-                    const isLocked = !isPremium && !canAccessAllGames && !game.is_free && !purchasedGames.includes(game.id);
+                    const isLocked = !game.is_free && userPlan === 'free' && !purchasedGames.includes(game.id);
                     return (
                       <GameCard
                         key={game.id}
@@ -114,7 +103,6 @@ const GameCategories: React.FC<GameCategoriesProps> = ({
                         onPlay={(game) => onGameClick(game, key)}
                         onPurchase={onPurchaseGame}
                         onUpgrade={onUpgradeToPremium}
-                        isPremium={isPremium}
                       />
                     );
                   })}
