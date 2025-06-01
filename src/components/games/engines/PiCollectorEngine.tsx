@@ -351,7 +351,10 @@ const PiCollectorEngine: React.FC<PiCollectorEngineProps> = ({ onBack, onGameCom
         </div>
 
         {/* Game Area */}
-        <div className="relative bg-gradient-to-b from-blue-900 to-purple-900 rounded-lg mx-auto overflow-hidden" style={{ width: gameArea.width, height: gameArea.height }}>
+        <div 
+          className="relative bg-gradient-to-b from-blue-900 to-purple-900 rounded-lg mx-auto overflow-hidden" 
+          style={{ width: gameArea.width, height: gameArea.height }}
+        >
           {/* Player */}
           <div
             className="absolute bg-gradient-to-r from-blue-400 to-purple-400 rounded-lg flex items-center justify-center text-white font-bold transition-all duration-75"
@@ -380,7 +383,7 @@ const PiCollectorEngine: React.FC<PiCollectorEngineProps> = ({ onBack, onGameCom
                 backgroundColor: 
                   coin.type === 'mega' ? '#8B5CF6' : 
                   coin.type === 'golden' ? '#F59E0B' : '#3B82F6',
-                boxShadow: `0 0 ${coin.type === 'mega' ? '15px' : '8px} ${
+                boxShadow: `0 0 ${coin.type === 'mega' ? '15px' : '8px'} ${
                   coin.type === 'mega' ? '#8B5CF6' : 
                   coin.type === 'golden' ? '#F59E0B' : '#3B82F6'
                 }50`
