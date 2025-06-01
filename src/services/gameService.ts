@@ -99,7 +99,7 @@ export class GameService {
     try {
       const adResult = await showRewardedAdAdvanced();
       
-      if (adResult.result === 'AD_REWARDED') {
+      if (adResult.success) {
         // Record the ad-based unlock
         const { error } = await supabase
           .from('purchased_games')

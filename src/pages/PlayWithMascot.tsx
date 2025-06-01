@@ -30,6 +30,7 @@ const PlayWithMascot = () => {
   const [showPiBrowserCheck, setShowPiBrowserCheck] = useState(true);
   const [selectedCharacter, setSelectedCharacter] = useState<any>(null);
   const [showAllGames, setShowAllGames] = useState(false);
+  const [purchasedGames, setPurchasedGames] = useState<string[]>([]);
 
   const isPremium = plan === 'premium';
 
@@ -362,9 +363,9 @@ const PlayWithMascot = () => {
             <GameCategories
               games={games}
               userPlan={plan}
-              purchasedGames={[]}
+              purchasedGames={purchasedGames}
               onGameClick={handleGameSelect}
-              onPurchaseGame={() => {}}
+              onPurchaseGame={handlePurchaseGame}
               onUpgradeToPremium={handleUpgradeToPremium}
               isPremium={isPremium}
               canAccessAllGames={canAccessAllGames}
