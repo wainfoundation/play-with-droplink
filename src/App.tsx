@@ -8,6 +8,8 @@ import Play from "@/pages/Play";
 import Help from "@/pages/Help";
 import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
+import SudokuInfinite from "@/pages/games/SudokuInfinite";
+import DroplinkRunner from "@/pages/games/DroplinkRunner";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +48,14 @@ function App() {
             <Route path="/help" element={<Help />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
+            {/* Game Routes */}
+            <Route path="/game/sudoku-infinite" element={<SudokuInfinite />} />
+            <Route path="/game/droplink-runner" element={<DroplinkRunner />} />
+            <Route path="/game/block-connect" element={<SudokuInfinite />} />
+            <Route path="/game/word-puzzle" element={<SudokuInfinite />} />
+            <Route path="/game/target-rush" element={<DroplinkRunner />} />
+            <Route path="/game/quick-tap" element={<DroplinkRunner />} />
+            <Route path="/game/pi-collector" element={<DroplinkRunner />} />
           </Routes>
         )}
       </Router>
