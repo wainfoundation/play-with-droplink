@@ -73,7 +73,7 @@ Take care of your personal Droplink character like a virtual pet!
 **Droplink Coin** is the in-game currency used to unlock paid features, cosmetic items, and special content.
 
 ### 🎥 How to Earn Coins
-- **1 Pi Ad watched = 1 Coin**
+- **1 Ad watched = 1 Coin**
 - **1 Pi payment = 10 Coins**
 - **Daily bonuses** for premium users
 
