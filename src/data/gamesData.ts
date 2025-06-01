@@ -1,4 +1,3 @@
-
 export const gamesData = [
   // Free Games - Accessible to all visitors
   {
@@ -44,6 +43,41 @@ export const gamesData = [
     price_pi: 0,
     premium: false,
     description: 'Blend colors to solve puzzles through infinite levels! Perfect for training creativity and logic!'
+  },
+  
+  // Free Trivia Games
+  {
+    id: 'general-knowledge',
+    name: 'General Knowledge',
+    title: 'General Knowledge',
+    category: 'trivia',
+    difficulty: 'Medium',
+    is_free: true,
+    price_pi: 0,
+    premium: false,
+    description: 'Test your knowledge across various topics'
+  },
+  {
+    id: 'geography-quiz',
+    name: 'Geography Quiz',
+    title: 'Geography Quiz',
+    category: 'trivia',
+    difficulty: 'Medium',
+    is_free: true,
+    price_pi: 0,
+    premium: false,
+    description: 'Explore the world through geography questions'
+  },
+  {
+    id: 'sports-trivia',
+    name: 'Sports Trivia',
+    title: 'Sports Trivia',
+    category: 'trivia',
+    difficulty: 'Easy',
+    is_free: true,
+    price_pi: 0,
+    premium: false,
+    description: 'Test your sports knowledge from football to fencing'
   },
   
   // Premium Games - Require Pi payment or subscription
@@ -113,6 +147,30 @@ export const gamesData = [
     premium: true,
     description: 'Become the ultimate action hero in fast-paced adventures'
   },
+  
+  // Premium Trivia Games
+  {
+    id: 'science-quiz',
+    name: 'Science Quiz',
+    title: 'Science Quiz',
+    category: 'trivia',
+    difficulty: 'Hard',
+    is_free: false,
+    price_pi: 2,
+    premium: true,
+    description: 'Challenge yourself with advanced science questions'
+  },
+  {
+    id: 'history-quiz',
+    name: 'History Quiz',
+    title: 'History Quiz',
+    category: 'trivia',
+    difficulty: 'Medium',
+    is_free: false,
+    price_pi: 1,
+    premium: true,
+    description: 'Journey through historical events and figures'
+  },
   {
     id: 'trivia-champion',
     name: 'Trivia Champion',
@@ -120,10 +178,33 @@ export const gamesData = [
     category: 'trivia',
     difficulty: 'Expert',
     is_free: false,
+    price_pi: 3,
+    premium: true,
+    description: 'Ultimate trivia challenge for true champions'
+  },
+  {
+    id: 'movie-trivia',
+    name: 'Movie Trivia',
+    title: 'Movie Trivia',
+    category: 'trivia',
+    difficulty: 'Medium',
+    is_free: false,
+    price_pi: 1,
+    premium: true,
+    description: 'Test your knowledge of cinema and film history'
+  },
+  {
+    id: 'literature-quiz',
+    name: 'Literature Quiz',
+    title: 'Literature Quiz',
+    category: 'trivia',
+    difficulty: 'Hard',
+    is_free: false,
     price_pi: 2,
     premium: true,
-    description: 'Challenge yourself with expert-level trivia questions'
+    description: 'Explore the world of books and famous authors'
   },
+  
   {
     id: 'creative-studio',
     name: 'Creative Studio',
@@ -169,17 +250,6 @@ export const gamesData = [
     price_pi: 0,
     premium: false,
     description: 'Tap as fast as you can to beat high scores'
-  },
-  {
-    id: 'general-knowledge',
-    name: 'General Knowledge',
-    title: 'General Knowledge',
-    category: 'trivia',
-    difficulty: 'Medium',
-    is_free: true,
-    price_pi: 0,
-    premium: false,
-    description: 'Test your knowledge across various topics'
   },
   {
     id: 'color-mixer',

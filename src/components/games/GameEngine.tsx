@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +10,7 @@ import { playSoundEffect, backgroundMusic } from '@/utils/sounds';
 import BlockConnectEngine from '@/components/games/engines/BlockConnectEngine';
 import ColorMergeEngine from '@/components/games/engines/ColorMergeEngine';
 import SudokuClassicEngine from '@/components/games/engines/SudokuClassicEngine';
+import TriviaEngine from '@/components/games/engines/TriviaEngine';
 
 interface GameEngineProps {
   game: {
@@ -37,6 +37,11 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
 
   if (game.id === 'sudoku-classic') {
     return <SudokuClassicEngine onBack={onBack} onGameComplete={onGameComplete} />;
+  }
+
+  // Handle all trivia games with the TriviaEngine
+  if (game.category === 'trivia') {
+    return <TriviaEngine gameId={game.id} onBack={onBack} onGameComplete={onGameComplete} />;
   }
 
   const [gameState, setGameState] = React.useState<any>({});
@@ -102,9 +107,6 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
       case 'action':
         initializeActionGame();
         break;
-      case 'trivia':
-        initializeTriviaGame();
-        break;
       case 'creative':
         initializeCreativeGame();
         break;
@@ -143,15 +145,6 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
       bullets: [],
       obstacles: [],
       speed: 1
-    });
-  };
-
-  const initializeTriviaGame = () => {
-    setGameState({
-      currentQuestion: 0,
-      questions: generateTriviaQuestions(),
-      answers: [],
-      streak: 0
     });
   };
 
@@ -200,21 +193,6 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
       correctPosition: i,
       currentPosition: Math.floor(Math.random() * 16)
     }));
-  };
-
-  const generateTriviaQuestions = () => {
-    return [
-      {
-        question: "What is the capital of France?",
-        options: ["London", "Berlin", "Paris", "Madrid"],
-        correct: 2
-      },
-      {
-        question: "What is 2 + 2?",
-        options: ["3", "4", "5", "6"],
-        correct: 1
-      }
-    ];
   };
 
   const handleGameAction = (action: string, data?: any) => {
@@ -352,8 +330,6 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
         return renderPuzzleGame();
       case 'action':
         return renderActionGame();
-      case 'trivia':
-        return renderTriviaGame();
       case 'creative':
         return renderCreativeGame();
       case 'infinite':
@@ -414,31 +390,6 @@ const GameEngine: React.FC<GameEngineProps> = ({ game, onBack, onGameComplete })
       </div>
     </div>
   );
-
-  const renderTriviaGame = () => {
-    const question = gameState.questions?.[gameState.currentQuestion];
-    if (!question) return <div>Loading question...</div>;
-
-    return (
-      <div className="space-y-4">
-        <div className="text-center">
-          <h3 className="text-lg font-semibold mb-4">{question.question}</h3>
-          <div className="grid grid-cols-1 gap-2 max-w-md mx-auto">
-            {question.options.map((option: string, i: number) => (
-              <Button
-                key={i}
-                variant="outline"
-                onClick={() => handleAnswer(i)}
-                className="text-left justify-start"
-              >
-                {String.fromCharCode(65 + i)}. {option}
-              </Button>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   const renderCreativeGame = () => (
     <div className="space-y-4">
