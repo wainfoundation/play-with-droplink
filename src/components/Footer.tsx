@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Heart, Github, Twitter, Mail } from "lucide-react";
+import { Heart, Github, Twitter, Mail, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 
 const Footer = () => {
@@ -23,7 +23,7 @@ const Footer = () => {
             </div>
             <p className="text-gray-600 mb-4 max-w-md">
               Experience the joy of gaming and pet care in the Pi Network ecosystem. 
-              Play games, earn Pi coins, and take care of your adorable pet droplet!
+              Take care of your adorable pet droplet, play mini-games, and earn Pi coins!
             </p>
             <div className="flex items-center space-x-4">
               <motion.a
@@ -72,22 +72,36 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/auth" className="text-gray-600 hover:text-primary transition-colors">
-                  Login
+                <Link to="/other-apps" className="text-gray-600 hover:text-primary transition-colors">
+                  Other Apps
+                </Link>
+              </li>
+              <li>
+                <Link to="/help" className="text-gray-600 hover:text-primary transition-colors">
+                  Help & Support
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Game Features */}
+          {/* Legal & Info */}
           <div>
-            <h4 className="font-semibold text-gray-800 mb-4">Game Features</h4>
+            <h4 className="font-semibold text-gray-800 mb-4">Legal & Info</h4>
             <ul className="space-y-2">
-              <li className="text-gray-600">🐾 Pet Care System</li>
-              <li className="text-gray-600">🎮 Mini Games</li>
-              <li className="text-gray-600">💰 Pi Coin Rewards</li>
-              <li className="text-gray-600">🏪 Pet Shop</li>
-              <li className="text-gray-600">📈 Level Up System</li>
+              <li>
+                <Link to="/privacy" className="text-gray-600 hover:text-primary transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms" className="text-gray-600 hover:text-primary transition-colors">
+                  Terms of Service
+                </Link>
+              </li>
+              <li className="flex items-center gap-2 text-gray-600">
+                <Globe className="w-4 h-4" />
+                MRWAIN ORGANIZATION
+              </li>
             </ul>
           </div>
         </div>

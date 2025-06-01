@@ -5,7 +5,7 @@ import { isRunningInPiBrowser } from '@/utils/pi-sdk';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { Lock, AlertTriangle, ExternalLink } from 'lucide-react';
+import { Lock, AlertTriangle, ExternalLink, Code } from 'lucide-react';
 import CharacterRenderer from '@/components/welcome/CharacterRenderer';
 import { characters } from '@/components/welcome/characterData';
 import PiBrowserRedirect from '@/components/auth/PiBrowserRedirect';
@@ -19,9 +19,13 @@ interface AuthGuardProps {
 const AuthGuard: React.FC<AuthGuardProps> = ({ children, requireAuth = true }) => {
   const { user, loading } = useAuth();
   const [isPiBrowser, setIsPiBrowser] = useState(false);
+  const [devBypass, setDevBypass] = useState(false);
 
   useEffect(() => {
     setIsPiBrowser(isRunningInPiBrowser());
+    // Check for development bypass
+    const hasDevBypass = localStorage.getItem('devBypass') === 'true';
+    setDevBypass(hasDevBypass);
   }, []);
 
   // Show loading state
@@ -41,10 +45,21 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, requireAuth = true }) =
     return <>{children}</>;
   }
 
+  // Development bypass
+  if (devBypass && process.env.NODE_ENV === 'development') {
+    return <>{children}</>;
+  }
+
   // If user is authenticated, render children
   if (user) {
     return <>{children}</>;
   }
+
+  // Development bypass option
+  const handleDevBypass = () => {
+    localStorage.setItem('devBypass', 'true');
+    setDevBypass(true);
+  };
 
   // If not in Pi Browser, show redirect prompt
   if (!isPiBrowser) {
@@ -67,6 +82,20 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, requireAuth = true }) =
             onContinue={() => {}} 
             showContinueOption={false}
           />
+
+          {/* Development bypass */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mt-4">
+              <Button
+                onClick={handleDevBypass}
+                variant="outline"
+                className="w-full border-orange-300 text-orange-700 hover:bg-orange-100"
+              >
+                <Code className="w-4 h-4 mr-2" />
+                Development Bypass
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -101,6 +130,18 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, requireAuth = true }) =
           
           <CardContent className="space-y-4">
             <PiAuthButton />
+            
+            {/* Development bypass */}
+            {process.env.NODE_ENV === 'development' && (
+              <Button
+                onClick={handleDevBypass}
+                variant="outline"
+                className="w-full border-orange-300 text-orange-700 hover:bg-orange-100"
+              >
+                <Code className="w-4 h-4 mr-2" />
+                Development Bypass
+              </Button>
+            )}
             
             <div className="text-center">
               <p className="text-xs text-gray-500">

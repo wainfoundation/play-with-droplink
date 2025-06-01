@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Gamepad2, HelpCircle } from "lucide-react";
+import { Gamepad2, HelpCircle, Globe } from "lucide-react";
 
 const DesktopNavigation = () => {
   const location = useLocation();
@@ -12,6 +12,7 @@ const DesktopNavigation = () => {
   const navItems = [
     { name: "Home", path: "/" },
     { name: "Play with Droplink", path: "/play", icon: Gamepad2 },
+    { name: "Other Apps", path: "/other-apps", icon: Globe },
     { name: "Help", path: "/help", icon: HelpCircle },
   ];
 

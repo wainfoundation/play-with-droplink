@@ -17,13 +17,11 @@ const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
   const [buttonsVisible, setButtonsVisible] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState('droplet-blue');
 
-  // Check if user has already completed the welcome flow
+  // Always start with splash screen (removed the localStorage check)
   useEffect(() => {
-    const hasCompletedWelcome = localStorage.getItem('welcomeCompleted');
-    if (hasCompletedWelcome) {
-      setCurrentStep('complete');
-      setShowSplash(false);
-    }
+    // For development, we always start fresh with splash
+    setCurrentStep('splash');
+    setShowSplash(true);
   }, []);
 
   const handleSplashComplete = () => {
@@ -69,12 +67,32 @@ const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
     setCurrentStep('complete');
   };
 
+  // Development bypass - add a skip button in development mode
+  const handleDevBypass = () => {
+    localStorage.setItem('welcomeCompleted', 'true');
+    localStorage.setItem('devBypass', 'true');
+    setCurrentStep('complete');
+  };
+
   if (currentStep === 'complete') {
     return <>{children}</>;
   }
 
   if (showSplash) {
-    return <SplashScreen onComplete={handleSplashComplete} />;
+    return (
+      <div className="relative">
+        <SplashScreen onComplete={handleSplashComplete} />
+        {/* Development bypass button */}
+        {process.env.NODE_ENV === 'development' && (
+          <button
+            onClick={handleDevBypass}
+            className="fixed top-4 right-4 z-50 bg-red-500 text-white px-3 py-1 rounded text-xs opacity-70 hover:opacity-100"
+          >
+            DEV SKIP
+          </button>
+        )}
+      </div>
+    );
   }
 
   if (currentStep === 'welcome') {
