@@ -7,6 +7,8 @@ import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, Heart, Utensils, Sparkles, Moon, Gamepad2, ShoppingBag, Coins } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import CharacterRenderer from '@/components/welcome/CharacterRenderer';
+import { characters } from '@/components/welcome/characterData';
 
 interface PetStats {
   happiness: number;
@@ -28,28 +30,43 @@ const PetCareGame: React.FC<PetCareGameProps> = ({ onBack }) => {
   });
   
   const [piCoins, setPiCoins] = useState(100);
-  const [petMood, setPetMood] = useState<'happy' | 'hungry' | 'dirty' | 'sleepy' | 'sad'>('happy');
   const [currentScreen, setCurrentScreen] = useState<'main' | 'shop' | 'minigame'>('main');
-  const [petAnimation, setPetAnimation] = useState('idle');
   const [hearts, setHearts] = useState<Array<{ id: number; x: number; y: number }>>([]);
   const [level, setLevel] = useState(1);
   const [experience, setExperience] = useState(0);
   const [experienceToNext, setExperienceToNext] = useState(100);
+  const [selectedCharacter, setSelectedCharacter] = useState(characters[0]);
+  const [currentMood, setCurrentMood] = useState('happy');
+
+  // Load selected character from localStorage on component mount
+  useEffect(() => {
+    const savedCharacter = localStorage.getItem('selectedCharacter');
+    if (savedCharacter) {
+      try {
+        const parsedCharacter = JSON.parse(savedCharacter);
+        setSelectedCharacter(parsedCharacter);
+      } catch (error) {
+        console.log('Error parsing saved character, using default');
+      }
+    }
+  }, []);
 
   // Pet mood calculation based on stats
   useEffect(() => {
     const { happiness, hunger, cleanliness, energy } = petStats;
     
     if (hunger < 30) {
-      setPetMood('hungry');
+      setCurrentMood('hungry');
     } else if (cleanliness < 30) {
-      setPetMood('dirty');
+      setCurrentMood('dirty');
     } else if (energy < 30) {
-      setPetMood('sleepy');
+      setCurrentMood('sleepy');
     } else if (happiness < 40) {
-      setPetMood('sad');
+      setCurrentMood('sad');
+    } else if (happiness > 80) {
+      setCurrentMood('excited');
     } else {
-      setPetMood('happy');
+      setCurrentMood('happy');
     }
   }, [petStats]);
 
@@ -76,15 +93,12 @@ const PetCareGame: React.FC<PetCareGameProps> = ({ onBack }) => {
         happiness: Math.min(100, prev.happiness + 10)
       }));
       
-      setPetAnimation('eating');
-      setTimeout(() => setPetAnimation('idle'), 2000);
-      
       addExperience(10);
       showFloatingHearts();
       
       toast({
         title: "Yummy! 🍎",
-        description: "Your pet loved the food!",
+        description: `${selectedCharacter.name} loved the food!`,
       });
     } else {
       toast({
@@ -104,15 +118,12 @@ const PetCareGame: React.FC<PetCareGameProps> = ({ onBack }) => {
         happiness: Math.min(100, prev.happiness + 15)
       }));
       
-      setPetAnimation('cleaning');
-      setTimeout(() => setPetAnimation('idle'), 2000);
-      
       addExperience(8);
       showFloatingHearts();
       
       toast({
         title: "So clean! ✨",
-        description: "Your pet is sparkling clean!",
+        description: `${selectedCharacter.name} is sparkling clean!`,
       });
     } else {
       toast({
@@ -130,14 +141,11 @@ const PetCareGame: React.FC<PetCareGameProps> = ({ onBack }) => {
       happiness: Math.min(100, prev.happiness + 10)
     }));
     
-    setPetAnimation('sleeping');
-    setTimeout(() => setPetAnimation('idle'), 3000);
-    
     addExperience(5);
     
     toast({
       title: "Sweet dreams! 😴",
-      description: "Your pet had a refreshing nap!",
+      description: `${selectedCharacter.name} had a refreshing nap!`,
     });
   };
 
@@ -148,15 +156,12 @@ const PetCareGame: React.FC<PetCareGameProps> = ({ onBack }) => {
       energy: Math.max(0, prev.energy - 10)
     }));
     
-    setPetAnimation('playing');
-    setTimeout(() => setPetAnimation('idle'), 2000);
-    
     addExperience(15);
     showFloatingHearts();
     
     toast({
       title: "So much fun! 🎮",
-      description: "Your pet loves playing with you!",
+      description: `${selectedCharacter.name} loves playing with you!`,
     });
   };
 
@@ -170,7 +175,7 @@ const PetCareGame: React.FC<PetCareGameProps> = ({ onBack }) => {
         
         toast({
           title: "Level Up! 🎉",
-          description: `Your pet reached level ${level + 1}! +20π bonus!`,
+          description: `${selectedCharacter.name} reached level ${level + 1}! +20π bonus!`,
         });
         
         return newExp - experienceToNext;
@@ -193,72 +198,55 @@ const PetCareGame: React.FC<PetCareGameProps> = ({ onBack }) => {
     }, 2000);
   };
 
-  const getPetEmoji = () => {
-    switch (petMood) {
-      case 'happy': return '😊';
-      case 'hungry': return '😋';
-      case 'dirty': return '😅';
-      case 'sleepy': return '😴';
-      case 'sad': return '😢';
-      default: return '😊';
-    }
-  };
+  const renderPet = () => {
+    // Create character with current mood for rendering
+    const characterWithMood = {
+      ...selectedCharacter,
+      mood: currentMood
+    };
 
-  const getPetAnimationClass = () => {
-    switch (petAnimation) {
-      case 'eating': return 'animate-bounce';
-      case 'cleaning': return 'animate-spin';
-      case 'sleeping': return 'animate-pulse';
-      case 'playing': return 'animate-bounce';
-      default: return 'animate-pulse';
-    }
-  };
-
-  const renderPet = () => (
-    <div className="relative flex items-center justify-center h-48">
-      {/* Pet Character */}
-      <motion.div
-        className={`relative ${getPetAnimationClass()}`}
-        animate={{ scale: [1, 1.05, 1] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      >
-        <div 
-          className="w-32 h-32 rounded-full flex items-center justify-center text-6xl shadow-lg"
-          style={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            border: '4px solid white'
-          }}
+    return (
+      <div className="relative flex items-center justify-center h-48">
+        {/* Pet Character using CharacterRenderer */}
+        <motion.div
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="relative"
         >
-          {getPetEmoji()}
-        </div>
-        
-        {/* Eyes */}
-        <div className="absolute top-8 left-8 w-3 h-3 bg-white rounded-full"></div>
-        <div className="absolute top-8 right-8 w-3 h-3 bg-white rounded-full"></div>
-        
-        {/* Blush */}
-        <div className="absolute top-16 left-4 w-4 h-2 bg-pink-300 rounded-full opacity-60"></div>
-        <div className="absolute top-16 right-4 w-4 h-2 bg-pink-300 rounded-full opacity-60"></div>
-      </motion.div>
+          <CharacterRenderer character={characterWithMood} size={160} />
+        </motion.div>
 
-      {/* Floating Hearts */}
-      <AnimatePresence>
-        {hearts.map(heart => (
-          <motion.div
-            key={heart.id}
-            className="absolute text-red-500 text-xl pointer-events-none"
-            style={{ left: heart.x, top: heart.y }}
-            initial={{ opacity: 1, y: 0, scale: 0.5 }}
-            animate={{ opacity: 0, y: -50, scale: 1.2 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 2 }}
-          >
-            ❤️
-          </motion.div>
-        ))}
-      </AnimatePresence>
-    </div>
-  );
+        {/* Floating Hearts */}
+        <AnimatePresence>
+          {hearts.map(heart => (
+            <motion.div
+              key={heart.id}
+              className="absolute text-red-500 text-xl pointer-events-none"
+              style={{ left: heart.x, top: heart.y }}
+              initial={{ opacity: 1, y: 0, scale: 0.5 }}
+              animate={{ opacity: 0, y: -50, scale: 1.2 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 2 }}
+            >
+              ❤️
+            </motion.div>
+          ))}
+        </AnimatePresence>
+
+        {/* Mood indicator */}
+        <div className="absolute -top-2 -right-2 bg-white rounded-full p-2 shadow-lg border-2 border-primary/20">
+          <div className="text-sm">
+            {currentMood === 'hungry' && '🍎'}
+            {currentMood === 'sleepy' && '💤'}
+            {currentMood === 'dirty' && '🧼'}
+            {currentMood === 'excited' && '✨'}
+            {currentMood === 'happy' && '😊'}
+            {currentMood === 'sad' && '😢'}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const renderShop = () => (
     <div className="space-y-4">
@@ -319,7 +307,7 @@ const PetCareGame: React.FC<PetCareGameProps> = ({ onBack }) => {
       </div>
       
       <Button variant="outline" onClick={() => setCurrentScreen('main')} className="w-full">
-        Back to Pet
+        Back to {selectedCharacter.name}
       </Button>
     </div>
   );
@@ -350,7 +338,7 @@ const PetCareGame: React.FC<PetCareGameProps> = ({ onBack }) => {
       </div>
       
       <Button variant="outline" onClick={() => setCurrentScreen('main')} className="w-full">
-        Back to Pet
+        Back to {selectedCharacter.name}
       </Button>
     </div>
   );
@@ -390,17 +378,27 @@ const PetCareGame: React.FC<PetCareGameProps> = ({ onBack }) => {
           </div>
         </div>
 
-        {/* Pet Level & XP */}
+        {/* Pet Info */}
         <div className="text-center mb-4">
-          <Badge variant="outline" className="mb-2">Level {level}</Badge>
-          <Progress value={(experience / experienceToNext) * 100} className="h-2" />
+          <h2 className="text-2xl font-bold">{selectedCharacter.name}</h2>
+          <div className="flex items-center justify-center gap-2 mt-1">
+            <Badge variant="outline" className="text-xs">Level {level}</Badge>
+            <Badge variant="secondary" className="text-xs capitalize">{currentMood}</Badge>
+          </div>
+          <Progress value={(experience / experienceToNext) * 100} className="h-2 mt-2" />
           <div className="text-xs text-gray-600 mt-1">
             {experience}/{experienceToNext} XP
           </div>
         </div>
 
         {/* Pet Display */}
-        <div className="bg-gradient-to-b from-yellow-100 to-orange-100 rounded-lg p-4 mb-6">
+        <div className="bg-gradient-to-b from-blue-50 to-purple-50 rounded-lg p-4 mb-6 relative overflow-hidden">
+          {/* Room decorations */}
+          <div className="absolute top-2 left-2 text-2xl">🪴</div>
+          <div className="absolute top-2 right-2 text-2xl">🎈</div>
+          <div className="absolute bottom-2 left-2 text-2xl">🧸</div>
+          <div className="absolute bottom-2 right-2 text-2xl">⚽</div>
+          
           {renderPet()}
         </div>
 
