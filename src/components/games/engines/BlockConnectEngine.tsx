@@ -203,10 +203,9 @@ const BlockConnectEngine: React.FC<BlockConnectEngineProps> = ({ onBack, onGameC
         
         <LivesSystem 
           onLivesChange={setLives}
-          className="mb-4"
         />
         
-        <div className="grid gap-1">
+        <div className="grid gap-1 mt-4">
           {grid.map((row, rowIndex) => (
             <div key={rowIndex} className="flex">
               {row.map((_, colIndex) => renderBlock(rowIndex, colIndex))}

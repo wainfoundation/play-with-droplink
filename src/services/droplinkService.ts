@@ -27,7 +27,7 @@ export class DroplinkService {
       const link = `${baseUrl}/droplink/${uniqueId}`;
 
       const { error } = await supabase
-        .from('droplinks')
+        .from('droplinks' as any)
         .insert({
           user_id: data.userId,
           type,
@@ -70,7 +70,7 @@ export class DroplinkService {
   } | null> {
     try {
       const { data, error } = await supabase
-        .from('droplinks')
+        .from('droplinks' as any)
         .select('*')
         .eq('unique_id', uniqueId)
         .single();

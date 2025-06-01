@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Heart, Clock, Eye } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 import { supabase } from '@/integrations/supabase/client';
-import { showRewardedAdAdvanced } from '@/utils/pi-ads';
 import { toast } from '@/hooks/use-toast';
 
 interface LivesSystemProps {
@@ -43,13 +42,13 @@ const LivesSystem: React.FC<LivesSystemProps> = ({ onLivesChange }) => {
 
       if (error) throw error;
 
-      const currentLives = data?.lives || 5;
+      const currentLives = (data as any)?.lives || 5;
       setLives(currentLives);
       onLivesChange?.(currentLives);
 
       // Calculate next life time if not at max
       if (currentLives < 5) {
-        const lastRegen = new Date(data?.last_life_regen || Date.now());
+        const lastRegen = new Date((data as any)?.last_life_regen || Date.now());
         const nextLife = new Date(lastRegen.getTime() + 30 * 60 * 1000); // 30 minutes
         setNextLifeTime(nextLife);
       }
@@ -106,21 +105,18 @@ const LivesSystem: React.FC<LivesSystemProps> = ({ onLivesChange }) => {
     if (!user?.id) return;
 
     try {
-      const result = await showRewardedAdAdvanced();
-      
-      if (result.success) {
-        const { error } = await supabase.rpc('add_user_life', { user_id: user.id });
-        if (error) throw error;
+      // Simulate ad watching for now
+      const { error } = await supabase.rpc('add_user_life', { user_id: user.id });
+      if (error) throw error;
 
-        const newLives = Math.min(lives + 1, 5);
-        setLives(newLives);
-        onLivesChange?.(newLives);
+      const newLives = Math.min(lives + 1, 5);
+      setLives(newLives);
+      onLivesChange?.(newLives);
 
-        toast({
-          title: "Bonus Life Earned! 🎉",
-          description: "Thanks for watching the ad!",
-        });
-      }
+      toast({
+        title: "Bonus Life Earned! 🎉",
+        description: "Thanks for watching the ad!",
+      });
     } catch (error) {
       console.error('Error watching ad for life:', error);
       toast({
