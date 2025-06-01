@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,11 +10,13 @@ import {
   RocketIcon,
   BrainIcon,
   PaletteIcon,
-  InfinityIcon,
-  ArrowLeft
+  ArrowLeft,
+  Play as PlayIcon
 } from 'lucide-react';
 
 const Play = () => {
+  const [selectedGame, setSelectedGame] = useState<string | null>(null);
+
   const gameCategories = [
     {
       id: 'puzzle',
@@ -22,9 +24,9 @@ const Play = () => {
       icon: PuzzleIcon,
       color: "bg-blue-500",
       games: [
-        { id: 'sudoku', name: 'Sudoku Classic', difficulty: 'Medium' },
-        { id: 'block-connect', name: 'Block Connect', difficulty: 'Easy' },
-        { id: 'word-puzzle', name: 'Word Puzzle', difficulty: 'Hard' }
+        { id: 'sudoku', name: 'Sudoku Classic', difficulty: 'Medium', description: 'Classic number puzzle game' },
+        { id: 'block-connect', name: 'Block Connect', difficulty: 'Easy', description: 'Connect colored blocks' },
+        { id: 'word-puzzle', name: 'Word Puzzle', difficulty: 'Hard', description: 'Challenge your vocabulary' }
       ]
     },
     {
@@ -33,8 +35,8 @@ const Play = () => {
       icon: RocketIcon,
       color: "bg-red-500",
       games: [
-        { id: 'target-shoot', name: 'Target Shooter', difficulty: 'Medium' },
-        { id: 'quick-tap', name: 'Quick Tap', difficulty: 'Easy' }
+        { id: 'target-shoot', name: 'Target Shooter', difficulty: 'Medium', description: 'Test your aim and speed' },
+        { id: 'quick-tap', name: 'Quick Tap', difficulty: 'Easy', description: 'Tap as fast as you can' }
       ]
     },
     {
@@ -43,8 +45,8 @@ const Play = () => {
       icon: BrainIcon,
       color: "bg-green-500",
       games: [
-        { id: 'general-quiz', name: 'General Knowledge', difficulty: 'Medium' },
-        { id: 'math-quiz', name: 'Math Challenge', difficulty: 'Hard' }
+        { id: 'general-quiz', name: 'General Knowledge', difficulty: 'Medium', description: 'Test your knowledge' },
+        { id: 'math-quiz', name: 'Math Challenge', difficulty: 'Hard', description: 'Solve math problems' }
       ]
     },
     {
@@ -53,8 +55,8 @@ const Play = () => {
       icon: PaletteIcon,
       color: "bg-purple-500",
       games: [
-        { id: 'color-merge', name: 'Color Merge', difficulty: 'Easy' },
-        { id: 'draw-challenge', name: 'Drawing Challenge', difficulty: 'Medium' }
+        { id: 'color-merge', name: 'Color Merge', difficulty: 'Easy', description: 'Mix and match colors' },
+        { id: 'draw-challenge', name: 'Drawing Challenge', difficulty: 'Medium', description: 'Express your creativity' }
       ]
     }
   ];
@@ -68,10 +70,14 @@ const Play = () => {
     }
   };
 
-  const handleGameClick = (game: any) => {
-    console.log('Starting game:', game.name);
-    // For now, just log the game selection
-    // Game engine will be added later
+  const handleGameClick = (gameId: string, gameName: string) => {
+    setSelectedGame(gameId);
+    console.log(`Starting game: ${gameName}`);
+    // For now, just show selection feedback
+    setTimeout(() => {
+      alert(`Game "${gameName}" would start here!`);
+      setSelectedGame(null);
+    }, 1000);
   };
 
   return (
@@ -88,15 +94,15 @@ const Play = () => {
             <div className="flex items-center justify-between">
               <Link 
                 to="/" 
-                className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors"
+                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
                 Back to Home
               </Link>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Droplink Games
               </h1>
-              <div className="w-24"></div> {/* Spacer for centering */}
+              <div className="w-24"></div>
             </div>
           </div>
         </div>
@@ -104,7 +110,7 @@ const Play = () => {
         {/* Main Content */}
         <div className="container mx-auto px-4 py-8">
           <div className="text-center mb-8">
-            <h2 className="text-4xl font-bold mb-4">Choose Your Game</h2>
+            <h2 className="text-4xl font-bold mb-4 text-gray-900">Choose Your Game</h2>
             <p className="text-lg text-gray-600">
               Select from our collection of interactive games and activities
             </p>
@@ -113,13 +119,13 @@ const Play = () => {
           {/* Game Categories */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {gameCategories.map((category) => (
-              <Card key={category.id} className="transition-all duration-200 hover:shadow-lg">
+              <Card key={category.id} className="transition-all duration-200 hover:shadow-lg border-2 hover:border-blue-200">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <category.icon className="w-6 h-6" />
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <category.icon className="w-6 h-6 text-blue-600" />
                     {category.name}
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-gray-600">
                     Choose from {category.games.length} {category.name.toLowerCase()} games
                   </CardDescription>
                 </CardHeader>
@@ -128,12 +134,16 @@ const Play = () => {
                     {category.games.map((game) => (
                       <div
                         key={game.id}
-                        className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                        className={`flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-all cursor-pointer ${
+                          selectedGame === game.id ? 'bg-blue-50 border-blue-300' : 'border-gray-200'
+                        }`}
+                        onClick={() => handleGameClick(game.id, game.name)}
                       >
                         <div className="flex items-center gap-3">
                           <div className="text-2xl">🎮</div>
                           <div>
-                            <h4 className="font-medium">{game.name}</h4>
+                            <h4 className="font-medium text-gray-900">{game.name}</h4>
+                            <p className="text-sm text-gray-600 mb-2">{game.description}</p>
                             <Badge 
                               variant="outline" 
                               className={getDifficultyColor(game.difficulty)}
@@ -143,11 +153,22 @@ const Play = () => {
                           </div>
                         </div>
                         <Button 
-                          onClick={() => handleGameClick(game)}
-                          variant="outline"
+                          variant={selectedGame === game.id ? "default" : "outline"}
                           size="sm"
+                          disabled={selectedGame === game.id}
+                          className="min-w-[80px]"
                         >
-                          Play
+                          {selectedGame === game.id ? (
+                            <div className="flex items-center gap-1">
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              Loading
+                            </div>
+                          ) : (
+                            <>
+                              <PlayIcon className="w-4 h-4 mr-1" />
+                              Play
+                            </>
+                          )}
                         </Button>
                       </div>
                     ))}
@@ -164,13 +185,13 @@ const Play = () => {
             <div className="flex flex-col md:flex-row justify-center items-center gap-6">
               <Link 
                 to="/privacy" 
-                className="text-gray-600 hover:text-primary transition-colors"
+                className="text-gray-600 hover:text-blue-600 transition-colors"
               >
                 Privacy Policy
               </Link>
               <Link 
                 to="/terms" 
-                className="text-gray-600 hover:text-primary transition-colors"
+                className="text-gray-600 hover:text-blue-600 transition-colors"
               >
                 Terms of Service
               </Link>
