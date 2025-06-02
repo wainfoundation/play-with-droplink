@@ -1,14 +1,15 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Coins, Package, Star, Utensils, Heart, Gamepad2, Pill } from 'lucide-react';
+import { ArrowLeft, Coins, Package, TrendingUp } from 'lucide-react';
 import { useShopItems, ShopItem } from '@/hooks/useShopItems';
 import { useCharacterShop } from '@/hooks/useCharacterShop';
 import { useAuth } from '@/hooks/useAuth';
+import ShopFilters from './ShopFilters';
+import ShopItemGrid from './ShopItemGrid';
 
 interface EnhancedItemShopProps {
   onBack: () => void;
@@ -17,86 +18,77 @@ interface EnhancedItemShopProps {
 const EnhancedItemShop: React.FC<EnhancedItemShopProps> = ({ onBack }) => {
   const { user } = useAuth();
   const { wallet } = useCharacterShop();
-  const { shopItems, inventory, buyItem, loading, getItemsByCategory, getInventoryByCategory } = useShopItems();
-  const [selectedCategory, setSelectedCategory] = useState('food');
+  const { shopItems, inventory, buyItem, loading } = useShopItems();
+  
+  // Filter states
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [sortBy, setSortBy] = useState('price-asc');
+  const [priceRange, setPriceRange] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [rarity, setRarity] = useState('all');
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'food': return <Utensils className="w-5 h-5" />;
-      case 'toy': return <Gamepad2 className="w-5 h-5" />;
-      case 'accessory': return <Heart className="w-5 h-5" />;
-      case 'medicine': return <Pill className="w-5 h-5" />;
-      default: return <Package className="w-5 h-5" />;
-    }
-  };
+  // Filter and sort items
+  const filteredAndSortedItems = useMemo(() => {
+    let filtered = shopItems;
 
-  const getRarityColor = (rarity: string) => {
-    switch (rarity) {
-      case 'common': return 'border-gray-300 bg-gray-50';
-      case 'rare': return 'border-blue-300 bg-blue-50';
-      case 'epic': return 'border-purple-300 bg-purple-50';
-      case 'legendary': return 'border-yellow-300 bg-yellow-50';
-      default: return 'border-gray-300 bg-gray-50';
+    // Category filter
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(item => item.category === selectedCategory);
     }
-  };
 
-  const getRarityBadge = (rarity: string) => {
-    const colors = {
-      common: 'bg-gray-100 text-gray-700',
-      rare: 'bg-blue-100 text-blue-700',
-      epic: 'bg-purple-100 text-purple-700',
-      legendary: 'bg-yellow-100 text-yellow-700'
-    };
-    return colors[rarity as keyof typeof colors] || colors.common;
-  };
+    // Search filter
+    if (searchTerm) {
+      filtered = filtered.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
 
-  const getItemEmoji = (category: string, itemId: string) => {
-    if (category === 'food') {
-      if (itemId.includes('apple')) return '🍎';
-      if (itemId.includes('banana')) return '🍌';
-      if (itemId.includes('carrot')) return '🥕';
-      if (itemId.includes('fish')) return '🐟';
-      if (itemId.includes('cake')) return '🎂';
-      if (itemId.includes('pizza')) return '🍕';
-      if (itemId.includes('sandwich')) return '🥪';
-      if (itemId.includes('soup')) return '🍲';
-      if (itemId.includes('cookie')) return '🍪';
-      if (itemId.includes('salad')) return '🥗';
+    // Price range filter
+    if (priceRange !== 'all') {
+      const [min, max] = priceRange.split('-').map(p => p.replace('+', ''));
+      filtered = filtered.filter(item => {
+        if (priceRange === '5001+') return item.price_coins >= 5001;
+        return item.price_coins >= parseInt(min) && item.price_coins <= parseInt(max);
+      });
     }
-    if (category === 'toy') {
-      if (itemId.includes('ball')) return '⚽';
-      if (itemId.includes('rope')) return '🪢';
-      if (itemId.includes('puzzle')) return '🧩';
-      if (itemId.includes('squeaky')) return '🐭';
-      if (itemId.includes('laser')) return '🔴';
-    }
-    if (category === 'accessory') {
-      if (itemId.includes('hat')) return '🎩';
-      if (itemId.includes('bow')) return '🎀';
-      if (itemId.includes('glasses')) return '👓';
-      if (itemId.includes('collar')) return '💎';
-      if (itemId.includes('cape')) return '🦸';
-    }
-    if (category === 'medicine') {
-      if (itemId.includes('vitamin')) return '💊';
-      if (itemId.includes('energy')) return '⚡';
-      if (itemId.includes('heal')) return '🧪';
-      if (itemId.includes('super')) return '✨';
-    }
-    return '📦';
-  };
 
-  const getOwnedQuantity = (itemId: string) => {
-    const item = inventory.find(inv => inv.item_id === itemId);
-    return item ? item.quantity : 0;
-  };
+    // Rarity filter
+    if (rarity !== 'all') {
+      filtered = filtered.filter(item => item.rarity === rarity);
+    }
 
-  const categories = [
-    { id: 'food', name: 'Food', icon: <Utensils className="w-4 h-4" /> },
-    { id: 'toy', name: 'Toys', icon: <Gamepad2 className="w-4 h-4" /> },
-    { id: 'accessory', name: 'Accessories', icon: <Heart className="w-4 h-4" /> },
-    { id: 'medicine', name: 'Medicine', icon: <Pill className="w-4 h-4" /> },
-  ];
+    // Sort items
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'price-asc':
+          return a.price_coins - b.price_coins;
+        case 'price-desc':
+          return b.price_coins - a.price_coins;
+        case 'name-asc':
+          return a.name.localeCompare(b.name);
+        case 'name-desc':
+          return b.name.localeCompare(a.name);
+        case 'rarity':
+          const rarityOrder = { common: 1, rare: 2, epic: 3, legendary: 4 };
+          return (rarityOrder[b.rarity as keyof typeof rarityOrder] || 0) - 
+                 (rarityOrder[a.rarity as keyof typeof rarityOrder] || 0);
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [shopItems, selectedCategory, sortBy, priceRange, searchTerm, rarity]);
+
+  // Category stats
+  const categoryStats = useMemo(() => {
+    const stats: Record<string, number> = {};
+    shopItems.forEach(item => {
+      stats[item.category] = (stats[item.category] || 0) + 1;
+    });
+    return stats;
+  }, [shopItems]);
 
   if (loading) {
     return (
@@ -120,7 +112,7 @@ const EnhancedItemShop: React.FC<EnhancedItemShopProps> = ({ onBack }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 p-4">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
@@ -128,9 +120,15 @@ const EnhancedItemShop: React.FC<EnhancedItemShopProps> = ({ onBack }) => {
             Back to Game
           </Button>
           
-          <div className="flex items-center gap-2 bg-yellow-100 px-4 py-2 rounded-full border-2 border-yellow-300">
-            <Coins className="w-5 h-5 text-yellow-600" />
-            <span className="font-bold text-yellow-800">{wallet?.droplet_coins || 0}</span>
+          <div className="flex items-center gap-4">
+            <Badge variant="outline" className="flex items-center gap-2">
+              <Package className="w-4 h-4" />
+              {filteredAndSortedItems.length} items
+            </Badge>
+            <div className="flex items-center gap-2 bg-yellow-100 px-4 py-2 rounded-full border-2 border-yellow-300">
+              <Coins className="w-5 h-5 text-yellow-600" />
+              <span className="font-bold text-yellow-800">{wallet?.droplet_coins?.toLocaleString() || 0}</span>
+            </div>
           </div>
         </div>
 
@@ -138,106 +136,65 @@ const EnhancedItemShop: React.FC<EnhancedItemShopProps> = ({ onBack }) => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Package className="w-6 h-6 text-green-500" />
-              Item Shop
+              Enhanced Item Shop
+              <Badge className="bg-green-500 text-white">
+                {shopItems.length}+ Items Available
+              </Badge>
             </CardTitle>
-            <p className="text-gray-600">Purchase items to care for and customize your pet</p>
+            <p className="text-gray-600">
+              Discover everything from basic food to luxury mansions and spaceships!
+            </p>
           </CardHeader>
         </Card>
 
-        {/* Category Tabs */}
-        <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            {categories.map((category) => (
-              <TabsTrigger key={category.id} value={category.id} className="flex items-center gap-2">
-                {category.icon}
-                <span className="hidden sm:inline">{category.name}</span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
-
-          {categories.map((category) => (
-            <TabsContent key={category.id} value={category.id} className="mt-6">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                {getItemsByCategory(category.id).map((item: ShopItem) => {
-                  const ownedQuantity = getOwnedQuantity(item.id);
-                  const canAfford = (wallet?.droplet_coins || 0) >= item.price_coins;
-
-                  return (
-                    <motion.div
-                      key={item.id}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Card className={`border-2 ${getRarityColor(item.rarity)} hover:shadow-lg transition-all`}>
-                        <CardContent className="p-4">
-                          {/* Item Icon */}
-                          <div className="text-center mb-3">
-                            <div className="text-4xl mb-2">
-                              {getItemEmoji(item.category, item.id)}
-                            </div>
-                            <h3 className="font-semibold text-sm">{item.name}</h3>
-                          </div>
-
-                          {/* Rarity Badge */}
-                          <div className="flex justify-center mb-2">
-                            <Badge className={`text-xs ${getRarityBadge(item.rarity)}`}>
-                              {item.rarity}
-                            </Badge>
-                          </div>
-
-                          {/* Effects */}
-                          <div className="text-xs text-gray-600 mb-3 min-h-[2rem]">
-                            {Object.entries(item.effect).map(([key, value]) => (
-                              <div key={key} className="flex justify-between">
-                                <span>{key}:</span>
-                                <span className={value > 0 ? 'text-green-600' : 'text-red-600'}>
-                                  {value > 0 ? '+' : ''}{value}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Price and Owned */}
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between text-sm">
-                              <div className="flex items-center gap-1">
-                                <Coins className="w-3 h-3 text-yellow-600" />
-                                <span className="font-semibold">{item.price_coins}</span>
-                              </div>
-                              {ownedQuantity > 0 && (
-                                <Badge variant="outline" className="text-xs">
-                                  Owned: {ownedQuantity}
-                                </Badge>
-                              )}
-                            </div>
-
-                            {/* Buy Button */}
-                            <Button
-                              onClick={() => buyItem(item)}
-                              disabled={!canAfford || loading}
-                              size="sm"
-                              className="w-full text-xs"
-                              variant={canAfford ? "default" : "outline"}
-                            >
-                              {canAfford ? 'Buy' : 'Not enough coins'}
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  );
-                })}
-              </div>
-              
-              {getItemsByCategory(category.id).length === 0 && (
-                <div className="text-center py-8 text-gray-500">
-                  <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>No items in this category yet</p>
-                </div>
-              )}
-            </TabsContent>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
+          {[
+            { category: 'food', icon: '🍎', name: 'Food' },
+            { category: 'luxury', icon: '💎', name: 'Luxury' },
+            { category: 'vehicle', icon: '🚗', name: 'Vehicles' },
+            { category: 'technology', icon: '💻', name: 'Tech' },
+            { category: 'enhancement', icon: '⚡', name: 'Boosts' },
+            { category: 'collectible', icon: '🏆', name: 'Rare' }
+          ].map(({ category, icon, name }) => (
+            <Card 
+              key={category} 
+              className={`cursor-pointer transition-all hover:shadow-md ${
+                selectedCategory === category ? 'ring-2 ring-blue-400' : ''
+              }`}
+              onClick={() => setSelectedCategory(category)}
+            >
+              <CardContent className="p-3 text-center">
+                <div className="text-2xl mb-1">{icon}</div>
+                <div className="text-xs font-semibold">{name}</div>
+                <div className="text-xs text-gray-500">{categoryStats[category] || 0}</div>
+              </CardContent>
+            </Card>
           ))}
-        </Tabs>
+        </div>
+
+        {/* Filters */}
+        <ShopFilters
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+          priceRange={priceRange}
+          onPriceRangeChange={setPriceRange}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          rarity={rarity}
+          onRarityChange={setRarity}
+        />
+
+        {/* Items Grid */}
+        <ShopItemGrid
+          items={filteredAndSortedItems}
+          wallet={wallet}
+          inventory={inventory}
+          onBuyItem={buyItem}
+          loading={loading}
+        />
       </div>
     </div>
   );
