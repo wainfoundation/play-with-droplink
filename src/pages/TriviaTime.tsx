@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
@@ -476,11 +475,14 @@ const TriviaTime: React.FC = () => {
   }
 
   if (gameState === 'playing') {
+    // Ensure we always have a valid question number for the title
+    const safeQuestionNumber = typeof questionIndex === 'number' && questionIndex >= 0 ? questionIndex + 1 : 1;
+    
     return (
       <AuthGuard requireAuth={true}>
         <>
           <Helmet>
-            <title>Playing Trivia - Question {questionIndex + 1}</title>
+            <title>{`Playing Trivia - Question ${safeQuestionNumber}`}</title>
           </Helmet>
           
           <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
