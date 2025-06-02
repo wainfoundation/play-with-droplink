@@ -10,7 +10,8 @@ import Footer from "@/components/Footer";
 import EmotionalCharacterRenderer from "@/components/welcome/EmotionalCharacterRenderer";
 import { characters } from "@/components/welcome/characterData";
 import GoToTop from '@/components/GoToTop';
-import { usePetMoodEngine, usePetEconomy } from '@/hooks/usePetMoodEngine';
+import { usePetMoodEngine } from '@/hooks/usePetMoodEngine';
+import { usePetEconomy } from '@/hooks/usePetEconomy';
 
 const Index = () => {
   const [selectedCharacter, setSelectedCharacter] = useState(characters[0]);
