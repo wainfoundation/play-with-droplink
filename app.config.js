@@ -11,7 +11,7 @@ export default {
   extra: {
     piNetwork: {
       apiKey: process.env.VITE_PI_API_KEY,
-      sandbox: process.env.NODE_ENV === 'production',
+      sandbox: process.env.NODE_ENV === 'development',
       supportedFeatures: [
         'authentication',
         'payments', 
