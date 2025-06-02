@@ -12,6 +12,9 @@ interface PetDisplayProps {
 const PetDisplay: React.FC<PetDisplayProps> = ({ characterId, className = "" }) => {
   const { moodState, currentMessage } = usePetMoodEngine(characterId);
 
+  // Destructure after moodState is available
+  const { happiness, health, hunger, energy } = moodState;
+
   const getMoodEmoji = (happiness: number, health: number, hunger: number, energy: number) => {
     if (health < 30) return '🤒';
     if (hunger < 30) return '😋';
@@ -29,8 +32,6 @@ const PetDisplay: React.FC<PetDisplayProps> = ({ characterId, className = "" }) 
     mood: happiness > 70 ? 'happy' : happiness < 40 ? 'sad' : 'neutral',
     personality: 'friendly'
   };
-
-  const { happiness, health, hunger, energy } = moodState;
 
   return (
     <div className={`flex flex-col items-center ${className}`}>

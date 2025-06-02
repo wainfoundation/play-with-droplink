@@ -110,7 +110,7 @@ const MyBooStyleGame: React.FC = () => {
           onRoomChange={setCurrentRoom}
           onOpenShop={() => setShowShop(true)}
           onOpenInventory={() => setShowInventory(true)}
-          coinBalance={wallet?.droplet_coins || 0}
+          coinBalance={wallet?.dropletCoins || 0}
         />
 
         {/* Shop Modal */}
