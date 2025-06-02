@@ -93,12 +93,13 @@ const RealTimePetCare: React.FC<RealTimePetCareProps> = ({ character }) => {
         </CardHeader>
         
         <CardContent className="text-center relative">
-          {/* Character Display */}
+          {/* Character Display with Mood Text */}
           <div className="relative flex justify-center mb-6">
             <EmotionalCharacterRenderer 
               character={character} 
               moodState={moodState} 
-              size={150} 
+              size={150}
+              showMoodText={true}
             />
             
             {/* Floating Hearts Effect */}

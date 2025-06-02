@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import CharacterEyes from './CharacterEyes';
 import CharacterMouth from './CharacterMouth';
 import CharacterDecorations from './CharacterDecorations';
+import CharacterMoodText from './CharacterMoodText';
 import { PetMoodState } from '@/hooks/usePetMoodEngine';
 
 interface Character {
@@ -19,12 +20,14 @@ interface EmotionalCharacterRendererProps {
   character: Character;
   moodState: PetMoodState;
   size?: number;
+  showMoodText?: boolean;
 }
 
 const EmotionalCharacterRenderer: React.FC<EmotionalCharacterRendererProps> = ({ 
   character, 
   moodState, 
-  size = 120 
+  size = 120,
+  showMoodText = true
 }) => {
   const gradientId = `${character.id}EmotionalGradient`;
   
@@ -143,100 +146,107 @@ const EmotionalCharacterRenderer: React.FC<EmotionalCharacterRendererProps> = ({
   const moodColor = getMoodColor();
 
   return (
-    <motion.div
-      animate={getMoodAnimation()}
-      className="relative"
-    >
-      <svg width={size} height={size * 1.2} viewBox="0 0 200 240">
-        <defs>
-          <linearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor={moodColor} />
-            <stop offset="50%" stopColor={moodColor} stopOpacity="0.8" />
-            <stop offset="100%" stopColor={moodColor} stopOpacity="0.6" />
-          </linearGradient>
+    <div className="flex flex-col items-center space-y-3">
+      <motion.div
+        animate={getMoodAnimation()}
+        className="relative"
+      >
+        <svg width={size} height={size * 1.2} viewBox="0 0 200 240">
+          <defs>
+            <linearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor={moodColor} />
+              <stop offset="50%" stopColor={moodColor} stopOpacity="0.8" />
+              <stop offset="100%" stopColor={moodColor} stopOpacity="0.6" />
+            </linearGradient>
+            
+            {/* Add glow effect for happy moods */}
+            {(currentMood === 'excited' || currentMood === 'happy') && (
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge> 
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            )}
+          </defs>
           
-          {/* Add glow effect for happy moods */}
-          {(currentMood === 'excited' || currentMood === 'happy') && (
-            <filter id="glow">
-              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-              <feMerge> 
-                <feMergeNode in="coloredBlur"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
+          {/* Character shape */}
+          <path
+            d="M100 20 C60 60, 35 100, 35 140 C35 185, 65 220, 100 220 C135 220, 165 185, 165 140 C165 100, 140 60, 100 20 Z"
+            fill={`url(#${gradientId})`}
+            filter={(currentMood === 'excited' || currentMood === 'happy') ? 'url(#glow)' : undefined}
+            opacity={currentMood === 'sick' ? 0.7 : 1}
+          />
+          
+          {/* Highlight */}
+          <ellipse
+            cx="75"
+            cy="70"
+            rx="12"
+            ry="18"
+            fill="rgba(255, 255, 255, 0.6)"
+            opacity={currentMood === 'sick' ? 0.3 : 0.6}
+          />
+          
+          {/* Eyes based on mood */}
+          <CharacterEyes mood={currentMood} />
+          
+          {/* Mouth based on mood */}
+          <CharacterMouth mood={currentMood} />
+
+          {/* Gender indicator and mood icons */}
+          <CharacterDecorations gender={character.gender} mood={currentMood} />
+
+          {/* Mood-specific visual effects */}
+          {getMoodEffects()}
+
+          {/* Health indicator (red cross when sick) */}
+          {moodState.health < 50 && (
+            <g>
+              <rect x="155" y="45" width="8" height="2" fill="#ef4444" />
+              <rect x="156" y="44" width="6" height="4" fill="#ef4444" />
+            </g>
           )}
-        </defs>
-        
-        {/* Character shape */}
-        <path
-          d="M100 20 C60 60, 35 100, 35 140 C35 185, 65 220, 100 220 C135 220, 165 185, 165 140 C165 100, 140 60, 100 20 Z"
-          fill={`url(#${gradientId})`}
-          filter={(currentMood === 'excited' || currentMood === 'happy') ? 'url(#glow)' : undefined}
-          opacity={currentMood === 'sick' ? 0.7 : 1}
-        />
-        
-        {/* Highlight */}
-        <ellipse
-          cx="75"
-          cy="70"
-          rx="12"
-          ry="18"
-          fill="rgba(255, 255, 255, 0.6)"
-          opacity={currentMood === 'sick' ? 0.3 : 0.6}
-        />
-        
-        {/* Eyes based on mood */}
-        <CharacterEyes mood={currentMood} />
-        
-        {/* Mouth based on mood */}
-        <CharacterMouth mood={currentMood} />
+        </svg>
 
-        {/* Gender indicator and mood icons */}
-        <CharacterDecorations gender={character.gender} mood={currentMood} />
+        {/* Floating status indicators */}
+        <div className="absolute -top-2 -right-2 flex flex-col gap-1">
+          {moodState.hunger < 30 && (
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 1, repeat: Infinity }}
+              className="bg-orange-100 border border-orange-300 rounded-full p-1"
+            >
+              <span className="text-xs">🍎</span>
+            </motion.div>
+          )}
+          {moodState.cleanliness < 30 && (
+            <motion.div
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="bg-blue-100 border border-blue-300 rounded-full p-1"
+            >
+              <span className="text-xs">🧼</span>
+            </motion.div>
+          )}
+          {moodState.tiredness < 30 && (
+            <motion.div
+              animate={{ opacity: [1, 0.5, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              className="bg-purple-100 border border-purple-300 rounded-full p-1"
+            >
+              <span className="text-xs">💤</span>
+            </motion.div>
+          )}
+        </div>
+      </motion.div>
 
-        {/* Mood-specific visual effects */}
-        {getMoodEffects()}
-
-        {/* Health indicator (red cross when sick) */}
-        {moodState.health < 50 && (
-          <g>
-            <rect x="155" y="45" width="8" height="2" fill="#ef4444" />
-            <rect x="156" y="44" width="6" height="4" fill="#ef4444" />
-          </g>
-        )}
-      </svg>
-
-      {/* Floating status indicators */}
-      <div className="absolute -top-2 -right-2 flex flex-col gap-1">
-        {moodState.hunger < 30 && (
-          <motion.div
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 1, repeat: Infinity }}
-            className="bg-orange-100 border border-orange-300 rounded-full p-1"
-          >
-            <span className="text-xs">🍎</span>
-          </motion.div>
-        )}
-        {moodState.cleanliness < 30 && (
-          <motion.div
-            animate={{ rotate: [0, 10, -10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="bg-blue-100 border border-blue-300 rounded-full p-1"
-          >
-            <span className="text-xs">🧼</span>
-          </motion.div>
-        )}
-        {moodState.tiredness < 30 && (
-          <motion.div
-            animate={{ opacity: [1, 0.5, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="bg-purple-100 border border-purple-300 rounded-full p-1"
-          >
-            <span className="text-xs">💤</span>
-          </motion.div>
-        )}
-      </div>
-    </motion.div>
+      {/* Mood Text Display */}
+      {showMoodText && (
+        <CharacterMoodText mood={currentMood} characterName={character.name} />
+      )}
+    </div>
   );
 };
 
