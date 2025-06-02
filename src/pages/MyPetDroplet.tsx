@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
@@ -138,45 +137,126 @@ const MyPetDroplet: React.FC = () => {
   const renderDropletAvatar = () => (
     <div className="relative flex items-center justify-center h-48">
       <motion.div
-        animate={{ scale: [1, 1.05, 1] }}
-        transition={{ duration: 2, repeat: Infinity }}
+        animate={{ scale: [1, 1.05, 1], y: [0, -5, 0] }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         className="relative"
       >
-        {/* Main Droplet Body */}
-        <div className="w-32 h-40 bg-gradient-to-b from-cyan-300 to-cyan-500 rounded-full relative shadow-lg">
-          {/* Highlight */}
-          <div className="absolute top-4 left-6 w-4 h-6 bg-white/60 rounded-full"></div>
+        {/* Main Droplet Body - Water Drop Shape */}
+        <div className="relative">
+          <svg width="120" height="150" viewBox="0 0 120 150" className="drop-shadow-lg">
+            {/* Gradient Definition */}
+            <defs>
+              <radialGradient id="dropletGradient" cx="0.3" cy="0.3" r="0.8">
+                <stop offset="0%" stopColor="#87CEEB" />
+                <stop offset="50%" stopColor="#4FC3F7" />
+                <stop offset="100%" stopColor="#29B6F6" />
+              </radialGradient>
+              <radialGradient id="highlightGradient" cx="0.5" cy="0.5" r="0.6">
+                <stop offset="0%" stopColor="rgba(255,255,255,0.8)" />
+                <stop offset="100%" stopColor="rgba(255,255,255,0.1)" />
+              </radialGradient>
+            </defs>
+            
+            {/* Main Water Drop Shape */}
+            <path
+              d="M60 10 C40 35, 25 60, 25 90 C25 115, 40 130, 60 130 C80 130, 95 115, 95 90 C95 60, 80 35, 60 10 Z"
+              fill="url(#dropletGradient)"
+              stroke="rgba(255,255,255,0.3)"
+              strokeWidth="2"
+            />
+            
+            {/* Main Highlight */}
+            <ellipse
+              cx="45"
+              cy="50"
+              rx="12"
+              ry="18"
+              fill="url(#highlightGradient)"
+            />
+            
+            {/* Smaller Highlight */}
+            <ellipse
+              cx="50"
+              cy="40"
+              rx="4"
+              ry="6"
+              fill="rgba(255,255,255,0.9)"
+            />
+          </svg>
           
           {/* Eyes */}
-          <div className="absolute top-12 left-8 flex gap-3">
-            <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-              <div className="w-4 h-4 bg-blue-800 rounded-full"></div>
+          <div className="absolute top-12 left-8 flex gap-4">
+            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm">
+              <div className="w-5 h-5 bg-blue-900 rounded-full relative">
+                <div className="absolute top-1 left-1 w-2 h-2 bg-white rounded-full"></div>
+              </div>
             </div>
-            <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-              <div className="w-4 h-4 bg-blue-800 rounded-full"></div>
+            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm">
+              <div className="w-5 h-5 bg-blue-900 rounded-full relative">
+                <div className="absolute top-1 left-1 w-2 h-2 bg-white rounded-full"></div>
+              </div>
             </div>
           </div>
           
           {/* Mouth */}
-          <div className="absolute top-20 left-12 w-8 h-4 bg-red-400 rounded-full"></div>
+          <div className="absolute top-20 left-12">
+            <div className="w-10 h-6 bg-gradient-to-b from-red-400 to-red-500 rounded-full border-2 border-red-600 shadow-sm"></div>
+          </div>
           
-          {/* Blush */}
-          <div className="absolute top-16 left-4 w-3 h-2 bg-pink-300 rounded-full opacity-60"></div>
-          <div className="absolute top-16 right-4 w-3 h-2 bg-pink-300 rounded-full opacity-60"></div>
+          {/* Blush Marks */}
+          <div className="absolute top-16 left-4">
+            <div className="w-4 h-3 bg-pink-300 rounded-full opacity-70"></div>
+          </div>
+          <div className="absolute top-16 right-4">
+            <div className="w-4 h-3 bg-pink-300 rounded-full opacity-70"></div>
+          </div>
           
-          {/* Accessories */}
+          {/* Accessories based on selected droplet */}
           {selectedDroplet.accessories.includes('bow') && (
-            <div className="absolute -top-2 left-10 w-8 h-4 bg-red-500 rounded transform rotate-12"></div>
+            <div className="absolute -top-2 left-10">
+              <div className="w-10 h-6 bg-gradient-to-r from-red-400 to-red-500 rounded transform rotate-12 shadow-lg border-2 border-red-600"></div>
+              <div className="absolute top-1 left-3 w-4 h-4 bg-red-600 rounded-full"></div>
+            </div>
           )}
+          
           {selectedDroplet.accessories.includes('glasses') && (
-            <div className="absolute top-10 left-6 w-20 h-8 border-4 border-blue-800 rounded-full bg-transparent"></div>
+            <div className="absolute top-10 left-6">
+              <div className="w-24 h-10 border-4 border-blue-800 rounded-full bg-transparent shadow-lg">
+                <div className="absolute left-2 top-1 w-7 h-6 border-2 border-blue-800 rounded-full bg-white/20"></div>
+                <div className="absolute right-2 top-1 w-7 h-6 border-2 border-blue-800 rounded-full bg-white/20"></div>
+              </div>
+            </div>
           )}
+          
           {selectedDroplet.accessories.includes('hat') && (
-            <div className="absolute -top-4 left-8 w-16 h-8 bg-orange-400 rounded-full border-2 border-orange-600"></div>
+            <div className="absolute -top-6 left-6">
+              <div className="w-20 h-12 bg-gradient-to-b from-orange-400 to-orange-500 rounded-full border-4 border-orange-600 shadow-lg"></div>
+              <div className="absolute top-8 left-2 w-16 h-4 bg-orange-600 rounded-full"></div>
+            </div>
           )}
+          
           {selectedDroplet.accessories.includes('medal') && (
-            <div className="absolute top-28 left-12 w-8 h-8 bg-yellow-400 rounded-full border-2 border-yellow-600 flex items-center justify-center">
-              <span className="text-xs">π</span>
+            <div className="absolute top-24 left-12">
+              <div className="w-10 h-10 bg-gradient-to-b from-yellow-300 to-yellow-400 rounded-full border-4 border-yellow-600 shadow-lg flex items-center justify-center">
+                <span className="text-yellow-800 font-bold text-lg">π</span>
+              </div>
+              <div className="absolute -top-2 left-4 w-2 h-4 bg-red-500 transform -rotate-12"></div>
+            </div>
+          )}
+          
+          {selectedDroplet.accessories.includes('hair') && (
+            <div className="absolute -top-4 left-8">
+              <div className="w-16 h-8 bg-gradient-to-b from-purple-300 to-purple-400 rounded-t-full border-2 border-purple-500 shadow-lg"></div>
+              <div className="absolute top-2 left-2 w-3 h-6 bg-purple-400 rounded transform -rotate-12"></div>
+              <div className="absolute top-2 right-2 w-3 h-6 bg-purple-400 rounded transform rotate-12"></div>
+            </div>
+          )}
+          
+          {selectedDroplet.accessories.includes('bowtie') && (
+            <div className="absolute top-28 left-11">
+              <div className="w-8 h-4 bg-gradient-to-r from-purple-500 to-purple-600 transform rotate-45 shadow-lg"></div>
+              <div className="absolute top-0 left-1 w-6 h-4 bg-gradient-to-r from-purple-600 to-purple-700 transform -rotate-45"></div>
+              <div className="absolute top-1 left-2 w-4 h-2 bg-purple-800 rounded-full"></div>
             </div>
           )}
         </div>
