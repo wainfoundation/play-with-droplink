@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Settings, ShoppingBag, Package, Plus } from 'lucide-react';
+import { Settings, ShoppingBag, Package, Plus, Gift } from 'lucide-react';
 import { usePetMoodEngine } from '@/hooks/usePetMoodEngine';
 import { usePetEconomy } from '@/hooks/usePetEconomy';
 import { useRoomManager } from '@/hooks/useRoomManager';
@@ -16,15 +17,22 @@ const FullScreenPetGame: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
 
   const { moodState, actions } = usePetMoodEngine(selectedCharacter);
-  const { wallet } = usePetEconomy(selectedCharacter);
+  const { wallet, claimDailyCoins, canClaimDailyCoins } = usePetEconomy(selectedCharacter);
   const { currentRoom, changeRoom, getCurrentTheme, getCurrentMood } = useRoomManager();
 
   const currentTheme = getCurrentTheme();
   const currentMood = getCurrentMood();
 
+  // Calculate pet level based on overall stats
+  const calculatePetLevel = () => {
+    const totalStats = moodState.happiness + moodState.health + moodState.energy + moodState.hunger;
+    return Math.max(1, Math.floor(totalStats / 100));
+  };
+
+  const petLevel = calculatePetLevel();
+
   // Apply room mood effects
   useEffect(() => {
-    // Automatically adjust pet mood based on room
     console.log(`Moved to ${currentRoom} - applying ${currentMood.primaryMood} mood`);
   }, [currentRoom, currentMood]);
 
@@ -46,6 +54,13 @@ const FullScreenPetGame: React.FC = () => {
     { action: 'pet', icon: '💝', label: 'Pet', onClick: actions.petCharacter }
   ];
 
+  const handleClaimDaily = () => {
+    const earned = claimDailyCoins(petLevel);
+    if (earned > 0) {
+      console.log(`Claimed ${earned} daily coins!`);
+    }
+  };
+
   return (
     <div className="w-screen h-screen overflow-hidden relative">
       {/* Dynamic Background */}
@@ -57,7 +72,6 @@ const FullScreenPetGame: React.FC = () => {
           backgroundPosition: 'center'
         } : {}}
       >
-        {/* Background overlay for better text readability */}
         <div className="absolute inset-0 bg-black/5" />
       </div>
 
@@ -66,7 +80,7 @@ const FullScreenPetGame: React.FC = () => {
         <div className="flex items-center space-x-2">
           {/* Level Badge */}
           <div className="bg-yellow-400 text-black rounded-full w-10 h-10 flex items-center justify-center font-bold">
-            2
+            {petLevel}
           </div>
           
           {/* Current Room & Mood */}
@@ -82,9 +96,18 @@ const FullScreenPetGame: React.FC = () => {
             <span className="text-lg">💰</span>
             <span>{wallet?.dropletCoins || 0}</span>
           </div>
-          <Button variant="outline" size="sm" className="bg-white/20 border-white/30 text-white">
-            <Plus className="w-4 h-4" />
-          </Button>
+          
+          {canClaimDailyCoins() && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="bg-green-500/80 border-green-300 text-white hover:bg-green-600"
+              onClick={handleClaimDaily}
+            >
+              <Gift className="w-4 h-4" />
+            </Button>
+          )}
+          
           <Button 
             variant="outline" 
             size="sm" 

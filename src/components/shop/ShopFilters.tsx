@@ -1,10 +1,10 @@
 
 import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Search, Filter, SortAsc, SortDesc } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Search, Filter } from 'lucide-react';
 
 interface ShopFiltersProps {
   selectedCategory: string;
@@ -32,27 +32,31 @@ const ShopFilters: React.FC<ShopFiltersProps> = ({
   onRarityChange
 }) => {
   const categories = [
-    { id: 'all', name: 'All Items', icon: '🛍️' },
+    { id: 'all', name: 'All', icon: '🏪' },
     { id: 'food', name: 'Food', icon: '🍎' },
     { id: 'toy', name: 'Toys', icon: '🎾' },
-    { id: 'accessory', name: 'Accessories', icon: '👑' },
-    { id: 'medicine', name: 'Medicine', icon: '💊' },
-    { id: 'enhancement', name: 'Enhancements', icon: '⚡' },
+    { id: 'medicine', name: 'Health', icon: '💊' },
+    { id: 'cleaning', name: 'Clean', icon: '🧼' },
     { id: 'luxury', name: 'Luxury', icon: '💎' },
-    { id: 'vehicle', name: 'Vehicles', icon: '🚗' },
-    { id: 'furniture', name: 'Furniture', icon: '🛋️' },
-    { id: 'technology', name: 'Technology', icon: '💻' },
-    { id: 'collectible', name: 'Collectibles', icon: '🏆' }
+    { id: 'theme', name: 'Themes', icon: '🎨' },
+    { id: 'special', name: 'Special', icon: '✨' }
+  ];
+
+  const sortOptions = [
+    { id: 'price-asc', name: 'Price: Low to High' },
+    { id: 'price-desc', name: 'Price: High to Low' },
+    { id: 'name-asc', name: 'Name: A to Z' },
+    { id: 'name-desc', name: 'Name: Z to A' },
+    { id: 'rarity', name: 'Rarity: Best First' }
   ];
 
   const priceRanges = [
     { id: 'all', name: 'All Prices' },
-    { id: '0-20', name: '0-20 coins' },
-    { id: '21-100', name: '21-100 coins' },
+    { id: '1-10', name: '1-10 coins' },
+    { id: '11-50', name: '11-50 coins' },
+    { id: '51-100', name: '51-100 coins' },
     { id: '101-500', name: '101-500 coins' },
-    { id: '501-1000', name: '501-1,000 coins' },
-    { id: '1001-5000', name: '1,001-5,000 coins' },
-    { id: '5001+', name: '5,001+ coins' }
+    { id: '501+', name: '500+ coins' }
   ];
 
   const rarities = [
@@ -64,85 +68,87 @@ const ShopFilters: React.FC<ShopFiltersProps> = ({
   ];
 
   return (
-    <div className="space-y-4 mb-6">
-      {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-        <Input
-          placeholder="Search items..."
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10"
-        />
-      </div>
-
-      {/* Category Filter */}
-      <div className="flex flex-wrap gap-2">
-        {categories.map((category) => (
-          <Button
-            key={category.id}
-            variant={selectedCategory === category.id ? "default" : "outline"}
-            size="sm"
-            onClick={() => onCategoryChange(category.id)}
-            className="flex items-center gap-1"
-          >
-            <span>{category.icon}</span>
-            <span className="hidden sm:inline">{category.name}</span>
-          </Button>
-        ))}
-      </div>
-
-      {/* Advanced Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <label className="text-sm font-medium mb-2 block">Sort By</label>
-          <Select value={sortBy} onValueChange={onSortChange}>
-            <SelectTrigger>
-              <SelectValue placeholder="Sort by..." />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="price-asc">Price: Low to High</SelectItem>
-              <SelectItem value="price-desc">Price: High to Low</SelectItem>
-              <SelectItem value="name-asc">Name: A to Z</SelectItem>
-              <SelectItem value="name-desc">Name: Z to A</SelectItem>
-              <SelectItem value="rarity">Rarity</SelectItem>
-            </SelectContent>
-          </Select>
+    <Card className="mb-6">
+      <CardContent className="p-4 space-y-4">
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Input
+            placeholder="Search items..."
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="pl-10"
+          />
         </div>
 
+        {/* Categories */}
         <div>
-          <label className="text-sm font-medium mb-2 block">Price Range</label>
-          <Select value={priceRange} onValueChange={onPriceRangeChange}>
-            <SelectTrigger>
-              <SelectValue placeholder="All Prices" />
-            </SelectTrigger>
-            <SelectContent>
+          <div className="flex items-center gap-2 mb-2">
+            <Filter className="w-4 h-4 text-gray-600" />
+            <span className="text-sm font-semibold text-gray-700">Categories</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((cat) => (
+              <Button
+                key={cat.id}
+                onClick={() => onCategoryChange(cat.id)}
+                variant={selectedCategory === cat.id ? "default" : "outline"}
+                size="sm"
+                className="h-8"
+              >
+                <span className="mr-1">{cat.icon}</span>
+                {cat.name}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Filters Row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Sort */}
+          <div>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Sort By</label>
+            <select
+              value={sortBy}
+              onChange={(e) => onSortChange(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+            >
+              {sortOptions.map((option) => (
+                <option key={option.id} value={option.id}>{option.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Price Range */}
+          <div>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Price Range</label>
+            <select
+              value={priceRange}
+              onChange={(e) => onPriceRangeChange(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+            >
               {priceRanges.map((range) => (
-                <SelectItem key={range.id} value={range.id}>
-                  {range.name}
-                </SelectItem>
+                <option key={range.id} value={range.id}>{range.name}</option>
               ))}
-            </SelectContent>
-          </Select>
-        </div>
+            </select>
+          </div>
 
-        <div>
-          <label className="text-sm font-medium mb-2 block">Rarity</label>
-          <Select value={rarity} onValueChange={onRarityChange}>
-            <SelectTrigger>
-              <SelectValue placeholder="All Rarities" />
-            </SelectTrigger>
-            <SelectContent>
-              {rarities.map((r) => (
-                <SelectItem key={r.id} value={r.id}>
-                  {r.name}
-                </SelectItem>
+          {/* Rarity */}
+          <div>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Rarity</label>
+            <select
+              value={rarity}
+              onChange={(e) => onRarityChange(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+            >
+              {rarities.map((rar) => (
+                <option key={rar.id} value={rar.id}>{rar.name}</option>
               ))}
-            </SelectContent>
-          </Select>
+            </select>
+          </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

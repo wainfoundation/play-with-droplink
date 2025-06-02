@@ -1,109 +1,108 @@
 
 import { useState, useEffect, useCallback } from 'react';
+import { toast } from '@/hooks/use-toast';
 
-export interface WalletState {
+interface WalletState {
   dropletCoins: number;
   piBalance: number;
-  lastCoinClaim: number;
   totalEarned: number;
+  lastClaimTime: number;
 }
 
-const DEFAULT_WALLET: WalletState = {
-  dropletCoins: 50, // Starting coins
-  piBalance: 0,
-  lastCoinClaim: 0,
-  totalEarned: 0
-};
-
 export const useWallet = () => {
-  const [wallet, setWallet] = useState<WalletState>(DEFAULT_WALLET);
+  const [wallet, setWallet] = useState<WalletState>({
+    dropletCoins: 100,
+    piBalance: 0,
+    totalEarned: 100,
+    lastClaimTime: 0
+  });
 
-  // Load wallet from localStorage
+  // Load from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('petWallet');
-    if (saved) {
+    const savedWallet = localStorage.getItem('droplet_wallet');
+    if (savedWallet) {
       try {
-        const parsed = JSON.parse(saved);
-        setWallet(parsed);
+        setWallet(JSON.parse(savedWallet));
       } catch (error) {
-        console.log('Error loading wallet, using default');
+        console.log('Error loading wallet');
       }
     }
   }, []);
 
-  // Save wallet to localStorage
-  const saveWallet = useCallback((newWallet: WalletState) => {
-    localStorage.setItem('petWallet', JSON.stringify(newWallet));
-    setWallet(newWallet);
+  // Save to localStorage
+  useEffect(() => {
+    localStorage.setItem('droplet_wallet', JSON.stringify(wallet));
+  }, [wallet]);
+
+  const addCoins = useCallback((amount: number, source: string = 'manual') => {
+    setWallet(prev => ({
+      ...prev,
+      dropletCoins: prev.dropletCoins + amount,
+      totalEarned: prev.totalEarned + amount
+    }));
+
+    toast({
+      title: `Earned ${amount} coins! 💰`,
+      description: `Source: ${source}`,
+      className: "bg-yellow-50 border-yellow-200"
+    });
   }, []);
 
-  // Add coins from various sources
-  const addCoins = useCallback((amount: number, source: 'ad' | 'daily' | 'purchase' | 'levelup') => {
-    setWallet(prev => {
-      const newWallet = {
-        ...prev,
-        dropletCoins: prev.dropletCoins + amount,
-        totalEarned: prev.totalEarned + amount
-      };
-      saveWallet(newWallet);
-      return newWallet;
-    });
-  }, [saveWallet]);
-
-  // Spend coins for purchases
   const spendCoins = useCallback((amount: number) => {
-    if (wallet.dropletCoins < amount) return false;
-    
-    setWallet(prev => {
-      const newWallet = {
-        ...prev,
-        dropletCoins: prev.dropletCoins - amount
-      };
-      saveWallet(newWallet);
-      return newWallet;
-    });
-    return true;
-  }, [wallet.dropletCoins, saveWallet]);
+    if (wallet.dropletCoins < amount) {
+      toast({
+        title: "Not enough coins! 💸",
+        description: `You need ${amount} coins but only have ${wallet.dropletCoins}`,
+        variant: "destructive"
+      });
+      return false;
+    }
 
-  // Check if daily coins can be claimed
+    setWallet(prev => ({
+      ...prev,
+      dropletCoins: prev.dropletCoins - amount
+    }));
+
+    return true;
+  }, [wallet.dropletCoins]);
+
+  const claimDailyCoins = useCallback((petLevel: number = 1) => {
+    const now = Date.now();
+    const lastClaim = wallet.lastClaimTime;
+    const timeDiff = now - lastClaim;
+    const oneDay = 24 * 60 * 60 * 1000;
+
+    if (timeDiff < oneDay) {
+      return 0;
+    }
+
+    const baseReward = 50;
+    const levelBonus = petLevel * 10;
+    const totalReward = baseReward + levelBonus;
+
+    setWallet(prev => ({
+      ...prev,
+      dropletCoins: prev.dropletCoins + totalReward,
+      totalEarned: prev.totalEarned + totalReward,
+      lastClaimTime: now
+    }));
+
+    return totalReward;
+  }, [wallet.lastClaimTime]);
+
   const canClaimDailyCoins = useCallback(() => {
     const now = Date.now();
-    const lastClaim = wallet.lastCoinClaim;
-    const oneDayMs = 24 * 60 * 60 * 1000;
-    return now - lastClaim >= oneDayMs;
-  }, [wallet.lastCoinClaim]);
-
-  // Claim daily coins based on pet level
-  const claimDailyCoins = useCallback((petLevel: number) => {
-    if (!canClaimDailyCoins()) return false;
-
-    const coinsToAdd = Math.max(1, petLevel * 2); // Level-based daily reward
-    setWallet(prev => {
-      const newWallet = {
-        ...prev,
-        dropletCoins: prev.dropletCoins + coinsToAdd,
-        lastCoinClaim: Date.now(),
-        totalEarned: prev.totalEarned + coinsToAdd
-      };
-      saveWallet(newWallet);
-      return newWallet;
-    });
-    return coinsToAdd;
-  }, [canClaimDailyCoins, saveWallet]);
-
-  // Buy coins with Pi (simulation)
-  const buyCoinsWithPi = useCallback((piAmount: number) => {
-    const coinsToAdd = piAmount * 10; // 1 Pi = 10 Droplet Coins
-    addCoins(coinsToAdd, 'purchase');
-    return coinsToAdd;
-  }, [addCoins]);
+    const lastClaim = wallet.lastClaimTime;
+    const timeDiff = now - lastClaim;
+    const oneDay = 24 * 60 * 60 * 1000;
+    return timeDiff >= oneDay;
+  }, [wallet.lastClaimTime]);
 
   return {
     wallet,
     addCoins,
     spendCoins,
-    canClaimDailyCoins,
     claimDailyCoins,
-    buyCoinsWithPi
+    canClaimDailyCoins
   };
 };

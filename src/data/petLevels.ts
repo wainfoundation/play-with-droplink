@@ -1,31 +1,102 @@
 
 export interface PetLevel {
   level: number;
-  coinsPerDay: number;
-  xpRequired: number;
-  title: string;
+  name: string;
+  requiredStats: number;
+  dailyCoins: number;
   description: string;
+  unlocks: string[];
 }
 
 export const petLevelChart: PetLevel[] = [
-  { level: 0, coinsPerDay: 1, xpRequired: 10, title: "Newborn", description: "Just starting out!" },
-  { level: 1, coinsPerDay: 2, xpRequired: 20, title: "Toddler", description: "Learning the basics" },
-  { level: 2, coinsPerDay: 3, xpRequired: 30, title: "Young", description: "Getting more active" },
-  { level: 3, coinsPerDay: 5, xpRequired: 50, title: "Playful", description: "Full of energy" },
-  { level: 4, coinsPerDay: 7, xpRequired: 75, title: "Smart", description: "Quick learner" },
-  { level: 5, coinsPerDay: 10, xpRequired: 100, title: "Clever", description: "Solving problems" },
-  { level: 6, coinsPerDay: 13, xpRequired: 150, title: "Wise", description: "Knows what they want" },
-  { level: 7, coinsPerDay: 17, xpRequired: 200, title: "Expert", description: "Master of skills" },
-  { level: 8, coinsPerDay: 22, xpRequired: 300, title: "Legendary", description: "Truly special" },
-  { level: 9, coinsPerDay: 28, xpRequired: 400, title: "Mythical", description: "One of a kind" },
-  { level: 10, coinsPerDay: 35, xpRequired: 500, title: "Divine", description: "Perfect companion" }
+  {
+    level: 0,
+    name: "Newborn",
+    requiredStats: 0,
+    dailyCoins: 50,
+    description: "Your pet is just starting its journey!",
+    unlocks: ["Basic care actions"]
+  },
+  {
+    level: 1,
+    name: "Happy Baby",
+    requiredStats: 100,
+    dailyCoins: 60,
+    description: "Your pet is learning to be happy!",
+    unlocks: ["Room navigation", "Basic shop items"]
+  },
+  {
+    level: 2,
+    name: "Energetic Child",
+    requiredStats: 200,
+    dailyCoins: 70,
+    description: "Full of energy and ready to play!",
+    unlocks: ["More room themes", "Toy categories"]
+  },
+  {
+    level: 3,
+    name: "Healthy Teen",
+    requiredStats: 300,
+    dailyCoins: 80,
+    description: "Growing strong and healthy!",
+    unlocks: ["Health items", "Premium food"]
+  },
+  {
+    level: 4,
+    name: "Smart Adult",
+    requiredStats: 400,
+    dailyCoins: 90,
+    description: "Your pet is wise and well-cared for!",
+    unlocks: ["Luxury items", "Special themes"]
+  },
+  {
+    level: 5,
+    name: "Wise Elder",
+    requiredStats: 500,
+    dailyCoins: 100,
+    description: "A perfectly balanced and content pet!",
+    unlocks: ["Legendary items", "All content"]
+  },
+  {
+    level: 6,
+    name: "Legendary Pet",
+    requiredStats: 600,
+    dailyCoins: 120,
+    description: "Your pet has transcended normal limits!",
+    unlocks: ["Mythical items", "Secret rooms"]
+  },
+  {
+    level: 7,
+    name: "Mythical Being",
+    requiredStats: 700,
+    dailyCoins: 150,
+    description: "A creature of legend and wonder!",
+    unlocks: ["Divine items", "Cosmic themes"]
+  },
+  {
+    level: 8,
+    name: "Cosmic Entity",
+    requiredStats: 800,
+    dailyCoins: 200,
+    description: "Your pet commands the very stars!",
+    unlocks: ["Universal items", "Reality-bending powers"]
+  },
+  {
+    level: 9,
+    name: "Universal Guardian",
+    requiredStats: 900,
+    dailyCoins: 250,
+    description: "Protector of all dimensions!",
+    unlocks: ["Omnipotent items", "Multiverse access"]
+  },
+  {
+    level: 10,
+    name: "Eternal Companion",
+    requiredStats: 1000,
+    dailyCoins: 300,
+    description: "Beyond time and space - the perfect pet!",
+    unlocks: ["Everything", "Infinite possibilities"]
+  }
 ];
 
-export const getNextLevelInfo = (currentLevel: number) => {
-  const nextLevel = petLevelChart.find(l => l.level === currentLevel + 1);
-  return nextLevel || petLevelChart[petLevelChart.length - 1];
-};
-
-export const getCurrentLevelInfo = (level: number) => {
-  return petLevelChart.find(l => l.level === level) || petLevelChart[0];
-};
+export default petLevelChart;

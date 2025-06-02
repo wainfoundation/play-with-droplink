@@ -2,147 +2,179 @@
 export interface ShopItem {
   id: string;
   name: string;
-  category: 'food' | 'hygiene' | 'play' | 'cosmetic' | 'theme' | 'medicine';
+  description: string;
   price: number;
+  category: string;
+  rarity: string;
   effect: {
     hunger?: number;
-    cleanliness?: number;
-    energy?: number;
     happiness?: number;
+    energy?: number;
     health?: number;
+    cleanliness?: number;
     affection?: number;
   };
-  description: string;
-  emoji: string;
+  imageUrl?: string;
 }
 
 export const shopItems: ShopItem[] = [
   // Food Items
   {
-    id: "apple",
-    name: "Apple",
-    category: "food",
-    price: 2,
-    effect: { hunger: 25 },
-    description: "A crispy red apple that restores hunger",
-    emoji: "🍎"
-  },
-  {
-    id: "sandwich",
-    name: "Sandwich",
-    category: "food", 
-    price: 4,
-    effect: { hunger: 40 },
-    description: "A delicious sandwich for bigger appetite",
-    emoji: "🥪"
-  },
-  {
-    id: "pizza",
-    name: "Pizza Slice",
-    category: "food",
-    price: 6,
-    effect: { hunger: 60, happiness: 10 },
-    description: "Tasty pizza that makes pets extra happy",
-    emoji: "🍕"
-  },
-
-  // Hygiene Items
-  {
-    id: "soap",
-    name: "Soap Bar",
-    category: "hygiene",
-    price: 3,
-    effect: { cleanliness: 30 },
-    description: "Basic soap for everyday cleaning",
-    emoji: "🧼"
-  },
-  {
-    id: "shampoo",
-    name: "Premium Shampoo",
-    category: "hygiene",
+    id: 'apple',
+    name: 'Red Apple',
+    description: 'A crispy, fresh apple that restores hunger and adds happiness.',
     price: 5,
-    effect: { cleanliness: 50, happiness: 5 },
-    description: "Luxury shampoo that smells amazing",
-    emoji: "🧴"
-  },
-
-  // Play Items
-  {
-    id: "toy_ball",
-    name: "Bouncy Ball",
-    category: "play",
-    price: 4,
-    effect: { energy: 30, happiness: 15 },
-    description: "A fun ball that boosts energy and mood",
-    emoji: "⚽"
+    category: 'food',
+    rarity: 'common',
+    effect: { hunger: 25, happiness: 5 }
   },
   {
-    id: "puzzle_toy",
-    name: "Puzzle Toy",
-    category: "play",
-    price: 8,
-    effect: { energy: 40, happiness: 20 },
-    description: "Interactive puzzle that stimulates the mind",
-    emoji: "🧩"
-  },
-
-  // Medicine
-  {
-    id: "health_potion",
-    name: "Health Potion",
-    category: "medicine",
-    price: 10,
-    effect: { health: 50, happiness: 5 },
-    description: "Restores health when your pet is sick",
-    emoji: "💊"
-  },
-
-  // Cosmetics
-  {
-    id: "rainbow_hat",
-    name: "Rainbow Hat",
-    category: "cosmetic",
+    id: 'pizza',
+    name: 'Pizza Slice',
+    description: 'Delicious pizza slice! Restores lots of hunger.',
     price: 15,
-    effect: { happiness: 10, affection: 10 },
-    description: "A colorful hat that makes pets feel special",
-    emoji: "🎩"
+    category: 'food',
+    rarity: 'common',
+    effect: { hunger: 40, happiness: 10 }
   },
   {
-    id: "bow_tie",
-    name: "Elegant Bow Tie",
-    category: "cosmetic", 
-    price: 12,
-    effect: { happiness: 8, affection: 8 },
-    description: "Classy bow tie for formal occasions",
-    emoji: "🎀"
+    id: 'cake',
+    name: 'Birthday Cake',
+    description: 'Special cake that makes your pet very happy!',
+    price: 30,
+    category: 'food',
+    rarity: 'rare',
+    effect: { hunger: 30, happiness: 25 }
   },
 
-  // Themes
+  // Toys
   {
-    id: "forest_theme",
-    name: "Forest Theme",
-    category: "theme",
-    price: 20,
-    effect: { happiness: 15, energy: 10 },
-    description: "Peaceful forest background with nature sounds",
-    emoji: "🌲"
+    id: 'ball',
+    name: 'Bouncy Ball',
+    description: 'A fun ball to play with. Increases energy and happiness.',
+    price: 10,
+    category: 'toy',
+    rarity: 'common',
+    effect: { happiness: 15, energy: 10 }
   },
   {
-    id: "beach_theme", 
-    name: "Beach Theme",
-    category: "theme",
+    id: 'frisbee',
+    name: 'Flying Frisbee',
+    description: 'Great for outdoor play! Boosts energy and happiness.',
+    price: 20,
+    category: 'toy',
+    rarity: 'common',
+    effect: { happiness: 20, energy: 15 }
+  },
+
+  // Health Items
+  {
+    id: 'medicine',
+    name: 'Health Potion',
+    description: 'Restores health but tastes bitter.',
     price: 25,
-    effect: { happiness: 20, cleanliness: 5 },
-    description: "Relaxing beach scene with ocean waves",
-    emoji: "🏖️"
+    category: 'medicine',
+    rarity: 'common',
+    effect: { health: 30, happiness: -5 }
+  },
+  {
+    id: 'vitamin',
+    name: 'Energy Vitamin',
+    description: 'Boosts energy and health without side effects.',
+    price: 40,
+    category: 'medicine',
+    rarity: 'rare',
+    effect: { health: 20, energy: 25 }
+  },
+
+  // Cleaning Items
+  {
+    id: 'soap',
+    name: 'Bubble Soap',
+    description: 'Makes bath time fun! Increases cleanliness and happiness.',
+    price: 8,
+    category: 'cleaning',
+    rarity: 'common',
+    effect: { cleanliness: 30, happiness: 10 }
+  },
+  {
+    id: 'shampoo',
+    name: 'Premium Shampoo',
+    description: 'Luxury shampoo that makes your pet sparkle clean.',
+    price: 35,
+    category: 'cleaning',
+    rarity: 'rare',
+    effect: { cleanliness: 50, happiness: 15, health: 5 }
+  },
+
+  // Luxury Items
+  {
+    id: 'diamond_collar',
+    name: 'Diamond Collar',
+    description: 'Extremely rare luxury item that boosts all stats!',
+    price: 500,
+    category: 'luxury',
+    rarity: 'legendary',
+    effect: { happiness: 30, health: 20, energy: 20, affection: 25 }
+  },
+  {
+    id: 'golden_food_bowl',
+    name: 'Golden Food Bowl',
+    description: 'Makes every meal special. Permanent happiness boost.',
+    price: 200,
+    category: 'luxury',
+    rarity: 'epic',
+    effect: { happiness: 20, affection: 15 }
+  },
+
+  // Room Themes
+  {
+    id: 'theme_bedroom_space',
+    name: 'Space Bedroom Theme',
+    description: 'Transform your bedroom into a cosmic wonderland!',
+    price: 100,
+    category: 'theme',
+    rarity: 'rare',
+    effect: { happiness: 5, energy: 5 }
+  },
+  {
+    id: 'theme_playroom_rainbow',
+    name: 'Rainbow Playroom Theme',
+    description: 'Colorful rainbow theme for the playroom!',
+    price: 120,
+    category: 'theme',
+    rarity: 'rare',
+    effect: { happiness: 10 }
+  },
+  {
+    id: 'theme_bathroom_ocean',
+    name: 'Ocean Bathroom Theme',
+    description: 'Underwater paradise for bath time!',
+    price: 90,
+    category: 'theme',
+    rarity: 'rare',
+    effect: { cleanliness: 5, happiness: 5 }
+  },
+
+  // Special Items
+  {
+    id: 'love_potion',
+    name: 'Love Potion',
+    description: 'Magical potion that boosts affection tremendously!',
+    price: 75,
+    category: 'special',
+    rarity: 'epic',
+    effect: { affection: 40, happiness: 20 }
+  },
+  {
+    id: 'energy_crystal',
+    name: 'Energy Crystal',
+    description: 'Mystical crystal that provides unlimited energy for a while.',
+    price: 150,
+    category: 'special',
+    rarity: 'epic',
+    effect: { energy: 50, health: 10 }
   }
 ];
 
-export const shopCategories = [
-  { id: 'food', name: 'Food', emoji: '🍎', color: 'bg-red-100' },
-  { id: 'hygiene', name: 'Hygiene', emoji: '🧼', color: 'bg-blue-100' },
-  { id: 'play', name: 'Play', emoji: '⚽', color: 'bg-green-100' },
-  { id: 'medicine', name: 'Medicine', emoji: '💊', color: 'bg-purple-100' },
-  { id: 'cosmetic', name: 'Cosmetics', emoji: '🎩', color: 'bg-pink-100' },
-  { id: 'theme', name: 'Themes', emoji: '🌲', color: 'bg-yellow-100' }
-];
+export default shopItems;

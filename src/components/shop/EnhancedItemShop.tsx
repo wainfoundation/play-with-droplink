@@ -5,9 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Coins, Package, TrendingUp } from 'lucide-react';
-import { useShopItems, ShopItem } from '@/hooks/useShopItems';
-import { useCharacterShop } from '@/hooks/useCharacterShop';
-import { useAuth } from '@/hooks/useAuth';
+import { useLocalShop } from '@/hooks/useLocalShop';
+import { usePetEconomy } from '@/hooks/usePetEconomy';
 import ShopFilters from './ShopFilters';
 import ShopItemGrid from './ShopItemGrid';
 
@@ -16,9 +15,8 @@ interface EnhancedItemShopProps {
 }
 
 const EnhancedItemShop: React.FC<EnhancedItemShopProps> = ({ onBack }) => {
-  const { user } = useAuth();
-  const { wallet } = useCharacterShop();
-  const { shopItems, inventory, buyItem, loading } = useShopItems();
+  const { shopItems, buyItem, loading } = useLocalShop('droplet-blue');
+  const { wallet } = usePetEconomy('droplet-blue');
   
   // Filter states
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -48,8 +46,8 @@ const EnhancedItemShop: React.FC<EnhancedItemShopProps> = ({ onBack }) => {
     if (priceRange !== 'all') {
       const [min, max] = priceRange.split('-').map(p => p.replace('+', ''));
       filtered = filtered.filter(item => {
-        if (priceRange === '5001+') return item.price_coins >= 5001;
-        return item.price_coins >= parseInt(min) && item.price_coins <= parseInt(max);
+        if (priceRange === '501+') return item.price >= 501;
+        return item.price >= parseInt(min) && item.price <= parseInt(max);
       });
     }
 
@@ -62,9 +60,9 @@ const EnhancedItemShop: React.FC<EnhancedItemShopProps> = ({ onBack }) => {
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'price-asc':
-          return a.price_coins - b.price_coins;
+          return a.price - b.price;
         case 'price-desc':
-          return b.price_coins - a.price_coins;
+          return b.price - a.price;
         case 'name-asc':
           return a.name.localeCompare(b.name);
         case 'name-desc':
@@ -98,18 +96,6 @@ const EnhancedItemShop: React.FC<EnhancedItemShopProps> = ({ onBack }) => {
     );
   }
 
-  if (!user) {
-    return (
-      <Card className="max-w-md mx-auto mt-20">
-        <CardContent className="p-6 text-center">
-          <h2 className="text-2xl font-bold mb-4">Login Required</h2>
-          <p className="text-gray-600 mb-4">Please log in to access the shop</p>
-          <Button onClick={onBack}>Back to Game</Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 p-4">
       <div className="max-w-7xl mx-auto">
@@ -127,7 +113,7 @@ const EnhancedItemShop: React.FC<EnhancedItemShopProps> = ({ onBack }) => {
             </Badge>
             <div className="flex items-center gap-2 bg-yellow-100 px-4 py-2 rounded-full border-2 border-yellow-300">
               <Coins className="w-5 h-5 text-yellow-600" />
-              <span className="font-bold text-yellow-800">{wallet?.droplet_coins?.toLocaleString() || 0}</span>
+              <span className="font-bold text-yellow-800">{wallet?.dropletCoins?.toLocaleString() || 0}</span>
             </div>
           </div>
         </div>
@@ -142,7 +128,7 @@ const EnhancedItemShop: React.FC<EnhancedItemShopProps> = ({ onBack }) => {
               </Badge>
             </CardTitle>
             <p className="text-gray-600">
-              Discover everything from basic food to luxury mansions and spaceships!
+              Discover everything from basic food to luxury items and special themes!
             </p>
           </CardHeader>
         </Card>
@@ -152,10 +138,10 @@ const EnhancedItemShop: React.FC<EnhancedItemShopProps> = ({ onBack }) => {
           {[
             { category: 'food', icon: '🍎', name: 'Food' },
             { category: 'luxury', icon: '💎', name: 'Luxury' },
-            { category: 'vehicle', icon: '🚗', name: 'Vehicles' },
-            { category: 'technology', icon: '💻', name: 'Tech' },
-            { category: 'enhancement', icon: '⚡', name: 'Boosts' },
-            { category: 'collectible', icon: '🏆', name: 'Rare' }
+            { category: 'toy', icon: '🎾', name: 'Toys' },
+            { category: 'medicine', icon: '💊', name: 'Health' },
+            { category: 'cleaning', icon: '🧼', name: 'Clean' },
+            { category: 'special', icon: '✨', name: 'Special' }
           ].map(({ category, icon, name }) => (
             <Card 
               key={category} 
@@ -191,7 +177,7 @@ const EnhancedItemShop: React.FC<EnhancedItemShopProps> = ({ onBack }) => {
         <ShopItemGrid
           items={filteredAndSortedItems}
           wallet={wallet}
-          inventory={inventory}
+          inventory={[]}
           onBuyItem={buyItem}
           loading={loading}
         />
