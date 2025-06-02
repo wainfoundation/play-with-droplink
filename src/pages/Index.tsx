@@ -1,294 +1,234 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Helmet } from "react-helmet-async";
-import { createClient } from '@supabase/supabase-js';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Heart, Gamepad2, Users, Trophy, Star, Coins } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
-const supabase = createClient('https://tzptajfvmjsiddjjoyqu.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6cHRhamZ2bWpzaWRkampveXF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg2NjEwNDcsImV4cCI6MjA2NDIzNzA0N30.nO2d3la6HsOHy71OQwoHLhuWCv6ffnZqQWv00GqpZSI');
-
-const defaultStats = {
-  hunger: 100,
-  cleanliness: 100,
-  happiness: 100,
-  coins: 0,
-  xp: 0,
-  level: 1
-};
-
-const MyPetDroplet = () => {
-  const [user, setUser] = useState<any>(null);
-  const [stats, setStats] = useState(defaultStats);
-  const [lastCare, setLastCare] = useState(Date.now());
-  const [loading, setLoading] = useState(true);
-  const [showMiniGame, setShowMiniGame] = useState(false);
-  const [score, setScore] = useState(0);
-  const gameAreaRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    authenticatePiUser();
-  }, []);
-
-  const onIncompletePaymentFound = (payment: any) => {
-    console.log('Pending payment:', payment);
-  };
-
-  const authenticatePiUser = async () => {
-    try {
-      const authResult = await window.Pi.authenticate(['username', 'payments'], onIncompletePaymentFound);
-      setUser(authResult);
-      const { data } = await supabase.from('users').select('*').eq('id', authResult.user.uid).single();
-      if (!data) {
-        await supabase.from('users').insert([{ id: authResult.user.uid, ...defaultStats }]);
-        setStats(defaultStats);
-      } else {
-        decayStats(data);
-      }
-    } catch (error) {
-      console.log('Pi authentication not available, using demo mode');
-      setUser({ user: { uid: 'demo-user' } });
-      setStats(defaultStats);
-    }
-    setLoading(false);
-  };
-
-  const decayStats = (data: any) => {
-    const lastCareTime = new Date(data.last_care).getTime();
-    const hours = (Date.now() - lastCareTime) / 3600000;
-    const newStats = {
-      hunger: Math.max(data.hunger - hours * 5, 0),
-      cleanliness: Math.max(data.cleanliness - hours * 3, 0),
-      happiness: Math.max(data.happiness - hours * 4, 0),
-      coins: data.coins,
-      xp: data.xp,
-      level: data.level
-    };
-    setStats(newStats);
-    setLastCare(Date.now());
-    if (user?.user?.uid !== 'demo-user') {
-      supabase.from('users').update({ ...newStats, last_care: new Date().toISOString() }).eq('id', data.id);
-    }
-  };
-
-  const careAction = (type: string) => {
-    const change = 15;
-    const newStats = { ...stats };
-    if (type === 'feed') newStats.hunger = Math.min(100, newStats.hunger + change);
-    if (type === 'clean') newStats.cleanliness = Math.min(100, newStats.cleanliness + change);
-    if (type === 'play') newStats.happiness = Math.min(100, newStats.happiness + change);
-    newStats.xp += 5;
-    if (newStats.xp >= 100) {
-      newStats.level += 1;
-      newStats.xp = 0;
-    }
-    setStats(newStats);
-    if (user?.user?.uid !== 'demo-user') {
-      supabase.from('users').update({ ...newStats, last_care: new Date().toISOString() }).eq('id', user.user.uid);
-    }
-  };
-
-  const earnCoins = async () => {
-    try {
-      const rewarded = await window.Pi.Ads?.showAd('rewarded');
-      if (rewarded && rewarded.result === 'AD_REWARDED') {
-        const newStats = { ...stats, coins: stats.coins + 5 };
-        setStats(newStats);
-        if (user?.user?.uid !== 'demo-user') {
-          supabase.from('users').update({ coins: newStats.coins }).eq('id', user.user.uid);
-        }
-      }
-    } catch (error) {
-      console.log('Pi ads not available, giving demo coins');
-      const newStats = { ...stats, coins: stats.coins + 5 };
-      setStats(newStats);
-    }
-  };
-
-  const shopPurchase = async (itemName: string, cost: number) => {
-    if (stats.coins < cost) return alert('Not enough coins!');
-    const newStats = { ...stats, coins: stats.coins - cost };
-    setStats(newStats);
-    if (user?.user?.uid !== 'demo-user') {
-      await supabase.from('inventory').insert([{ user_id: user.user.uid, item_name: itemName, quantity: 1 }]);
-      await supabase.from('users').update({ coins: newStats.coins }).eq('id', user.user.uid);
-    }
-  };
-
-  const startMiniGame = () => {
-    setScore(0);
-    setShowMiniGame(true);
-    spawnDroplet();
-  };
-
-  const spawnDroplet = () => {
-    const gameArea = gameAreaRef.current;
-    if (!gameArea) return;
-    const droplet = document.createElement('div');
-    droplet.className = 'absolute w-6 h-6 bg-blue-400 rounded-full cursor-pointer';
-    droplet.style.top = `${Math.random() * 90}%`;
-    droplet.style.left = `${Math.random() * 90}%`;
-    droplet.onclick = () => {
-      setScore((prev) => prev + 1);
-      droplet.remove();
-    };
-    gameArea.appendChild(droplet);
-    setTimeout(() => droplet.remove(), 1500);
-    if (showMiniGame) setTimeout(spawnDroplet, 800);
-  };
-
-  const endMiniGame = () => {
-    setShowMiniGame(false);
-    const earned = score;
-    const newStats = { ...stats, coins: stats.coins + earned };
-    setStats(newStats);
-    if (user?.user?.uid !== 'demo-user') {
-      supabase.from('users').update({ coins: newStats.coins }).eq('id', user.user.uid);
-    }
-  };
-
-  if (loading) return (
-    <>
-      <Helmet>
-        <title>My Pet Droplet - Pi-Powered Virtual Pet Game</title>
-        <meta name="description" content="Take care of your virtual pet droplet in this Pi Network powered game!" />
-      </Helmet>
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading pet...</p>
-        </div>
-      </div>
-    </>
-  );
-
-  if (showMiniGame) return (
-    <>
-      <Helmet>
-        <title>Catch the Droplet Mini Game - My Pet Droplet</title>
-      </Helmet>
-      <div ref={gameAreaRef} className="relative w-full h-screen bg-sky-200 overflow-hidden text-center">
-        <h2 className="text-xl font-bold p-2">🎮 Catch the Droplet! Score: {score}</h2>
-        <button 
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-red-400 hover:bg-red-500 px-4 py-2 rounded transition-colors" 
-          onClick={endMiniGame}
-        >
-          End Game
-        </button>
-      </div>
-    </>
-  );
-
+const Index = () => {
   return (
     <>
       <Helmet>
-        <title>My Pet Droplet - Pi-Powered Virtual Pet Game</title>
-        <meta name="description" content="Take care of your virtual pet droplet in this Pi Network powered game!" />
+        <title>Play with Droplink - Your Pi Network Gaming Hub</title>
+        <meta name="description" content="Experience the joy of gaming and pet care in the Pi Network ecosystem. Play games, earn Pi coins, and take care of your adorable pet droplet!" />
       </Helmet>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
-        <div className="max-w-md mx-auto text-center">
-          <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            🐣 My Pet Droplet
-          </h1>
+      
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+        {/* Hero Section */}
+        <section className="container mx-auto px-4 py-20 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-6">
+              Play with Droplink
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
+              Your ultimate Pi Network gaming hub! Care for virtual pets, play exciting games, and earn Pi coins while having fun.
+            </p>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Link to="/my-pet-droplet">
+                <Button size="lg" className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-4 text-lg">
+                  🐾 My Pet Droplet
+                </Button>
+              </Link>
+              <Link to="/play">
+                <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
+                  🎮 More Games
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* Featured Games */}
+        <section className="container mx-auto px-4 py-16">
+          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            Featured Games
+          </h2>
           
-          <div className="bg-white p-6 rounded-xl mb-6 shadow-lg border">
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="text-center">
-                <p className="text-2xl">❤️</p>
-                <p className="text-sm text-gray-600">Hunger</p>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-red-400 h-2 rounded-full transition-all" 
-                    style={{ width: `${stats.hunger}%` }}
-                  ></div>
-                </div>
-                <p className="text-xs mt-1">{Math.round(stats.hunger)}/100</p>
-              </div>
-              
-              <div className="text-center">
-                <p className="text-2xl">🧼</p>
-                <p className="text-sm text-gray-600">Cleanliness</p>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-400 h-2 rounded-full transition-all" 
-                    style={{ width: `${stats.cleanliness}%` }}
-                  ></div>
-                </div>
-                <p className="text-xs mt-1">{Math.round(stats.cleanliness)}/100</p>
-              </div>
-              
-              <div className="text-center">
-                <p className="text-2xl">😊</p>
-                <p className="text-sm text-gray-600">Happiness</p>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-yellow-400 h-2 rounded-full transition-all" 
-                    style={{ width: `${stats.happiness}%` }}
-                  ></div>
-                </div>
-                <p className="text-xs mt-1">{Math.round(stats.happiness)}/100</p>
-              </div>
-              
-              <div className="text-center">
-                <p className="text-2xl">⭐</p>
-                <p className="text-sm text-gray-600">Level {stats.level}</p>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-purple-400 h-2 rounded-full transition-all" 
-                    style={{ width: `${stats.xp}%` }}
-                  ></div>
-                </div>
-                <p className="text-xs mt-1">{stats.xp}/100 XP</p>
-              </div>
-            </div>
-            
-            <div className="text-center py-2 bg-yellow-50 rounded">
-              <p className="text-lg font-semibold">🪙 {stats.coins} Coins</p>
-            </div>
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* My Pet Droplet Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <Card className="hover:shadow-xl transition-all duration-300 border-2 border-cyan-200 bg-gradient-to-br from-cyan-50 to-blue-50">
+                <CardHeader>
+                  <div className="text-6xl text-center mb-4">💧</div>
+                  <CardTitle className="text-center text-cyan-600">My Pet Droplet</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-gray-600 mb-4">
+                    Raise and bond with your very own Droplet! Feed, play, and watch it grow through different life stages.
+                  </p>
+                  <div className="flex justify-center gap-2 mb-4">
+                    <Badge variant="secondary" className="bg-cyan-100 text-cyan-700">Virtual Pet</Badge>
+                    <Badge variant="secondary" className="bg-purple-100 text-purple-700">Pi Rewards</Badge>
+                  </div>
+                  <Link to="/my-pet-droplet">
+                    <Button className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700">
+                      Start Caring
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </motion.div>
 
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            <button 
-              className="bg-green-400 hover:bg-green-500 text-white px-4 py-3 rounded-lg transition-colors shadow-md"
-              onClick={() => careAction('feed')}
+            {/* Pet Care Game Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
             >
-              🍽 Feed
-            </button>
-            <button 
-              className="bg-blue-400 hover:bg-blue-500 text-white px-4 py-3 rounded-lg transition-colors shadow-md"
-              onClick={() => careAction('clean')}
-            >
-              🛁 Clean
-            </button>
-            <button 
-              className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-3 rounded-lg transition-colors shadow-md"
-              onClick={() => careAction('play')}
-            >
-              🎾 Play
-            </button>
-            <button 
-              className="bg-purple-400 hover:bg-purple-500 text-white px-4 py-3 rounded-lg transition-colors shadow-md"
-              onClick={earnCoins}
-            >
-              🎥 Watch Ad
-            </button>
-          </div>
+              <Card className="hover:shadow-xl transition-all duration-300 border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
+                <CardHeader>
+                  <div className="text-6xl text-center mb-4">🐣</div>
+                  <CardTitle className="text-center text-green-600">Pet Care Adventures</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-gray-600 mb-4">
+                    Advanced pet simulation with character progression, room decoration, and social features.
+                  </p>
+                  <div className="flex justify-center gap-2 mb-4">
+                    <Badge variant="secondary" className="bg-green-100 text-green-700">Simulation</Badge>
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-700">Multiplayer</Badge>
+                  </div>
+                  <Link to="/play">
+                    <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700">
+                      Play Now
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </motion.div>
 
-          <div className="space-y-3">
-            <button 
-              className="w-full bg-pink-400 hover:bg-pink-500 text-white px-4 py-3 rounded-lg transition-colors shadow-md"
-              onClick={() => shopPurchase('Food Pack', 10)}
+            {/* Trivia Time Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
             >
-              🛍 Buy Food Pack (10 coins)
-            </button>
-            <button 
-              className="w-full bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-3 rounded-lg transition-colors shadow-md"
-              onClick={startMiniGame}
-            >
-              🎮 Play Mini Game
-            </button>
+              <Card className="hover:shadow-xl transition-all duration-300 border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50">
+                <CardHeader>
+                  <div className="text-6xl text-center mb-4">🧠</div>
+                  <CardTitle className="text-center text-purple-600">Trivia Time</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-gray-600 mb-4">
+                    Test your knowledge with endless trivia questions and climb the leaderboard!
+                  </p>
+                  <div className="flex justify-center gap-2 mb-4">
+                    <Badge variant="secondary" className="bg-purple-100 text-purple-700">Quiz</Badge>
+                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-700">Brain Training</Badge>
+                  </div>
+                  <Link to="/trivia">
+                    <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700">
+                      Start Quiz
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
-        </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="container mx-auto px-4 py-16 bg-white/50 backdrop-blur-sm">
+          <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Why Choose Droplink?
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1 }}
+              className="text-center"
+            >
+              <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center">
+                <Heart className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Pet Care</h3>
+              <p className="text-gray-600">Nurture virtual pets with love and watch them grow</p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-center"
+            >
+              <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center">
+                <Gamepad2 className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Mini Games</h3>
+              <p className="text-gray-600">Enjoy variety of fun games with your pets</p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-center"
+            >
+              <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-full flex items-center justify-center">
+                <Coins className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Pi Rewards</h3>
+              <p className="text-gray-600">Earn Pi coins while playing and having fun</p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-center"
+            >
+              <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                <Users className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Social Play</h3>
+              <p className="text-gray-600">Connect with friends and share your progress</p>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="container mx-auto px-4 py-20 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Ready to Start Your Adventure?
+            </h2>
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+              Join thousands of players in the Droplink universe. Your virtual pet is waiting for you!
+            </p>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Link to="/my-pet-droplet">
+                <Button size="lg" className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-4 text-lg">
+                  🐾 Start with Pet Droplet
+                </Button>
+              </Link>
+              <Link to="/trivia">
+                <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
+                  🧠 Try Trivia Challenge
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+        </section>
       </div>
     </>
   );
 };
 
-export default MyPetDroplet;
+export default Index;

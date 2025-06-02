@@ -15,6 +15,7 @@ import PiBrowserDialog from "./components/PiBrowserDialog";
 const Index = lazy(() => import("./pages/Index"));
 const PlayWithMascot = lazy(() => import("./pages/PlayWithMascot"));
 const TriviaTime = lazy(() => import("./pages/TriviaTime"));
+const MyPetDroplet = lazy(() => import("./pages/MyPetDroplet"));
 const Help = lazy(() => import("./pages/Help"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
@@ -46,6 +47,7 @@ function App() {
                       <Route path="/" element={<Index />} />
                       <Route path="/play" element={<PlayWithMascot />} />
                       <Route path="/trivia" element={<TriviaTime />} />
+                      <Route path="/my-pet-droplet" element={<MyPetDroplet />} />
                       <Route path="/help" element={<Help />} />
                       <Route path="/privacy" element={<Privacy />} />
                       <Route path="/terms" element={<Terms />} />
