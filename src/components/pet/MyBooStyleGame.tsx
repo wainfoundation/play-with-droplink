@@ -8,9 +8,7 @@ import { characters } from '@/components/welcome/characterData';
 import { usePetMoodEngine } from '@/hooks/usePetMoodEngine';
 import { usePetEconomy } from '@/hooks/usePetEconomy';
 import PetDisplay from './PetDisplay';
-import PetStatsPanel from './PetStatsPanel';
 import ActionButtons from './ActionButtons';
-import NavigationBar from './NavigationBar';
 import RoomBackground from './RoomBackground';
 import EnhancedItemShop from '../shop/EnhancedItemShop';
 import InventoryModal from './InventoryModal';
@@ -40,78 +38,144 @@ const MyBooStyleGame: React.FC = () => {
 
   return (
     <RoomBackground roomId={currentRoom}>
-      <div className="min-h-screen flex flex-col">
-        {/* Header */}
-        <div className="p-4 flex justify-between items-center">
-          <Link to="/">
-            <Button variant="outline" size="sm" className="bg-white/80 backdrop-blur-sm">
-              <X className="w-4 h-4" />
+      <div className="min-h-screen flex flex-col relative">
+        {/* Top Status Bar - My Boo Style */}
+        <div className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-400 to-purple-500 text-white relative z-10">
+          <div className="flex items-center space-x-2">
+            {/* Level Badge */}
+            <div className="bg-yellow-400 text-black rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">
+              2
+            </div>
+            
+            {/* Stats Icons */}
+            <div className="flex items-center space-x-1 bg-blue-600 rounded-full px-3 py-1">
+              <span className="text-yellow-300">⚡</span>
+              <span className="text-sm font-bold">{Math.round(moodState.energy)}</span>
+            </div>
+            
+            <div className="flex items-center space-x-1 bg-gray-700 rounded-full px-3 py-1">
+              <span className="text-gray-300">🧠</span>
+              <span className="text-sm font-bold">{Math.round(moodState.health)}</span>
+            </div>
+            
+            <div className="flex items-center space-x-1 bg-pink-500 rounded-full px-3 py-1">
+              <span className="text-white">💝</span>
+              <span className="text-sm font-bold">{Math.round(moodState.happiness)}</span>
+            </div>
+          </div>
+
+          {/* Coin Balance - My Boo Style */}
+          <div className="flex items-center space-x-2">
+            <div className="bg-yellow-400 text-black rounded-full px-4 py-1 font-bold flex items-center space-x-1">
+              <span className="text-lg">💰</span>
+              <span>{wallet?.dropletCoins || 0}</span>
+            </div>
+            <Button variant="outline" size="sm" className="bg-white/20 border-white/30 text-white">
+              <span className="text-lg">➕</span>
             </Button>
-          </Link>
-          
-          <motion.h1 
-            className="text-xl font-bold text-center bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full"
-            animate={{ scale: [1, 1.02, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            My Droplet Pet 🐾
-          </motion.h1>
-          
-          <Link to="/welcome">
-            <Button variant="outline" size="sm" className="bg-white/80 backdrop-blur-sm">
-              <Settings className="w-4 h-4" />
-            </Button>
-          </Link>
+          </div>
         </div>
 
-        {/* Main Game Area */}
-        <div className="flex-1 flex flex-col items-center justify-center px-4 pb-4">
-          {/* Pet Display */}
+        {/* Decorative Bunting */}
+        <div className="absolute top-16 left-0 right-0 z-5">
+          <svg width="100%" height="40" viewBox="0 0 400 40" className="overflow-visible">
+            <path d="M0,0 L40,0 L50,30 L30,30 Z" fill="#00ff88" />
+            <path d="M40,0 L80,0 L90,30 L70,30 Z" fill="#ff69b4" />
+            <path d="M80,0 L120,0 L130,30 L110,30 Z" fill="#ffff00" />
+            <path d="M120,0 L160,0 L170,30 L150,30 Z" fill="#ff6347" />
+            <path d="M160,0 L200,0 L210,30 L190,30 Z" fill="#4169e1" />
+            <path d="M200,0 L240,0 L250,30 L230,30 Z" fill="#00ff88" />
+            <path d="M240,0 L280,0 L290,30 L270,30 Z" fill="#ff69b4" />
+            <path d="M280,0 L320,0 L330,30 L310,30 Z" fill="#ffff00" />
+            <path d="M320,0 L360,0 L370,30 L350,30 Z" fill="#ff6347" />
+            <path d="M360,0 L400,0 L410,30 L390,30 Z" fill="#4169e1" />
+          </svg>
+        </div>
+
+        {/* Main Pet Area */}
+        <div className="flex-1 flex flex-col items-center justify-center px-4 pt-8 pb-4">
+          {/* Pet Display - Centered like My Boo */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="mb-6"
+            className="mb-8"
           >
-            <PetDisplay characterId={selectedCharacter.id} />
+            <PetDisplay characterId={selectedCharacter.id} className="scale-125" />
           </motion.div>
 
-          {/* Pet Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="mb-6 w-full max-w-md"
-          >
-            <PetStatsPanel stats={moodState} />
-          </motion.div>
-
-          {/* Action Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="mb-6"
-          >
-            <ActionButtons
-              onFeed={actions.feedPet}
-              onPlay={actions.playWithPet}
-              onSleep={actions.sleepPet}
-              onMedicine={actions.giveMedicine}
-              onClean={actions.bathePet}
-              onPet={actions.petCharacter}
-            />
-          </motion.div>
+          {/* Room Decorations */}
+          <div className="absolute bottom-32 left-8">
+            <div className="w-16 h-16 bg-orange-400 rounded-lg shadow-lg flex items-center justify-center">
+              <span className="text-2xl">🔥</span>
+            </div>
+          </div>
         </div>
 
-        {/* Navigation Bar */}
-        <NavigationBar
-          activeRoom={currentRoom}
-          onRoomChange={setCurrentRoom}
-          onOpenShop={() => setShowShop(true)}
-          onOpenInventory={() => setShowInventory(true)}
-          coinBalance={wallet?.dropletCoins || 0}
-        />
+        {/* Bottom Navigation - My Boo Style */}
+        <div className="bg-gradient-to-r from-yellow-300 to-orange-400 p-4 flex justify-around items-center shadow-lg relative z-10">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setCurrentRoom('bedroom')}
+            className={`flex flex-col items-center justify-center w-16 h-16 rounded-xl shadow-lg transition-all ${
+              currentRoom === 'bedroom' 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-white text-blue-500'
+            }`}
+          >
+            <span className="text-2xl">🏠</span>
+            <span className="text-xs font-bold">Boo</span>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowShop(true)}
+            className="flex flex-col items-center justify-center w-16 h-16 bg-white rounded-xl shadow-lg text-orange-500"
+          >
+            <span className="text-2xl">🎨</span>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={actions.playWithPet}
+            className="flex flex-col items-center justify-center w-16 h-16 bg-white rounded-xl shadow-lg text-purple-500"
+          >
+            <span className="text-2xl">🎮</span>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowInventory(true)}
+            className="flex flex-col items-center justify-center w-16 h-16 bg-white rounded-xl shadow-lg text-green-500"
+          >
+            <span className="text-2xl">🏠</span>
+          </motion.button>
+        </div>
+
+        {/* Floating Action Buttons - My Boo Style */}
+        <div className="absolute bottom-24 right-4 flex flex-col space-y-2">
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={actions.feedPet}
+            className="w-12 h-12 bg-orange-500 rounded-full shadow-lg flex items-center justify-center text-white"
+          >
+            <span className="text-xl">🍎</span>
+          </motion.button>
+          
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={actions.bathePet}
+            className="w-12 h-12 bg-blue-500 rounded-full shadow-lg flex items-center justify-center text-white"
+          >
+            <span className="text-xl">🛁</span>
+          </motion.button>
+        </div>
 
         {/* Shop Modal */}
         <AnimatePresence>

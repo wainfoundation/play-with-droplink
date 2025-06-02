@@ -35,40 +35,53 @@ const PetDisplay: React.FC<PetDisplayProps> = ({ characterId, className = "" }) 
 
   return (
     <div className={`flex flex-col items-center ${className}`}>
-      {/* Pet Character */}
+      {/* Pet Character - My Boo Style */}
       <motion.div
         animate={{ 
-          scale: [1, 1.05, 1],
-          rotate: [0, 2, -2, 0] 
+          scale: [1, 1.02, 1],
+          y: [0, -2, 0]
         }}
         transition={{ 
-          duration: 3, 
+          duration: 2, 
           repeat: Infinity,
           ease: "easeInOut" 
         }}
-        className="relative"
+        className="relative mb-4"
       >
-        <CharacterRenderer character={character} size={140} />
+        <CharacterRenderer character={character} size={160} />
         
-        {/* Mood Indicator */}
+        {/* Mood Indicator - Top Right like My Boo */}
         <motion.div
-          animate={{ scale: [1, 1.2, 1] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="absolute -top-2 -right-2 text-2xl bg-white rounded-full p-1 shadow-lg"
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+          className="absolute -top-1 -right-1 text-2xl"
         >
           {getMoodEmoji(happiness, health, hunger, energy)}
         </motion.div>
+
+        {/* Sleeping pillow when tired */}
+        {energy < 30 && (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="absolute -right-8 top-12"
+          >
+            <span className="text-3xl">💤</span>
+          </motion.div>
+        )}
       </motion.div>
 
-      {/* Pet Message */}
+      {/* Pet Message - My Boo Style Speech Bubble */}
       {currentMessage && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          className="mt-4 bg-white/90 backdrop-blur-sm rounded-2xl px-4 py-2 shadow-lg max-w-xs text-center"
+          initial={{ opacity: 0, y: 10, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -10, scale: 0.9 }}
+          className="relative bg-white rounded-2xl px-4 py-2 shadow-lg max-w-xs text-center border-2 border-gray-200"
         >
-          <p className="text-sm text-gray-800">{currentMessage}</p>
+          <p className="text-sm text-gray-800 font-medium">{currentMessage}</p>
+          {/* Speech bubble tail */}
+          <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white"></div>
         </motion.div>
       )}
     </div>
