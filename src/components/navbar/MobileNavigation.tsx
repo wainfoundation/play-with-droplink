@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Home, HelpCircle, LogOut, LogIn, UserPlus, Gamepad2 } from "lucide-react";
+import { Menu, X, Home, HelpCircle, LogOut, LogIn, UserPlus, Gamepad2, Brain, Grid3X3 } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -20,6 +20,8 @@ const MobileNavigation = () => {
   const navigationItems = [
     { name: "Home", path: "/", icon: Home },
     { name: "Play with Droplink", path: "/play", icon: Gamepad2 },
+    { name: "Trivia Time", path: "/trivia", icon: Brain },
+    { name: "Other Apps", path: "/other-apps", icon: Grid3X3 },
     { name: "Help", path: "/help", icon: HelpCircle },
   ];
 

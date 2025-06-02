@@ -1,235 +1,245 @@
 
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Heart, Gamepad2, Star, Users, Zap, Sparkles } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import CharacterRenderer from "@/components/welcome/CharacterRenderer";
-import { characters } from "@/components/welcome/characterData";
-import { useAuth } from "@/hooks/useAuth";
-import GoToTop from '@/components/GoToTop';
+import { Link } from "react-router-dom";
+import { ArrowRight, Play, Heart, Coins, Trophy, Gamepad2, Brain, Sparkles, Star } from "lucide-react";
+import { motion } from "framer-motion";
+import PiDomainShowcase from "@/components/PiDomainShowcase";
 
 const Index = () => {
-  const [selectedCharacter, setSelectedCharacter] = useState(characters[0]);
-  const { user } = useAuth();
-
-  useEffect(() => {
-    const savedCharacter = localStorage.getItem('selectedCharacter');
-    if (savedCharacter) {
-      try {
-        const parsedCharacter = JSON.parse(savedCharacter);
-        setSelectedCharacter(parsedCharacter);
-      } catch (error) {
-        console.log('Error parsing saved character, using default');
-      }
+  const gameFeatures = [
+    {
+      icon: "🐾",
+      title: "Pet Care System",
+      description: "Take care of your virtual Droplet companion"
+    },
+    {
+      icon: "🎮",
+      title: "50+ Mini Games",
+      description: "Puzzle, action, trivia, and creative games"
+    },
+    {
+      icon: "💰",
+      title: "Pi Integration",
+      description: "Earn rewards and make purchases with Pi"
+    },
+    {
+      icon: "🏆",
+      title: "Leaderboards",
+      description: "Compete with players worldwide"
     }
-  }, []);
+  ];
+
+  const games = [
+    {
+      title: "Play with Droplink",
+      description: "Your virtual pet gaming world with 50+ interactive games",
+      icon: Gamepad2,
+      color: "from-blue-500 to-purple-600",
+      features: ["Pet Care", "Mini Games", "Pi Shop", "Leveling"],
+      href: "/play",
+      isNew: false
+    },
+    {
+      title: "Trivia Time",
+      description: "Test your knowledge and earn Pi rewards in this endless trivia game",
+      icon: Brain,
+      color: "from-purple-500 to-pink-600",
+      features: ["Endless Questions", "Pi Ads", "Lives System", "Leaderboards"],
+      href: "/trivia",
+      isNew: true
+    }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      <Navbar />
+    <>
+      <Helmet>
+        <title>Play with Droplink - Pi Network Gaming Hub</title>
+        <meta name="description" content="Experience the ultimate Pi Network gaming platform with virtual pets, 50+ games, and Pi rewards!" />
+      </Helmet>
       
-      {/* Hero Section */}
-      <section className="pt-20 pb-16 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="min-h-screen">
+        {/* Hero Section */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-20 px-4">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.05"%3E%3Ccircle cx="20" cy="20" r="4"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
+          
+          <div className="container mx-auto relative z-10">
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center max-w-4xl mx-auto"
             >
-              <Badge className="mb-4 bg-gradient-to-r from-primary to-secondary text-white">
-                New: My Pet Droplet Game! 🐾
-              </Badge>
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-2xl">
+                  🎮
+                </div>
+                <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  Play with Droplink
+                </h1>
+              </div>
               
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                Your Pi-Powered Digital Pet Adventure
-              </h1>
-              
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Care for your adorable pet droplet, play mini-games, earn Pi coins, and build the ultimate digital companion experience!
+              <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
+                Your ultimate <span className="font-semibold text-primary">Pi Network</span> gaming hub featuring virtual pets, endless entertainment, and real Pi rewards!
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4">
-                {user ? (
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <Button asChild size="lg" className="bg-gradient-to-r from-primary to-secondary hover:scale-105 transition-transform text-lg px-8 py-3">
                   <Link to="/play">
-                    <Button size="lg" className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold">
-                      Continue Playing
-                      <Gamepad2 className="ml-2 h-5 w-5" />
-                    </Button>
+                    <Play className="w-5 h-5 mr-2" />
+                    Start Playing
                   </Link>
-                ) : (
-                  <Link to="/auth">
-                    <Button size="lg" className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold">
-                      Start Your Adventure
-                      <Sparkles className="ml-2 h-5 w-5" />
-                    </Button>
+                </Button>
+                <Button asChild variant="outline" size="lg" className="border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors text-lg px-8 py-3">
+                  <Link to="/trivia">
+                    <Brain className="w-5 h-5 mr-2" />
+                    Try Trivia Time
                   </Link>
-                )}
-                
-                <Link to="/play">
-                  <Button variant="outline" size="lg" className="border-2 hover:bg-gray-50">
-                    View Games
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
+                </Button>
               </div>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              className="relative"
-            >
-              <div className="bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 rounded-3xl p-8 border-4 border-pink-200 shadow-2xl">
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">Meet Your Pet Droplet!</h3>
-                  <p className="text-gray-600">Cute, lovable, and waiting for your care</p>
+
+              {/* Stats Row */}
+              <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-primary">50+</div>
+                  <div className="text-sm text-gray-600">Games</div>
                 </div>
-                
-                <div className="flex justify-center mb-6">
-                  <CharacterRenderer character={selectedCharacter} size={150} />
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-secondary">∞</div>
+                  <div className="text-sm text-gray-600">Trivia Questions</div>
                 </div>
-                
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-white/60 rounded-2xl p-3 text-center border-2 border-pink-200">
-                    <Heart className="w-6 h-6 text-pink-500 mx-auto mb-1" />
-                    <p className="text-sm font-semibold text-pink-700">Pet Care</p>
-                  </div>
-                  <div className="bg-white/60 rounded-2xl p-3 text-center border-2 border-blue-200">
-                    <Gamepad2 className="w-6 h-6 text-blue-500 mx-auto mb-1" />
-                    <p className="text-sm font-semibold text-blue-700">Mini Games</p>
-                  </div>
-                  <div className="bg-white/60 rounded-2xl p-3 text-center border-2 border-yellow-200">
-                    <Zap className="w-6 h-6 text-yellow-600 mx-auto mb-1" />
-                    <p className="text-sm font-semibold text-yellow-700">Pi Rewards</p>
-                  </div>
-                  <div className="bg-white/60 rounded-2xl p-3 text-center border-2 border-green-200">
-                    <Users className="w-6 h-6 text-green-500 mx-auto mb-1" />
-                    <p className="text-sm font-semibold text-green-700">Community</p>
-                  </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">100%</div>
+                  <div className="text-sm text-gray-600">Pi Integrated</div>
                 </div>
               </div>
             </motion.div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Features Section */}
-      <section className="py-16 px-4 bg-white/50">
-        <div className="container mx-auto max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose Pet Droplet?</h2>
-            <p className="text-xl text-gray-600">The most engaging Pi Network pet care game</p>
-          </motion.div>
+        {/* Games Section */}
+        <section className="py-20 px-4 bg-white">
+          <div className="container mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">
+                Choose Your Gaming Adventure
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Experience different gaming worlds, each with unique features and Pi Network integration
+              </p>
+            </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Heart,
-                title: "Pet Care System",
-                description: "Feed, clean, play, and watch your pet grow with realistic care mechanics",
-                color: "text-pink-500"
-              },
-              {
-                icon: Gamepad2,
-                title: "Mini Games",
-                description: "Play engaging mini-games to earn Pi coins and keep your pet entertained",
-                color: "text-blue-500"
-              },
-              {
-                icon: Zap,
-                title: "Pi Network Integration",
-                description: "Earn real Pi coins through gameplay and spend them in the pet shop",
-                color: "text-yellow-500"
-              },
-              {
-                icon: Star,
-                title: "Level Up System",
-                description: "Watch your pet grow, unlock new features, and reach higher levels",
-                color: "text-purple-500"
-              },
-              {
-                icon: Users,
-                title: "Community Features",
-                description: "Share your pet's progress and compete with other Pi Network users",
-                color: "text-green-500"
-              },
-              {
-                icon: Sparkles,
-                title: "Regular Updates",
-                description: "New features, pets, and mini-games added regularly to keep it fresh",
-                color: "text-indigo-500"
-              }
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <Card className="h-full hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <feature.icon className={`w-8 h-8 ${feature.color} mb-2`} />
-                    <CardTitle className="text-xl">{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-base">{feature.description}</CardDescription>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              {games.map((game, index) => (
+                <motion.div
+                  key={game.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.2 }}
+                >
+                  <Card className="h-full hover:shadow-xl transition-shadow duration-300 border-2 hover:border-primary/20">
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${game.color} flex items-center justify-center`}>
+                          <game.icon className="w-6 h-6 text-white" />
+                        </div>
+                        {game.isNew && (
+                          <Badge className="bg-green-500 text-white">NEW!</Badge>
+                        )}
+                      </div>
+                      <CardTitle className="text-xl">{game.title}</CardTitle>
+                      <CardDescription className="text-base">
+                        {game.description}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex flex-wrap gap-2">
+                          {game.features.map((feature) => (
+                            <Badge key={feature} variant="secondary" className="text-xs">
+                              {feature}
+                            </Badge>
+                          ))}
+                        </div>
+                        <Button asChild className="w-full" size="lg">
+                          <Link to={game.href}>
+                            <Play className="w-4 h-4 mr-2" />
+                            Play Now
+                            <ArrowRight className="w-4 h-4 ml-2" />
+                          </Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA Section */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto max-w-4xl text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Ready to Start Your Pet Adventure?
-            </h2>
-            <p className="text-xl text-gray-600 mb-8">
-              Join thousands of Pi Network users already caring for their digital pets
-            </p>
-            
-            {user ? (
-              <Link to="/play">
-                <Button size="lg" className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white font-semibold">
-                  Continue Playing
-                  <Gamepad2 className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
-            ) : (
-              <Link to="/auth">
-                <Button size="lg" className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white font-semibold">
-                  Login with Pi Network
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
-            )}
-          </motion.div>
-        </div>
-      </section>
+        {/* Features Grid */}
+        <section className="py-20 px-4 bg-gray-50">
+          <div className="container mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">
+                Why Choose Play with Droplink?
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Built specifically for the Pi Network ecosystem with innovative features and real rewards
+              </p>
+            </div>
 
-      <Footer />
-      <GoToTop />
-    </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {gameFeatures.map((feature, index) => (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="text-center"
+                >
+                  <div className="text-4xl mb-4">{feature.icon}</div>
+                  <h3 className="text-xl font-semibold mb-3 text-gray-900">{feature.title}</h3>
+                  <p className="text-gray-600">{feature.description}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Pi Domain Showcase */}
+        <PiDomainShowcase />
+
+        {/* CTA Section */}
+        <section className="py-20 px-4 bg-gradient-to-br from-primary/10 to-secondary/10">
+          <div className="container mx-auto text-center">
+            <div className="max-w-3xl mx-auto">
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">
+                Ready to Start Your Pi Gaming Journey?
+              </h2>
+              <p className="text-lg text-gray-600 mb-8">
+                Join thousands of Pi Network pioneers enjoying games, earning rewards, and building their digital presence
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button asChild size="lg" className="bg-gradient-to-r from-primary to-secondary hover:scale-105 transition-transform text-lg px-8 py-3">
+                  <Link to="/play">
+                    <Sparkles className="w-5 h-5 mr-2" />
+                    Start Gaming Now
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg" className="border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors text-lg px-8 py-3">
+                  <Link to="/help">
+                    Learn How to Play
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </>
   );
 };
 
