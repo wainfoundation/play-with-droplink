@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -41,7 +40,7 @@ const FullScreenPetGame: React.FC = () => {
   const actionButtons = [
     { action: 'feed', icon: '🍎', label: 'Feed', onClick: actions.feedPet },
     { action: 'play', icon: '🎾', label: 'Play', onClick: actions.playWithPet },
-    { action: 'sleep', icon: '😴', label: 'Sleep', onClick: actions.restPet },
+    { action: 'sleep', icon: '😴', label: 'Sleep', onClick: actions.sleepPet },
     { action: 'bathe', icon: '🛁', label: 'Bathe', onClick: actions.bathePet },
     { action: 'medicine', icon: '💊', label: 'Heal', onClick: actions.giveMedicine },
     { action: 'pet', icon: '💝', label: 'Pet', onClick: actions.petCharacter }
