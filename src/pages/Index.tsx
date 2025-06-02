@@ -116,7 +116,7 @@ const Index = () => {
                         Level {petLevel}
                       </Badge>
                       <Badge className="bg-green-500 text-white">
-                        {wallet.dropletCoins} 🪙
+                        {wallet?.dropletCoins || 0} 🪙
                       </Badge>
                     </div>
                   </div>
@@ -149,7 +149,7 @@ const Index = () => {
                     <Coins className="w-6 h-6 text-yellow-600 mx-auto mb-1" />
                     <p className="text-sm font-semibold text-yellow-700">Coins/Day</p>
                     <div className="text-xs text-gray-600 mt-1">
-                      {levelInfo.coinsPerDay} Daily
+                      {levelInfo?.coinsPerDay || 50} Daily
                     </div>
                   </div>
                   <div className="bg-white/60 rounded-2xl p-3 text-center border-2 border-green-200">

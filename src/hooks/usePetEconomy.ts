@@ -1,6 +1,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
+import { petLevelChart } from '@/data/petLevels';
+import { usePetMoodEngine } from './usePetMoodEngine';
 
 interface Wallet {
   dropletCoins: number;
@@ -14,6 +16,15 @@ interface InventoryItem {
   purchasedAt: number;
 }
 
+interface LevelInfo {
+  level: number;
+  name: string;
+  coinsPerDay: number;
+  description: string;
+  progress: number;
+  nextLevelStats: number;
+}
+
 export const usePetEconomy = (characterId: string) => {
   const [wallet, setWallet] = useState<Wallet>({
     dropletCoins: 100,
@@ -22,6 +33,7 @@ export const usePetEconomy = (characterId: string) => {
   });
 
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const { moodState, actions: moodActions } = usePetMoodEngine(characterId);
 
   // Load wallet from localStorage
   useEffect(() => {
@@ -53,6 +65,37 @@ export const usePetEconomy = (characterId: string) => {
   useEffect(() => {
     localStorage.setItem(`pet_inventory_${characterId}`, JSON.stringify(inventory));
   }, [inventory, characterId]);
+
+  // Calculate pet level based on mood stats
+  const calculatePetLevel = useCallback(() => {
+    const totalStats = moodState.happiness + moodState.health + moodState.energy + moodState.hunger + moodState.cleanliness + moodState.affection;
+    const averageStats = totalStats / 6;
+    return Math.max(1, Math.floor(averageStats / 15) + 1);
+  }, [moodState]);
+
+  const petLevel = calculatePetLevel();
+
+  // Get level information
+  const getLevelInfo = useCallback((): LevelInfo => {
+    const currentLevelData = petLevelChart.find(l => l.level === petLevel) || petLevelChart[0];
+    const nextLevelData = petLevelChart.find(l => l.level === petLevel + 1);
+    
+    const totalStats = moodState.happiness + moodState.health + moodState.energy + moodState.hunger + moodState.cleanliness + moodState.affection;
+    const currentProgress = totalStats;
+    const nextLevelRequired = nextLevelData ? nextLevelData.requiredStats : currentLevelData.requiredStats;
+    const progress = nextLevelData ? Math.min(100, (currentProgress / nextLevelRequired) * 100) : 100;
+
+    return {
+      level: petLevel,
+      name: currentLevelData.name,
+      coinsPerDay: currentLevelData.dailyCoins,
+      description: currentLevelData.description,
+      progress,
+      nextLevelStats: nextLevelRequired
+    };
+  }, [petLevel, moodState]);
+
+  const levelInfo = getLevelInfo();
 
   const addCoins = useCallback((amount: number, source: string = 'manual') => {
     setWallet(prev => ({
@@ -175,6 +218,10 @@ export const usePetEconomy = (characterId: string) => {
   return {
     wallet,
     inventory,
+    moodState,
+    moodActions,
+    petLevel,
+    levelInfo,
     addCoins,
     spendCoins,
     claimDailyCoins,

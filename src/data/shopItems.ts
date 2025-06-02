@@ -6,6 +6,7 @@ export interface ShopItem {
   price: number;
   category: string;
   rarity: string;
+  emoji?: string;
   effect: {
     hunger?: number;
     happiness?: number;
@@ -17,6 +18,22 @@ export interface ShopItem {
   imageUrl?: string;
 }
 
+export interface ShopCategory {
+  id: string;
+  name: string;
+  emoji: string;
+}
+
+export const shopCategories: ShopCategory[] = [
+  { id: 'food', name: 'Food', emoji: '🍎' },
+  { id: 'toy', name: 'Toys', emoji: '🎾' },
+  { id: 'medicine', name: 'Health', emoji: '💊' },
+  { id: 'cleaning', name: 'Cleaning', emoji: '🧼' },
+  { id: 'luxury', name: 'Luxury', emoji: '💎' },
+  { id: 'theme', name: 'Themes', emoji: '🎨' },
+  { id: 'special', name: 'Special', emoji: '✨' }
+];
+
 export const shopItems: ShopItem[] = [
   // Food Items
   {
@@ -26,6 +43,7 @@ export const shopItems: ShopItem[] = [
     price: 5,
     category: 'food',
     rarity: 'common',
+    emoji: '🍎',
     effect: { hunger: 25, happiness: 5 }
   },
   {
@@ -35,6 +53,7 @@ export const shopItems: ShopItem[] = [
     price: 15,
     category: 'food',
     rarity: 'common',
+    emoji: '🍕',
     effect: { hunger: 40, happiness: 10 }
   },
   {
@@ -44,6 +63,7 @@ export const shopItems: ShopItem[] = [
     price: 30,
     category: 'food',
     rarity: 'rare',
+    emoji: '🎂',
     effect: { hunger: 30, happiness: 25 }
   },
 
@@ -55,6 +75,7 @@ export const shopItems: ShopItem[] = [
     price: 10,
     category: 'toy',
     rarity: 'common',
+    emoji: '🎾',
     effect: { happiness: 15, energy: 10 }
   },
   {
@@ -64,6 +85,7 @@ export const shopItems: ShopItem[] = [
     price: 20,
     category: 'toy',
     rarity: 'common',
+    emoji: '🥏',
     effect: { happiness: 20, energy: 15 }
   },
 
@@ -75,6 +97,7 @@ export const shopItems: ShopItem[] = [
     price: 25,
     category: 'medicine',
     rarity: 'common',
+    emoji: '💊',
     effect: { health: 30, happiness: -5 }
   },
   {
@@ -84,6 +107,7 @@ export const shopItems: ShopItem[] = [
     price: 40,
     category: 'medicine',
     rarity: 'rare',
+    emoji: '💉',
     effect: { health: 20, energy: 25 }
   },
 
@@ -95,6 +119,7 @@ export const shopItems: ShopItem[] = [
     price: 8,
     category: 'cleaning',
     rarity: 'common',
+    emoji: '🧼',
     effect: { cleanliness: 30, happiness: 10 }
   },
   {
@@ -104,6 +129,7 @@ export const shopItems: ShopItem[] = [
     price: 35,
     category: 'cleaning',
     rarity: 'rare',
+    emoji: '🧴',
     effect: { cleanliness: 50, happiness: 15, health: 5 }
   },
 
@@ -115,6 +141,7 @@ export const shopItems: ShopItem[] = [
     price: 500,
     category: 'luxury',
     rarity: 'legendary',
+    emoji: '💎',
     effect: { happiness: 30, health: 20, energy: 20, affection: 25 }
   },
   {
@@ -124,6 +151,7 @@ export const shopItems: ShopItem[] = [
     price: 200,
     category: 'luxury',
     rarity: 'epic',
+    emoji: '🏆',
     effect: { happiness: 20, affection: 15 }
   },
 
@@ -135,6 +163,7 @@ export const shopItems: ShopItem[] = [
     price: 100,
     category: 'theme',
     rarity: 'rare',
+    emoji: '🚀',
     effect: { happiness: 5, energy: 5 }
   },
   {
@@ -144,6 +173,7 @@ export const shopItems: ShopItem[] = [
     price: 120,
     category: 'theme',
     rarity: 'rare',
+    emoji: '🌈',
     effect: { happiness: 10 }
   },
   {
@@ -153,6 +183,7 @@ export const shopItems: ShopItem[] = [
     price: 90,
     category: 'theme',
     rarity: 'rare',
+    emoji: '🌊',
     effect: { cleanliness: 5, happiness: 5 }
   },
 
@@ -164,6 +195,7 @@ export const shopItems: ShopItem[] = [
     price: 75,
     category: 'special',
     rarity: 'epic',
+    emoji: '💖',
     effect: { affection: 40, happiness: 20 }
   },
   {
@@ -173,6 +205,7 @@ export const shopItems: ShopItem[] = [
     price: 150,
     category: 'special',
     rarity: 'epic',
+    emoji: '⚡',
     effect: { energy: 50, health: 10 }
   }
 ];

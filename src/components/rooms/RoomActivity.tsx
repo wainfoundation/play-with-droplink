@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, Heart, Utensils, Sparkles, Gamepad2, Pill, Trees } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Room } from '@/hooks/useRooms';
-import { usePetEconomy } from '@/hooks/usePetEconomy';
+import { usePetMoodEngine } from '@/hooks/usePetMoodEngine';
 import EmotionalCharacterRenderer from '@/components/welcome/EmotionalCharacterRenderer';
 import { useCharacterShop } from '@/hooks/useCharacterShop';
 
@@ -17,7 +17,7 @@ interface RoomActivityProps {
 
 const RoomActivity: React.FC<RoomActivityProps> = ({ room, onBack }) => {
   const { selectedCharacterId, characters } = useCharacterShop();
-  const { moodState, moodActions } = usePetEconomy(selectedCharacterId || 'default');
+  const { moodState, actions } = usePetMoodEngine(selectedCharacterId || 'default');
 
   const selectedCharacter = characters.find(c => c.id === selectedCharacterId);
   
@@ -37,7 +37,7 @@ const RoomActivity: React.FC<RoomActivityProps> = ({ room, onBack }) => {
         return (
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button 
-              onClick={moodActions.feedPet}
+              onClick={actions.feedPet}
               className="w-full h-20 bg-orange-500 hover:bg-orange-600 flex flex-col gap-2"
             >
               <Utensils className="w-8 h-8" />
@@ -50,7 +50,7 @@ const RoomActivity: React.FC<RoomActivityProps> = ({ room, onBack }) => {
         return (
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button 
-              onClick={moodActions.bathePet}
+              onClick={actions.bathePet}
               className="w-full h-20 bg-blue-500 hover:bg-blue-600 flex flex-col gap-2"
             >
               <Sparkles className="w-8 h-8" />
@@ -63,7 +63,7 @@ const RoomActivity: React.FC<RoomActivityProps> = ({ room, onBack }) => {
         return (
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button 
-              onClick={moodActions.playWithPet}
+              onClick={actions.playWithPet}
               className="w-full h-20 bg-green-500 hover:bg-green-600 flex flex-col gap-2"
             >
               <Gamepad2 className="w-8 h-8" />
@@ -76,7 +76,7 @@ const RoomActivity: React.FC<RoomActivityProps> = ({ room, onBack }) => {
         return (
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button 
-              onClick={moodActions.giveMedicine}
+              onClick={actions.giveMedicine}
               className="w-full h-20 bg-red-500 hover:bg-red-600 flex flex-col gap-2"
             >
               <Pill className="w-8 h-8" />
@@ -90,7 +90,7 @@ const RoomActivity: React.FC<RoomActivityProps> = ({ room, onBack }) => {
           <div className="grid grid-cols-2 gap-4">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button 
-                onClick={moodActions.playWithPet}
+                onClick={actions.playWithPet}
                 className="w-full h-20 bg-green-500 hover:bg-green-600 flex flex-col gap-2"
               >
                 <Trees className="w-8 h-8" />
@@ -99,7 +99,7 @@ const RoomActivity: React.FC<RoomActivityProps> = ({ room, onBack }) => {
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button 
-                onClick={moodActions.petCharacter}
+                onClick={actions.petCharacter}
                 className="w-full h-20 bg-pink-500 hover:bg-pink-600 flex flex-col gap-2"
               >
                 <Heart className="w-8 h-8" />
@@ -113,7 +113,7 @@ const RoomActivity: React.FC<RoomActivityProps> = ({ room, onBack }) => {
         return (
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button 
-              onClick={moodActions.petCharacter}
+              onClick={actions.petCharacter}
               className="w-full h-20 bg-purple-500 hover:bg-purple-600 flex flex-col gap-2"
             >
               <Heart className="w-8 h-8" />

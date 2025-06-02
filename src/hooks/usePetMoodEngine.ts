@@ -2,294 +2,169 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
 
-interface MoodState {
+export interface MoodState {
   happiness: number;
-  health: number;
-  energy: number;
   hunger: number;
+  energy: number;
   cleanliness: number;
+  health: number;
   affection: number;
+  tiredness: number;
 }
 
-interface PetMessage {
-  text: string;
-  timestamp: number;
+export interface PetPersonality {
+  name: string;
+  favoriteActivity: string;
+  moodModifiers: {
+    happiness: number;
+    energy: number;
+    social: number;
+  };
+  sleepSchedule: {
+    bedtime: number;
+    wakeTime: number;
+  };
 }
+
+export interface PetMoodState extends MoodState {
+  personality: PetPersonality;
+}
+
+const initialMoodState: MoodState = {
+  happiness: 70,
+  hunger: 80,
+  energy: 75,
+  cleanliness: 85,
+  health: 90,
+  affection: 60,
+  tiredness: 20
+};
+
+const defaultPersonality: PetPersonality = {
+  name: 'Friendly Pet',
+  favoriteActivity: 'playing with toys',
+  moodModifiers: {
+    happiness: 1.0,
+    energy: 1.0,
+    social: 1.0
+  },
+  sleepSchedule: {
+    bedtime: 22,
+    wakeTime: 7
+  }
+};
 
 export const usePetMoodEngine = (characterId: string) => {
-  const [moodState, setMoodState] = useState<MoodState>({
-    happiness: 80,
-    health: 85,
-    energy: 70,
-    hunger: 60,
-    cleanliness: 75,
-    affection: 90
-  });
-
-  const [currentMessage, setCurrentMessage] = useState<string>('');
+  const [moodState, setMoodState] = useState<MoodState>(initialMoodState);
+  const [personality] = useState<PetPersonality>(defaultPersonality);
+  const [currentMessage, setCurrentMessage] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Load saved state from localStorage
+  // Load mood state from localStorage
   useEffect(() => {
-    const savedState = localStorage.getItem(`pet_mood_${characterId}`);
-    if (savedState) {
+    const savedMood = localStorage.getItem(`pet_mood_${characterId}`);
+    if (savedMood) {
       try {
-        setMoodState(JSON.parse(savedState));
+        setMoodState(JSON.parse(savedMood));
       } catch (error) {
-        console.log('Error loading pet mood state');
+        console.log('Error loading mood state');
       }
     }
   }, [characterId]);
 
-  // Save state to localStorage
+  // Save mood state to localStorage
   useEffect(() => {
     localStorage.setItem(`pet_mood_${characterId}`, JSON.stringify(moodState));
   }, [moodState, characterId]);
 
-  // Generate mood messages
-  const generateMessage = useCallback((action: string, stats: MoodState) => {
-    const messages: { [key: string]: string[] } = {
-      feed: [
-        "Yummy! That was delicious! 🍎",
-        "Thank you for the tasty food! 😋",
-        "I feel so much better now! 🌟"
-      ],
-      play: [
-        "That was so much fun! 🎾",
-        "I love playing with you! 😊",
-        "Let's play again soon! 🎮"
-      ],
-      sleep: [
-        "Zzz... I feel so refreshed! 😴",
-        "That nap was perfect! 💤",
-        "I'm full of energy now! ⚡"
-      ],
-      bathe: [
-        "I'm so clean and fresh! 🛁",
-        "Splish splash! I love bath time! ✨",
-        "I feel squeaky clean! 🧼"
-      ],
-      medicine: [
-        "I'm feeling much better! 💊",
-        "Thank you for taking care of me! ❤️",
-        "The medicine worked! 🏥"
-      ],
-      pet: [
-        "I love your gentle touch! 💝",
-        "That feels so nice! 🥰",
-        "You're the best! 💖"
-      ]
+  // Generate contextual messages based on mood
+  useEffect(() => {
+    const generateMessage = () => {
+      const { happiness, hunger, energy, cleanliness, health, tiredness } = moodState;
+      
+      if (health < 30) return "I don't feel very well... 🤒";
+      if (hunger < 25) return "I'm so hungry! Can we eat something? 🍎";
+      if (tiredness > 80) return "I'm getting really sleepy... 😴";
+      if (cleanliness < 25) return "I feel dirty! Can we take a bath? 🛁";
+      if (energy < 25) return "I'm too tired to play right now... 😴";
+      if (happiness > 85) return "I'm so happy! This is the best day ever! 😊";
+      if (happiness < 30) return "I'm feeling a bit sad... 😢";
+      if (energy > 80) return "I'm full of energy! Let's play! 🎾";
+      
+      return "I'm doing okay! Thanks for taking care of me! 😊";
     };
 
-    const actionMessages = messages[action] || ["I'm happy!"];
-    return actionMessages[Math.floor(Math.random() * actionMessages.length)];
-  }, []);
+    setCurrentMessage(generateMessage());
+  }, [moodState]);
 
-  // Pet care actions
-  const feedPet = useCallback(() => {
-    if (moodState.hunger >= 95) {
-      toast({
-        title: "I'm too full! 🤢",
-        description: "Maybe later when I'm hungrier!",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsAnimating(true);
-    setMoodState(prev => ({
-      ...prev,
-      hunger: Math.min(100, prev.hunger + 25),
-      happiness: Math.min(100, prev.happiness + 10),
-      energy: Math.min(100, prev.energy + 5)
-    }));
-
-    const message = generateMessage('feed', moodState);
-    setCurrentMessage(message);
-    
-    setTimeout(() => {
-      setIsAnimating(false);
-      setCurrentMessage('');
-    }, 3000);
-
-    toast({
-      title: "Fed your pet! 🍎",
-      description: message,
-      className: "bg-green-50 border-green-200"
-    });
-  }, [moodState, generateMessage]);
-
-  const playWithPet = useCallback(() => {
-    if (moodState.energy <= 15) {
-      toast({
-        title: "Too tired to play! 😴",
-        description: "Let me rest first!",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsAnimating(true);
-    setMoodState(prev => ({
-      ...prev,
-      happiness: Math.min(100, prev.happiness + 20),
-      energy: Math.max(0, prev.energy - 15),
-      affection: Math.min(100, prev.affection + 10)
-    }));
-
-    const message = generateMessage('play', moodState);
-    setCurrentMessage(message);
-    
-    setTimeout(() => {
-      setIsAnimating(false);
-      setCurrentMessage('');
-    }, 3000);
-
-    toast({
-      title: "Played with your pet! 🎾",
-      description: message,
-      className: "bg-blue-50 border-blue-200"
-    });
-  }, [moodState, generateMessage]);
-
-  const sleepPet = useCallback(() => {
-    setIsAnimating(true);
-    setMoodState(prev => ({
-      ...prev,
-      energy: Math.min(100, prev.energy + 30),
-      happiness: Math.min(100, prev.happiness + 10),
-      health: Math.min(100, prev.health + 5)
-    }));
-
-    const message = generateMessage('sleep', moodState);
-    setCurrentMessage(message);
-    
-    setTimeout(() => {
-      setIsAnimating(false);
-      setCurrentMessage('');
-    }, 3000);
-
-    toast({
-      title: "Pet is sleeping! 😴",
-      description: message,
-      className: "bg-purple-50 border-purple-200"
-    });
-  }, [moodState, generateMessage]);
-
-  const bathePet = useCallback(() => {
-    if (moodState.cleanliness >= 95) {
-      toast({
-        title: "I'm already clean! ✨",
-        description: "No need for a bath right now!",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsAnimating(true);
-    setMoodState(prev => ({
-      ...prev,
-      cleanliness: Math.min(100, prev.cleanliness + 35),
-      happiness: Math.min(100, prev.happiness + 15),
-      health: Math.min(100, prev.health + 10)
-    }));
-
-    const message = generateMessage('bathe', moodState);
-    setCurrentMessage(message);
-    
-    setTimeout(() => {
-      setIsAnimating(false);
-      setCurrentMessage('');
-    }, 3000);
-
-    toast({
-      title: "Bathed your pet! 🛁",
-      description: message,
-      className: "bg-cyan-50 border-cyan-200"
-    });
-  }, [moodState, generateMessage]);
-
-  const giveMedicine = useCallback(() => {
-    if (moodState.health >= 95) {
-      toast({
-        title: "I'm perfectly healthy! 💪",
-        description: "No medicine needed right now!",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsAnimating(true);
-    setMoodState(prev => ({
-      ...prev,
-      health: Math.min(100, prev.health + 25),
-      happiness: Math.max(0, prev.happiness - 5) // Medicine tastes bad!
-    }));
-
-    const message = generateMessage('medicine', moodState);
-    setCurrentMessage(message);
-    
-    setTimeout(() => {
-      setIsAnimating(false);
-      setCurrentMessage('');
-    }, 3000);
-
-    toast({
-      title: "Gave medicine! 💊",
-      description: message,
-      className: "bg-red-50 border-red-200"
-    });
-  }, [moodState, generateMessage]);
-
-  const petCharacter = useCallback(() => {
-    setIsAnimating(true);
-    setMoodState(prev => ({
-      ...prev,
-      happiness: Math.min(100, prev.happiness + 15),
-      affection: Math.min(100, prev.affection + 20)
-    }));
-
-    const message = generateMessage('pet', moodState);
-    setCurrentMessage(message);
-    
-    setTimeout(() => {
-      setIsAnimating(false);
-      setCurrentMessage('');
-    }, 3000);
-
-    toast({
-      title: "Pet loves your attention! 💝",
-      description: message,
-      className: "bg-pink-50 border-pink-200"
-    });
-  }, [moodState, generateMessage]);
-
-  // Auto-decay stats over time
+  // Mood decay over time
   useEffect(() => {
     const interval = setInterval(() => {
       setMoodState(prev => ({
         ...prev,
-        hunger: Math.max(0, prev.hunger - 1),
-        energy: Math.max(0, prev.energy - 0.5),
-        cleanliness: Math.max(0, prev.cleanliness - 0.3),
-        happiness: Math.max(0, prev.happiness - 0.2)
+        hunger: Math.max(0, prev.hunger - 0.5),
+        energy: Math.max(0, prev.energy - 0.3),
+        cleanliness: Math.max(0, prev.cleanliness - 0.2),
+        happiness: Math.max(0, prev.happiness - 0.1),
+        tiredness: Math.min(100, prev.tiredness + 0.4)
       }));
     }, 30000); // Every 30 seconds
 
     return () => clearInterval(interval);
   }, []);
 
+  const updateMood = useCallback((changes: Partial<MoodState>, message: string) => {
+    setIsAnimating(true);
+    setMoodState(prev => {
+      const newState = { ...prev };
+      Object.entries(changes).forEach(([key, value]) => {
+        if (typeof value === 'number') {
+          newState[key as keyof MoodState] = Math.max(0, Math.min(100, prev[key as keyof MoodState] + value));
+        }
+      });
+      return newState;
+    });
+
+    toast({
+      title: message,
+      description: "Your pet's mood has changed!",
+      className: "bg-green-50 border-green-200"
+    });
+
+    setTimeout(() => setIsAnimating(false), 1000);
+  }, []);
+
+  const actions = {
+    feedPet: useCallback(() => {
+      updateMood({ hunger: 30, happiness: 10, energy: 5 }, "Fed your pet! 🍎");
+    }, [updateMood]),
+
+    playWithPet: useCallback(() => {
+      updateMood({ happiness: 20, energy: -10, affection: 15, tiredness: 10 }, "Played with your pet! 🎾");
+    }, [updateMood]),
+
+    sleepPet: useCallback(() => {
+      updateMood({ energy: 40, tiredness: -50, health: 10 }, "Your pet had a good rest! 😴");
+    }, [updateMood]),
+
+    bathePet: useCallback(() => {
+      updateMood({ cleanliness: 40, happiness: 5, health: 5 }, "Bath time was fun! 🛁");
+    }, [updateMood]),
+
+    giveMedicine: useCallback(() => {
+      updateMood({ health: 30, happiness: -5, energy: 5 }, "Medicine helped your pet feel better! 💊");
+    }, [updateMood]),
+
+    petCharacter: useCallback(() => {
+      updateMood({ happiness: 15, affection: 20 }, "Your pet loves the attention! 💖");
+    }, [updateMood])
+  };
+
   return {
     moodState,
+    personality,
     currentMessage,
     isAnimating,
-    actions: {
-      feedPet,
-      playWithPet,
-      sleepPet,
-      bathePet,
-      giveMedicine,
-      petCharacter
-    }
+    actions
   };
 };
