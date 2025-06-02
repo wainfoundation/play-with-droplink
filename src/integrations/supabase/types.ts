@@ -72,6 +72,42 @@ export type Database = {
         }
         Relationships: []
       }
+      characters: {
+        Row: {
+          base_price_coins: number
+          color: string
+          created_at: string | null
+          description: string | null
+          gender: string
+          id: string
+          is_starter: boolean | null
+          name: string
+          skin_image_url: string | null
+        }
+        Insert: {
+          base_price_coins?: number
+          color?: string
+          created_at?: string | null
+          description?: string | null
+          gender?: string
+          id?: string
+          is_starter?: boolean | null
+          name: string
+          skin_image_url?: string | null
+        }
+        Update: {
+          base_price_coins?: number
+          color?: string
+          created_at?: string | null
+          description?: string | null
+          gender?: string
+          id?: string
+          is_starter?: boolean | null
+          name?: string
+          skin_image_url?: string | null
+        }
+        Relationships: []
+      }
       digital_products: {
         Row: {
           category: string | null
@@ -695,6 +731,33 @@ export type Database = {
           },
         ]
       }
+      rooms: {
+        Row: {
+          background_color: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          room_type: string
+        }
+        Insert: {
+          background_color?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          room_type: string
+        }
+        Update: {
+          background_color?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          room_type?: string
+        }
+        Relationships: []
+      }
       tips: {
         Row: {
           amount: number
@@ -789,6 +852,35 @@ export type Database = {
         }
         Relationships: []
       }
+      user_owned_characters: {
+        Row: {
+          character_id: string
+          id: string
+          purchased_at: string | null
+          user_id: string
+        }
+        Insert: {
+          character_id: string
+          id?: string
+          purchased_at?: string | null
+          user_id: string
+        }
+        Update: {
+          character_id?: string
+          id?: string
+          purchased_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_owned_characters_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "characters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_pet_data: {
         Row: {
           cleanliness: number
@@ -857,6 +949,7 @@ export type Database = {
           pi_domain: string | null
           pi_wallet_address: string | null
           plan: string | null
+          selected_character_id: string | null
           total_score: number | null
           updated_at: string | null
           username: string
@@ -874,6 +967,7 @@ export type Database = {
           pi_domain?: string | null
           pi_wallet_address?: string | null
           plan?: string | null
+          selected_character_id?: string | null
           total_score?: number | null
           updated_at?: string | null
           username: string
@@ -891,9 +985,51 @@ export type Database = {
           pi_domain?: string | null
           pi_wallet_address?: string | null
           plan?: string | null
+          selected_character_id?: string | null
           total_score?: number | null
           updated_at?: string | null
           username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_profiles_selected_character_id_fkey"
+            columns: ["selected_character_id"]
+            isOneToOne: false
+            referencedRelation: "characters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_wallet: {
+        Row: {
+          created_at: string | null
+          droplet_coins: number
+          id: string
+          last_coin_claim: string | null
+          pi_balance: number | null
+          total_earned: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          droplet_coins?: number
+          id?: string
+          last_coin_claim?: string | null
+          pi_balance?: number | null
+          total_earned?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          droplet_coins?: number
+          id?: string
+          last_coin_claim?: string | null
+          pi_balance?: number | null
+          total_earned?: number | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -902,8 +1038,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_droplet_coins: {
+        Args: { p_user_id: string; p_coins_to_add: number }
+        Returns: undefined
+      }
       add_user_life: {
         Args: { user_id: string }
+        Returns: undefined
+      }
+      buy_character: {
+        Args: { p_user_id: string; p_character_id: string; p_price: number }
         Returns: undefined
       }
       regenerate_life: {
