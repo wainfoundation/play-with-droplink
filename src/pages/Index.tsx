@@ -3,19 +3,20 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Heart, Gamepad2, Star, Users, Zap, Sparkles, Settings } from "lucide-react";
+import { ArrowRight, Heart, Gamepad2, Star, Users, Zap, Sparkles, Settings, Coins, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EmotionalCharacterRenderer from "@/components/welcome/EmotionalCharacterRenderer";
 import { characters } from "@/components/welcome/characterData";
 import GoToTop from '@/components/GoToTop';
-import { usePetMoodEngine } from '@/hooks/usePetMoodEngine';
+import { usePetMoodEngine, usePetEconomy } from '@/hooks/usePetMoodEngine';
 
 const Index = () => {
   const [selectedCharacter, setSelectedCharacter] = useState(characters[0]);
   const [showCharacterSelector, setShowCharacterSelector] = useState(false);
   const { moodState } = usePetMoodEngine(selectedCharacter.id);
+  const { wallet, petLevel, levelInfo, canClaimDailyCoins } = usePetEconomy(selectedCharacter.id);
 
   useEffect(() => {
     const savedCharacter = localStorage.getItem('selectedCharacter');
@@ -50,7 +51,7 @@ const Index = () => {
               transition={{ duration: 0.6 }}
             >
               <Badge className="mb-4 bg-gradient-to-r from-primary to-secondary text-white">
-                New: Real-Time Emotional Pet System! 🧠💖
+                New: Complete Pet Economy System! 💰🛍️
               </Badge>
               
               <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
@@ -58,13 +59,13 @@ const Index = () => {
               </h1>
               
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Care for your emotional pet droplet that reacts in real-time! Watch their mood change based on your care, time of day, and personal needs. Every character is a living virtual companion with unique emotions.
+                Care for your emotional pet droplet with a complete economy! Earn Droplet Coins, shop for items, watch Pi Ads for rewards, and level up your pet for daily coin bonuses.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/play">
                   <Button size="lg" className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold">
-                    Start Caring For Your Pet
+                    Start Caring & Earning
                     <Heart className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
@@ -99,8 +100,8 @@ const Index = () => {
                   </div>
                   <p className="text-gray-600">Your living emotional companion</p>
                   
-                  {/* Real-time mood indicator */}
-                  <div className="mt-2">
+                  {/* Real-time mood and economy indicators */}
+                  <div className="mt-2 space-y-2">
                     <Badge variant="outline" className="bg-white/60">
                       Current Mood: {
                         moodState.happiness > 80 ? '😊 Very Happy' :
@@ -109,6 +110,14 @@ const Index = () => {
                         '😢 Needs Care'
                       }
                     </Badge>
+                    <div className="flex gap-2 justify-center">
+                      <Badge className="bg-yellow-400 text-yellow-800">
+                        Level {petLevel}
+                      </Badge>
+                      <Badge className="bg-green-500 text-white">
+                        {wallet.dropletCoins} 🪙
+                      </Badge>
+                    </div>
                   </div>
                 </div>
                 
@@ -123,9 +132,9 @@ const Index = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-white/60 rounded-2xl p-3 text-center border-2 border-pink-200">
                     <Heart className="w-6 h-6 text-pink-500 mx-auto mb-1" />
-                    <p className="text-sm font-semibold text-pink-700">Real-Time Care</p>
+                    <p className="text-sm font-semibold text-pink-700">Happiness</p>
                     <div className="text-xs text-gray-600 mt-1">
-                      {Math.round(moodState.affection)}% Loved
+                      {Math.round(moodState.happiness)}%
                     </div>
                   </div>
                   <div className="bg-white/60 rounded-2xl p-3 text-center border-2 border-blue-200">
@@ -136,10 +145,10 @@ const Index = () => {
                     </div>
                   </div>
                   <div className="bg-white/60 rounded-2xl p-3 text-center border-2 border-yellow-200">
-                    <Star className="w-6 h-6 text-yellow-600 mx-auto mb-1" />
-                    <p className="text-sm font-semibold text-yellow-700">Happiness</p>
+                    <Coins className="w-6 h-6 text-yellow-600 mx-auto mb-1" />
+                    <p className="text-sm font-semibold text-yellow-700">Coins/Day</p>
                     <div className="text-xs text-gray-600 mt-1">
-                      {Math.round(moodState.happiness)}% Happy
+                      {levelInfo.coinsPerDay} Daily
                     </div>
                   </div>
                   <div className="bg-white/60 rounded-2xl p-3 text-center border-2 border-green-200">
@@ -151,7 +160,24 @@ const Index = () => {
                   </div>
                 </div>
 
-                {/* Urgent care alerts */}
+                {/* Economy status and urgent care alerts */}
+                {canClaimDailyCoins && (
+                  <motion.div
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                    className="mt-4 bg-green-100 border-2 border-green-300 rounded-lg p-3 text-center"
+                  >
+                    <p className="text-green-700 font-semibold text-sm">
+                      🎁 Daily coins ready to claim!
+                    </p>
+                    <Link to="/play">
+                      <Button size="sm" className="mt-2 bg-green-500 hover:bg-green-600">
+                        Claim Reward
+                      </Button>
+                    </Link>
+                  </motion.div>
+                )}
+
                 {(moodState.hunger < 30 || moodState.cleanliness < 30 || moodState.health < 50) && (
                   <motion.div
                     animate={{ scale: [1, 1.05, 1] }}
@@ -225,7 +251,7 @@ const Index = () => {
         )}
       </AnimatePresence>
 
-      {/* Features Section */}
+      {/* Updated Features Section */}
       <section className="py-16 px-4 bg-white/50">
         <div className="container mx-auto max-w-6xl">
           <motion.div
@@ -234,8 +260,8 @@ const Index = () => {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Revolutionary Emotional Pet System</h2>
-            <p className="text-xl text-gray-600">Real-time emotions that respond to time, care, and interaction</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Complete Pet Economy System</h2>
+            <p className="text-xl text-gray-600">Real-time emotions, earning, shopping, and progression</p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -247,27 +273,27 @@ const Index = () => {
                 color: "text-pink-500"
               },
               {
-                icon: Gamepad2,
-                title: "Time-Based Needs",
-                description: "Pets get hungry, tired, and dirty based on real-world time passage",
-                color: "text-blue-500"
-              },
-              {
-                icon: Zap,
-                title: "Dynamic Reactions",
-                description: "Each character reacts differently to care and neglect with unique personalities",
+                icon: Coins,
+                title: "Droplet Coin Economy",
+                description: "Earn coins through daily rewards, Pi Ads, and pet leveling system",
                 color: "text-yellow-500"
               },
               {
+                icon: ShoppingBag,
+                title: "Complete Shop System",
+                description: "Buy food, hygiene items, toys, cosmetics, and themes for your pet",
+                color: "text-blue-500"
+              },
+              {
                 icon: Star,
-                title: "Personality System",
-                description: "Every pet has unique sleep schedules, favorite activities, and emotional patterns",
+                title: "Pet Leveling System",
+                description: "Level up your pet through care to earn more daily coin rewards",
                 color: "text-purple-500"
               },
               {
-                icon: Users,
-                title: "Character Variety",
-                description: "Multiple unique droplet characters with distinct emotional traits and needs",
+                icon: Gamepad2,
+                title: "Pi Ad Integration",
+                description: "Watch Pi Network ads to earn Droplet Coins and support the ecosystem",
                 color: "text-green-500"
               },
               {
@@ -310,12 +336,12 @@ const Index = () => {
               Ready to Meet Your Living Virtual Soul?
             </h2>
             <p className="text-xl text-gray-600 mb-8">
-              Experience the most advanced emotional pet system ever created!
+              Experience the most advanced emotional pet system with complete economy integration!
             </p>
             
             <Link to="/play">
               <Button size="lg" className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white font-semibold">
-                Start Your Emotional Journey
+                Start Your Emotional & Economic Journey
                 <Heart className="ml-2 h-5 w-5" />
               </Button>
             </Link>
