@@ -15,41 +15,44 @@ const defaultStats = {
 };
 
 const MyPetDroplet = () => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
   const [stats, setStats] = useState(defaultStats);
   const [lastCare, setLastCare] = useState(Date.now());
   const [loading, setLoading] = useState(true);
   const [showMiniGame, setShowMiniGame] = useState(false);
   const [score, setScore] = useState(0);
-  const gameAreaRef = useRef(null);
+  const gameAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     authenticatePiUser();
   }, []);
 
+  const onIncompletePaymentFound = (payment: any) => {
+    console.log('Pending payment:', payment);
+  };
+
   const authenticatePiUser = async () => {
     try {
-      const user = await window.Pi.authenticate({
-        onIncompletePaymentFound: (payment) => console.log('Pending payment:', payment)
-      });
-      setUser(user);
-      const { data } = await supabase.from('users').select('*').eq('id', user.uid).single();
+      const authResult = await window.Pi.authenticate(['username', 'payments'], onIncompletePaymentFound);
+      setUser(authResult);
+      const { data } = await supabase.from('users').select('*').eq('id', authResult.user.uid).single();
       if (!data) {
-        await supabase.from('users').insert([{ id: user.uid, ...defaultStats }]);
+        await supabase.from('users').insert([{ id: authResult.user.uid, ...defaultStats }]);
         setStats(defaultStats);
       } else {
         decayStats(data);
       }
     } catch (error) {
       console.log('Pi authentication not available, using demo mode');
-      setUser({ uid: 'demo-user' });
+      setUser({ user: { uid: 'demo-user' } });
       setStats(defaultStats);
     }
     setLoading(false);
   };
 
-  const decayStats = (data) => {
-    const hours = (Date.now() - new Date(data.last_care)) / 3600000;
+  const decayStats = (data: any) => {
+    const lastCareTime = new Date(data.last_care).getTime();
+    const hours = (Date.now() - lastCareTime) / 3600000;
     const newStats = {
       hunger: Math.max(data.hunger - hours * 5, 0),
       cleanliness: Math.max(data.cleanliness - hours * 3, 0),
@@ -60,12 +63,12 @@ const MyPetDroplet = () => {
     };
     setStats(newStats);
     setLastCare(Date.now());
-    if (user?.uid !== 'demo-user') {
+    if (user?.user?.uid !== 'demo-user') {
       supabase.from('users').update({ ...newStats, last_care: new Date().toISOString() }).eq('id', data.id);
     }
   };
 
-  const careAction = (type) => {
+  const careAction = (type: string) => {
     const change = 15;
     const newStats = { ...stats };
     if (type === 'feed') newStats.hunger = Math.min(100, newStats.hunger + change);
@@ -77,19 +80,19 @@ const MyPetDroplet = () => {
       newStats.xp = 0;
     }
     setStats(newStats);
-    if (user?.uid !== 'demo-user') {
-      supabase.from('users').update({ ...newStats, last_care: new Date().toISOString() }).eq('id', user.uid);
+    if (user?.user?.uid !== 'demo-user') {
+      supabase.from('users').update({ ...newStats, last_care: new Date().toISOString() }).eq('id', user.user.uid);
     }
   };
 
   const earnCoins = async () => {
     try {
-      const rewarded = await window.Pi.showAd({ reward: 'coins' });
-      if (rewarded) {
+      const rewarded = await window.Pi.Ads?.showAd('rewarded');
+      if (rewarded && rewarded.result === 'AD_REWARDED') {
         const newStats = { ...stats, coins: stats.coins + 5 };
         setStats(newStats);
-        if (user?.uid !== 'demo-user') {
-          supabase.from('users').update({ coins: newStats.coins }).eq('id', user.uid);
+        if (user?.user?.uid !== 'demo-user') {
+          supabase.from('users').update({ coins: newStats.coins }).eq('id', user.user.uid);
         }
       }
     } catch (error) {
@@ -99,13 +102,13 @@ const MyPetDroplet = () => {
     }
   };
 
-  const shopPurchase = async (itemName, cost) => {
+  const shopPurchase = async (itemName: string, cost: number) => {
     if (stats.coins < cost) return alert('Not enough coins!');
     const newStats = { ...stats, coins: stats.coins - cost };
     setStats(newStats);
-    if (user?.uid !== 'demo-user') {
-      await supabase.from('inventory').insert([{ user_id: user.uid, item_name: itemName, quantity: 1 }]);
-      await supabase.from('users').update({ coins: newStats.coins }).eq('id', user.uid);
+    if (user?.user?.uid !== 'demo-user') {
+      await supabase.from('inventory').insert([{ user_id: user.user.uid, item_name: itemName, quantity: 1 }]);
+      await supabase.from('users').update({ coins: newStats.coins }).eq('id', user.user.uid);
     }
   };
 
@@ -136,8 +139,8 @@ const MyPetDroplet = () => {
     const earned = score;
     const newStats = { ...stats, coins: stats.coins + earned };
     setStats(newStats);
-    if (user?.uid !== 'demo-user') {
-      supabase.from('users').update({ coins: newStats.coins }).eq('id', user.uid);
+    if (user?.user?.uid !== 'demo-user') {
+      supabase.from('users').update({ coins: newStats.coins }).eq('id', user.user.uid);
     }
   };
 
