@@ -48,7 +48,20 @@ export const useShopItems = () => {
         .order('price_coins', { ascending: true });
       
       if (error) throw error;
-      setShopItems(data || []);
+      
+      // Convert Supabase data to our ShopItem interface
+      const convertedItems: ShopItem[] = (data || []).map(item => ({
+        id: item.id,
+        category: item.category,
+        name: item.name,
+        effect: (item.effect as Record<string, number>) || {},
+        price_coins: item.price_coins,
+        image_url: item.image_url || undefined,
+        description: item.description || '',
+        rarity: item.rarity || 'common'
+      }));
+      
+      setShopItems(convertedItems);
     } catch (error) {
       console.error('Error loading shop items:', error);
     }
@@ -87,10 +100,23 @@ export const useShopItems = () => {
       
       if (error) throw error;
       
-      const inventoryWithItems = data?.map(item => ({
-        ...item,
-        item: item.shop_items
-      })) || [];
+      // Convert Supabase data to our InventoryItem interface
+      const inventoryWithItems: InventoryItem[] = (data || []).map(item => ({
+        id: item.id,
+        item_id: item.item_id,
+        quantity: item.quantity,
+        equipped: item.equipped,
+        item: item.shop_items ? {
+          id: item.shop_items.id,
+          category: item.shop_items.category,
+          name: item.shop_items.name,
+          effect: (item.shop_items.effect as Record<string, number>) || {},
+          price_coins: item.shop_items.price_coins,
+          image_url: item.shop_items.image_url || undefined,
+          description: item.shop_items.description || '',
+          rarity: item.shop_items.rarity || 'common'
+        } : undefined
+      }));
       
       setInventory(inventoryWithItems);
     } catch (error) {
