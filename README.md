@@ -1,5 +1,5 @@
 
-# 🎮 Play with Droplink
+# 🎮 Play with Droplink App Name : PlayDrop
 
 **Play with Droplink** is a Pi Network-powered virtual gaming world where users can play 50+ interactive games, care for a digital mascot (virtual pet), and earn or spend **Droplink Coins** for fun cosmetic upgrades, game access, and in-game items. Built into the Pi ecosystem, users can watch Pi Ads or pay with Pi to unlock deeper experiences.
 
