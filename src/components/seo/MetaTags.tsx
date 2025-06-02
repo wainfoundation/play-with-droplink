@@ -20,7 +20,9 @@ export function MetaTags({
   type = "website",
   siteName = "Droplink"
 }: MetaTagsProps) {
-  const fullTitle = title.includes("Droplink") ? title : `${title} | Droplink`;
+  // Ensure title is always a valid string
+  const safeTitle = title && title.trim() ? title : "Droplink | Drop All Your Links";
+  const fullTitle = safeTitle.includes("Droplink") ? safeTitle : `${safeTitle} | Droplink`;
 
   return (
     <Helmet>
