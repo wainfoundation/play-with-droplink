@@ -1,10 +1,13 @@
 
 import React, { useState } from 'react';
-import { ArrowLeft, Store, Home } from 'lucide-react';
+import { ArrowLeft, Store, Home, Coins, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import CharacterShop from '@/components/shop/CharacterShop';
+import CoinShop from '@/components/shop/CoinShop';
+import EnhancedItemShop from '@/components/shop/EnhancedItemShop';
+import UserInventory from '@/components/inventory/UserInventory';
 import RoomSelector from '@/components/rooms/RoomSelector';
 import RoomActivity from '@/components/rooms/RoomActivity';
 import RealTimePetCare from '@/components/games/RealTimePetCare';
@@ -16,7 +19,7 @@ interface NewPetCareGameProps {
   onBack: () => void;
 }
 
-type GameScreen = 'main' | 'shop' | 'rooms' | 'room-activity' | 'legacy-care';
+type GameScreen = 'main' | 'character-shop' | 'coin-shop' | 'item-shop' | 'inventory' | 'rooms' | 'room-activity' | 'legacy-care';
 
 const NewPetCareGame: React.FC<NewPetCareGameProps> = ({ onBack }) => {
   const { user } = useAuth();
@@ -50,22 +53,31 @@ const NewPetCareGame: React.FC<NewPetCareGameProps> = ({ onBack }) => {
     );
   }
 
-  // Character Shop Screen
-  if (currentScreen === 'shop') {
+  // Screen routing
+  if (currentScreen === 'character-shop') {
     return <CharacterShop onBack={handleBackToMain} />;
   }
 
-  // Room Selector Screen
+  if (currentScreen === 'coin-shop') {
+    return <CoinShop onBack={handleBackToMain} />;
+  }
+
+  if (currentScreen === 'item-shop') {
+    return <EnhancedItemShop onBack={handleBackToMain} />;
+  }
+
+  if (currentScreen === 'inventory') {
+    return <UserInventory onBack={handleBackToMain} />;
+  }
+
   if (currentScreen === 'rooms') {
     return <RoomSelector onSelectRoom={handleRoomSelect} onBack={handleBackToMain} />;
   }
 
-  // Room Activity Screen
   if (currentScreen === 'room-activity' && selectedRoom) {
     return <RoomActivity room={selectedRoom} onBack={() => setCurrentScreen('rooms')} />;
   }
 
-  // Legacy Pet Care Screen
   if (currentScreen === 'legacy-care' && selectedCharacter) {
     return <RealTimePetCare character={selectedCharacter} />;
   }
@@ -96,7 +108,7 @@ const NewPetCareGame: React.FC<NewPetCareGameProps> = ({ onBack }) => {
               🏠 Pet Care Center
             </CardTitle>
             <p className="text-center text-gray-600">
-              Take care of your virtual pet in different rooms and environments
+              Complete pet care ecosystem with shopping, inventory, and room activities
             </p>
           </CardHeader>
         </Card>
@@ -121,7 +133,7 @@ const NewPetCareGame: React.FC<NewPetCareGameProps> = ({ onBack }) => {
               <p className="text-sm text-gray-600 mb-4">
                 Please choose a character from the shop to start caring for your pet
               </p>
-              <Button onClick={() => setCurrentScreen('shop')}>
+              <Button onClick={() => setCurrentScreen('character-shop')}>
                 Go to Character Shop
               </Button>
             </CardContent>
@@ -130,14 +142,48 @@ const NewPetCareGame: React.FC<NewPetCareGameProps> = ({ onBack }) => {
 
         {/* Main Action Buttons */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setCurrentScreen('shop')}>
+          {/* Character Shop */}
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setCurrentScreen('character-shop')}>
             <CardContent className="p-6 text-center">
               <Store className="w-12 h-12 mx-auto mb-4 text-purple-500" />
               <h3 className="text-xl font-semibold mb-2">Character Shop</h3>
-              <p className="text-sm text-gray-600">Buy new characters and earn coins</p>
+              <p className="text-sm text-gray-600">Buy new characters and companions</p>
             </CardContent>
           </Card>
 
+          {/* Coin Shop */}
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setCurrentScreen('coin-shop')}>
+            <CardContent className="p-6 text-center">
+              <Coins className="w-12 h-12 mx-auto mb-4 text-yellow-500" />
+              <h3 className="text-xl font-semibold mb-2">Coin Shop</h3>
+              <p className="text-sm text-gray-600">Buy coins with Pi Network</p>
+            </CardContent>
+          </Card>
+
+          {/* Item Shop */}
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setCurrentScreen('item-shop')}>
+            <CardContent className="p-6 text-center">
+              <Package className="w-12 h-12 mx-auto mb-4 text-green-500" />
+              <h3 className="text-xl font-semibold mb-2">Item Shop</h3>
+              <p className="text-sm text-gray-600">Food, toys, accessories & medicine</p>
+            </CardContent>
+          </Card>
+
+          {/* Inventory */}
+          <Card 
+            className={`cursor-pointer hover:shadow-lg transition-shadow ${
+              !selectedCharacter ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+            onClick={() => selectedCharacter && setCurrentScreen('inventory')}
+          >
+            <CardContent className="p-6 text-center">
+              <Package className="w-12 h-12 mx-auto mb-4 text-indigo-500" />
+              <h3 className="text-xl font-semibold mb-2">Inventory</h3>
+              <p className="text-sm text-gray-600">Use items and manage equipment</p>
+            </CardContent>
+          </Card>
+
+          {/* Room Activities */}
           <Card 
             className={`cursor-pointer hover:shadow-lg transition-shadow ${
               !selectedCharacter ? 'opacity-50 cursor-not-allowed' : ''
@@ -146,11 +192,12 @@ const NewPetCareGame: React.FC<NewPetCareGameProps> = ({ onBack }) => {
           >
             <CardContent className="p-6 text-center">
               <Home className="w-12 h-12 mx-auto mb-4 text-blue-500" />
-              <h3 className="text-xl font-semibold mb-2">Choose Room</h3>
+              <h3 className="text-xl font-semibold mb-2">Room Activities</h3>
               <p className="text-sm text-gray-600">Visit different rooms for activities</p>
             </CardContent>
           </Card>
 
+          {/* Quick Care */}
           <Card 
             className={`cursor-pointer hover:shadow-lg transition-shadow ${
               !selectedCharacter ? 'opacity-50 cursor-not-allowed' : ''
@@ -158,7 +205,7 @@ const NewPetCareGame: React.FC<NewPetCareGameProps> = ({ onBack }) => {
             onClick={() => selectedCharacter && setCurrentScreen('legacy-care')}
           >
             <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 mx-auto mb-4 text-green-500 text-2xl">🎮</div>
+              <div className="w-12 h-12 mx-auto mb-4 text-red-500 text-2xl">❤️</div>
               <h3 className="text-xl font-semibold mb-2">Quick Care</h3>
               <p className="text-sm text-gray-600">Direct pet care and interaction</p>
             </CardContent>
@@ -171,7 +218,7 @@ const NewPetCareGame: React.FC<NewPetCareGameProps> = ({ onBack }) => {
             <CardContent className="p-6 text-center">
               <h3 className="text-lg font-semibold mb-2">🔐 Enhanced Features</h3>
               <p className="text-sm text-gray-600 mb-4">
-                Log in to save your progress, buy characters, and access all premium features
+                Log in to save your progress, buy items, use inventory, and access all premium features
               </p>
               <Button variant="outline">Login / Sign Up</Button>
             </CardContent>

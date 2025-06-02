@@ -108,6 +108,33 @@ export type Database = {
         }
         Relationships: []
       }
+      coin_packs: {
+        Row: {
+          bonus_percentage: number | null
+          coins_given: number
+          created_at: string | null
+          description: string | null
+          id: string
+          pi_cost: number
+        }
+        Insert: {
+          bonus_percentage?: number | null
+          coins_given: number
+          created_at?: string | null
+          description?: string | null
+          id: string
+          pi_cost: number
+        }
+        Update: {
+          bonus_percentage?: number | null
+          coins_given?: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          pi_cost?: number
+        }
+        Relationships: []
+      }
       digital_products: {
         Row: {
           category: string | null
@@ -758,6 +785,42 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_items: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          effect: Json | null
+          id: string
+          image_url: string | null
+          name: string
+          price_coins: number
+          rarity: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          effect?: Json | null
+          id: string
+          image_url?: string | null
+          name: string
+          price_coins: number
+          rarity?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          effect?: Json | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          price_coins?: number
+          rarity?: string | null
+        }
+        Relationships: []
+      }
       tips: {
         Row: {
           amount: number
@@ -851,6 +914,41 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_inventory: {
+        Row: {
+          created_at: string | null
+          equipped: boolean | null
+          id: string
+          item_id: string
+          quantity: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          equipped?: boolean | null
+          id?: string
+          item_id: string
+          quantity?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          equipped?: boolean | null
+          id?: string
+          item_id?: string
+          quantity?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_inventory_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "shop_items"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_owned_characters: {
         Row: {
@@ -1050,9 +1148,30 @@ export type Database = {
         Args: { p_user_id: string; p_character_id: string; p_price: number }
         Returns: undefined
       }
+      buy_coin_pack: {
+        Args: {
+          p_user_id: string
+          p_pack_id: string
+          p_pi_cost: number
+          p_coins_given: number
+        }
+        Returns: undefined
+      }
+      buy_shop_item: {
+        Args: { p_user_id: string; p_item_id: string; p_price_coins: number }
+        Returns: undefined
+      }
       regenerate_life: {
         Args: { user_id: string }
         Returns: undefined
+      }
+      toggle_equip_item: {
+        Args: { p_user_id: string; p_item_id: string; p_equip: boolean }
+        Returns: undefined
+      }
+      use_item: {
+        Args: { p_user_id: string; p_item_id: string }
+        Returns: Json
       }
       use_user_lives: {
         Args: { user_id: string; amount?: number }
