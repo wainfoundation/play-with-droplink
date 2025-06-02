@@ -2,34 +2,29 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Settings, ShoppingBag, Package, Plus, Gift } from 'lucide-react';
+import { Settings, ShoppingBag, Package, Plus, Gift, Coins } from 'lucide-react';
 import { usePetMoodEngine } from '@/hooks/usePetMoodEngine';
 import { usePetEconomy } from '@/hooks/usePetEconomy';
 import { useRoomManager } from '@/hooks/useRoomManager';
 import PetDisplay from './PetDisplay';
+import BedroomRoom from '../rooms/BedroomRoom';
 import EnhancedItemShop from '../shop/EnhancedItemShop';
+import CoinShop from '../shop/CoinShop';
 import InventoryModal from './InventoryModal';
 
 const FullScreenPetGame: React.FC = () => {
   const [selectedCharacter] = useState('droplet-blue');
   const [showShop, setShowShop] = useState(false);
+  const [showCoinShop, setShowCoinShop] = useState(false);
   const [showInventory, setShowInventory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
   const { moodState, actions } = usePetMoodEngine(selectedCharacter);
-  const { wallet, claimDailyCoins, canClaimDailyCoins } = usePetEconomy(selectedCharacter);
+  const { wallet, claimDailyCoins, canClaimDailyCoins, petLevel, levelInfo } = usePetEconomy(selectedCharacter);
   const { currentRoom, changeRoom, getCurrentTheme, getCurrentMood } = useRoomManager();
 
   const currentTheme = getCurrentTheme();
   const currentMood = getCurrentMood();
-
-  // Calculate pet level based on overall stats
-  const calculatePetLevel = () => {
-    const totalStats = moodState.happiness + moodState.health + moodState.energy + moodState.hunger;
-    return Math.max(1, Math.floor(totalStats / 100));
-  };
-
-  const petLevel = calculatePetLevel();
 
   // Apply room mood effects
   useEffect(() => {
@@ -60,6 +55,11 @@ const FullScreenPetGame: React.FC = () => {
       console.log(`Claimed ${earned} daily coins!`);
     }
   };
+
+  // Render special room components
+  if (currentRoom === 'bedroom') {
+    return <BedroomRoom characterId={selectedCharacter} />;
+  }
 
   return (
     <div className="w-screen h-screen overflow-hidden relative">
@@ -197,27 +197,55 @@ const FullScreenPetGame: React.FC = () => {
         </div>
 
         {/* Shop & Inventory */}
-        <div className="flex justify-center space-x-4">
+        <div className="flex justify-center space-x-2">
+          <Button
+            onClick={() => setShowCoinShop(true)}
+            className="flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black px-4 py-3 rounded-full shadow-lg"
+          >
+            <Coins className="w-4 h-4" />
+            <span className="font-semibold text-sm">Coins</span>
+          </Button>
+
           <Button
             onClick={() => setShowShop(true)}
-            className="flex items-center space-x-2 bg-gradient-to-r from-purple-400 to-purple-600 hover:from-purple-500 hover:to-purple-700 text-white px-6 py-3 rounded-full shadow-lg"
+            className="flex items-center space-x-2 bg-gradient-to-r from-purple-400 to-purple-600 hover:from-purple-500 hover:to-purple-700 text-white px-4 py-3 rounded-full shadow-lg"
           >
-            <ShoppingBag className="w-5 h-5" />
-            <span className="font-semibold">Shop</span>
+            <ShoppingBag className="w-4 h-4" />
+            <span className="font-semibold text-sm">Shop</span>
           </Button>
 
           <Button
             onClick={() => setShowInventory(true)}
-            className="flex items-center space-x-2 bg-gradient-to-r from-emerald-400 to-emerald-600 hover:from-emerald-500 hover:to-emerald-700 text-white px-6 py-3 rounded-full shadow-lg"
+            className="flex items-center space-x-2 bg-gradient-to-r from-emerald-400 to-emerald-600 hover:from-emerald-500 hover:to-emerald-700 text-white px-4 py-3 rounded-full shadow-lg"
           >
-            <Package className="w-5 h-5" />
-            <span className="font-semibold">Items</span>
+            <Package className="w-4 h-4" />
+            <span className="font-semibold text-sm">Items</span>
           </Button>
         </div>
       </div>
 
       {/* Modals */}
       <AnimatePresence>
+        {showCoinShop && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/50"
+            onClick={() => setShowCoinShop(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="h-full overflow-auto"
+            >
+              <CoinShop onBack={() => setShowCoinShop(false)} />
+            </motion.div>
+          </motion.div>
+        )}
+
         {showShop && (
           <motion.div
             initial={{ opacity: 0 }}
