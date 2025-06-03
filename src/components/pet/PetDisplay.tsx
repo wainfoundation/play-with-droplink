@@ -19,7 +19,6 @@ const PetDisplay: React.FC<PetDisplayProps> = ({ characterId, className = "" }) 
   const { happiness, health, hunger, energy } = moodState;
 
   const getMoodEmoji = (happiness: number, health: number, hunger: number, energy: number, roomMood: string) => {
-    // Room-specific mood overrides
     if (roomMood === 'sleepy' && energy < 50) return '😴';
     if (roomMood === 'playful' && energy > 50) return '🤩';
     if (roomMood === 'clean') return '✨';
@@ -27,7 +26,6 @@ const PetDisplay: React.FC<PetDisplayProps> = ({ characterId, className = "" }) 
     if (roomMood === 'sick' && health < 50) return '🤒';
     if (roomMood === 'adventurous') return '🌟';
     
-    // Default mood logic
     if (health < 30) return '🤒';
     if (hunger < 30) return '😋';
     if (energy < 30) return '😴';
@@ -70,7 +68,7 @@ const PetDisplay: React.FC<PetDisplayProps> = ({ characterId, className = "" }) 
         }}
         className="relative mb-4"
       >
-        <CharacterRenderer character={character} size={160} />
+        <CharacterRenderer character={character} size={120} />
         
         {/* Room & Mood Indicator */}
         <motion.div
@@ -133,7 +131,6 @@ const PetDisplay: React.FC<PetDisplayProps> = ({ characterId, className = "" }) 
               </span>
             )}
           </p>
-          {/* Speech bubble tail */}
           <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white/90"></div>
         </motion.div>
       )}
