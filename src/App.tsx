@@ -28,7 +28,32 @@ const queryClient = new QueryClient({
   },
 });
 
-// Auth wrapper component with splash and welcome flow
+// Home page wrapper that shows splash/welcome flow for new users
+const HomeWrapper = () => {
+  const { user, loading } = useAuthSystem();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+  
+  // For authenticated users, show splash/welcome flow
+  if (user) {
+    return (
+      <SplashWrapper>
+        <Index />
+      </SplashWrapper>
+    );
+  }
+  
+  // For non-authenticated users, show Index directly
+  return <Index />;
+};
+
+// Auth wrapper component for protected game routes
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuthSystem();
   
@@ -44,18 +69,14 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/auth" replace />;
   }
   
-  return (
-    <SplashWrapper>
-      {children}
-    </SplashWrapper>
-  );
+  return <>{children}</>;
 };
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Index />} />
+        <Route path="/" element={<HomeWrapper />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/play" element={
           <AuthWrapper>
