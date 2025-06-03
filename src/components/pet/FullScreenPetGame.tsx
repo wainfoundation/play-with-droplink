@@ -1,385 +1,281 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Settings, ShoppingBag, Package, Gift, Coins, Star } from 'lucide-react';
-import { usePersistentPetEngine } from '@/hooks/usePersistentPetEngine';
-import { usePetEconomy } from '@/hooks/usePetEconomy';
-import { useRoomManager } from '@/hooks/useRoomManager';
-import { useAuthSystem } from '@/hooks/useAuthSystem';
-import PetDisplay from './PetDisplay';
-import EnhancedItemShop from '../shop/EnhancedItemShop';
-import InventoryModal from './InventoryModal';
-import ComprehensiveCoinShop from '../shop/ComprehensiveCoinShop';
-import { useLocalShop } from '@/hooks/useLocalShop';
 
-interface DailyRewardResult {
-  success: boolean;
-  streak?: number;
-  coins?: number;
-  xp?: number;
-  message?: string;
-}
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Menu, Home, ShoppingBag, Package, Wallet, 
+  Trophy, Gift, Settings, User, Heart,
+  Gamepad2, Calendar
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useAuthSystem } from '@/hooks/useAuthSystem';
+import { useWallet } from '@/hooks/useWallet';
+import { usePetStats } from '@/hooks/usePetStats';
+import CharacterRenderer from '@/components/welcome/CharacterRenderer';
+import { characters } from '@/components/welcome/characterData';
+import PetShop from '@/components/economy/PetShop';
+import PetInventory from '@/components/pet/PetInventory';
+import WalletDisplay from '@/components/economy/WalletDisplay';
+import MiniGameHub from '@/components/games/MiniGameHub';
+import DailyRewards from '@/components/rewards/DailyRewards';
+
+type GameView = 'home' | 'shop' | 'inventory' | 'wallet' | 'games' | 'rewards' | 'profile';
+type Room = 'bedroom' | 'kitchen' | 'bathroom' | 'playroom' | 'nature' | 'health';
+
+const rooms: { id: Room; name: string; emoji: string; bgColor: string }[] = [
+  { id: 'bedroom', name: 'Bedroom', emoji: '🛏️', bgColor: 'from-purple-100 to-blue-100' },
+  { id: 'kitchen', name: 'Kitchen', emoji: '🍳', bgColor: 'from-orange-100 to-yellow-100' },
+  { id: 'bathroom', name: 'Bathroom', emoji: '🛁', bgColor: 'from-blue-100 to-cyan-100' },
+  { id: 'playroom', name: 'Playroom', emoji: '🧸', bgColor: 'from-pink-100 to-purple-100' },
+  { id: 'nature', name: 'Nature', emoji: '🌳', bgColor: 'from-green-100 to-emerald-100' },
+  { id: 'health', name: 'Health', emoji: '🏥', bgColor: 'from-red-100 to-pink-100' }
+];
 
 const FullScreenPetGame: React.FC = () => {
-  const [selectedCharacter] = useState('droplet-blue');
-  const [showShop, setShowShop] = useState(false);
-  const [showInventory, setShowInventory] = useState(false);
-  const [showCoinShop, setShowCoinShop] = useState(false);
-  const [draggedItem, setDraggedItem] = useState<any>(null);
+  const [currentView, setCurrentView] = useState<GameView>('home');
+  const [currentRoom, setCurrentRoom] = useState<Room>('bedroom');
+  const [showMenu, setShowMenu] = useState(false);
+  const { user } = useAuthSystem();
+  const { wallet } = useWallet();
+  const { petStats, updateStat } = usePetStats();
 
-  const { user, profile, claimDailyReward } = useAuthSystem();
-  const { moodState, actions } = usePersistentPetEngine();
-  const { wallet, claimDailyCoins, canClaimDailyCoins } = usePetEconomy(selectedCharacter);
-  const { currentRoom, changeRoom, getCurrentTheme, getCurrentMood } = useRoomManager();
-  const { inventory, useItem } = useLocalShop(selectedCharacter);
+  // Get selected character or default
+  const selectedCharacter = characters.find(c => c.id === 'droplet-blue') || characters[0];
+  
+  // Create character with current pet mood
+  const currentCharacter = {
+    ...selectedCharacter,
+    mood: petStats?.mood || 'happy'
+  };
 
-  const currentTheme = getCurrentTheme();
-  const currentMood = getCurrentMood();
+  const currentRoomData = rooms.find(r => r.id === currentRoom) || rooms[0];
 
-  // Calculate pet level from profile
-  const petLevel = profile?.level || 1;
-  const petXP = profile?.xp || 0;
-  const dailyStreak = profile?.daily_streak || 0;
-
-  useEffect(() => {
-    console.log(`Moved to ${currentRoom} - applying ${currentMood.primaryMood} mood`);
-  }, [currentRoom, currentMood]);
-
-  const rooms = [
-    { id: 'bedroom', name: 'Sleep', icon: '🛏️', color: 'from-purple-400 to-purple-600' },
-    { id: 'playroom', name: 'Play', icon: '🎮', color: 'from-green-400 to-green-600' },
-    { id: 'bathroom', name: 'Bath', icon: '🛁', color: 'from-cyan-400 to-cyan-600' },
-    { id: 'kitchen', name: 'Food', icon: '🍽️', color: 'from-orange-400 to-orange-600' },
-    { id: 'medicine', name: 'Health', icon: '💊', color: 'from-red-400 to-red-600' },
-    { id: 'outside', name: 'Nature', icon: '🌳', color: 'from-emerald-400 to-emerald-600' }
+  const menuItems = [
+    { id: 'home' as GameView, label: 'Home', icon: Home },
+    { id: 'shop' as GameView, label: 'Shop', icon: ShoppingBag },
+    { id: 'inventory' as GameView, label: 'Inventory', icon: Package },
+    { id: 'wallet' as GameView, label: 'Wallet', icon: Wallet },
+    { id: 'games' as GameView, label: 'Games', icon: Gamepad2 },
+    { id: 'rewards' as GameView, label: 'Rewards', icon: Gift },
+    { id: 'profile' as GameView, label: 'Profile', icon: User },
   ];
 
-  const actionButtons = [
-    { action: 'feed', icon: '🍎', label: 'Feed', onClick: actions.feedPet },
-    { action: 'play', icon: '🎾', label: 'Play', onClick: actions.playWithPet },
-    { action: 'sleep', icon: '😴', label: 'Sleep', onClick: actions.sleepPet },
-    { action: 'bathe', icon: '🛁', label: 'Bathe', onClick: actions.bathePet },
-    { action: 'medicine', icon: '💊', label: 'Heal', onClick: actions.giveMedicine },
-    { action: 'pet', icon: '💝', label: 'Pet', onClick: actions.petCharacter }
-  ];
-
-  const handleClaimDaily = async () => {
-    try {
-      const result = await claimDailyReward();
-      
-      // Safely parse the result
-      if (result && typeof result === 'object' && 'success' in result) {
-        const dailyResult = result as unknown as DailyRewardResult;
-        if (dailyResult.success) {
-          console.log(`Claimed daily reward! Streak: ${dailyResult.streak}, Coins: ${dailyResult.coins}, XP: ${dailyResult.xp}`);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to claim daily reward:', error);
-    }
+  const handleItemPurchased = () => {
+    // Refresh pet stats or handle post-purchase logic
+    console.log('Item purchased');
   };
 
-  const canClaimDaily = () => {
-    if (!profile?.last_daily_claim) return true;
-    const lastClaim = new Date(profile.last_daily_claim);
-    const today = new Date();
-    return lastClaim.toDateString() !== today.toDateString();
-  };
+  if (currentView === 'shop') {
+    return <PetShop onBack={() => setCurrentView('home')} onItemPurchased={handleItemPurchased} />;
+  }
 
-  const handleDragStart = (item: any) => {
-    setDraggedItem(item);
-  };
+  if (currentView === 'inventory') {
+    return <PetInventory onBack={() => setCurrentView('home')} />;
+  }
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
+  if (currentView === 'games') {
+    return <MiniGameHub onBack={() => setCurrentView('home')} />;
+  }
 
-  const handleDropOnCharacter = (e: React.DragEvent) => {
-    e.preventDefault();
-    if (draggedItem) {
-      const effects = useItem(draggedItem.itemId);
-      if (effects) {
-        if (draggedItem.item?.category === 'food') {
-          actions.feedPet();
-        } else if (draggedItem.item?.category === 'medicine') {
-          actions.giveMedicine();
-        }
-      }
-      setDraggedItem(null);
-    }
-  };
+  if (currentView === 'rewards') {
+    return <DailyRewards onBack={() => setCurrentView('home')} />;
+  }
 
-  const getAvailableItems = () => {
-    return inventory.filter(item => {
-      if (currentRoom === 'kitchen') return item.item?.category === 'food';
-      if (currentRoom === 'medicine') return item.item?.category === 'medicine';
-      if (currentRoom === 'bathroom') return item.item?.category === 'cleaning';
-      return item.quantity > 0;
-    }).slice(0, 3);
-  };
+  if (currentView === 'wallet') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
+        <div className="max-w-2xl mx-auto space-y-6">
+          <div className="flex items-center justify-between">
+            <Button variant="outline" onClick={() => setCurrentView('home')}>
+              ← Back
+            </Button>
+            <h1 className="text-2xl font-bold">My Wallet</h1>
+            <div></div>
+          </div>
+          <WalletDisplay dropletCoins={wallet.dropletCoins} />
+        </div>
+      </div>
+    );
+  }
 
-  const availableItems = getAvailableItems();
+  if (currentView === 'profile') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-4">
+        <div className="max-w-2xl mx-auto space-y-6">
+          <div className="flex items-center justify-between">
+            <Button variant="outline" onClick={() => setCurrentView('home')}>
+              ← Back
+            </Button>
+            <h1 className="text-2xl font-bold">Profile</h1>
+            <div></div>
+          </div>
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="mb-4">
+                <CharacterRenderer character={currentCharacter} size={100} />
+              </div>
+              <h2 className="text-xl font-bold mb-2">{user?.username || 'Player'}</h2>
+              <div className="space-y-2">
+                <Badge variant="outline">Level 1</Badge>
+                <Badge variant="outline">{wallet.dropletCoins} Coins</Badge>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-screen h-screen overflow-hidden relative">
-      {/* Dynamic Background */}
-      <div 
-        className={`absolute inset-0 transition-all duration-700 ${currentTheme.background_color}`}
-        style={currentTheme.background_image ? {
-          backgroundImage: `url(${currentTheme.background_image})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        } : {}}
-      >
-        <div className="absolute inset-0 bg-black/5" />
-      </div>
-
-      {/* Top Status Bar */}
-      <div className="relative z-10 flex justify-between items-center p-4 bg-gradient-to-r from-blue-400/90 to-purple-500/90 backdrop-blur-sm text-white">
-        <div className="flex items-center space-x-3">
-          <div className="bg-yellow-400 text-black rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg">
-            {petLevel}
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-bold capitalize">{currentRoom}</span>
-            <span className="text-xs opacity-80 capitalize">{currentMood.primaryMood}</span>
-            <div className="flex items-center space-x-2 text-xs">
-              <span>XP: {petXP}</span>
-              {dailyStreak > 0 && (
-                <div className="flex items-center space-x-1">
-                  <Star className="w-3 h-3" />
-                  <span>{dailyStreak}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <div className="bg-yellow-400 text-black rounded-full px-4 py-2 font-bold flex items-center space-x-1">
-            <span className="text-lg">💰</span>
-            <span>{wallet?.dropletCoins || 0}</span>
-          </div>
-          
-          {canClaimDaily() && (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="bg-green-500/80 border-green-300 text-white hover:bg-green-600"
-              onClick={handleClaimDaily}
-            >
-              <Gift className="w-4 h-4" />
-            </Button>
-          )}
-          
+    <div className="fixed inset-0 bg-gradient-to-br overflow-hidden" style={{
+      background: `linear-gradient(to bottom right, var(--tw-gradient-from), var(--tw-gradient-to))`,
+    }} className={`min-h-screen bg-gradient-to-br ${currentRoomData.bgColor}`}>
+      
+      {/* Top Bar */}
+      <div className="absolute top-0 left-0 right-0 z-20 p-4">
+        <div className="flex items-center justify-between">
           <Button 
             variant="outline" 
             size="sm" 
-            className="bg-white/20 border-white/30 text-white"
-            onClick={() => setShowInventory(true)}
+            onClick={() => setShowMenu(!showMenu)}
+            className="bg-white/80 backdrop-blur-sm"
           >
-            <Settings className="w-4 h-4" />
+            <Menu className="h-4 w-4" />
           </Button>
+          
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="bg-white/80 backdrop-blur-sm">
+              <Heart className="h-3 w-3 mr-1 text-red-500" />
+              {petStats?.happiness || 80}
+            </Badge>
+            <Badge variant="outline" className="bg-white/80 backdrop-blur-sm">
+              💰 {wallet.dropletCoins}
+            </Badge>
+          </div>
         </div>
       </div>
 
-      {/* Left Side - Available Items */}
-      <div className="absolute left-0 top-20 bottom-20 w-24 bg-white/10 backdrop-blur-sm border-r border-white/20 flex flex-col items-center py-4 space-y-4 z-10">
-        <div className="text-white text-xs font-semibold mb-2">Items</div>
-        {availableItems.map((item, index) => (
+      {/* Side Menu */}
+      <AnimatePresence>
+        {showMenu && (
           <motion.div
-            key={`${item.itemId}-${index}`}
-            draggable
-            onDragStart={() => handleDragStart(item)}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-white/90 rounded-xl p-3 cursor-grab active:cursor-grabbing shadow-lg"
+            initial={{ x: -300 }}
+            animate={{ x: 0 }}
+            exit={{ x: -300 }}
+            className="absolute top-0 left-0 z-30 h-full w-64 bg-white/95 backdrop-blur-lg shadow-xl"
           >
-            <div className="text-center">
-              <div className="text-2xl mb-1">
-                {item.item?.category === 'food' ? '🍎' : 
-                 item.item?.category === 'medicine' ? '💊' :
-                 item.item?.category === 'cleaning' ? '🧼' : '📦'}
-              </div>
-              <div className="text-xs font-bold text-gray-700">{item.quantity}</div>
+            <div className="p-4 space-y-2">
+              <div className="text-lg font-bold mb-4">Menu</div>
+              {menuItems.map(item => (
+                <Button
+                  key={item.id}
+                  variant={currentView === item.id ? "default" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setCurrentView(item.id);
+                    setShowMenu(false);
+                  }}
+                >
+                  <item.icon className="h-4 w-4 mr-2" />
+                  {item.label}
+                </Button>
+              ))}
             </div>
           </motion.div>
-        ))}
-      </div>
+        )}
+      </AnimatePresence>
 
-      {/* Center Area - Pet and Game */}
-      <div className="flex-1 flex flex-col pl-24">
-        {/* Pet Display Area */}
-        <div 
-          className="flex-1 flex items-center justify-center"
-          onDragOver={handleDragOver}
-          onDrop={handleDropOnCharacter}
-        >
-          <motion.div
-            key={`${currentRoom}-${currentMood.primaryMood}`}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="scale-75"
-          >
-            <PetDisplay characterId={selectedCharacter} />
-          </motion.div>
-        </div>
-
-        {/* Stats Display */}
-        <div className="px-6 pb-4">
-          <div className="grid grid-cols-4 gap-3">
-            {[
-              { label: 'Happy', value: moodState.happiness, color: 'bg-pink-500', icon: '💝' },
-              { label: 'Health', value: moodState.health, color: 'bg-red-500', icon: '❤️' },
-              { label: 'Energy', value: moodState.energy, color: 'bg-blue-500', icon: '⚡' },
-              { label: 'Hunger', value: moodState.hunger, color: 'bg-orange-500', icon: '🍎' }
-            ].map((stat) => (
-              <div key={stat.label} className="bg-white/90 backdrop-blur-sm rounded-xl p-3 text-center">
-                <div className="text-lg mb-1">{stat.icon}</div>
-                <div className="text-xs font-medium text-gray-700 mb-2">{stat.label}</div>
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${Math.max(0, Math.min(100, stat.value))}%` }}
-                    className={`h-full ${stat.color} rounded-full`}
-                  />
-                </div>
-                <div className="text-xs font-bold text-gray-600 mt-1">
-                  {Math.round(stat.value)}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="grid grid-cols-3 gap-3 mt-4">
-            {actionButtons.map((button) => (
-              <motion.button
-                key={button.action}
-                onClick={button.onClick}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-white/90 backdrop-blur-sm rounded-xl p-4 flex flex-col items-center justify-center shadow-lg border-2 border-white/50 hover:bg-white transition-all"
-              >
-                <span className="text-2xl mb-1">{button.icon}</span>
-                <span className="text-xs font-medium text-gray-700">{button.label}</span>
-              </motion.button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Navigation */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 bg-gradient-to-r from-yellow-300/95 to-orange-400/95 backdrop-blur-sm p-4">
-        {/* Room Navigation */}
-        <div className="flex justify-between items-center mb-4">
-          {rooms.map((room) => (
-            <motion.button
+      {/* Room Selector */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 p-4">
+        <div className="flex justify-center gap-2 overflow-x-auto">
+          {rooms.map(room => (
+            <Button
               key={room.id}
-              onClick={() => changeRoom(room.id)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`flex flex-col items-center justify-center w-14 h-14 rounded-xl shadow-lg transition-all ${
-                currentRoom === room.id 
-                  ? `bg-gradient-to-r ${room.color} text-white` 
-                  : 'bg-white text-gray-600'
-              }`}
+              variant={currentRoom === room.id ? "default" : "outline"}
+              size="sm"
+              onClick={() => setCurrentRoom(room.id)}
+              className="min-w-fit bg-white/80 backdrop-blur-sm"
             >
-              <span className="text-lg">{room.icon}</span>
-              <span className="text-xs font-bold mt-1">{room.name}</span>
-            </motion.button>
+              <span className="mr-1">{room.emoji}</span>
+              {room.name}
+            </Button>
           ))}
         </div>
-
-        {/* Shop & Inventory */}
-        <div className="flex justify-center space-x-4">
-          <Button
-            onClick={() => setShowCoinShop(true)}
-            className="flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-white px-6 py-3 rounded-full shadow-lg"
-          >
-            <Coins className="w-5 h-5" />
-            <span className="font-semibold">Buy Coins</span>
-          </Button>
-
-          <Button
-            onClick={() => setShowShop(true)}
-            className="flex items-center space-x-2 bg-gradient-to-r from-purple-400 to-purple-600 hover:from-purple-500 hover:to-purple-700 text-white px-6 py-3 rounded-full shadow-lg"
-          >
-            <ShoppingBag className="w-5 h-5" />
-            <span className="font-semibold">Shop</span>
-          </Button>
-
-          <Button
-            onClick={() => setShowInventory(true)}
-            className="flex items-center space-x-2 bg-gradient-to-r from-emerald-400 to-emerald-600 hover:from-emerald-500 hover:to-emerald-700 text-white px-6 py-3 rounded-full shadow-lg"
-          >
-            <Package className="w-5 h-5" />
-            <span className="font-semibold">Items</span>
-          </Button>
-        </div>
       </div>
 
-      {/* Modals */}
+      {/* Main Pet Area */}
+      <div className="flex items-center justify-center h-full p-20">
+        <motion.div
+          key={currentRoom}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="text-center"
+        >
+          <div className="mb-4">
+            <CharacterRenderer character={currentCharacter} size={200} />
+          </div>
+          <div className="text-2xl font-bold mb-2">
+            Welcome to the {currentRoomData.name}!
+          </div>
+          <p className="text-gray-600 mb-4">
+            Your droplet is feeling {petStats?.mood || 'happy'} today
+          </p>
+          
+          {/* Pet Stats */}
+          <div className="flex justify-center gap-2 mb-4">
+            <Badge variant="outline">😋 Hunger: {petStats?.hunger || 60}</Badge>
+            <Badge variant="outline">⚡ Energy: {petStats?.energy || 85}</Badge>
+            <Badge variant="outline">🧼 Clean: {petStats?.cleanliness || 70}</Badge>
+          </div>
+          
+          {/* Room-specific actions */}
+          <div className="flex justify-center gap-2">
+            {currentRoom === 'kitchen' && (
+              <Button onClick={() => updateStat('hunger', 10)}>
+                🍎 Feed Pet
+              </Button>
+            )}
+            {currentRoom === 'bathroom' && (
+              <Button onClick={() => updateStat('cleanliness', 15)}>
+                🛁 Clean Pet
+              </Button>
+            )}
+            {currentRoom === 'bedroom' && (
+              <Button onClick={() => updateStat('energy', 20)}>
+                😴 Rest
+              </Button>
+            )}
+            {currentRoom === 'playroom' && (
+              <Button onClick={() => updateStat('happiness', 10)}>
+                🎾 Play
+              </Button>
+            )}
+            {currentRoom === 'nature' && (
+              <Button onClick={() => updateStat('happiness', 5)}>
+                🌳 Explore
+              </Button>
+            )}
+            {currentRoom === 'health' && (
+              <Button onClick={() => updateStat('health', 10)}>
+                💊 Heal
+              </Button>
+            )}
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Background overlay for menu */}
       <AnimatePresence>
-        {showShop && (
+        {showMenu && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/50"
-            onClick={() => setShowShop(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="h-full overflow-auto"
-            >
-              <EnhancedItemShop onBack={() => setShowShop(false)} />
-            </motion.div>
-          </motion.div>
-        )}
-
-        {showInventory && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/50"
-            onClick={() => setShowInventory(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="h-full overflow-auto"
-            >
-              <InventoryModal onClose={() => setShowInventory(false)} />
-            </motion.div>
-          </motion.div>
-        )}
-
-        {showCoinShop && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/50"
-            onClick={() => setShowCoinShop(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="h-full overflow-auto"
-            >
-              <ComprehensiveCoinShop onBack={() => setShowCoinShop(false)} />
-            </motion.div>
-          </motion.div>
+            className="absolute inset-0 bg-black/20 z-25"
+            onClick={() => setShowMenu(false)}
+          />
         )}
       </AnimatePresence>
     </div>
