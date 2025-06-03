@@ -17,6 +17,12 @@ import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import Welcome from "./pages/Welcome";
+import Shop from "./pages/Shop";
+import Inventory from "./pages/Inventory";
+import Wallet from "./pages/Wallet";
+import Games from "./pages/Games";
+import Stats from "./pages/Stats";
+import Settings from "./pages/Settings";
 
 // Create query client outside of component to avoid recreation
 const queryClient = new QueryClient({
@@ -42,17 +48,34 @@ const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Main game flow with splash/welcome */}
         <Route path="/" element={<HomeWrapper />} />
         <Route path="/welcome" element={<Welcome />} />
+        
+        {/* Game pages */}
+        <Route path="/play" element={<PlayWithMascot />} />
+        <Route path="/playdrop" element={<PlayDrop />} />
+        
+        {/* Game feature pages */}
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/inventory" element={<Inventory />} />
+        <Route path="/wallet" element={<Wallet />} />
+        <Route path="/games" element={<Games />} />
+        <Route path="/stats" element={<Stats />} />
+        <Route path="/settings" element={<Settings />} />
+        
+        {/* Auth pages (redirect to auth page) */}
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/login" element={<Navigate to="/auth" replace />} />
         <Route path="/signup" element={<Navigate to="/auth" replace />} />
-        <Route path="/play" element={<PlayWithMascot />} />
-        <Route path="/playdrop" element={<PlayDrop />} />
+        
+        {/* Static pages */}
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/terms" element={<Privacy />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/contact" element={<Contact />} />
+        
+        {/* 404 page */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

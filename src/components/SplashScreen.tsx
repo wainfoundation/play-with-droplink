@@ -12,44 +12,60 @@ export interface SplashScreenProps {
 const SplashScreen = ({ onComplete }: SplashScreenProps) => {
   const [progress, setProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+  const [loadingText, setLoadingText] = useState('Initializing...');
 
   useEffect(() => {
-    // Total loading time in milliseconds - slightly longer for smoother animation
-    const totalLoadTime = 2800;
-    // Update interval in milliseconds - more frequent updates for smoother progress
-    const updateInterval = 16; // ~60fps
-    // Calculate the number of updates needed
+    // Total loading time in milliseconds - slightly longer for better experience
+    const totalLoadTime = 3500;
+    const updateInterval = 50; // More frequent updates for smoother progress
     const totalUpdates = totalLoadTime / updateInterval;
-    // Calculate progress increment per update
     const progressIncrement = 100 / totalUpdates;
     
-    // Start progress animation with easing
+    // Loading text progression
+    const loadingSteps = [
+      { progress: 0, text: 'Initializing Pet System...' },
+      { progress: 25, text: 'Loading Character Data...' },
+      { progress: 50, text: 'Setting Up Rooms...' },
+      { progress: 75, text: 'Preparing Game Assets...' },
+      { progress: 90, text: 'Almost Ready...' },
+      { progress: 100, text: 'Welcome to Droplink!' }
+    ];
+    
+    // Start progress animation
     const interval = setInterval(() => {
       setProgress((prevProgress) => {
-        // Apply slight easing to make progress more natural
-        const remaining = 100 - prevProgress;
-        const increment = Math.min(progressIncrement * (0.5 + (remaining / 100)), remaining);
+        const newProgress = Math.min(prevProgress + progressIncrement, 100);
         
-        if (prevProgress >= 100) {
+        // Update loading text based on progress
+        const currentStep = loadingSteps.find(step => newProgress >= step.progress);
+        if (currentStep) {
+          setLoadingText(currentStep.text);
+        }
+        
+        if (newProgress >= 100) {
           clearInterval(interval);
           return 100;
         }
-        return Math.min(prevProgress + increment, 100);
+        return newProgress;
       });
     }, updateInterval);
     
     // Complete the loading after the total time
     const timer = setTimeout(() => {
-      // Play sound when loading completes
-      playSound(sounds.loadingComplete, 0.4);
+      // Play completion sound
+      try {
+        playSound(sounds.loadingComplete, 0.4);
+      } catch (error) {
+        console.log('Sound not available, continuing...');
+      }
       
-      // Set visibility to false for smooth transition
+      // Fade out smoothly
       setIsVisible(false);
       
-      // Small delay after sound before transitioning
+      // Small delay for smooth transition
       setTimeout(() => {
         onComplete();
-      }, 500);
+      }, 800);
     }, totalLoadTime);
 
     return () => {
@@ -59,7 +75,14 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
   }, [onComplete]);
 
   if (!isVisible) {
-    return null;
+    return (
+      <motion.div
+        className="fixed inset-0 z-50 bg-gradient-to-br from-primary to-secondary"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 0 }}
+        transition={{ duration: 0.8 }}
+      />
+    );
   }
 
   return (
@@ -67,7 +90,6 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-primary to-secondary"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
       <motion.div
@@ -76,66 +98,114 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
         className="text-center"
       >
-        {/* Mascot Logo */}
+        {/* Mascot Logo with enhanced animation */}
         <motion.div
-          className="mx-auto mb-6 h-24 w-24 rounded-xl bg-white p-4 shadow-lg flex items-center justify-center"
-          initial={{ scale: 0.8, rotate: -5 }}
+          className="mx-auto mb-8 h-32 w-32 rounded-xl bg-white p-6 shadow-2xl flex items-center justify-center"
+          initial={{ scale: 0.8, rotate: -10, y: 50 }}
           animate={{ 
-            scale: [0.8, 1.05, 1],
-            rotate: [-5, 2, 0] 
+            scale: [0.8, 1.1, 1],
+            rotate: [-10, 5, 0],
+            y: [50, -10, 0] 
           }}
           transition={{ 
             delay: 0.3, 
-            duration: 0.8, 
+            duration: 1.2, 
             ease: "easeOut",
-            times: [0, 0.7, 1] 
+            times: [0, 0.6, 1] 
           }}
         >
-          <MascotIcon size={64} mood="excited" />
+          <MascotIcon size={80} mood="excited" />
         </motion.div>
         
-        {/* App Name */}
+        {/* App Name with enhanced styling */}
         <motion.h1 
-          className="mb-2 font-poppins text-4xl font-bold text-white"
-          initial={{ y: 20, opacity: 0 }}
+          className="mb-3 font-poppins text-5xl md:text-6xl font-bold text-white drop-shadow-lg"
+          initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.5, ease: "easeOut" }}
+          transition={{ delay: 0.5, duration: 0.6, ease: "easeOut" }}
         >
           Play with Droplink
         </motion.h1>
         
-        {/* Company Name */}
+        {/* Enhanced tagline */}
         <motion.p 
-          className="text-sm text-white/80"
+          className="text-lg md:text-xl text-white/90 mb-2 font-medium"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.5, ease: "easeOut" }}
+          transition={{ delay: 0.6, duration: 0.5, ease: "easeOut" }}
+        >
+          Your Pi Network Gaming Hub
+        </motion.p>
+        
+        {/* Company Name */}
+        <motion.p 
+          className="text-sm text-white/70 mb-12"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.7, duration: 0.5, ease: "easeOut" }}
         >
           by MRWAIN ORGANIZATION
         </motion.p>
         
-        {/* Progress Percentage */}
+        {/* Loading text with dynamic updates */}
         <motion.p
-          className="mt-6 text-white/90 font-medium"
+          className="mt-8 mb-4 text-white/90 font-medium text-lg"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
+        >
+          {loadingText}
+        </motion.p>
+        
+        {/* Progress Percentage */}
+        <motion.p
+          className="mb-4 text-white/80 font-semibold text-xl"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.9, duration: 0.5 }}
         >
           {Math.round(progress)}%
         </motion.p>
         
-        {/* Progress Bar */}
+        {/* Enhanced Progress Bar */}
         <motion.div 
-          className="mt-2 w-64 md:w-80"
-          initial={{ opacity: 0, width: "60%" }}
-          animate={{ opacity: 1, width: "100%" }}
-          transition={{ delay: 0.7, duration: 0.6 }}
+          className="w-80 md:w-96"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1.0, duration: 0.6 }}
         >
           <Progress 
             value={progress} 
-            className="h-2 overflow-hidden" 
+            className="h-3 bg-white/20 border border-white/30 rounded-full overflow-hidden" 
           />
         </motion.div>
+        
+        {/* Animated decorative elements */}
+        <motion.div
+          className="absolute top-20 left-20 w-4 h-4 bg-white/30 rounded-full"
+          animate={{
+            scale: [1, 1.5, 1],
+            opacity: [0.3, 0.8, 0.3],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+        <motion.div
+          className="absolute bottom-32 right-16 w-6 h-6 bg-white/20 rounded-full"
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.2, 0.6, 0.2],
+          }}
+          transition={{
+            duration: 2.5,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.5,
+          }}
+        />
       </motion.div>
     </motion.div>
   );
