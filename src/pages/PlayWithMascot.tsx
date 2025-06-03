@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useGameData } from '@/hooks/useGameData';
 import { useAuthSystem } from '@/hooks/useAuthSystem';
+import { useWallet } from '@/hooks/useWallet';
 import PetCharacter from '@/components/game/PetCharacter';
 import Room, { rooms } from '@/components/game/Room';
 import StatsDisplay from '@/components/game/StatsDisplay';
@@ -28,6 +29,7 @@ import { toast } from '@/hooks/use-toast';
 const PlayWithMascot: React.FC = () => {
   const { user } = useAuthSystem();
   const { petStats, userProfile, inventory, loading, useItem, changeRoom } = useGameData();
+  const { wallet } = useWallet();
   const [showMenu, setShowMenu] = useState(false);
   const [isLampOn, setIsLampOn] = useState(true);
   const [selectedRoom, setSelectedRoom] = useState('bedroom');
@@ -149,7 +151,7 @@ const PlayWithMascot: React.FC = () => {
               </Button>
               
               <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
-                💰 {userProfile.droplet_coins} Coins
+                💰 {wallet?.dropletCoins || 0} Coins
               </Badge>
             </div>
             
