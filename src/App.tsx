@@ -1,3 +1,4 @@
+
 import React, { Suspense, useEffect, useState } from 'react';
 import {
   BrowserRouter as Router,
@@ -9,8 +10,6 @@ import { Toaster } from '@/components/ui/toaster';
 import { useAuth } from '@/hooks/useAuth';
 import { PiContextProvider } from '@/contexts/PiContext';
 import { ThemeProvider } from '@/components/theme-provider';
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from "@vercel/speed-insights/react"
 import {
   useQuery,
   useMutation,
@@ -22,7 +21,7 @@ import LandingPage from '@/pages/LandingPage';
 import Index from '@/pages/Index';
 
 function AppRoutes() {
-  const { loading, isAuthenticated } = useAuth();
+  const { loading } = useAuth();
   const location = useLocation();
   const [showSplashScreen, setShowSplashScreen] = useState(true);
 
@@ -126,8 +125,6 @@ function App() {
           <Router>
             <AppRoutes />
             <Toaster />
-            <Analytics />
-            <SpeedInsights />
           </Router>
         </PiContextProvider>
       </ThemeProvider>
