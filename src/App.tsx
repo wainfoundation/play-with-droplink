@@ -1,4 +1,3 @@
-
 import { Helmet } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -50,6 +49,11 @@ const App = () => {
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/play" element={
+              <AuthWrapper>
+                <PlayWithMascot />
+              </AuthWrapper>
+            } />
+            <Route path="/playdrop" element={
               <AuthWrapper>
                 <PlayWithMascot />
               </AuthWrapper>
