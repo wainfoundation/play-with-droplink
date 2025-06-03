@@ -135,6 +135,36 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_rewards: {
+        Row: {
+          claim_date: string | null
+          created_at: string | null
+          id: string
+          reward_coins: number | null
+          reward_xp: number | null
+          streak_count: number | null
+          user_id: string
+        }
+        Insert: {
+          claim_date?: string | null
+          created_at?: string | null
+          id?: string
+          reward_coins?: number | null
+          reward_xp?: number | null
+          streak_count?: number | null
+          user_id: string
+        }
+        Update: {
+          claim_date?: string | null
+          created_at?: string | null
+          id?: string
+          reward_coins?: number | null
+          reward_xp?: number | null
+          streak_count?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       digital_products: {
         Row: {
           category: string | null
@@ -662,6 +692,51 @@ export type Database = {
         }
         Relationships: []
       }
+      pet_stats: {
+        Row: {
+          character_id: string
+          cleanliness: number | null
+          created_at: string | null
+          energy: number | null
+          happiness: number | null
+          health: number | null
+          hunger: number | null
+          id: string
+          last_decay: string | null
+          mood: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          character_id?: string
+          cleanliness?: number | null
+          created_at?: string | null
+          energy?: number | null
+          happiness?: number | null
+          health?: number | null
+          hunger?: number | null
+          id?: string
+          last_decay?: string | null
+          mood?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          character_id?: string
+          cleanliness?: number | null
+          created_at?: string | null
+          energy?: number | null
+          happiness?: number | null
+          health?: number | null
+          hunger?: number | null
+          id?: string
+          last_decay?: string | null
+          mood?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       pi_payments: {
         Row: {
           amount: number
@@ -757,6 +832,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      room_themes: {
+        Row: {
+          id: string
+          is_equipped: boolean | null
+          purchased_at: string | null
+          room_type: string
+          theme_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          is_equipped?: boolean | null
+          purchased_at?: string | null
+          room_type: string
+          theme_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          is_equipped?: boolean | null
+          purchased_at?: string | null
+          room_type?: string
+          theme_id?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       rooms: {
         Row: {
@@ -1039,54 +1141,72 @@ export type Database = {
           bio: string | null
           created_at: string | null
           custom_domain: string | null
+          daily_streak: number | null
           display_name: string | null
           games_played: number | null
           id: string
+          last_daily_claim: string | null
           last_life_regen: string | null
+          level: number | null
           lives: number | null
           pi_domain: string | null
           pi_wallet_address: string | null
           plan: string | null
           selected_character_id: string | null
+          selected_room: string | null
           total_score: number | null
+          tutorial_completed: boolean | null
           updated_at: string | null
           username: string
+          xp: number | null
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
           custom_domain?: string | null
+          daily_streak?: number | null
           display_name?: string | null
           games_played?: number | null
           id: string
+          last_daily_claim?: string | null
           last_life_regen?: string | null
+          level?: number | null
           lives?: number | null
           pi_domain?: string | null
           pi_wallet_address?: string | null
           plan?: string | null
           selected_character_id?: string | null
+          selected_room?: string | null
           total_score?: number | null
+          tutorial_completed?: boolean | null
           updated_at?: string | null
           username: string
+          xp?: number | null
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
           custom_domain?: string | null
+          daily_streak?: number | null
           display_name?: string | null
           games_played?: number | null
           id?: string
+          last_daily_claim?: string | null
           last_life_regen?: string | null
+          level?: number | null
           lives?: number | null
           pi_domain?: string | null
           pi_wallet_address?: string | null
           plan?: string | null
           selected_character_id?: string | null
+          selected_room?: string | null
           total_score?: number | null
+          tutorial_completed?: boolean | null
           updated_at?: string | null
           username?: string
+          xp?: number | null
         }
         Relationships: [
           {
@@ -1131,6 +1251,33 @@ export type Database = {
         }
         Relationships: []
       }
+      xp_transactions: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          description: string | null
+          id: string
+          user_id: string
+          xp_gained: number
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          user_id: string
+          xp_gained: number
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          user_id?: string
+          xp_gained?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1143,6 +1290,15 @@ export type Database = {
       add_user_life: {
         Args: { user_id: string }
         Returns: undefined
+      }
+      add_xp: {
+        Args: {
+          p_user_id: string
+          p_xp: number
+          p_action_type: string
+          p_description?: string
+        }
+        Returns: Json
       }
       buy_character: {
         Args: { p_user_id: string; p_character_id: string; p_price: number }
@@ -1159,6 +1315,14 @@ export type Database = {
       }
       buy_shop_item: {
         Args: { p_user_id: string; p_item_id: string; p_price_coins: number }
+        Returns: undefined
+      }
+      claim_daily_reward: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
+      decay_pet_stats: {
+        Args: Record<PropertyKey, never>
         Returns: undefined
       }
       regenerate_life: {

@@ -2,7 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import CharacterRenderer from '../welcome/CharacterRenderer';
-import { usePetMoodEngine } from '@/hooks/usePetMoodEngine';
+import { usePersistentPetEngine } from '@/hooks/usePersistentPetEngine';
 import { useRoomManager } from '@/hooks/useRoomManager';
 
 interface PetDisplayProps {
@@ -11,7 +11,7 @@ interface PetDisplayProps {
 }
 
 const PetDisplay: React.FC<PetDisplayProps> = ({ characterId, className = "" }) => {
-  const { moodState, currentMessage } = usePetMoodEngine(characterId);
+  const { moodState, currentMessage } = usePersistentPetEngine();
   const { getCurrentMood } = useRoomManager();
   
   const roomMood = getCurrentMood();

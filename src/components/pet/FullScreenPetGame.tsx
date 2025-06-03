@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Settings, ShoppingBag, Package, Plus, Gift, Coins } from 'lucide-react';
-import { usePetMoodEngine } from '@/hooks/usePetMoodEngine';
+import { Settings, ShoppingBag, Package, Gift, Coins, Star } from 'lucide-react';
+import { usePersistentPetEngine } from '@/hooks/usePersistentPetEngine';
 import { usePetEconomy } from '@/hooks/usePetEconomy';
 import { useRoomManager } from '@/hooks/useRoomManager';
+import { useAuthSystem } from '@/hooks/useAuthSystem';
 import PetDisplay from './PetDisplay';
 import EnhancedItemShop from '../shop/EnhancedItemShop';
 import InventoryModal from './InventoryModal';
@@ -18,7 +19,8 @@ const FullScreenPetGame: React.FC = () => {
   const [showCoinShop, setShowCoinShop] = useState(false);
   const [draggedItem, setDraggedItem] = useState<any>(null);
 
-  const { moodState, actions } = usePetMoodEngine(selectedCharacter);
+  const { user, profile, claimDailyReward } = useAuthSystem();
+  const { moodState, actions } = usePersistentPetEngine();
   const { wallet, claimDailyCoins, canClaimDailyCoins } = usePetEconomy(selectedCharacter);
   const { currentRoom, changeRoom, getCurrentTheme, getCurrentMood } = useRoomManager();
   const { inventory, useItem } = useLocalShop(selectedCharacter);
@@ -26,13 +28,10 @@ const FullScreenPetGame: React.FC = () => {
   const currentTheme = getCurrentTheme();
   const currentMood = getCurrentMood();
 
-  // Calculate pet level
-  const calculatePetLevel = () => {
-    const totalStats = moodState.happiness + moodState.health + moodState.energy + moodState.hunger;
-    return Math.max(1, Math.floor(totalStats / 100));
-  };
-
-  const petLevel = calculatePetLevel();
+  // Calculate pet level from profile
+  const petLevel = profile?.level || 1;
+  const petXP = profile?.xp || 0;
+  const dailyStreak = profile?.daily_streak || 0;
 
   useEffect(() => {
     console.log(`Moved to ${currentRoom} - applying ${currentMood.primaryMood} mood`);
@@ -56,11 +55,22 @@ const FullScreenPetGame: React.FC = () => {
     { action: 'pet', icon: '💝', label: 'Pet', onClick: actions.petCharacter }
   ];
 
-  const handleClaimDaily = () => {
-    const earned = claimDailyCoins(petLevel);
-    if (earned > 0) {
-      console.log(`Claimed ${earned} daily coins!`);
+  const handleClaimDaily = async () => {
+    try {
+      const result = await claimDailyReward();
+      if (result?.success) {
+        console.log(`Claimed daily reward! Streak: ${result.streak}, Coins: ${result.coins}, XP: ${result.xp}`);
+      }
+    } catch (error) {
+      console.error('Failed to claim daily reward:', error);
     }
+  };
+
+  const canClaimDaily = () => {
+    if (!profile?.last_daily_claim) return true;
+    const lastClaim = new Date(profile.last_daily_claim);
+    const today = new Date();
+    return lastClaim.toDateString() !== today.toDateString();
   };
 
   const handleDragStart = (item: any) => {
@@ -74,10 +84,8 @@ const FullScreenPetGame: React.FC = () => {
   const handleDropOnCharacter = (e: React.DragEvent) => {
     e.preventDefault();
     if (draggedItem) {
-      // Use the item and apply effects
       const effects = useItem(draggedItem.itemId);
       if (effects) {
-        // Apply effects to pet based on item type
         if (draggedItem.item?.category === 'food') {
           actions.feedPet();
         } else if (draggedItem.item?.category === 'medicine') {
@@ -88,14 +96,13 @@ const FullScreenPetGame: React.FC = () => {
     }
   };
 
-  // Get available inventory items for current room
   const getAvailableItems = () => {
     return inventory.filter(item => {
       if (currentRoom === 'kitchen') return item.item?.category === 'food';
       if (currentRoom === 'medicine') return item.item?.category === 'medicine';
       if (currentRoom === 'bathroom') return item.item?.category === 'cleaning';
       return item.quantity > 0;
-    }).slice(0, 3); // Show max 3 items
+    }).slice(0, 3);
   };
 
   const availableItems = getAvailableItems();
@@ -116,13 +123,22 @@ const FullScreenPetGame: React.FC = () => {
 
       {/* Top Status Bar */}
       <div className="relative z-10 flex justify-between items-center p-4 bg-gradient-to-r from-blue-400/90 to-purple-500/90 backdrop-blur-sm text-white">
-        <div className="flex items-center space-x-2">
-          <div className="bg-yellow-400 text-black rounded-full w-10 h-10 flex items-center justify-center font-bold">
+        <div className="flex items-center space-x-3">
+          <div className="bg-yellow-400 text-black rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg">
             {petLevel}
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-bold capitalize">{currentRoom}</span>
             <span className="text-xs opacity-80 capitalize">{currentMood.primaryMood}</span>
+            <div className="flex items-center space-x-2 text-xs">
+              <span>XP: {petXP}</span>
+              {dailyStreak > 0 && (
+                <div className="flex items-center space-x-1">
+                  <Star className="w-3 h-3" />
+                  <span>{dailyStreak}</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -132,7 +148,7 @@ const FullScreenPetGame: React.FC = () => {
             <span>{wallet?.dropletCoins || 0}</span>
           </div>
           
-          {canClaimDailyCoins() && (
+          {canClaimDaily() && (
             <Button 
               variant="outline" 
               size="sm" 
@@ -154,92 +170,89 @@ const FullScreenPetGame: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="relative z-10 flex-1 flex h-full">
-        {/* Left Side - Available Items */}
-        <div className="w-24 bg-white/10 backdrop-blur-sm border-r border-white/20 flex flex-col items-center py-4 space-y-4">
-          <div className="text-white text-xs font-semibold mb-2">Items</div>
-          {availableItems.map((item, index) => (
-            <motion.div
-              key={`${item.itemId}-${index}`}
-              draggable
-              onDragStart={() => handleDragStart(item)}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-white/90 rounded-xl p-3 cursor-grab active:cursor-grabbing shadow-lg"
-            >
-              <div className="text-center">
-                <div className="text-2xl mb-1">
-                  {item.item?.category === 'food' ? '🍎' : 
-                   item.item?.category === 'medicine' ? '💊' :
-                   item.item?.category === 'cleaning' ? '🧼' : '📦'}
-                </div>
-                <div className="text-xs font-bold text-gray-700">{item.quantity}</div>
+      {/* Left Side - Available Items */}
+      <div className="absolute left-0 top-20 bottom-20 w-24 bg-white/10 backdrop-blur-sm border-r border-white/20 flex flex-col items-center py-4 space-y-4 z-10">
+        <div className="text-white text-xs font-semibold mb-2">Items</div>
+        {availableItems.map((item, index) => (
+          <motion.div
+            key={`${item.itemId}-${index}`}
+            draggable
+            onDragStart={() => handleDragStart(item)}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-white/90 rounded-xl p-3 cursor-grab active:cursor-grabbing shadow-lg"
+          >
+            <div className="text-center">
+              <div className="text-2xl mb-1">
+                {item.item?.category === 'food' ? '🍎' : 
+                 item.item?.category === 'medicine' ? '💊' :
+                 item.item?.category === 'cleaning' ? '🧼' : '📦'}
               </div>
-            </motion.div>
-          ))}
+              <div className="text-xs font-bold text-gray-700">{item.quantity}</div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Center Area - Pet and Game */}
+      <div className="flex-1 flex flex-col pl-24">
+        {/* Pet Display Area */}
+        <div 
+          className="flex-1 flex items-center justify-center"
+          onDragOver={handleDragOver}
+          onDrop={handleDropOnCharacter}
+        >
+          <motion.div
+            key={`${currentRoom}-${currentMood.primaryMood}`}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="scale-75"
+          >
+            <PetDisplay characterId={selectedCharacter} />
+          </motion.div>
         </div>
 
-        {/* Center Area - Pet and Game */}
-        <div className="flex-1 flex flex-col">
-          {/* Pet Display Area */}
-          <div 
-            className="flex-1 flex items-center justify-center"
-            onDragOver={handleDragOver}
-            onDrop={handleDropOnCharacter}
-          >
-            <motion.div
-              key={`${currentRoom}-${currentMood.primaryMood}`}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="scale-75" // Smaller character like in demo
-            >
-              <PetDisplay characterId={selectedCharacter} />
-            </motion.div>
+        {/* Stats Display */}
+        <div className="px-6 pb-4">
+          <div className="grid grid-cols-4 gap-3">
+            {[
+              { label: 'Happy', value: moodState.happiness, color: 'bg-pink-500', icon: '💝' },
+              { label: 'Health', value: moodState.health, color: 'bg-red-500', icon: '❤️' },
+              { label: 'Energy', value: moodState.energy, color: 'bg-blue-500', icon: '⚡' },
+              { label: 'Hunger', value: moodState.hunger, color: 'bg-orange-500', icon: '🍎' }
+            ].map((stat) => (
+              <div key={stat.label} className="bg-white/90 backdrop-blur-sm rounded-xl p-3 text-center">
+                <div className="text-lg mb-1">{stat.icon}</div>
+                <div className="text-xs font-medium text-gray-700 mb-2">{stat.label}</div>
+                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${Math.max(0, Math.min(100, stat.value))}%` }}
+                    className={`h-full ${stat.color} rounded-full`}
+                  />
+                </div>
+                <div className="text-xs font-bold text-gray-600 mt-1">
+                  {Math.round(stat.value)}
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/* Stats Display - Bottom positioned like demo */}
-          <div className="px-6 pb-4">
-            <div className="grid grid-cols-4 gap-3">
-              {[
-                { label: 'Happy', value: moodState.happiness, color: 'bg-pink-500', icon: '💝' },
-                { label: 'Health', value: moodState.health, color: 'bg-red-500', icon: '❤️' },
-                { label: 'Energy', value: moodState.energy, color: 'bg-blue-500', icon: '⚡' },
-                { label: 'Hunger', value: moodState.hunger, color: 'bg-orange-500', icon: '🍎' }
-              ].map((stat) => (
-                <div key={stat.label} className="bg-white/90 backdrop-blur-sm rounded-xl p-3 text-center">
-                  <div className="text-lg mb-1">{stat.icon}</div>
-                  <div className="text-xs font-medium text-gray-700 mb-2">{stat.label}</div>
-                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${Math.max(0, Math.min(100, stat.value))}%` }}
-                      className={`h-full ${stat.color} rounded-full`}
-                    />
-                  </div>
-                  <div className="text-xs font-bold text-gray-600 mt-1">
-                    {Math.round(stat.value)}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="grid grid-cols-3 gap-3 mt-4">
-              {actionButtons.map((button, index) => (
-                <motion.button
-                  key={button.action}
-                  onClick={button.onClick}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-white/90 backdrop-blur-sm rounded-xl p-4 flex flex-col items-center justify-center shadow-lg border-2 border-white/50 hover:bg-white transition-all"
-                >
-                  <span className="text-2xl mb-1">{button.icon}</span>
-                  <span className="text-xs font-medium text-gray-700">{button.label}</span>
-                </motion.button>
-              ))}
-            </div>
+          {/* Action Buttons */}
+          <div className="grid grid-cols-3 gap-3 mt-4">
+            {actionButtons.map((button) => (
+              <motion.button
+                key={button.action}
+                onClick={button.onClick}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-white/90 backdrop-blur-sm rounded-xl p-4 flex flex-col items-center justify-center shadow-lg border-2 border-white/50 hover:bg-white transition-all"
+              >
+                <span className="text-2xl mb-1">{button.icon}</span>
+                <span className="text-xs font-medium text-gray-700">{button.label}</span>
+              </motion.button>
+            ))}
           </div>
         </div>
       </div>

@@ -1,54 +1,69 @@
-
+import { Helmet } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { HelmetProvider } from 'react-helmet-async';
-import { UserProvider } from "@/context/UserContext";
-import SplashWrapper from "@/components/welcome/SplashWrapper";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { SecurityHeaders } from "@/components/security/SecurityHeaders";
+import { useAuthSystem } from "@/hooks/useAuthSystem";
+import SessionManager from "@/components/security/SessionManager";
 import Index from "./pages/Index";
-import Login from "./pages/Login";
-import LoginPage from "./pages/LoginPage";
-import Signup from "./pages/Signup";
-import SignupPage from "./pages/SignupPage";
-import AuthPage from "./pages/AuthPage";
+import Auth from "./pages/Auth";
 import PlayWithMascot from "./pages/PlayWithMascot";
-import Help from "./pages/Help";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
-import OtherApps from "./pages/OtherApps";
+import PricingPage from "./pages/PricingPage";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import ContactPage from "./pages/ContactPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <HelmetProvider>
+// Auth wrapper component
+const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading } = useAuthSystem();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+  
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+const App = () => {
+  return (
     <QueryClientProvider client={queryClient}>
-      <UserProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <SplashWrapper>
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/login-page" element={<LoginPage />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/signup-page" element={<SignupPage />} />
-                <Route path="/auth" element={<AuthPage />} />
-                <Route path="/play" element={<PlayWithMascot />} />
-                <Route path="/help" element={<Help />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/other-apps" element={<OtherApps />} />
-              </Routes>
-            </BrowserRouter>
-          </SplashWrapper>
-        </TooltipProvider>
-      </UserProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <SecurityHeaders />
+        <SessionManager />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/play" element={
+              <AuthWrapper>
+                <PlayWithMascot />
+              </AuthWrapper>
+            } />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
     </QueryClientProvider>
-  </HelmetProvider>
-);
+  );
+};
 
 export default App;
