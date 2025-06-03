@@ -17,9 +17,18 @@ const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
   const [buttonsVisible, setButtonsVisible] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState('droplet-blue');
 
-  // Always start with splash screen (removed the localStorage check)
   useEffect(() => {
-    // For development, we always start fresh with splash
+    // Check if user has completed welcome flow
+    const welcomeCompleted = localStorage.getItem('welcomeCompleted');
+    const hasSelectedCharacter = localStorage.getItem('selectedCharacter');
+    
+    if (welcomeCompleted === 'true' && hasSelectedCharacter) {
+      setCurrentStep('complete');
+      setShowSplash(false);
+      return;
+    }
+    
+    // Start with splash screen
     setCurrentStep('splash');
     setShowSplash(true);
   }, []);

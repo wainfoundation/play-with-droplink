@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SecurityHeaders } from "@/components/security/SecurityHeaders";
 import { useAuthSystem } from "@/hooks/useAuthSystem";
 import SessionManager from "@/components/security/SessionManager";
+import SplashWrapper from "@/components/welcome/SplashWrapper";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
 import PlayWithMascot from "./pages/PlayWithMascot";
@@ -19,7 +20,7 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Auth wrapper component
+// Auth wrapper component with splash and welcome flow
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuthSystem();
   
@@ -35,7 +36,11 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/auth" replace />;
   }
   
-  return <>{children}</>;
+  return (
+    <SplashWrapper>
+      {children}
+    </SplashWrapper>
+  );
 };
 
 const App = () => {
