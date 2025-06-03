@@ -9,6 +9,38 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ads_rewards: {
+        Row: {
+          ad_type: string | null
+          id: string
+          reward_coins: number | null
+          timestamp: string | null
+          user_id: string
+        }
+        Insert: {
+          ad_type?: string | null
+          id?: string
+          reward_coins?: number | null
+          timestamp?: string | null
+          user_id: string
+        }
+        Update: {
+          ad_type?: string | null
+          id?: string
+          reward_coins?: number | null
+          timestamp?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ads_rewards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       career_applications: {
         Row: {
           additional_info: string | null
@@ -115,7 +147,10 @@ export type Database = {
           created_at: string | null
           description: string | null
           id: string
+          is_best_value: boolean | null
+          is_popular: boolean | null
           pi_cost: number
+          savings_percentage: number | null
         }
         Insert: {
           bonus_percentage?: number | null
@@ -123,7 +158,10 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id: string
+          is_best_value?: boolean | null
+          is_popular?: boolean | null
           pi_cost: number
+          savings_percentage?: number | null
         }
         Update: {
           bonus_percentage?: number | null
@@ -131,7 +169,10 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          is_best_value?: boolean | null
+          is_popular?: boolean | null
           pi_cost?: number
+          savings_percentage?: number | null
         }
         Relationships: []
       }
@@ -1313,6 +1354,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      buy_coin_pack_enhanced: {
+        Args: { p_user_id: string; p_pack_id: string }
+        Returns: Json
+      }
       buy_shop_item: {
         Args: { p_user_id: string; p_item_id: string; p_price_coins: number }
         Returns: undefined
@@ -1340,6 +1385,10 @@ export type Database = {
       use_user_lives: {
         Args: { user_id: string; amount?: number }
         Returns: undefined
+      }
+      watch_ad_reward: {
+        Args: { p_user_id: string }
+        Returns: Json
       }
     }
     Enums: {
