@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -70,7 +69,7 @@ const FullScreenPetGame: React.FC = () => {
       
       // Safely parse the result
       if (result && typeof result === 'object' && 'success' in result) {
-        const dailyResult = result as DailyRewardResult;
+        const dailyResult = result as unknown as DailyRewardResult;
         if (dailyResult.success) {
           console.log(`Claimed daily reward! Streak: ${dailyResult.streak}, Coins: ${dailyResult.coins}, XP: ${dailyResult.xp}`);
         }
