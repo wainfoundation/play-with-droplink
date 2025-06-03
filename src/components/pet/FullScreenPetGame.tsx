@@ -1,15 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Settings, ShoppingBag, Package, Plus, Gift } from 'lucide-react';
+import { Settings, ShoppingBag, Package, Plus, Gift, Coins } from 'lucide-react';
 import { usePetMoodEngine } from '@/hooks/usePetMoodEngine';
 import { usePetEconomy } from '@/hooks/usePetEconomy';
 import { useRoomManager } from '@/hooks/useRoomManager';
 import PetDisplay from './PetDisplay';
 import EnhancedItemShop from '../shop/EnhancedItemShop';
 import InventoryModal from './InventoryModal';
-import CoinShop from '../shop/CoinShop';
+import ComprehensiveCoinShop from '../shop/ComprehensiveCoinShop';
 import { useLocalShop } from '@/hooks/useLocalShop';
 
 const FullScreenPetGame: React.FC = () => {
@@ -270,6 +269,14 @@ const FullScreenPetGame: React.FC = () => {
         {/* Shop & Inventory */}
         <div className="flex justify-center space-x-4">
           <Button
+            onClick={() => setShowCoinShop(true)}
+            className="flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-white px-6 py-3 rounded-full shadow-lg"
+          >
+            <Coins className="w-5 h-5" />
+            <span className="font-semibold">Buy Coins</span>
+          </Button>
+
+          <Button
             onClick={() => setShowShop(true)}
             className="flex items-center space-x-2 bg-gradient-to-r from-purple-400 to-purple-600 hover:from-purple-500 hover:to-purple-700 text-white px-6 py-3 rounded-full shadow-lg"
           >
@@ -344,7 +351,7 @@ const FullScreenPetGame: React.FC = () => {
               onClick={(e) => e.stopPropagation()}
               className="h-full overflow-auto"
             >
-              <CoinShop onBack={() => setShowCoinShop(false)} />
+              <ComprehensiveCoinShop onBack={() => setShowCoinShop(false)} />
             </motion.div>
           </motion.div>
         )}
