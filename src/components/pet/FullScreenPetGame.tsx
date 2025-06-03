@@ -12,6 +12,14 @@ import InventoryModal from './InventoryModal';
 import ComprehensiveCoinShop from '../shop/ComprehensiveCoinShop';
 import { useLocalShop } from '@/hooks/useLocalShop';
 
+interface DailyRewardResult {
+  success: boolean;
+  streak?: number;
+  coins?: number;
+  xp?: number;
+  message?: string;
+}
+
 const FullScreenPetGame: React.FC = () => {
   const [selectedCharacter] = useState('droplet-blue');
   const [showShop, setShowShop] = useState(false);
@@ -57,7 +65,7 @@ const FullScreenPetGame: React.FC = () => {
 
   const handleClaimDaily = async () => {
     try {
-      const result = await claimDailyReward();
+      const result = await claimDailyReward() as DailyRewardResult;
       if (result?.success) {
         console.log(`Claimed daily reward! Streak: ${result.streak}, Coins: ${result.coins}, XP: ${result.xp}`);
       }

@@ -1,3 +1,4 @@
+
 import { Helmet } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -10,11 +11,10 @@ import SessionManager from "@/components/security/SessionManager";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import PlayWithMascot from "./pages/PlayWithMascot";
-import PricingPage from "./pages/PricingPage";
-import TermsOfService from "./pages/TermsOfService";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import ContactPage from "./pages/ContactPage";
-import NotFoundPage from "./pages/NotFoundPage";
+import Pricing from "./pages/Pricing";
+import Privacy from "./pages/Privacy";
+import Contact from "./pages/Contact";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -54,11 +54,11 @@ const App = () => {
                 <PlayWithMascot />
               </AuthWrapper>
             } />
-            <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/terms" element={<TermsOfService />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="*" element={<NotFoundPage />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/terms" element={<Privacy />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
