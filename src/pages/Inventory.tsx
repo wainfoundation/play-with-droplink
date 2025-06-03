@@ -1,14 +1,13 @@
-
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Package, Shirt, Apple, Toy } from 'lucide-react';
+import { Package, Shirt, Apple, Gamepad2 } from 'lucide-react';
 
 const Inventory: React.FC = () => {
   const inventoryItems = [
     { id: 1, name: 'Apple', type: 'food', quantity: 5, icon: <Apple className="h-5 w-5" /> },
-    { id: 2, name: 'Ball', type: 'toy', quantity: 2, icon: <Toy className="h-5 w-5" /> },
+    { id: 2, name: 'Ball', type: 'toy', quantity: 2, icon: <Gamepad2 className="h-5 w-5" /> },
     { id: 3, name: 'Summer Outfit', type: 'clothing', quantity: 1, icon: <Shirt className="h-5 w-5" /> },
   ];
 
