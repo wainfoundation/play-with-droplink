@@ -36,7 +36,7 @@ const FullScreenPetGame: React.FC = () => {
   const [currentView, setCurrentView] = useState<GameView>('home');
   const [currentRoom, setCurrentRoom] = useState<Room>('bedroom');
   const [showMenu, setShowMenu] = useState(false);
-  const { user } = useAuthSystem();
+  const { user, profile } = useAuthSystem();
   const { wallet } = useWallet();
   const { petStats, updateStat } = usePetStats();
 
@@ -115,7 +115,7 @@ const FullScreenPetGame: React.FC = () => {
               <div className="mb-4">
                 <CharacterRenderer character={currentCharacter} size={100} />
               </div>
-              <h2 className="text-xl font-bold mb-2">{user?.username || 'Player'}</h2>
+              <h2 className="text-xl font-bold mb-2">{profile?.username || user?.email || 'Player'}</h2>
               <div className="space-y-2">
                 <Badge variant="outline">Level 1</Badge>
                 <Badge variant="outline">{wallet.dropletCoins} Coins</Badge>
@@ -128,9 +128,7 @@ const FullScreenPetGame: React.FC = () => {
   }
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br overflow-hidden" style={{
-      background: `linear-gradient(to bottom right, var(--tw-gradient-from), var(--tw-gradient-to))`,
-    }} className={`min-h-screen bg-gradient-to-br ${currentRoomData.bgColor}`}>
+    <div className={`fixed inset-0 bg-gradient-to-br overflow-hidden min-h-screen ${currentRoomData.bgColor}`}>
       
       {/* Top Bar */}
       <div className="absolute top-0 left-0 right-0 z-20 p-4">

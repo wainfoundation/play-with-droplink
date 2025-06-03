@@ -17,6 +17,13 @@ interface DailyReward {
   bonus?: string;
 }
 
+interface ClaimRewardResponse {
+  success: boolean;
+  streak: number;
+  coins: number;
+  xp: number;
+}
+
 const dailyRewards: DailyReward[] = [
   { day: 1, coins: 5, xp: 10 },
   { day: 2, coins: 7, xp: 15 },
@@ -93,17 +100,19 @@ const DailyRewards: React.FC<DailyRewardsProps> = ({ onBack }) => {
 
       if (error) throw error;
 
-      if (data.success) {
-        setCurrentStreak(data.streak);
+      const response = data as ClaimRewardResponse;
+
+      if (response.success) {
+        setCurrentStreak(response.streak);
         setCanClaim(false);
         setLastClaimDate(new Date().toISOString().split('T')[0]);
         
         // Add coins to local wallet
-        addCoins(data.coins, 'daily');
+        addCoins(response.coins, 'daily');
         
         toast({
           title: "Daily Reward Claimed!",
-          description: `Day ${data.streak}: +${data.coins} coins, +${data.xp} XP`,
+          description: `Day ${response.streak}: +${response.coins} coins, +${response.xp} XP`,
           className: "bg-green-50 border-green-200"
         });
       } else {
