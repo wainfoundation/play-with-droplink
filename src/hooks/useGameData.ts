@@ -116,18 +116,18 @@ export const useGameData = () => {
 
       if (error) throw error;
 
-      if (data.success) {
+      if (data && typeof data === 'object' && 'success' in data && data.success) {
         await loadUserData(); // Refresh data
         toast({
           title: "Item Used!",
-          description: `Applied effects: ${JSON.stringify(data.effects)}`,
+          description: `Applied effects: ${JSON.stringify((data as any).effects)}`,
           className: "bg-green-50 border-green-200"
         });
         return true;
       } else {
         toast({
           title: "Error",
-          description: data.error,
+          description: (data as any)?.error || "Failed to use item",
           variant: "destructive"
         });
         return false;
@@ -156,18 +156,18 @@ export const useGameData = () => {
 
       if (error) throw error;
 
-      if (data.success) {
+      if (data && typeof data === 'object' && 'success' in data && data.success) {
         await loadUserData(); // Refresh data
         toast({
           title: "Purchase Successful!",
-          description: `Spent ${data.cost} coins`,
+          description: `Spent ${(data as any).cost} coins`,
           className: "bg-green-50 border-green-200"
         });
         return true;
       } else {
         toast({
           title: "Purchase Failed",
-          description: data.error,
+          description: (data as any)?.error || "Failed to purchase item",
           variant: "destructive"
         });
         return false;
