@@ -18,7 +18,15 @@ import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+// Create query client outside of component to avoid recreation
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 // Auth wrapper component with splash and welcome flow
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -43,6 +51,32 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+const AppRoutes = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/play" element={
+          <AuthWrapper>
+            <PlayWithMascot />
+          </AuthWrapper>
+        } />
+        <Route path="/playdrop" element={
+          <AuthWrapper>
+            <PlayDrop />
+          </AuthWrapper>
+        } />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/terms" element={<Privacy />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -51,27 +85,7 @@ const App = () => {
         <Sonner />
         <SecurityHeaders />
         <SessionManager />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/play" element={
-              <AuthWrapper>
-                <PlayWithMascot />
-              </AuthWrapper>
-            } />
-            <Route path="/playdrop" element={
-              <AuthWrapper>
-                <PlayDrop />
-              </AuthWrapper>
-            } />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/terms" element={<Privacy />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <AppRoutes />
       </TooltipProvider>
     </QueryClientProvider>
   );
