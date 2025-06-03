@@ -3,11 +3,10 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, Heart, Shield, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthSystem } from '@/hooks/useAuthSystem';
 import { PiAuthButton } from '@/components/auth/PiAuthButton';
 import { isRunningInPiBrowser } from '@/utils/pi-sdk';
 import PiBrowserRedirect from '@/components/auth/PiBrowserRedirect';
@@ -16,12 +15,12 @@ import { characters } from '@/components/welcome/characterData';
 
 const AuthPage = () => {
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const { user, loading } = useAuthSystem();
   const isPiBrowser = isRunningInPiBrowser();
 
   useEffect(() => {
     if (user && !loading) {
-      navigate('/play'); // Redirect to games after login
+      navigate('/play');
     }
   }, [user, loading, navigate]);
 
@@ -40,8 +39,8 @@ const AuthPage = () => {
     return (
       <>
         <Helmet>
-          <title>Login - Droplink Pet Game</title>
-          <meta name="description" content="Login with Pi Network to start your pet care adventure!" />
+          <title>Login - PlayDrop Pi Network Game</title>
+          <meta name="description" content="Login with Pi Network to start your gaming adventure!" />
         </Helmet>
         <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 flex items-center justify-center p-4">
           <div className="w-full max-w-md">
@@ -53,8 +52,8 @@ const AuthPage = () => {
               <div className="flex justify-center mb-4">
                 <CharacterRenderer character={characters[0]} size={80} />
               </div>
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome to Pet Droplet!</h1>
-              <p className="text-gray-600">Login to start your pet care adventure</p>
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome to PlayDrop!</h1>
+              <p className="text-gray-600">Login to start your gaming adventure</p>
             </motion.div>
             
             <PiBrowserRedirect 
@@ -70,8 +69,8 @@ const AuthPage = () => {
   return (
     <>
       <Helmet>
-        <title>Login - Droplink Pet Game</title>
-        <meta name="description" content="Login with Pi Network to start your pet care adventure!" />
+        <title>Login - PlayDrop Pi Network Game</title>
+        <meta name="description" content="Login with Pi Network to start your gaming adventure!" />
       </Helmet>
       
       <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 flex items-center justify-center p-4">
@@ -85,8 +84,8 @@ const AuthPage = () => {
             <div className="flex justify-center mb-4">
               <CharacterRenderer character={characters[0]} size={80} />
             </div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome to Pet Droplet!</h1>
-            <p className="text-gray-600">Login with Pi Network to start your pet care adventure</p>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome to PlayDrop!</h1>
+            <p className="text-gray-600">Login with Pi Network to start your gaming adventure</p>
           </motion.div>
 
           {/* Login Card */}
@@ -98,10 +97,10 @@ const AuthPage = () => {
             <Card className="border-none bg-white/80 backdrop-blur-sm shadow-2xl">
               <CardHeader className="text-center pb-4">
                 <CardTitle className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                  Create Your Character
+                  Start Your Adventure
                 </CardTitle>
                 <p className="text-gray-600 text-sm">
-                  Connect with Pi Network to start caring for your adorable pet droplet
+                  Connect with Pi Network to start playing and earning rewards
                 </p>
               </CardHeader>
               
@@ -140,13 +139,13 @@ const AuthPage = () => {
                 {/* Benefits */}
                 <div className="text-center space-y-2">
                   <p className="text-xs text-gray-600">
-                    ✨ Create and customize your pet droplet
+                    🎮 Play games and earn Pi rewards
                   </p>
                   <p className="text-xs text-gray-600">
-                    🎮 Play mini-games and earn Pi coins
+                    🐾 Take care of your virtual pet droplet
                   </p>
                   <p className="text-xs text-gray-600">
-                    🏪 Shop for pet accessories and upgrades
+                    🏪 Shop for upgrades and accessories
                   </p>
                 </div>
               </CardContent>
@@ -161,7 +160,7 @@ const AuthPage = () => {
             className="text-center mt-6"
           >
             <p className="text-xs text-gray-500">
-              Join thousands of Pi Network users caring for their digital pets
+              Join the Pi Network gaming community
             </p>
           </motion.div>
         </div>

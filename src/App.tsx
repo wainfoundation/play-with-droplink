@@ -1,3 +1,4 @@
+
 import { Helmet } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -8,8 +9,9 @@ import { SecurityHeaders } from "@/components/security/SecurityHeaders";
 import { useAuthSystem } from "@/hooks/useAuthSystem";
 import SessionManager from "@/components/security/SessionManager";
 import Index from "./pages/Index";
-import Auth from "./pages/Auth";
+import AuthPage from "./pages/AuthPage";
 import PlayWithMascot from "./pages/PlayWithMascot";
+import PlayDrop from "./pages/PlayDrop";
 import Pricing from "./pages/Pricing";
 import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
@@ -47,7 +49,7 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
+            <Route path="/auth" element={<AuthPage />} />
             <Route path="/play" element={
               <AuthWrapper>
                 <PlayWithMascot />
@@ -55,7 +57,7 @@ const App = () => {
             } />
             <Route path="/playdrop" element={
               <AuthWrapper>
-                <PlayWithMascot />
+                <PlayDrop />
               </AuthWrapper>
             } />
             <Route path="/pricing" element={<Pricing />} />

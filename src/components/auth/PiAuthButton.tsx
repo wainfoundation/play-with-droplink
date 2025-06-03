@@ -4,27 +4,22 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useUser } from "@/context/UserContext";
-import { useErrorHandler } from "@/hooks/useErrorHandler";
+import { useAuthSystem } from "@/hooks/useAuthSystem";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Badge } from "@/components/ui/badge";
 import { authenticateWithPi, initPiNetwork, isRunningInPiBrowser } from "@/utils/pi-sdk";
-import { createRateLimiter } from "@/utils/input-sanitizer";
-
-// Create rate limiter for authentication attempts (5 attempts per 15 minutes)
-const authRateLimiter = createRateLimiter(5, 15 * 60 * 1000);
+import { Shield, Zap } from "lucide-react";
 
 export function PiAuthButton() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const navigate = useNavigate();
-  const { refreshUserData } = useUser();
-  const { handleError } = useErrorHandler();
+  const { refreshUserData } = useAuthSystem();
 
   // Check if we're in Pi Browser
   const isPiBrowser = isRunningInPiBrowser();
   
-  // Check if we're in production mode (not dev and sandbox is false)
-  const isProduction = !import.meta.env.DEV && import.meta.env.VITE_PI_SANDBOX !== 'true';
+  // Check if we're in production mode
+  const isProduction = !import.meta.env.DEV;
 
   if (!isPiBrowser) {
     return (
@@ -46,17 +41,6 @@ export function PiAuthButton() {
 
   const handleAuth = async () => {
     try {
-      // Rate limiting check
-      const clientId = navigator.userAgent + window.location.hostname;
-      if (!authRateLimiter(clientId)) {
-        toast({
-          title: "Too Many Attempts",
-          description: "Please wait 15 minutes before trying again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
       setIsAuthenticating(true);
       
       console.log("Initializing Pi SDK...");
@@ -74,132 +58,92 @@ export function PiAuthButton() {
 
       console.log("Pi auth result:", authResult);
 
-      // Enhanced validation for production
-      if (isProduction) {
-        // Additional validation in production mode
-        if (!authResult.accessToken) {
-          throw new Error("No access token received from Pi authentication");
-        }
-        
-        // Validate access token format (basic check)
-        if (typeof authResult.accessToken !== 'string' || authResult.accessToken.length < 10) {
-          throw new Error("Invalid access token format");
-        }
-      }
-
       // Validate required fields from auth result
       if (!authResult.user?.uid) {
         throw new Error("No user ID returned from Pi authentication");
       }
 
-      // Validate UID format (should be alphanumeric)
-      if (!/^[a-zA-Z0-9]+$/.test(authResult.user.uid)) {
-        throw new Error("Invalid user ID format from Pi authentication");
+      if (!authResult.user?.username) {
+        throw new Error("No username returned from Pi authentication");
       }
 
-      // Create a unique email for Pi users with additional security
-      const userEmail = `${authResult.user.uid}@pi-network-user.com`;
-      const userPassword = authResult.user.uid;
-      
-      console.log("Attempting Supabase authentication...");
-      
-      // Try to sign in first
-      let { error: signInError } = await supabase.auth.signInWithPassword({
-        email: userEmail,
-        password: userPassword,
-      });
-      
-      // If sign in fails, try to sign up
-      if (signInError) {
-        console.log("Sign in failed, attempting signup:", signInError.message);
-        
-        // Enhanced user data validation
-        const username = authResult.user.username || `pi_user_${authResult.user.uid.slice(-8)}`;
-        
-        // Validate username format
-        if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
-          throw new Error("Invalid username format from Pi authentication");
-        }
-        
-        const { error: signUpError } = await supabase.auth.signUp({
-          email: userEmail,
-          password: userPassword,
-          options: {
-            data: {
-              username: username.toLowerCase(),
-              pi_uid: authResult.user.uid,
-              display_name: authResult.user.username || `Pi User`,
-              auth_method: 'pi_network',
-              access_token: isProduction ? authResult.accessToken : 'sandbox_token',
-              authenticated_at: new Date().toISOString()
-            }
-          }
-        });
-        
-        if (signUpError && !signUpError.message.includes('User already registered')) {
-          throw signUpError;
-        }
-        
-        // If user already registered, try signing in again
-        if (signUpError?.message.includes('User already registered')) {
-          const { error: retryError } = await supabase.auth.signInWithPassword({
-            email: userEmail,
-            password: userPassword,
-          });
-          
-          if (retryError) {
-            throw retryError;
-          }
-        }
+      // Create/update user profile in Supabase
+      const { data: existingUser, error: fetchError } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', authResult.user.uid)
+        .single();
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        console.error('Error fetching user:', fetchError);
+        throw fetchError;
       }
-      
-      // Check admin status with enhanced security
-      try {
-        const { data: adminData } = await supabase.functions.invoke("check-admin", {
-          body: { 
-            piUserId: authResult.user.uid,
-            username: authResult.user.username || `pi_user_${authResult.user.uid.slice(-8)}`,
-            timestamp: new Date().toISOString(),
-            client_info: {
-              browser: isPiBrowser,
-              production: isProduction
-            }
-          }
+
+      if (existingUser) {
+        // User exists, update profile
+        const { error: updateError } = await supabase
+          .from('user_profiles')
+          .update({ 
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existingUser.id);
+
+        if (updateError) {
+          console.error('Error updating user:', updateError);
+        }
+
+        toast({
+          title: "Welcome back!",
+          description: `Welcome back, ${authResult.user.username}!`,
+        });
+      } else {
+        // New user, create profile
+        const { error: insertError } = await supabase
+          .from('user_profiles')
+          .insert({
+            id: authResult.user.uid,
+            username: authResult.user.username,
+            display_name: authResult.user.username,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+
+        if (insertError) {
+          console.error('Error creating user:', insertError);
+          throw insertError;
+        }
+
+        toast({
+          title: "Account created!",
+          description: `Welcome to PlayDrop, ${authResult.user.username}!`,
+        });
+      }
+
+      // Create or update user wallet
+      const { error: walletError } = await supabase
+        .from('user_wallet')
+        .upsert({
+          user_id: authResult.user.uid,
+          updated_at: new Date().toISOString()
+        }, { 
+          onConflict: 'user_id',
+          ignoreDuplicates: false 
         });
 
-        if (adminData?.isAdmin) {
-          toast({
-            title: "Admin Access Granted",
-            description: `Welcome back, Admin ${authResult.user.username}!`,
-          });
-        }
-      } catch (adminCheckError) {
-        console.error("Failed to check admin status:", adminCheckError);
+      if (walletError) {
+        console.error('Error creating/updating wallet:', walletError);
       }
-      
+
       await refreshUserData();
       
-      const welcomeMessage = authResult.user.username 
-        ? `Welcome ${authResult.user.username}!` 
-        : 'Welcome Pi User!';
-      
       toast({
-        title: "Welcome to Droplink!",
-        description: `Pi Network account connected successfully! ${welcomeMessage}`,
+        title: "Pi Network Connected!",
+        description: "You're now ready to play and earn Pi rewards!",
       });
       
-      navigate('/dashboard');
+      navigate('/play');
     } catch (error: any) {
       console.error("Pi auth error details:", error);
-      
-      // Enhanced error logging for security monitoring
-      console.error("Authentication failed:", {
-        timestamp: new Date().toISOString(),
-        error: error.message,
-        isPiBrowser,
-        isProduction,
-        userAgent: navigator.userAgent.substring(0, 100) // Truncated for privacy
-      });
       
       toast({
         title: "Pi Network Authentication Failed",
@@ -215,7 +159,7 @@ export function PiAuthButton() {
     <div className="space-y-6">
       <Button 
         onClick={handleAuth}
-        className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
+        className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
         disabled={isAuthenticating}
         size="lg"
       >
@@ -226,13 +170,11 @@ export function PiAuthButton() {
           </div>
         ) : (
           <>
-            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/>
-            </svg>
-            Continue with Pi Network
-            <Badge variant="default" className={`ml-2 text-xs ${isProduction ? 'bg-green-600' : 'bg-orange-600'}`}>
-              {isProduction ? 'LIVE' : 'TEST'}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              <Zap className="h-4 w-4" />
+              <span>Sign in with Pi Network</span>
+            </div>
           </>
         )}
       </Button>
@@ -244,7 +186,7 @@ export function PiAuthButton() {
       }`}>
         {isProduction 
           ? 'Production mode - Pi Network authentication ready'
-          : 'Test mode - Pi Network sandbox authentication'
+          : 'Development mode - Pi Network sandbox authentication'
         }
       </div>
     </div>
