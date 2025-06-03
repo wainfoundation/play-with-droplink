@@ -1,117 +1,130 @@
 
 import { useState } from 'react';
 import { createPiPayment } from '@/utils/pi-payments';
+import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
-export interface PaymentData {
-  amount: number;
-  memo: string;
-  metadata?: any;
+export interface CoinPack {
+  id: string;
+  description: string;
+  pi_cost: number;
+  coins_given: number;
+  bonus_percentage: number;
+  is_popular?: boolean;
+  is_best_value?: boolean;
+  savings_percentage?: number;
 }
-
-export interface PaymentResult {
-  identifier: string;
-  payment_id: string;
-  transaction_id?: string;
-}
-
-export const planPricing = {
-  free: { monthly: 0, annual: 0 },
-  starter: { monthly: 10, annual: 100 },
-  pro: { monthly: 15, annual: 150 },
-  premium: { monthly: 22, annual: 220 }
-};
 
 export const usePiPayment = () => {
   const [loading, setLoading] = useState(false);
-  const [processingPayment, setProcessingPayment] = useState(false);
+  const { user } = useAuth();
 
-  const createPayment = async (paymentData: PaymentData): Promise<PaymentResult> => {
+  const buyCoinPack = async (pack: CoinPack) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to purchase coins.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     setLoading(true);
     try {
-      // Create dummy callbacks for the payment
-      const callbacks = {
-        onReadyForServerApproval: (paymentId: string) => {
-          console.log('Payment ready for approval:', paymentId);
-        },
-        onReadyForServerCompletion: (paymentId: string, txid: string) => {
-          console.log('Payment completed:', paymentId, txid);
-        },
-        onCancel: (paymentId: string) => {
-          console.log('Payment cancelled:', paymentId);
-        },
-        onError: (error: Error) => {
-          console.error('Payment error:', error);
+      // Create payment data
+      const paymentData = {
+        amount: pack.pi_cost,
+        memo: `Buy ${pack.coins_given} Droplet Coins${pack.bonus_percentage > 0 ? ` (+${pack.bonus_percentage}% bonus)` : ''}`,
+        metadata: {
+          pack_id: pack.id,
+          coins: pack.coins_given,
+          bonus_percentage: pack.bonus_percentage,
         }
       };
 
-      await createPiPayment(paymentData, callbacks);
+      // Initiate payment via Pi SDK
+      const payment = await createPiPayment(paymentData, {
+        onReadyForServerApproval: async (paymentId) => {
+          console.log('Payment ready for approval:', paymentId);
+          const { data, error } = await supabase.functions.invoke('pi-payment-verify', {
+            body: { 
+              paymentData: { 
+                ...paymentData, 
+                paymentId 
+              }, 
+              user 
+            }
+          });
+          
+          if (error) {
+            console.error('Payment verification failed:', error);
+            toast({
+              title: "Payment Error",
+              description: "Unable to verify payment. Please try again.",
+              variant: "destructive",
+            });
+            return false;
+          }
+          
+          return { verified: true };
+        },
+        onReadyForServerCompletion: async (paymentId, txid) => {
+          console.log('Payment completed:', paymentId, txid);
+          toast({
+            title: "Payment Successful!",
+            description: `You received ${pack.coins_given + (pack.coins_given * pack.bonus_percentage / 100)} Droplet Coins.`,
+          });
+        },
+        onCancel: (paymentId) => {
+          console.log('Payment canceled:', paymentId);
+          toast({
+            title: "Payment Canceled",
+            description: "You canceled the payment.",
+          });
+        },
+        onError: (error) => {
+          console.error('Payment error:', error);
+          toast({
+            title: "Payment Error",
+            description: error.message || "Something went wrong with your payment.",
+            variant: "destructive",
+          });
+        }
+      });
       
-      // Return a mock result for now
-      return {
-        identifier: `payment-${Date.now()}`,
-        payment_id: `pi-${Date.now()}`,
-        transaction_id: undefined
-      };
+      return true;
     } catch (error) {
-      console.error('Payment creation failed:', error);
-      throw error;
+      console.error('Error buying coin pack:', error);
+      toast({
+        title: "Payment Failed",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive",
+      });
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
-  const approvePayment = async (paymentId: string): Promise<boolean> => {
+  const fetchCoinPacks = async (): Promise<CoinPack[]> => {
     try {
-      // Implementation for payment approval
-      return true;
+      const { data, error } = await supabase
+        .from('coin_packs')
+        .select('*')
+        .order('pi_cost', { ascending: true });
+        
+      if (error) throw error;
+      return data || [];
     } catch (error) {
-      console.error('Payment approval failed:', error);
-      return false;
-    }
-  };
-
-  const completePayment = async (paymentId: string): Promise<boolean> => {
-    try {
-      // Implementation for payment completion
-      return true;
-    } catch (error) {
-      console.error('Payment completion failed:', error);
-      return false;
-    }
-  };
-
-  const handleSubscribe = async (plan: string, billingCycle: string = 'monthly'): Promise<boolean> => {
-    setProcessingPayment(true);
-    try {
-      const amount = planPricing[plan as keyof typeof planPricing]?.[billingCycle as 'monthly' | 'annual'] || 0;
-      
-      if (amount > 0) {
-        const paymentData: PaymentData = {
-          amount,
-          memo: `Droplink ${plan} subscription (${billingCycle})`,
-          metadata: { plan, type: 'subscription', billingCycle }
-        };
-
-        await createPayment(paymentData);
-      }
-      
-      return true;
-    } catch (error) {
-      console.error('Subscription failed:', error);
-      return false;
-    } finally {
-      setProcessingPayment(false);
+      console.error('Error fetching coin packs:', error);
+      return [];
     }
   };
 
   return {
-    createPayment,
-    approvePayment,
-    completePayment,
-    handleSubscribe,
-    loading,
-    processingPayment,
-    planPricing
+    buyCoinPack,
+    fetchCoinPacks,
+    loading
   };
 };

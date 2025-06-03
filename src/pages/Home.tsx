@@ -1,69 +1,46 @@
-import React from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import Hero from "@/components/Hero";
-import PiDomainFeatures from "@/components/PiDomainFeatures";
-import PiDomainSetup from "@/components/PiDomainSetup";
-import PiDomainShowcase from "@/components/PiDomainShowcase";
-import Features from "@/components/Features";
-import PiDomainTestimonials from "@/components/PiDomainTestimonials";
-import HowItWorks from "@/components/HowItWorks";
-import DemoSection from "@/components/DemoSection";
-import CTA from "@/components/CTA";
-import FAQ from "@/components/FAQ";
-import CommunityLove from "@/components/CommunityLove";
-import TemplatesShowcase from "@/components/TemplatesShowcase";
-import CustomerSuccessStories from "@/components/CustomerSuccessStories";
-import AppInfo from "@/components/AppInfo";
-import GoToTop from "@/components/GoToTop";
-import WorkflowShowcase from "@/components/WorkflowShowcase";
-import { Helmet } from "react-helmet-async";
 
-const Home = () => {
+import React from 'react';
+import Header from '../components/Header';
+import Hero from '../components/Hero';
+import Features from '../components/Features';
+import HowItWorks from '../components/HowItWorks';
+import Testimonials from '../components/Testimonials';
+import CTA from '../components/CTA';
+import Footer from '../components/Footer';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Coins, Gift } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+
+const Home: React.FC = () => {
+  const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
+
   return (
-    <>
-      <Helmet>
-        <title>Connect Your .pi Domain to Droplink - Pi Network Link Hub</title>
-        <meta name="description" content="Transform your .pi domain into a powerful business hub. Connect to Droplink for Pi payments, professional profiles, and seamless Pi Browser integration." />
-        <meta name="keywords" content="pi domain, pi network, droplink, link in bio, pi payments, pi browser" />
-        <meta property="og:title" content="Connect Your .pi Domain to Droplink - Pi Network Link Hub" />
-        <meta property="og:description" content="Transform your .pi domain into a powerful business hub. Connect to Droplink for Pi payments, professional profiles, and seamless Pi Browser integration." />
-        <meta property="og:url" content="https://droplink.space" />
-      </Helmet>
+    <div>
+      <Header />
+      <Hero />
       
-      <div className="min-h-screen w-full bg-gradient-to-br from-background via-muted/20 to-primary/10">
-        <Navbar />
-        <main className="w-full overflow-x-hidden">
-          <Hero />
-          
-          {/* Enhanced mobile spacing and layout */}
-          <div className="relative w-full">
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/30 to-transparent pointer-events-none" />
-            
-            {/* Mobile-optimized sections with better spacing */}
-            <div className="w-full space-y-8 sm:space-y-12 md:space-y-16">
-              <PiDomainFeatures />
-              <PiDomainShowcase />
-              <CustomerSuccessStories />
-              <WorkflowShowcase />
-              <PiDomainSetup />
-              <HowItWorks />
-              <DemoSection />
-              <Features />
-              <TemplatesShowcase />
-              <PiDomainTestimonials />
-              <CommunityLove />
-              <FAQ />
-              <AppInfo />
-            </div>
-          </div>
-          
-          <CTA />
-        </main>
-        <Footer />
-        <GoToTop />
-      </div>
-    </>
+      {/* Coin Store Button for logged-in users */}
+      {isLoggedIn && (
+        <div className="container mx-auto mt-4 mb-6 text-center">
+          <Button 
+            onClick={() => navigate('/coin-store')}
+            className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white px-6 py-3 text-lg flex items-center gap-2"
+          >
+            <Coins className="w-5 h-5" /> 
+            Open Coin Store
+            <Gift className="w-5 h-5" />
+          </Button>
+        </div>
+      )}
+      
+      <Features />
+      <HowItWorks />
+      <Testimonials />
+      <CTA />
+      <Footer />
+    </div>
   );
 };
 
