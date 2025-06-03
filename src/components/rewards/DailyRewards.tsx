@@ -100,7 +100,8 @@ const DailyRewards: React.FC<DailyRewardsProps> = ({ onBack }) => {
 
       if (error) throw error;
 
-      const response = data as ClaimRewardResponse;
+      // Safely cast the response
+      const response = data as unknown as ClaimRewardResponse;
 
       if (response.success) {
         setCurrentStreak(response.streak);
