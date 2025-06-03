@@ -174,14 +174,11 @@ export const useProductionPi = () => {
     // Record ad reward if user is authenticated
     if (piUser) {
       try {
-        await supabase.from('user_wallet').upsert({
-          user_id: piUser.uid,
-          pi_balance: supabase.rpc('add_pi_balance', {
-            p_user_id: piUser.uid,
-            p_amount: reward.amount
-          }),
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'user_id' });
+        // Add coins using the correct RPC function
+        await supabase.rpc('add_droplet_coins', {
+          p_user_id: piUser.uid,
+          p_coins_to_add: Math.floor(reward.amount * 1000) // Convert to coins
+        });
       } catch (error) {
         console.error('Error recording ad reward:', error);
       }
