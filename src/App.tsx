@@ -1,4 +1,3 @@
-
 import React, { Suspense, useEffect, useState } from 'react';
 import {
   BrowserRouter as Router,
@@ -19,6 +18,8 @@ import {
 } from '@tanstack/react-query'
 import LandingPage from '@/pages/LandingPage';
 import Index from '@/pages/Index';
+import EnhancedSplashScreen from '@/components/splash/EnhancedSplashScreen';
+import EnhancedLandingPage from '@/pages/EnhancedLandingPage';
 
 function AppRoutes() {
   const { loading } = useAuth();
@@ -36,14 +37,7 @@ function AppRoutes() {
 
   const renderContent = () => {
     if (showSplashScreen) {
-      return (
-        <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center z-50">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
-          </div>
-        </div>
-      );
+      return <EnhancedSplashScreen onComplete={() => setShowSplashScreen(false)} />;
     }
 
     return (
@@ -56,7 +50,7 @@ function AppRoutes() {
         </div>
       }>
         <Routes>
-          <Route path="/landing" element={<LandingPage />} />
+          <Route path="/landing" element={<EnhancedLandingPage />} />
           <Route path="/" element={<Index />} />
           <Route path="/home" element={
             <Suspense fallback={<p>Loading...</p>}>
