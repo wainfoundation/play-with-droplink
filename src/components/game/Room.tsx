@@ -1,63 +1,70 @@
 
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 export interface RoomData {
   id: string;
   name: string;
+  bgColor: string;
+  bgGradient: string;
   icon: string;
-  backgroundColor: string;
-  description?: string;
+  description: string;
 }
 
 export const rooms: RoomData[] = [
   {
     id: 'bedroom',
     name: 'Bedroom',
+    bgColor: 'bg-purple-100',
+    bgGradient: 'from-purple-200 to-blue-200',
     icon: '🛏️',
-    backgroundColor: 'bg-gradient-to-br from-purple-100 to-blue-100',
-    description: 'A cozy place for your pet to rest'
+    description: 'A cozy place to rest and sleep'
   },
   {
     id: 'kitchen',
     name: 'Kitchen',
+    bgColor: 'bg-orange-100',
+    bgGradient: 'from-orange-200 to-yellow-200',
     icon: '🍳',
-    backgroundColor: 'bg-gradient-to-br from-orange-100 to-yellow-100',
-    description: 'Feed your hungry pet here'
+    description: 'Where delicious meals are prepared'
   },
   {
     id: 'bathroom',
     name: 'Bathroom',
+    bgColor: 'bg-cyan-100',
+    bgGradient: 'from-cyan-200 to-blue-200',
     icon: '🛁',
-    backgroundColor: 'bg-gradient-to-br from-blue-100 to-cyan-100',
-    description: 'Keep your pet clean and fresh'
+    description: 'Keep clean and fresh here'
   },
   {
     id: 'playroom',
     name: 'Playroom',
-    icon: '🧸',
-    backgroundColor: 'bg-gradient-to-br from-pink-100 to-purple-100',
-    description: 'Fun activities and games'
+    bgColor: 'bg-pink-100',
+    bgGradient: 'from-pink-200 to-purple-200',
+    icon: '🎮',
+    description: 'Fun and games await'
+  },
+  {
+    id: 'health',
+    name: 'Health Center',
+    bgColor: 'bg-green-100',
+    bgGradient: 'from-green-200 to-emerald-200',
+    icon: '🏥',
+    description: 'Medical care and wellness'
   },
   {
     id: 'nature',
     name: 'Garden',
-    icon: '🌳',
-    backgroundColor: 'bg-gradient-to-br from-green-100 to-emerald-100',
+    bgColor: 'bg-emerald-100',
+    bgGradient: 'from-emerald-200 to-green-200',
+    icon: '🌿',
     description: 'Fresh air and nature'
-  },
-  {
-    id: 'clinic',
-    name: 'Clinic',
-    icon: '🏥',
-    backgroundColor: 'bg-gradient-to-br from-red-100 to-pink-100',
-    description: 'Health care for your pet'
   }
 ];
 
 interface RoomProps {
   room: RoomData;
-  isActive?: boolean;
+  isActive: boolean;
   isDimmed?: boolean;
   children?: React.ReactNode;
   className?: string;
@@ -65,31 +72,85 @@ interface RoomProps {
 
 const Room: React.FC<RoomProps> = ({
   room,
-  isActive = false,
+  isActive,
   isDimmed = false,
   children,
-  className
+  className = ""
 }) => {
   return (
-    <div
-      className={cn(
-        'relative w-full h-full transition-all duration-500',
-        room.backgroundColor,
-        isDimmed && 'brightness-50',
-        isActive && 'shadow-inner',
-        className
-      )}
+    <motion.div
+      className={`
+        relative w-full h-full rounded-2xl overflow-hidden
+        ${isDimmed ? 'bg-gray-900' : `bg-gradient-to-br ${room.bgGradient}`}
+        ${className}
+      `}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ 
+        opacity: 1, 
+        scale: 1,
+        filter: isDimmed ? 'brightness(0.3)' : 'brightness(1)'
+      }}
+      transition={{ duration: 0.5 }}
     >
-      {/* Room content */}
-      <div className="absolute inset-0">
-        {children}
-      </div>
-      
-      {/* Dimmed overlay for sleep mode */}
-      {isDimmed && (
-        <div className="absolute inset-0 bg-black/30 transition-opacity duration-500" />
+      {/* Room decoration based on type */}
+      {room.id === 'bedroom' && !isDimmed && (
+        <>
+          <div className="absolute top-4 right-4 text-4xl">🛏️</div>
+          <div className="absolute bottom-4 left-4 text-2xl">🧸</div>
+        </>
       )}
-    </div>
+      
+      {room.id === 'kitchen' && (
+        <>
+          <div className="absolute top-4 left-4 text-3xl">🍳</div>
+          <div className="absolute top-4 right-4 text-3xl">🥘</div>
+          <div className="absolute bottom-4 right-4 text-2xl">🍎</div>
+        </>
+      )}
+      
+      {room.id === 'bathroom' && (
+        <>
+          <div className="absolute top-4 right-4 text-4xl">🛁</div>
+          <div className="absolute bottom-4 left-4 text-2xl">🧼</div>
+          <div className="absolute bottom-4 right-4 text-2xl">🚿</div>
+        </>
+      )}
+      
+      {room.id === 'playroom' && (
+        <>
+          <div className="absolute top-4 left-4 text-3xl">🎮</div>
+          <div className="absolute top-4 right-4 text-3xl">🎯</div>
+          <div className="absolute bottom-4 left-4 text-2xl">⚽</div>
+          <div className="absolute bottom-4 right-4 text-2xl">🧩</div>
+        </>
+      )}
+      
+      {room.id === 'health' && (
+        <>
+          <div className="absolute top-4 right-4 text-4xl">🏥</div>
+          <div className="absolute bottom-4 left-4 text-2xl">💊</div>
+          <div className="absolute bottom-4 right-4 text-2xl">🩺</div>
+        </>
+      )}
+      
+      {room.id === 'nature' && (
+        <>
+          <div className="absolute top-4 left-4 text-3xl">🌳</div>
+          <div className="absolute top-4 right-4 text-3xl">🌸</div>
+          <div className="absolute bottom-4 left-4 text-2xl">🦋</div>
+          <div className="absolute bottom-4 right-4 text-2xl">🌻</div>
+        </>
+      )}
+      
+      {/* Night overlay for bedroom when dimmed */}
+      {isDimmed && (
+        <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
+          <div className="text-6xl">🌙</div>
+        </div>
+      )}
+      
+      {children}
+    </motion.div>
   );
 };
 

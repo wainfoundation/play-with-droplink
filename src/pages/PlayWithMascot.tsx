@@ -7,9 +7,15 @@ import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { 
   Home, 
+  Menu, 
+  X, 
   Lightbulb, 
   LightbulbOff,
-  Settings
+  Settings,
+  ShoppingBag,
+  Package,
+  BarChart3,
+  Wallet
 } from 'lucide-react';
 import { useGameData } from '@/hooks/useGameData';
 import { useAuthSystem } from '@/hooks/useAuthSystem';
@@ -24,6 +30,7 @@ const PlayWithMascot: React.FC = () => {
   const { user } = useAuthSystem();
   const { petStats, userProfile, inventory, loading, useItem, changeRoom } = useGameData();
   const { wallet } = useWallet();
+  const [showMenu, setShowMenu] = useState(false);
   const [isLampOn, setIsLampOn] = useState(true);
   const [selectedRoom, setSelectedRoom] = useState('bedroom');
 
@@ -55,6 +62,7 @@ const PlayWithMascot: React.FC = () => {
     setSelectedRoom(roomId);
     await changeRoom(roomId);
     
+    // Room-specific effects
     if (roomId === 'nature' && petStats) {
       toast({
         title: "Fresh air!",
@@ -64,7 +72,7 @@ const PlayWithMascot: React.FC = () => {
     }
     
     if (roomId === 'bedroom') {
-      setIsLampOn(true);
+      setIsLampOn(true); // Reset lamp when entering bedroom
     }
   };
 
@@ -81,6 +89,18 @@ const PlayWithMascot: React.FC = () => {
       }
     }
   };
+
+  // Auto-decay stats every 5 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (petStats && !isAsleep) {
+        // Stats naturally decay over time (handled by database function)
+        console.log('Stats decay check...');
+      }
+    }, 5 * 60 * 1000); // 5 minutes
+
+    return () => clearInterval(interval);
+  }, [petStats, isAsleep]);
 
   if (loading) {
     return (
@@ -112,42 +132,106 @@ const PlayWithMascot: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Play with Droplet - Virtual Pet Game</title>
+        <title>Play with {userProfile.display_name || 'Your'} Pet - Droplet Pet</title>
         <meta name="description" content="Take care of your virtual pet droplet" />
       </Helmet>
       
       <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 overflow-hidden">
-        {/* Minimal Header */}
+        {/* Header */}
         <div className="absolute top-0 left-0 right-0 z-20 p-4">
           <div className="flex items-center justify-between">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => window.location.href = '/'}
-              className="bg-white/80 backdrop-blur-sm"
-            >
-              <Home className="h-4 w-4 mr-2" />
-              Home
-            </Button>
-            
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowMenu(!showMenu)}
+                className="bg-white/80 backdrop-blur-sm"
+              >
+                {showMenu ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+              </Button>
+              
               <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
                 💰 {wallet?.dropletCoins || 0} Coins
               </Badge>
-              
-              {selectedRoom === 'bedroom' && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleLampToggle}
-                  className="bg-white/80 backdrop-blur-sm"
-                >
-                  {isLampOn ? <Lightbulb className="h-4 w-4" /> : <LightbulbOff className="h-4 w-4" />}
-                </Button>
-              )}
             </div>
+            
+            {selectedRoom === 'bedroom' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLampToggle}
+                className="bg-white/80 backdrop-blur-sm"
+              >
+                {isLampOn ? <Lightbulb className="h-4 w-4" /> : <LightbulbOff className="h-4 w-4" />}
+                {isLampOn ? 'Lights On' : 'Lights Off'}
+              </Button>
+            )}
           </div>
         </div>
+
+        {/* Side Menu */}
+        {showMenu && (
+          <motion.div
+            initial={{ x: -300 }}
+            animate={{ x: 0 }}
+            exit={{ x: -300 }}
+            className="absolute top-0 left-0 bottom-0 z-30 w-64 bg-white shadow-lg"
+          >
+            <div className="p-4 border-b">
+              <h2 className="font-bold text-lg">Game Menu</h2>
+            </div>
+            <div className="p-4 space-y-2">
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => window.location.href = '/'}
+              >
+                <Home className="h-4 w-4 mr-2" />
+                Home
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => window.location.href = '/shop'}
+              >
+                <ShoppingBag className="h-4 w-4 mr-2" />
+                Shop
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => window.location.href = '/inventory'}
+              >
+                <Package className="h-4 w-4 mr-2" />
+                Inventory
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => window.location.href = '/stats'}
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Stats
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => window.location.href = '/wallet'}
+              >
+                <Wallet className="h-4 w-4 mr-2" />
+                Wallet
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => window.location.href = '/settings'}
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </Button>
+            </div>
+          </motion.div>
+        )}
 
         {/* Main Game Area */}
         <div className="flex h-full pt-16">
@@ -174,7 +258,7 @@ const PlayWithMascot: React.FC = () => {
               </div>
               
               {/* Room name */}
-              <div className="absolute bottom-20 left-4">
+              <div className="absolute bottom-4 left-4">
                 <Badge variant="secondary" className="bg-white/80 backdrop-blur-sm">
                   {currentRoom.icon} {currentRoom.name}
                 </Badge>
@@ -182,14 +266,12 @@ const PlayWithMascot: React.FC = () => {
             </Room>
           </div>
 
-          {/* Focused Sidebar */}
-          <div className="w-80 p-4 space-y-4 overflow-y-auto bg-white/50 backdrop-blur-sm">
+          {/* Right Sidebar */}
+          <div className="w-80 p-4 space-y-4 overflow-y-auto">
             {/* Pet Stats */}
             <Card>
               <CardContent className="p-4">
-                <h3 className="font-semibold mb-3 text-center">
-                  {userProfile.display_name || 'Your'} Pet
-                </h3>
+                <h3 className="font-semibold mb-3">Pet Stats</h3>
                 <StatsDisplay stats={petStats} />
               </CardContent>
             </Card>
