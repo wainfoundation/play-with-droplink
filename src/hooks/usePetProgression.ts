@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
+import { useMissionProgress } from './useMissionProgress';
 
 export type EvolutionStage = 'baby' | 'teen' | 'adult' | 'elder';
 
@@ -52,6 +53,7 @@ const XP_REWARDS = {
 };
 
 export const usePetProgression = () => {
+  const missionProgress = useMissionProgress();
   const [progression, setProgression] = useState<PetProgression>({
     level: 1,
     xp: 0,
@@ -147,19 +149,35 @@ export const usePetProgression = () => {
     return `Gained ${amount} XP from ${activity}!`;
   }, [calculateXPThreshold, getEvolutionStage]);
 
-  // Pet care activities
+  // Pet care activities with mission tracking
   const petCareActivities = {
-    feed: () => addXP(XP_REWARDS.feeding, 'feeding'),
-    bathe: () => addXP(XP_REWARDS.bathing, 'bathing'),
-    sleep: () => addXP(XP_REWARDS.sleeping, 'sleeping'),
-    play: () => addXP(XP_REWARDS.playing, 'playing'),
+    feed: () => {
+      missionProgress.trackFeedAction();
+      return addXP(XP_REWARDS.feeding, 'feeding');
+    },
+    bathe: () => {
+      missionProgress.trackCleanAction();
+      return addXP(XP_REWARDS.bathing, 'bathing');
+    },
+    sleep: () => {
+      missionProgress.trackSleepAction();
+      return addXP(XP_REWARDS.sleeping, 'sleeping');
+    },
+    play: () => {
+      missionProgress.trackPlayAction();
+      return addXP(XP_REWARDS.playing, 'playing');
+    },
     heal: () => addXP(XP_REWARDS.healing, 'healing'),
     pet: () => addXP(XP_REWARDS.petting, 'petting'),
     watchAd: () => addXP(XP_REWARDS.watchingAd, 'watching ad'),
     dailyTask: () => addXP(XP_REWARDS.dailyTask, 'daily task'),
     weeklyMission: () => addXP(XP_REWARDS.weeklyMission, 'weekly mission'),
     premiumPurchase: () => addXP(XP_REWARDS.premiumPurchase, 'premium purchase'),
-    seasonalEvent: () => addXP(XP_REWARDS.seasonalEvent, 'seasonal event')
+    seasonalEvent: () => addXP(XP_REWARDS.seasonalEvent, 'seasonal event'),
+    miniGame: () => {
+      missionProgress.trackMiniGameAction();
+      return addXP(XP_REWARDS.playing * 2, 'mini-game');
+    }
   };
 
   return {

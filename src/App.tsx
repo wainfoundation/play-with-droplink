@@ -24,6 +24,7 @@ import Wallet from "./pages/Wallet";
 import Games from "./pages/Games";
 import Stats from "./pages/Stats";
 import Settings from "./pages/Settings";
+import Missions from "./pages/Missions";
 
 // Create query client outside of component to avoid recreation
 const queryClient = new QueryClient({
@@ -64,6 +65,7 @@ const AppRoutes = () => {
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/wallet" element={<Wallet />} />
         <Route path="/games" element={<Games />} />
+        <Route path="/missions" element={<Missions />} />
         <Route path="/stats" element={<Stats />} />
         <Route path="/settings" element={<Settings />} />
         

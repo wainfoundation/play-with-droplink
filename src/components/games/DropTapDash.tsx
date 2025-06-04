@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { X, Play, Pause } from 'lucide-react';
 import { EvolutionStage } from '@/hooks/usePetProgression';
+import { useMissionProgress } from '@/hooks/useMissionProgress';
 
 interface DropTapDashProps {
   mascotStage: EvolutionStage;
@@ -61,6 +62,7 @@ const STAGE_CONFIG = {
 };
 
 export default function DropTapDash({ mascotStage, onGameEnd, onClose }: DropTapDashProps) {
+  const missionProgress = useMissionProgress();
   const [gameState, setGameState] = useState<'menu' | 'playing' | 'paused' | 'ended'>('menu');
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
@@ -95,6 +97,10 @@ export default function DropTapDash({ mascotStage, onGameEnd, onClose }: DropTap
     setGameState('ended');
     const xpEarned = Math.floor(score * config.xpMultiplier);
     const coinsEarned = Math.floor(score * config.coinMultiplier);
+    
+    // Track mini-game completion for missions
+    missionProgress.trackMiniGameAction();
+    
     onGameEnd(score, xpEarned, coinsEarned);
   };
 
@@ -245,6 +251,9 @@ export default function DropTapDash({ mascotStage, onGameEnd, onClose }: DropTap
                 <div className="font-semibold">Coins Earned</div>
                 <div className="text-yellow-600">+{coinsEarned}</div>
               </div>
+            </div>
+            <div className="bg-green-50 p-3 rounded-lg">
+              <div className="text-sm font-semibold text-green-700">✅ Mission Progress Updated!</div>
             </div>
           </div>
 
