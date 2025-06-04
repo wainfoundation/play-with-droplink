@@ -14,6 +14,10 @@ export const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<'splash' | 'welcome' | 'character' | 'tutorial' | 'home'>('splash');
   const [showDevSkip, setShowDevSkip] = useState(false);
+  const [selectedCharacter, setSelectedCharacter] = useState<string>('droplet-blue');
+  const [mascotVisible, setMascotVisible] = useState(false);
+  const [welcomeTextVisible, setWelcomeTextVisible] = useState(false);
+  const [buttonsVisible, setButtonsVisible] = useState(false);
 
   useEffect(() => {
     // Check if user has completed setup
@@ -40,6 +44,15 @@ export const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
     return () => clearTimeout(timer);
   }, [currentStep]);
 
+  useEffect(() => {
+    // Animate welcome screen elements
+    if (currentStep === 'welcome') {
+      setTimeout(() => setMascotVisible(true), 500);
+      setTimeout(() => setWelcomeTextVisible(true), 1000);
+      setTimeout(() => setButtonsVisible(true), 1500);
+    }
+  }, [currentStep]);
+
   const handleDevSkip = () => {
     localStorage.setItem('welcomeCompleted', 'true');
     localStorage.setItem('petSetupCompleted', 'true');
@@ -47,12 +60,29 @@ export const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
     navigate('/play');
   };
 
-  const handleWelcomeComplete = () => {
+  const handleSplashComplete = () => {
+    setCurrentStep('welcome');
+  };
+
+  const handleStartTutorial = () => {
+    setCurrentStep('character');
+  };
+
+  const handleSkipToCharacterSelect = () => {
     setCurrentStep('character');
   };
 
   const handleCharacterSelect = (characterId: string) => {
+    setSelectedCharacter(characterId);
     localStorage.setItem('selectedCharacter', characterId);
+    setCurrentStep('tutorial');
+  };
+
+  const handleCharacterBack = () => {
+    setCurrentStep('welcome');
+  };
+
+  const handleCharacterConfirm = () => {
     setCurrentStep('tutorial');
   };
 
@@ -62,10 +92,16 @@ export const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
     navigate('/play');
   };
 
+  const handleTutorialSkip = () => {
+    localStorage.setItem('welcomeCompleted', 'true');
+    localStorage.setItem('petSetupCompleted', 'true');
+    navigate('/play');
+  };
+
   if (currentStep === 'splash') {
     return (
       <>
-        <SplashScreen />
+        <SplashScreen onComplete={handleSplashComplete} />
         {showDevSkip && (
           <button
             onClick={handleDevSkip}
@@ -81,7 +117,13 @@ export const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
   if (currentStep === 'welcome') {
     return (
       <>
-        <WelcomeHome onContinue={handleWelcomeComplete} />
+        <WelcomeHome 
+          mascotVisible={mascotVisible}
+          welcomeTextVisible={welcomeTextVisible}
+          buttonsVisible={buttonsVisible}
+          onStartTutorial={handleStartTutorial}
+          onSkipToCharacterSelect={handleSkipToCharacterSelect}
+        />
         {showDevSkip && (
           <button
             onClick={handleDevSkip}
@@ -97,7 +139,12 @@ export const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
   if (currentStep === 'character') {
     return (
       <>
-        <CharacterSelection onSelect={handleCharacterSelect} />
+        <CharacterSelection 
+          selectedCharacter={selectedCharacter}
+          onCharacterSelect={handleCharacterSelect}
+          onBack={handleCharacterBack}
+          onConfirm={handleCharacterConfirm}
+        />
         {showDevSkip && (
           <button
             onClick={handleDevSkip}
@@ -113,7 +160,10 @@ export const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
   if (currentStep === 'tutorial') {
     return (
       <>
-        <GameTutorial onComplete={handleTutorialComplete} />
+        <GameTutorial 
+          onComplete={handleTutorialComplete}
+          onSkip={handleTutorialSkip}
+        />
         {showDevSkip && (
           <button
             onClick={handleDevSkip}
