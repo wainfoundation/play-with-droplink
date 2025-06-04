@@ -1,98 +1,62 @@
 
-import { Helmet } from "react-helmet-async";
+import { Suspense, lazy, useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { SecurityHeaders } from "@/components/security/SecurityHeaders";
-import SessionManager from "@/components/security/SessionManager";
-import SplashWrapper from "@/components/welcome/SplashWrapper";
-import Index from "./pages/Index";
-import AuthPage from "./pages/AuthPage";
-import PlayWithMascot from "./pages/PlayWithMascot";
-import PlayDrop from "./pages/PlayDrop";
-import Pricing from "./pages/Pricing";
-import Privacy from "./pages/Privacy";
-import Contact from "./pages/Contact";
-import NotFound from "./pages/NotFound";
-import Welcome from "./pages/Welcome";
-import Shop from "./pages/Shop";
-import Inventory from "./pages/Inventory";
-import Wallet from "./pages/Wallet";
-import Games from "./pages/Games";
-import Stats from "./pages/Stats";
-import Settings from "./pages/Settings";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
+import ErrorBoundary from "@/components/ErrorBoundary";
+import SplashScreen from "@/components/SplashScreen";
 
-// Create query client outside of component to avoid recreation
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+// Lazy load components
+const Home = lazy(() => import("./pages/Home"));
+const PlayDrop = lazy(() => import("./pages/PlayDrop"));
+const PetGame = lazy(() => import("./pages/PetGame"));
+const Welcome = lazy(() => import("./pages/Welcome"));
+const AuthPage = lazy(() => import("./pages/AuthPage"));
 
-// Home page wrapper that shows splash/welcome flow for new users
-const HomeWrapper = () => {
-  // Always show splash/welcome flow as requested
-  return (
-    <SplashWrapper>
-      <Index />
-    </SplashWrapper>
-  );
-};
-
-const AppRoutes = () => {
-  return (
-    <BrowserRouter>
-      <Routes>
-        {/* Main game flow with splash/welcome */}
-        <Route path="/" element={<HomeWrapper />} />
-        <Route path="/welcome" element={<Welcome />} />
-        
-        {/* Game pages */}
-        <Route path="/play" element={<PlayWithMascot />} />
-        <Route path="/playdrop" element={<PlayDrop />} />
-        
-        {/* Game feature pages */}
-        <Route path="/shop" element={<Shop />} />
-        <Route path="/inventory" element={<Inventory />} />
-        <Route path="/wallet" element={<Wallet />} />
-        <Route path="/games" element={<Games />} />
-        <Route path="/stats" element={<Stats />} />
-        <Route path="/settings" element={<Settings />} />
-        
-        {/* Auth pages (redirect to auth page) */}
-        <Route path="/auth" element={<AuthPage />} />
-        <Route path="/login" element={<Navigate to="/auth" replace />} />
-        <Route path="/signup" element={<Navigate to="/auth" replace />} />
-        
-        {/* Static pages */}
-        <Route path="/pricing" element={<Pricing />} />
-        <Route path="/terms" element={<Privacy />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/contact" element={<Contact />} />
-        
-        {/* 404 page */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
-  );
-};
+const queryClient = new QueryClient();
 
 const App = () => {
+  const [showSplash, setShowSplash] = useState(true);
+
+  const handleSplashComplete = () => {
+    setShowSplash(false);
+  };
+
+  if (showSplash) {
+    return <SplashScreen onComplete={handleSplashComplete} />;
+  }
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <SecurityHeaders />
-        <SessionManager />
-        <AppRoutes />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <HelmetProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Suspense 
+                fallback={
+                  <div className="min-h-screen flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                }
+              >
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/play" element={<PlayDrop />} />
+                  <Route path="/pet" element={<PetGame />} />
+                  <Route path="/welcome" element={<Welcome />} />
+                  <Route path="/auth" element={<AuthPage />} />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+          </TooltipProvider>
+        </HelmetProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 
