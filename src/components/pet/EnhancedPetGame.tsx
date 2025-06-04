@@ -1,18 +1,19 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
-import { Utensils, Gamepad2, Sparkles, Moon, Heart, Star } from 'lucide-react';
+import { Utensils, Gamepad2, Sparkles, Moon, Heart, Star, Zap } from 'lucide-react';
 import { useMascotProgression } from '@/hooks/useMascotProgression';
 import MascotRenderer from './MascotRenderer';
 import MascotEvolution from './MascotEvolution';
+import DropTapDash from '@/components/games/DropTapDash';
 
 const EnhancedPetGame: React.FC = () => {
   const { mascotState, petCareActivity, droplinkActivity, hasRoom } = useMascotProgression();
   const [showEvolution, setShowEvolution] = useState(false);
+  const [showDropTapDash, setShowDropTapDash] = useState(false);
 
   const handleFeed = async () => {
     const message = petCareActivity.feedPet();
@@ -67,6 +68,19 @@ const EnhancedPetGame: React.FC = () => {
     if (avgStats >= 50) return 'content';
     if (avgStats >= 30) return 'sad';
     return 'sick';
+  };
+
+  const handleGameEnd = (score: number, xpEarned: number, coinsEarned: number) => {
+    // Add XP through the progression system
+    droplinkActivity.communityEngagement(); // This gives XP
+    
+    toast({
+      title: "DropTap Dash Complete! 🎮",
+      description: `Score: ${score} | +${xpEarned} XP | +${coinsEarned} coins`,
+      className: "bg-green-50 border-green-200"
+    });
+    
+    setShowDropTapDash(false);
   };
 
   return (
@@ -153,6 +167,15 @@ const EnhancedPetGame: React.FC = () => {
                   Rest
                 </Button>
               </div>
+
+              {/* Mini-Game Button */}
+              <Button 
+                onClick={() => setShowDropTapDash(true)}
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                Play DropTap Dash
+              </Button>
             </CardContent>
           </Card>
 
@@ -238,6 +261,17 @@ const EnhancedPetGame: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* DropTap Dash Game Modal */}
+      <AnimatePresence>
+        {showDropTapDash && (
+          <DropTapDash
+            mascotStage={mascotState.stage}
+            onGameEnd={handleGameEnd}
+            onClose={() => setShowDropTapDash(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
