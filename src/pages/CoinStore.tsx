@@ -4,14 +4,26 @@ import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Coins, Zap, Crown, Gift, CreditCard } from 'lucide-react';
+import { ArrowLeft, Coins, Gift, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import IconButton from '@/components/ui/icon-button';
+import NavigationBar from '@/components/pet/NavigationBar';
+
+export interface CoinPack {
+  id: string;
+  name: string;
+  coins: number;
+  price: string;
+  bonus: number;
+  popular: boolean;
+  icon: string;
+  color: string;
+}
 
 const CoinStore: React.FC = () => {
   const navigate = useNavigate();
 
-  const coinPacks = [
+  const coinPacks: CoinPack[] = [
     {
       id: 'small',
       name: 'Small Pack',
@@ -66,8 +78,8 @@ const CoinStore: React.FC = () => {
         <meta name="description" content="Purchase coins using Pi Network to enhance your pet care experience" />
       </Helmet>
       
-      <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-orange-50 px-4 py-6">
-        <div className="max-w-4xl mx-auto">
+      <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-orange-50 pb-20">
+        <div className="max-w-4xl mx-auto px-4 py-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <IconButton
@@ -75,6 +87,7 @@ const CoinStore: React.FC = () => {
               label="Back"
               onClick={() => navigate(-1)}
               className="bg-gray-500 hover:bg-gray-600"
+              size="sm"
             />
             <div className="text-center flex-1 mx-4">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent mb-2">
@@ -195,6 +208,8 @@ const CoinStore: React.FC = () => {
             </CardContent>
           </Card>
         </div>
+        
+        <NavigationBar />
       </div>
     </>
   );
