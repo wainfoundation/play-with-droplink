@@ -1,71 +1,51 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import SplashScreen from '@/components/SplashScreen';
-import WelcomeHome from './WelcomeHome';
-import CharacterSelection from './CharacterSelection';
-import GameTutorial from './GameTutorial';
+import WelcomeHome from '@/components/welcome/WelcomeHome';
+import CharacterSelection from '@/components/welcome/CharacterSelection';
+import GameTutorial from '@/components/welcome/GameTutorial';
 
 interface SplashWrapperProps {
   children: React.ReactNode;
 }
 
-export const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
-  const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState<'splash' | 'welcome' | 'character' | 'tutorial' | 'home'>('splash');
-  const [showDevSkip, setShowDevSkip] = useState(false);
-  const [selectedCharacter, setSelectedCharacter] = useState<string>('droplet-blue');
+const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
+  const [currentStep, setCurrentStep] = useState<'splash' | 'welcome' | 'character' | 'tutorial' | 'complete'>('splash');
+  const [showSplash, setShowSplash] = useState(true);
   const [mascotVisible, setMascotVisible] = useState(false);
   const [welcomeTextVisible, setWelcomeTextVisible] = useState(false);
   const [buttonsVisible, setButtonsVisible] = useState(false);
+  const [selectedCharacter, setSelectedCharacter] = useState('droplet-blue');
 
   useEffect(() => {
-    // Check if user has completed setup
+    // Check if user has completed welcome flow AND pet setup
     const welcomeCompleted = localStorage.getItem('welcomeCompleted');
     const petSetupCompleted = localStorage.getItem('petSetupCompleted');
+    const hasSelectedCharacter = localStorage.getItem('selectedCharacter');
     
-    if (welcomeCompleted === 'true' && petSetupCompleted === 'true') {
-      setCurrentStep('home');
+    if (welcomeCompleted === 'true' && petSetupCompleted === 'true' && hasSelectedCharacter) {
+      setCurrentStep('complete');
+      setShowSplash(false);
       return;
     }
-
-    // Show dev skip in development
-    if (import.meta.env.DEV) {
-      setShowDevSkip(true);
-    }
-
-    // Auto-advance splash screen
-    const timer = setTimeout(() => {
-      if (currentStep === 'splash') {
-        setCurrentStep('welcome');
-      }
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [currentStep]);
-
-  useEffect(() => {
-    // Animate welcome screen elements
-    if (currentStep === 'welcome') {
-      setTimeout(() => setMascotVisible(true), 500);
-      setTimeout(() => setWelcomeTextVisible(true), 1000);
-      setTimeout(() => setButtonsVisible(true), 1500);
-    }
-  }, [currentStep]);
-
-  const handleDevSkip = () => {
-    localStorage.setItem('welcomeCompleted', 'true');
-    localStorage.setItem('petSetupCompleted', 'true');
-    localStorage.setItem('selectedCharacter', 'droplet-blue');
-    navigate('/play');
-  };
+    
+    // Start with splash screen
+    setCurrentStep('splash');
+    setShowSplash(true);
+  }, []);
 
   const handleSplashComplete = () => {
     setCurrentStep('welcome');
+    setShowSplash(false);
+    
+    // Stagger the welcome animations
+    setTimeout(() => setMascotVisible(true), 200);
+    setTimeout(() => setWelcomeTextVisible(true), 800);
+    setTimeout(() => setButtonsVisible(true), 1400);
   };
 
   const handleStartTutorial = () => {
-    setCurrentStep('character');
+    setCurrentStep('tutorial');
   };
 
   const handleSkipToCharacterSelect = () => {
@@ -74,7 +54,12 @@ export const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
 
   const handleCharacterSelect = (characterId: string) => {
     setSelectedCharacter(characterId);
-    localStorage.setItem('selectedCharacter', characterId);
+  };
+
+  const handleCharacterConfirm = () => {
+    // Save selected character to localStorage
+    const selectedCharacterData = { id: selectedCharacter };
+    localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacterData));
     setCurrentStep('tutorial');
   };
 
@@ -82,99 +67,78 @@ export const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
     setCurrentStep('welcome');
   };
 
-  const handleCharacterConfirm = () => {
-    setCurrentStep('tutorial');
-  };
-
   const handleTutorialComplete = () => {
     localStorage.setItem('welcomeCompleted', 'true');
-    localStorage.setItem('petSetupCompleted', 'true');
-    navigate('/play');
+    setCurrentStep('complete');
   };
 
-  const handleTutorialSkip = () => {
+  const handleSkipWelcome = () => {
+    localStorage.setItem('welcomeCompleted', 'true');
+    setCurrentStep('complete');
+  };
+
+  // Development bypass - add a skip button in development mode
+  const handleDevBypass = () => {
     localStorage.setItem('welcomeCompleted', 'true');
     localStorage.setItem('petSetupCompleted', 'true');
-    navigate('/play');
+    localStorage.setItem('devBypass', 'true');
+    setCurrentStep('complete');
   };
 
-  if (currentStep === 'splash') {
+  if (currentStep === 'complete') {
+    return <>{children}</>;
+  }
+
+  if (showSplash) {
     return (
-      <>
+      <div className="relative">
         <SplashScreen onComplete={handleSplashComplete} />
-        {showDevSkip && (
+        {/* Development bypass button */}
+        {process.env.NODE_ENV === 'development' && (
           <button
-            onClick={handleDevSkip}
-            className="fixed top-4 right-4 z-50 bg-red-500 text-white px-4 py-2 rounded text-sm font-bold hover:bg-red-600"
+            onClick={handleDevBypass}
+            className="fixed top-4 right-4 z-50 bg-red-500 text-white px-3 py-1 rounded text-xs opacity-70 hover:opacity-100"
           >
             DEV SKIP
           </button>
         )}
-      </>
+      </div>
     );
   }
 
   if (currentStep === 'welcome') {
     return (
-      <>
-        <WelcomeHome 
-          mascotVisible={mascotVisible}
-          welcomeTextVisible={welcomeTextVisible}
-          buttonsVisible={buttonsVisible}
-          onStartTutorial={handleStartTutorial}
-          onSkipToCharacterSelect={handleSkipToCharacterSelect}
-        />
-        {showDevSkip && (
-          <button
-            onClick={handleDevSkip}
-            className="fixed top-4 right-4 z-50 bg-red-500 text-white px-4 py-2 rounded text-sm font-bold hover:bg-red-600"
-          >
-            DEV SKIP
-          </button>
-        )}
-      </>
+      <WelcomeHome
+        mascotVisible={mascotVisible}
+        welcomeTextVisible={welcomeTextVisible}
+        buttonsVisible={buttonsVisible}
+        onStartTutorial={handleStartTutorial}
+        onSkipToCharacterSelect={handleSkipToCharacterSelect}
+      />
     );
   }
 
   if (currentStep === 'character') {
     return (
-      <>
-        <CharacterSelection 
-          selectedCharacter={selectedCharacter}
-          onCharacterSelect={handleCharacterSelect}
-          onBack={handleCharacterBack}
-          onConfirm={handleCharacterConfirm}
-        />
-        {showDevSkip && (
-          <button
-            onClick={handleDevSkip}
-            className="fixed top-4 right-4 z-50 bg-red-500 text-white px-4 py-2 rounded text-sm font-bold hover:bg-red-600"
-          >
-            DEV SKIP
-          </button>
-        )}
-      </>
+      <CharacterSelection
+        selectedCharacter={selectedCharacter}
+        onCharacterSelect={handleCharacterSelect}
+        onBack={handleCharacterBack}
+        onConfirm={handleCharacterConfirm}
+      />
     );
   }
 
   if (currentStep === 'tutorial') {
     return (
-      <>
-        <GameTutorial 
-          onComplete={handleTutorialComplete}
-          onSkip={handleTutorialSkip}
-        />
-        {showDevSkip && (
-          <button
-            onClick={handleDevSkip}
-            className="fixed top-4 right-4 z-50 bg-red-500 text-white px-4 py-2 rounded text-sm font-bold hover:bg-red-600"
-          >
-            DEV SKIP
-          </button>
-        )}
-      </>
+      <GameTutorial
+        onComplete={handleTutorialComplete}
+        onSkip={handleSkipWelcome}
+      />
     );
   }
 
   return <>{children}</>;
 };
+
+export default SplashWrapper;

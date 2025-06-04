@@ -1,45 +1,104 @@
 
+import { Helmet } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { HelmetProvider } from 'react-helmet-async';
-import { SplashWrapper } from "@/components/welcome/SplashWrapper";
-import Home from "./pages/Home";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { SecurityHeaders } from "@/components/security/SecurityHeaders";
+import SessionManager from "@/components/security/SessionManager";
+import SplashWrapper from "@/components/welcome/SplashWrapper";
+import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
-import FullScreenPetGame from "./components/pet/FullScreenPetGame";
-import MiniGameHub from "./components/games/MiniGameHub";
-import PetShop from "./components/economy/PetShop";
-import PetInventory from "./components/pet/PetInventory";
-import DailyRewards from "./components/rewards/DailyRewards";
-import StorePage from "./components/store/StorePage";
+import PlayWithMascot from "./pages/PlayWithMascot";
+import PlayDrop from "./pages/PlayDrop";
+import Pricing from "./pages/Pricing";
+import Privacy from "./pages/Privacy";
+import Contact from "./pages/Contact";
+import NotFound from "./pages/NotFound";
+import Welcome from "./pages/Welcome";
+import PetSetup from "./pages/PetSetup";
+import Shop from "./pages/Shop";
+import CoinStore from "./pages/CoinStore";
+import Inventory from "./pages/Inventory";
+import Wallet from "./pages/Wallet";
+import Games from "./pages/Games";
+import Stats from "./pages/Stats";
+import Settings from "./pages/Settings";
 
-const queryClient = new QueryClient();
+// Create query client outside of component to avoid recreation
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
-function App() {
+// Home page wrapper that shows splash/welcome flow for new users
+const HomeWrapper = () => {
+  // Always show splash/welcome flow as requested
   return (
-    <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<SplashWrapper><Home /></SplashWrapper>} />
-              <Route path="/play" element={<FullScreenPetGame />} />
-              <Route path="/games" element={<MiniGameHub onBack={() => window.history.back()} />} />
-              <Route path="/shop" element={<PetShop onBack={() => window.history.back()} onItemPurchased={() => {}} />} />
-              <Route path="/inventory" element={<PetInventory onBack={() => window.history.back()} />} />
-              <Route path="/rewards" element={<DailyRewards onBack={() => window.history.back()} />} />
-              <Route path="/coin-store" element={<StorePage />} />
-              <Route path="/auth" element={<AuthPage />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </HelmetProvider>
+    <SplashWrapper>
+      <Index />
+    </SplashWrapper>
   );
-}
+};
+
+const AppRoutes = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Main game flow with splash/welcome */}
+        <Route path="/" element={<HomeWrapper />} />
+        <Route path="/welcome" element={<Welcome />} />
+        <Route path="/pet-setup" element={<PetSetup />} />
+        
+        {/* Game pages */}
+        <Route path="/play" element={<PlayWithMascot />} />
+        <Route path="/home" element={<PlayWithMascot />} />
+        <Route path="/playdrop" element={<PlayDrop />} />
+        
+        {/* Game feature pages */}
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/coin-store" element={<CoinStore />} />
+        <Route path="/inventory" element={<Inventory />} />
+        <Route path="/wallet" element={<Wallet />} />
+        <Route path="/games" element={<Games />} />
+        <Route path="/stats" element={<Stats />} />
+        <Route path="/settings" element={<Settings />} />
+        
+        {/* Auth pages (redirect to auth page) */}
+        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/login" element={<Navigate to="/auth" replace />} />
+        <Route path="/signup" element={<Navigate to="/auth" replace />} />
+        
+        {/* Static pages */}
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/terms" element={<Privacy />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/contact" element={<Contact />} />
+        
+        {/* 404 page */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <SecurityHeaders />
+        <SessionManager />
+        <AppRoutes />
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
