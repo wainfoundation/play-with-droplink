@@ -19,7 +19,7 @@ interface PetShopProps {
 
 const PetShop: React.FC<PetShopProps> = ({ onBack, onItemPurchased }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const { wallet, spendCoins, addCoins } = useWallet();
+  const { balance, spendCoins, addCoins } = useWallet();
   const { inventory, addItem, hasItem } = useInventory();
 
   const filteredItems = selectedCategory === 'all' 
@@ -30,16 +30,16 @@ const PetShop: React.FC<PetShopProps> = ({ onBack, onItemPurchased }) => {
     const item = shopItems.find(i => i.id === itemId);
     if (!item) return;
 
-    if (wallet.dropletCoins < item.price) {
+    if (balance < item.price) {
       toast({
         title: "Not enough coins!",
-        description: `You need ${item.price - wallet.dropletCoins} more coins to buy ${item.name}`,
+        description: `You need ${item.price - balance} more coins to buy ${item.name}`,
         variant: "destructive"
       });
       return;
     }
 
-    const success = spendCoins(item.price);
+    const success = spendCoins(item.price, `Bought ${item.name}`);
     if (success) {
       addItem(item.id);
       onItemPurchased?.(item);
@@ -53,7 +53,7 @@ const PetShop: React.FC<PetShopProps> = ({ onBack, onItemPurchased }) => {
 
   const handleWatchAd = () => {
     // Simulate Pi Ad reward
-    addCoins(1, 'ad');
+    addCoins(1, 'Watched ad');
     toast({
       title: "Ad reward claimed!",
       description: "You earned 1 Droplet Coin for watching an ad!",
@@ -86,7 +86,7 @@ const PetShop: React.FC<PetShopProps> = ({ onBack, onItemPurchased }) => {
 
       {/* Wallet Display */}
       <WalletDisplay 
-        dropletCoins={wallet.dropletCoins}
+        dropletCoins={balance}
         onWatchAd={handleWatchAd}
         className="max-w-md mx-auto"
       />
@@ -131,7 +131,7 @@ const PetShop: React.FC<PetShopProps> = ({ onBack, onItemPurchased }) => {
           >
             <ShopItemCard
               item={item}
-              canAfford={wallet.dropletCoins >= item.price}
+              canAfford={balance >= item.price}
               owned={getItemQuantity(item.id)}
               onPurchase={handlePurchase}
             />

@@ -21,7 +21,7 @@ const FullScreenPetGame: React.FC = () => {
   const [currentRoom, setCurrentRoom] = useState<Room>('bedroom');
   const [showMenu, setShowMenu] = useState(false);
   const { user, profile } = useAuthSystem();
-  const { wallet } = useWallet();
+  const { balance } = useWallet();
   const { petStats, updateStat } = usePetStats();
 
   // Get selected character or default
@@ -73,7 +73,7 @@ const FullScreenPetGame: React.FC = () => {
       <PetGameViews
         currentView={currentView}
         onBack={() => setCurrentView('home')}
-        wallet={wallet}
+        wallet={{ dropletCoins: balance }}
         user={user}
         profile={profile}
         selectedCharacter={currentCharacter}
@@ -87,7 +87,7 @@ const FullScreenPetGame: React.FC = () => {
         showMenu={showMenu}
         onToggleMenu={handleMenuToggle}
         happiness={petStats?.happiness || 80}
-        dropletCoins={wallet.dropletCoins}
+        dropletCoins={balance}
       />
 
       <PetGameMenu

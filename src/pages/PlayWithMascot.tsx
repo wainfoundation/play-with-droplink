@@ -29,7 +29,7 @@ import { toast } from '@/hooks/use-toast';
 const PlayWithMascot: React.FC = () => {
   const { user } = useAuthSystem();
   const { petStats, userProfile, inventory, loading, useItem, changeRoom } = useGameData();
-  const { wallet } = useWallet();
+  const { balance } = useWallet();
   const [showMenu, setShowMenu] = useState(false);
   const [isLampOn, setIsLampOn] = useState(true);
   const [selectedRoom, setSelectedRoom] = useState('bedroom');
@@ -151,7 +151,7 @@ const PlayWithMascot: React.FC = () => {
               </Button>
               
               <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
-                💰 {wallet?.dropletCoins || 0} Coins
+                💰 {balance || 0} Coins
               </Badge>
             </div>
             
