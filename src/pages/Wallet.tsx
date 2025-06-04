@@ -2,7 +2,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wallet, Coins, TrendingUp, Home, Store, Gift } from 'lucide-react';
+import { Wallet, Coins, TrendingUp, Home, Store, Gift, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import IconButton from '@/components/ui/icon-button';
 
@@ -14,25 +14,29 @@ const WalletPage: React.FC = () => {
       id: 'earn',
       name: 'Earn Coins',
       icon: Coins,
-      color: 'bg-yellow-500 hover:bg-yellow-600'
+      color: 'bg-yellow-500 hover:bg-yellow-600',
+      action: () => navigate('/games')
     },
     {
       id: 'spend',
-      name: 'Spend',
+      name: 'Shop',
       icon: Store,
-      color: 'bg-green-500 hover:bg-green-600'
+      color: 'bg-green-500 hover:bg-green-600',
+      action: () => navigate('/shop')
+    },
+    {
+      id: 'buy',
+      name: 'Buy Coins',
+      icon: CreditCard,
+      color: 'bg-blue-500 hover:bg-blue-600',
+      action: () => navigate('/coin-store')
     },
     {
       id: 'rewards',
       name: 'Rewards',
       icon: Gift,
-      color: 'bg-purple-500 hover:bg-purple-600'
-    },
-    {
-      id: 'history',
-      name: 'History',
-      icon: TrendingUp,
-      color: 'bg-blue-500 hover:bg-blue-600'
+      color: 'bg-purple-500 hover:bg-purple-600',
+      action: () => navigate('/missions')
     }
   ];
 
@@ -90,7 +94,7 @@ const WalletPage: React.FC = () => {
                 key={action.id}
                 icon={action.icon}
                 label={action.name}
-                onClick={() => console.log(`${action.name} clicked`)}
+                onClick={action.action}
                 className={action.color}
                 size="lg"
               />
@@ -100,7 +104,10 @@ const WalletPage: React.FC = () => {
           {/* Recent Transactions */}
           <Card>
             <CardHeader>
-              <CardTitle>Recent Transactions</CardTitle>
+              <CardTitle className="flex items-center gap-3">
+                <TrendingUp className="h-6 w-6" />
+                Recent Transactions
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">

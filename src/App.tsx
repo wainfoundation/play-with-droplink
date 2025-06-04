@@ -8,15 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { UserProvider } from "@/context/UserContext";
 import SplashWrapper from "@/components/welcome/SplashWrapper";
 import Index from "./pages/Index";
-import AuthPage from "./pages/AuthPage";
 import PlayWithMascot from "./pages/PlayWithMascot";
-import PlayDrop from "./pages/PlayDrop";
-import Pricing from "./pages/Pricing";
-import Privacy from "./pages/Privacy";
-import Contact from "./pages/Contact";
-import NotFound from "./pages/NotFound";
-import Welcome from "./pages/Welcome";
-import PetSetup from "./pages/PetSetup";
 import Shop from "./pages/Shop";
 import CoinStore from "./pages/CoinStore";
 import Inventory from "./pages/Inventory";
@@ -25,6 +17,12 @@ import Games from "./pages/Games";
 import Stats from "./pages/Stats";
 import Settings from "./pages/Settings";
 import Missions from "./pages/Missions";
+import Welcome from "./pages/Welcome";
+import PetSetup from "./pages/PetSetup";
+import Pricing from "./pages/Pricing";
+import Privacy from "./pages/Privacy";
+import Contact from "./pages/Contact";
+import NotFound from "./pages/NotFound";
 
 // Create query client outside of component to avoid recreation
 const queryClient = new QueryClient({
@@ -49,15 +47,14 @@ const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Main game flow with splash/welcome */}
+        {/* Main entry point */}
         <Route path="/" element={<HomeWrapper />} />
         <Route path="/welcome" element={<Welcome />} />
         <Route path="/pet-setup" element={<PetSetup />} />
         
-        {/* Game pages */}
+        {/* Main game hub - both /play and /home route to the same component */}
         <Route path="/play" element={<PlayWithMascot />} />
         <Route path="/home" element={<PlayWithMascot />} />
-        <Route path="/playdrop" element={<PlayDrop />} />
         
         {/* Game feature pages */}
         <Route path="/shop" element={<Shop />} />
@@ -69,16 +66,16 @@ const AppRoutes = () => {
         <Route path="/stats" element={<Stats />} />
         <Route path="/settings" element={<Settings />} />
         
-        {/* Auth pages - redirect to main game in dev mode */}
-        <Route path="/auth" element={<Navigate to="/" replace />} />
-        <Route path="/login" element={<Navigate to="/" replace />} />
-        <Route path="/signup" element={<Navigate to="/" replace />} />
-        
         {/* Static pages */}
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/terms" element={<Privacy />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/contact" element={<Contact />} />
+        
+        {/* Redirects for consistency */}
+        <Route path="/auth" element={<Navigate to="/" replace />} />
+        <Route path="/login" element={<Navigate to="/" replace />} />
+        <Route path="/signup" element={<Navigate to="/" replace />} />
         
         {/* 404 page */}
         <Route path="*" element={<NotFound />} />
