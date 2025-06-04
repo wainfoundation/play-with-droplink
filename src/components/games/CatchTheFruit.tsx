@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { X, Pause, Play } from 'lucide-react';
 
-interface Fruit {
+interface FallingFruit {
   id: string;
   emoji: string;
   x: number;
@@ -19,13 +19,13 @@ interface CatchTheFruitProps {
   onClose: () => void;
 }
 
-const fruits = ['🍎', '🍌', '🍇', '🍊', '🍓', '🥝', '🍑', '🥭'];
+const fruitEmojis = ['🍎', '🍌', '🍇', '🍊', '🍓', '🥝', '🍑', '🥭'];
 
 const CatchTheFruit: React.FC<CatchTheFruitProps> = ({ onGameEnd, onClose }) => {
   const [gameState, setGameState] = useState<'waiting' | 'playing' | 'paused' | 'ended'>('waiting');
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30);
-  const [fruits, setFruits] = useState<Fruit[]>([]);
+  const [fruits, setFruits] = useState<FallingFruit[]>([]);
   const [gameArea, setGameArea] = useState({ width: 0, height: 0 });
   
   const gameAreaRef = useRef<HTMLDivElement>(null);
@@ -89,8 +89,8 @@ const CatchTheFruit: React.FC<CatchTheFruitProps> = ({ onGameEnd, onClose }) => 
   const spawnFruit = useCallback(() => {
     if (gameArea.width === 0) return;
 
-    const fruitEmoji = fruits[Math.floor(Math.random() * fruits.length)];
-    const newFruit: Fruit = {
+    const fruitEmoji = fruitEmojis[Math.floor(Math.random() * fruitEmojis.length)];
+    const newFruit: FallingFruit = {
       id: `fruit-${Date.now()}-${Math.random()}`,
       emoji: fruitEmoji,
       x: Math.random() * (gameArea.width - 60), // Account for fruit size
