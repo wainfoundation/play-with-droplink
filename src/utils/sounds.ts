@@ -1,4 +1,3 @@
-
 // Helper function to play sounds with volume control
 export const playSound = (audioUrl: string, volume = 1): void => {
   const audio = new Audio(audioUrl);
@@ -56,20 +55,29 @@ export const gameSounds = {
   // Background Music
   calmBackground: "/sounds/background/calm-ambient.mp3",
   gameplayMusic: "/sounds/background/gameplay-music.mp3",
+  mainTheme: "/assets/background_loop/PlayDroplink Main Theme Song.mp3",
   
   // System sounds from before
   loadingComplete: "/sounds/loading-complete.mp3",
   setupComplete: "/sounds/setup-complete.mp3",
 };
 
-// Background music manager
+// Enhanced background music manager with persistence
 class BackgroundMusicManager {
   private audio: HTMLAudioElement | null = null;
   private currentTrack: string | null = null;
   private volume: number = 0.3;
   private isPlaying: boolean = false;
+  private isMuted: boolean = false;
+
+  constructor() {
+    // Load mute state from localStorage
+    const savedMuteState = localStorage.getItem('droplet-music-muted');
+    this.isMuted = savedMuteState === 'true';
+  }
 
   play(track: string, loop: boolean = true) {
+    if (this.isMuted) return;
     if (this.currentTrack === track && this.isPlaying) return;
     
     this.stop();
@@ -97,6 +105,19 @@ class BackgroundMusicManager {
     }
   }
 
+  toggle() {
+    this.isMuted = !this.isMuted;
+    localStorage.setItem('droplet-music-muted', this.isMuted.toString());
+    
+    if (this.isMuted) {
+      this.stop();
+    } else if (this.currentTrack) {
+      this.play(this.currentTrack);
+    }
+    
+    return this.isMuted;
+  }
+
   setVolume(volume: number) {
     this.volume = Math.max(0, Math.min(1, volume));
     if (this.audio) {
@@ -119,9 +140,22 @@ class BackgroundMusicManager {
       }
     }, 50);
   }
+
+  getMuted() {
+    return this.isMuted;
+  }
+
+  getIsPlaying() {
+    return this.isPlaying && !this.isMuted;
+  }
 }
 
 export const backgroundMusic = new BackgroundMusicManager();
+
+// Auto-start main theme
+export const startMainTheme = () => {
+  backgroundMusic.play(gameSounds.mainTheme);
+};
 
 // Sound effects with categories
 export const playSoundEffect = (soundKey: keyof typeof gameSounds, volume?: number) => {

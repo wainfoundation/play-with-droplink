@@ -9,6 +9,7 @@ import { useMascotProgression } from '@/hooks/useMascotProgression';
 import MascotRenderer from './MascotRenderer';
 import MascotEvolution from './MascotEvolution';
 import DropTapDash from '@/components/games/DropTapDash';
+import { MusicToggle } from '@/components/ui/MusicToggle';
 
 const EnhancedPetGame: React.FC = () => {
   const { mascotState, petCareActivity, droplinkActivity, hasRoom } = useMascotProgression();
@@ -87,13 +88,21 @@ const EnhancedPetGame: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-2 relative">
           <h1 className="text-3xl font-bold text-gray-800">
             PlayyDrop Mascot Care
           </h1>
           <p className="text-gray-600">
             Care for your mascot and grow through Droplink activities!
           </p>
+          
+          {/* Music Toggle Button */}
+          <div className="absolute top-0 right-0">
+            <MusicToggle 
+              variant="outline" 
+              className="bg-white/80 backdrop-blur-sm border-white/50"
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
