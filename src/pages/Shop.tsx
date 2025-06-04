@@ -3,44 +3,53 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Coins, ShoppingBag, Palette, Shirt } from 'lucide-react';
+import { Coins, ShoppingBag, Palette, Shirt, Apple, Gamepad2, Home } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import IconButton from '@/components/ui/icon-button';
 
 const Shop: React.FC = () => {
+  const navigate = useNavigate();
+
   const shopCategories = [
     {
       id: 'food',
       name: 'Food',
-      icon: <ShoppingBag className="h-6 w-6" />,
+      icon: Apple,
       items: ['Apple', 'Bread', 'Fish', 'Cake'],
-      priceRange: '2-50 coins'
+      priceRange: '2-50 coins',
+      color: 'bg-green-500 hover:bg-green-600'
     },
     {
       id: 'hygiene',
       name: 'Hygiene',
-      icon: <Palette className="h-6 w-6" />,
+      icon: Palette,
       items: ['Soap', 'Shampoo', 'Towel', 'Toothbrush'],
-      priceRange: '5-30 coins'
+      priceRange: '5-30 coins',
+      color: 'bg-cyan-500 hover:bg-cyan-600'
     },
     {
       id: 'toys',
       name: 'Toys',
-      icon: <ShoppingBag className="h-6 w-6" />,
+      icon: Gamepad2,
       items: ['Ball', 'Blocks', 'Puzzle', 'Frisbee'],
-      priceRange: '10-100 coins'
+      priceRange: '10-100 coins',
+      color: 'bg-orange-500 hover:bg-orange-600'
     },
     {
       id: 'themes',
       name: 'Themes',
-      icon: <Palette className="h-6 w-6" />,
+      icon: Palette,
       items: ['Beach Theme', 'Space Theme', 'Forest Theme'],
-      priceRange: '200-5000 coins'
+      priceRange: '200-5000 coins',
+      color: 'bg-purple-500 hover:bg-purple-600'
     },
     {
       id: 'skins',
       name: 'Skins',
-      icon: <Shirt className="h-6 w-6" />,
+      icon: Shirt,
       items: ['Summer Outfit', 'Winter Coat', 'Party Hat'],
-      priceRange: '50-1000 coins'
+      priceRange: '50-1000 coins',
+      color: 'bg-pink-500 hover:bg-pink-600'
     }
   ];
 
@@ -53,9 +62,10 @@ const Shop: React.FC = () => {
       
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-4">
         <div className="max-w-6xl mx-auto">
+          {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
-              Pet Shop
+              🛒 Pet Shop
             </h1>
             <p className="text-lg text-gray-600">
               Buy everything your pet needs to stay happy and healthy!
@@ -66,12 +76,37 @@ const Shop: React.FC = () => {
             </div>
           </div>
 
+          {/* Quick Navigation */}
+          <div className="flex justify-center mb-8">
+            <IconButton
+              icon={Home}
+              label="Back Home"
+              onClick={() => navigate('/play')}
+              className="bg-blue-500 hover:bg-blue-600"
+            />
+          </div>
+
+          {/* Shop Categories */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8">
+            {shopCategories.map((category) => (
+              <IconButton
+                key={category.id}
+                icon={category.icon}
+                label={category.name}
+                onClick={() => console.log(`Navigate to ${category.name}`)}
+                className={category.color}
+                size="lg"
+              />
+            ))}
+          </div>
+
+          {/* Detailed Categories */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {shopCategories.map((category) => (
               <Card key={category.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-3">
-                    {category.icon}
+                    <category.icon className="h-6 w-6" />
                     {category.name}
                   </CardTitle>
                 </CardHeader>
@@ -94,19 +129,6 @@ const Shop: React.FC = () => {
                 </CardContent>
               </Card>
             ))}
-          </div>
-
-          <div className="mt-8 text-center">
-            <Button 
-              onClick={() => window.history.back()} 
-              variant="outline"
-              className="mr-4"
-            >
-              Back to Game
-            </Button>
-            <Button className="bg-gradient-to-r from-primary to-secondary">
-              View Inventory
-            </Button>
           </div>
         </div>
       </div>
