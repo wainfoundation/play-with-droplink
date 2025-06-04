@@ -6,64 +6,54 @@ interface CharacterEyesProps {
 }
 
 const CharacterEyes: React.FC<CharacterEyesProps> = ({ mood }) => {
-  const getEyeShape = () => {
+  const getEyeStyle = () => {
     switch (mood) {
       case 'happy':
       case 'excited':
         return (
           <>
-            <circle cx="80" cy="110" r="8" fill="#fff" />
-            <circle cx="120" cy="110" r="8" fill="#fff" />
-            <circle cx="80" cy="112" r="4" fill="#333" />
-            <circle cx="120" cy="112" r="4" fill="#333" />
-            <circle cx="81" cy="110" r="1.5" fill="#fff" />
-            <circle cx="121" cy="110" r="1.5" fill="#fff" />
-            {/* Sparkles for excited mood */}
-            {mood === 'excited' && (
-              <>
-                <circle cx="70" cy="100" r="1" fill="#FFD700" className="animate-pulse" />
-                <circle cx="130" cy="100" r="1" fill="#FFD700" className="animate-pulse delay-300" />
-              </>
-            )}
+            <circle cx="85" cy="85" r="8" fill="#333" />
+            <circle cx="115" cy="85" r="8" fill="#333" />
+            <circle cx="87" cy="83" r="2" fill="white" />
+            <circle cx="117" cy="83" r="2" fill="white" />
           </>
         );
       case 'sad':
         return (
           <>
-            <circle cx="80" cy="115" r="8" fill="#fff" />
-            <circle cx="120" cy="115" r="8" fill="#fff" />
-            <circle cx="80" cy="117" r="4" fill="#333" />
-            <circle cx="120" cy="117" r="4" fill="#333" />
-            <circle cx="81" cy="115" r="1.5" fill="#fff" />
-            <circle cx="121" cy="115" r="1.5" fill="#fff" />
+            <path d="M85 80 Q85 90 85 90" stroke="#333" strokeWidth="3" fill="none" />
+            <path d="M115 80 Q115 90 115 90" stroke="#333" strokeWidth="3" fill="none" />
           </>
         );
-      case 'surprised':
+      case 'sleepy':
         return (
           <>
-            <circle cx="80" cy="110" r="10" fill="#fff" />
-            <circle cx="120" cy="110" r="10" fill="#fff" />
-            <circle cx="80" cy="110" r="5" fill="#333" />
-            <circle cx="120" cy="110" r="5" fill="#333" />
-            <circle cx="82" cy="108" r="2" fill="#fff" />
-            <circle cx="122" cy="108" r="2" fill="#fff" />
+            <path d="M77 85 Q85 80 93 85" stroke="#333" strokeWidth="3" fill="none" />
+            <path d="M107 85 Q115 80 123 85" stroke="#333" strokeWidth="3" fill="none" />
+          </>
+        );
+      case 'angry':
+        return (
+          <>
+            <path d="M77 80 Q85 85 93 80" stroke="#333" strokeWidth="3" fill="none" />
+            <path d="M107 80 Q115 85 123 80" stroke="#333" strokeWidth="3" fill="none" />
+            <circle cx="85" cy="85" r="6" fill="#333" />
+            <circle cx="115" cy="85" r="6" fill="#333" />
           </>
         );
       default:
         return (
           <>
-            <circle cx="80" cy="110" r="8" fill="#fff" />
-            <circle cx="120" cy="110" r="8" fill="#fff" />
-            <circle cx="80" cy="112" r="4" fill="#333" />
-            <circle cx="120" cy="112" r="4" fill="#333" />
-            <circle cx="81" cy="110" r="1.5" fill="#fff" />
-            <circle cx="121" cy="110" r="1.5" fill="#fff" />
+            <circle cx="85" cy="85" r="6" fill="#333" />
+            <circle cx="115" cy="85" r="6" fill="#333" />
+            <circle cx="87" cy="83" r="2" fill="white" />
+            <circle cx="117" cy="83" r="2" fill="white" />
           </>
         );
     }
   };
 
-  return <>{getEyeShape()}</>;
+  return <g className="character-eyes">{getEyeStyle()}</g>;
 };
 
 export default CharacterEyes;

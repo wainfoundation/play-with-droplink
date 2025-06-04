@@ -1,123 +1,60 @@
 
-export const characters = [
+export interface Character {
+  id: string;
+  name: string;
+  gender: 'male' | 'female';
+  color: string;
+  mood: string;
+  personality: string;
+}
+
+export const characters: Character[] = [
   {
-    id: 'droplet-blue-happy',
-    name: 'Droplink',
-    gender: 'male',
-    color: '#00aaff',
+    id: 'droplet-blue',
+    name: 'Aqua',
+    gender: 'female',
+    color: '#3B82F6',
     mood: 'happy',
-    personality: 'Cheerful and optimistic'
+    personality: 'Cheerful and energetic, loves to play games!'
   },
   {
-    id: 'droplet-blue-excited',
-    name: 'Droplink',
-    gender: 'male',
-    color: '#00aaff',
+    id: 'droplet-pink',
+    name: 'Rosie',
+    gender: 'female',
+    color: '#EC4899',
     mood: 'excited',
-    personality: 'Full of energy and enthusiasm'
+    personality: 'Sweet and caring, always ready to help!'
   },
   {
-    id: 'droplet-blue-calm',
-    name: 'Droplink',
+    id: 'droplet-green',
+    name: 'Sage',
     gender: 'male',
-    color: '#00aaff',
+    color: '#10B981',
     mood: 'calm',
-    personality: 'Peaceful and relaxed'
+    personality: 'Wise and peaceful, enjoys quiet moments.'
   },
   {
-    id: 'droplet-blue-hungry',
-    name: 'Droplink',
-    gender: 'male',
-    color: '#00aaff',
-    mood: 'hungry',
-    personality: 'Ready for some snacks!'
+    id: 'droplet-purple',
+    name: 'Luna',
+    gender: 'female',
+    color: '#8B5CF6',
+    mood: 'mysterious',
+    personality: 'Mysterious and magical, full of surprises!'
   },
   {
-    id: 'droplet-blue-playful',
-    name: 'Droplink',
+    id: 'droplet-orange',
+    name: 'Sunny',
     gender: 'male',
-    color: '#00aaff',
+    color: '#F59E0B',
     mood: 'playful',
-    personality: 'Loves games and fun activities'
+    personality: 'Bright and optimistic, spreads joy everywhere!'
   },
   {
-    id: 'droplet-blue-sleepy',
-    name: 'Droplink',
+    id: 'droplet-red',
+    name: 'Blaze',
     gender: 'male',
-    color: '#00aaff',
-    mood: 'sleepy',
-    personality: 'Feeling a bit drowsy'
-  },
-  {
-    id: 'droplet-blue-focused',
-    name: 'Droplink',
-    gender: 'male',
-    color: '#00aaff',
-    mood: 'focused',
-    personality: 'Ready to concentrate on games'
-  },
-  {
-    id: 'droplet-pink-happy',
-    name: 'Droplia',
-    gender: 'female',
-    color: '#ff69b4',
-    mood: 'happy',
-    personality: 'Sweet and friendly'
-  },
-  {
-    id: 'droplet-pink-excited',
-    name: 'Droplia',
-    gender: 'female',
-    color: '#ff69b4',
-    mood: 'excited',
-    personality: 'Bubbling with excitement'
-  },
-  {
-    id: 'droplet-pink-playful',
-    name: 'Droplia',
-    gender: 'female',
-    color: '#ff69b4',
-    mood: 'playful',
-    personality: 'Loves creative games'
-  },
-  {
-    id: 'droplet-green-calm',
-    name: 'Dropzen',
-    gender: 'male',
-    color: '#32cd32',
-    mood: 'calm',
-    personality: 'Zen-like and thoughtful'
-  },
-  {
-    id: 'droplet-green-focused',
-    name: 'Dropzen',
-    gender: 'male',
-    color: '#32cd32',
-    mood: 'focused',
-    personality: 'Master of concentration'
-  },
-  {
-    id: 'droplet-purple-excited',
-    name: 'Dropia',
-    gender: 'female',
-    color: '#9370db',
-    mood: 'excited',
-    personality: 'Magical and energetic'
-  },
-  {
-    id: 'droplet-orange-playful',
-    name: 'Dropfire',
-    gender: 'male',
-    color: '#ff6347',
-    mood: 'playful',
-    personality: 'Fiery and fun-loving'
-  },
-  {
-    id: 'droplet-orange-hungry',
-    name: 'Dropfire',
-    gender: 'male',
-    color: '#ff6347',
-    mood: 'hungry',
-    personality: 'Always ready for a snack break'
+    color: '#EF4444',
+    mood: 'energetic',
+    personality: 'Bold and adventurous, always up for challenges!'
   }
 ];

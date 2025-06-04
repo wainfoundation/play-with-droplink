@@ -1,16 +1,14 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { motion } from 'framer-motion';
 import CharacterRenderer from '@/components/welcome/CharacterRenderer';
-import { Room } from './PetGameRooms';
+import { Button } from '@/components/ui/button';
+import { Apple, Droplets, Moon, Gamepad2 } from 'lucide-react';
 
 interface PetMainAreaProps {
-  currentRoom: Room;
+  currentRoom: string;
   currentCharacter: any;
   petStats: any;
-  currentRoomData: { name: string; bgColor: string };
+  currentRoomData: any;
   onUpdateStat: (stat: string, value: number) => void;
 }
 
@@ -21,66 +19,99 @@ const PetMainArea: React.FC<PetMainAreaProps> = ({
   currentRoomData,
   onUpdateStat
 }) => {
+  const handleFeed = () => {
+    onUpdateStat('hunger', (petStats?.hunger || 60) + 20);
+    onUpdateStat('happiness', (petStats?.happiness || 80) + 10);
+  };
+
+  const handleClean = () => {
+    onUpdateStat('cleanliness', (petStats?.cleanliness || 70) + 30);
+    onUpdateStat('happiness', (petStats?.happiness || 80) + 5);
+  };
+
+  const handleSleep = () => {
+    onUpdateStat('energy', (petStats?.energy || 85) + 40);
+    onUpdateStat('happiness', (petStats?.happiness || 80) + 5);
+  };
+
+  const handlePlay = () => {
+    onUpdateStat('happiness', (petStats?.happiness || 80) + 20);
+    onUpdateStat('energy', (petStats?.energy || 85) - 10);
+  };
+
+  const getRoomActions = () => {
+    switch (currentRoom) {
+      case 'kitchen':
+        return (
+          <Button onClick={handleFeed} className="bg-orange-500 hover:bg-orange-600">
+            <Apple className="h-4 w-4 mr-2" />
+            Feed
+          </Button>
+        );
+      case 'bathroom':
+        return (
+          <Button onClick={handleClean} className="bg-blue-500 hover:bg-blue-600">
+            <Droplets className="h-4 w-4 mr-2" />
+            Clean
+          </Button>
+        );
+      case 'bedroom':
+        return (
+          <Button onClick={handleSleep} className="bg-purple-500 hover:bg-purple-600">
+            <Moon className="h-4 w-4 mr-2" />
+            Sleep
+          </Button>
+        );
+      case 'playroom':
+        return (
+          <Button onClick={handlePlay} className="bg-green-500 hover:bg-green-600">
+            <Gamepad2 className="h-4 w-4 mr-2" />
+            Play
+          </Button>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="flex items-center justify-center h-full p-20">
-      <motion.div
-        key={currentRoom}
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="text-center"
-      >
-        <div className="mb-4">
-          <CharacterRenderer character={currentCharacter} size={200} />
+    <div className="flex-1 flex flex-col items-center justify-center px-4 pt-20 pb-24">
+      {/* Room Title */}
+      <div className="mb-8 text-center">
+        <h2 className="text-2xl font-bold text-white mb-2">
+          {currentRoomData?.icon} {currentRoomData?.name}
+        </h2>
+      </div>
+
+      {/* Character Display */}
+      <div className="mb-8">
+        <CharacterRenderer character={currentCharacter} size={150} />
+      </div>
+
+      {/* Room Actions */}
+      <div className="mb-8">
+        {getRoomActions()}
+      </div>
+
+      {/* Pet Stats Display */}
+      <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+        <div className="bg-white/20 rounded-lg p-3 text-center">
+          <div className="text-white text-sm">Happiness</div>
+          <div className="text-white font-bold">{petStats?.happiness || 80}%</div>
         </div>
-        <div className="text-2xl font-bold mb-2">
-          Welcome to the {currentRoomData.name}!
+        <div className="bg-white/20 rounded-lg p-3 text-center">
+          <div className="text-white text-sm">Hunger</div>
+          <div className="text-white font-bold">{petStats?.hunger || 60}%</div>
         </div>
-        <p className="text-gray-600 mb-4">
-          Your droplet is feeling {petStats?.mood || 'happy'} today
-        </p>
-        
-        {/* Pet Stats */}
-        <div className="flex justify-center gap-2 mb-4">
-          <Badge variant="outline">😋 Hunger: {petStats?.hunger || 60}</Badge>
-          <Badge variant="outline">⚡ Energy: {petStats?.energy || 85}</Badge>
-          <Badge variant="outline">🧼 Clean: {petStats?.cleanliness || 70}</Badge>
+        <div className="bg-white/20 rounded-lg p-3 text-center">
+          <div className="text-white text-sm">Energy</div>
+          <div className="text-white font-bold">{petStats?.energy || 85}%</div>
         </div>
-        
-        {/* Room-specific actions */}
-        <div className="flex justify-center gap-2">
-          {currentRoom === 'kitchen' && (
-            <Button onClick={() => onUpdateStat('hunger', 10)}>
-              🍎 Feed Pet
-            </Button>
-          )}
-          {currentRoom === 'bathroom' && (
-            <Button onClick={() => onUpdateStat('cleanliness', 15)}>
-              🛁 Clean Pet
-            </Button>
-          )}
-          {currentRoom === 'bedroom' && (
-            <Button onClick={() => onUpdateStat('energy', 20)}>
-              😴 Rest
-            </Button>
-          )}
-          {currentRoom === 'playroom' && (
-            <Button onClick={() => onUpdateStat('happiness', 10)}>
-              🎾 Play
-            </Button>
-          )}
-          {currentRoom === 'nature' && (
-            <Button onClick={() => onUpdateStat('happiness', 5)}>
-              🌳 Explore
-            </Button>
-          )}
-          {currentRoom === 'health' && (
-            <Button onClick={() => onUpdateStat('health', 10)}>
-              💊 Heal
-            </Button>
-          )}
+        <div className="bg-white/20 rounded-lg p-3 text-center">
+          <div className="text-white text-sm">Clean</div>
+          <div className="text-white font-bold">{petStats?.cleanliness || 70}%</div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

@@ -2,73 +2,72 @@
 import { useState, useEffect } from 'react';
 
 interface PetStats {
+  happiness: number;
   hunger: number;
   energy: number;
-  happiness: number;
   cleanliness: number;
   health: number;
   mood: string;
-  level: number;
-  xp: number;
-  xpToNext: number;
 }
 
 export const usePetStats = () => {
   const [petStats, setPetStats] = useState<PetStats>({
-    hunger: 80,
-    energy: 75,
-    happiness: 85,
-    cleanliness: 90,
-    health: 95,
-    mood: 'happy',
-    level: 1,
-    xp: 0,
-    xpToNext: 100,
+    happiness: 80,
+    hunger: 60,
+    energy: 85,
+    cleanliness: 70,
+    health: 90,
+    mood: 'happy'
   });
 
-  const updateStat = (statName: string, change: number) => {
+  // Calculate mood based on stats
+  const calculateMood = (stats: PetStats): string => {
+    const { happiness, hunger, energy, cleanliness, health } = stats;
+    
+    if (health < 30) return 'sick';
+    if (hunger < 30) return 'hungry';
+    if (energy < 30) return 'sleepy';
+    if (cleanliness < 30) return 'dirty';
+    if (happiness < 40) return 'sad';
+    if (happiness > 80) return 'excited';
+    return 'happy';
+  };
+
+  const updateStat = (statName: keyof PetStats, value: number) => {
     setPetStats(prev => {
-      const newValue = Math.max(0, Math.min(100, prev[statName as keyof PetStats] as number + change));
-      const updatedStats = {
+      const newStats = {
         ...prev,
-        [statName]: newValue,
+        [statName]: Math.max(0, Math.min(100, value))
       };
-
-      // Award XP for positive care actions
-      if (change > 0) {
-        updatedStats.xp += Math.floor(change / 5);
-      }
-
-      // Level up check
-      if (updatedStats.xp >= updatedStats.xpToNext) {
-        updatedStats.level += 1;
-        updatedStats.xp = 0;
-        updatedStats.xpToNext = updatedStats.level * 150;
-      }
-
-      // Update mood based on overall stats
-      const avgStats = (updatedStats.hunger + updatedStats.energy + updatedStats.happiness + updatedStats.cleanliness + updatedStats.health) / 5;
       
-      if (updatedStats.health < 30) {
-        updatedStats.mood = 'sick';
-      } else if (avgStats >= 85) {
-        updatedStats.mood = 'excited';
-      } else if (avgStats >= 70) {
-        updatedStats.mood = 'happy';
-      } else if (avgStats >= 50) {
-        updatedStats.mood = 'content';
-      } else if (avgStats >= 30) {
-        updatedStats.mood = 'sad';
-      } else {
-        updatedStats.mood = 'sick';
-      }
-
-      return updatedStats;
+      // Update mood based on new stats
+      const newMood = calculateMood(newStats);
+      return { ...newStats, mood: newMood };
     });
   };
 
+  // Auto-decay stats over time
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPetStats(prev => {
+        const newStats = {
+          ...prev,
+          hunger: Math.max(0, prev.hunger - 1),
+          energy: Math.max(0, prev.energy - 0.5),
+          cleanliness: Math.max(0, prev.cleanliness - 0.5),
+          happiness: Math.max(0, prev.happiness - 0.5)
+        };
+        
+        const newMood = calculateMood(newStats);
+        return { ...newStats, mood: newMood };
+      });
+    }, 60000); // Decay every minute
+
+    return () => clearInterval(interval);
+  }, []);
+
   return {
     petStats,
-    updateStat,
+    updateStat
   };
 };
