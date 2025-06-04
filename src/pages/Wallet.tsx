@@ -1,20 +1,49 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Coins, Gift, TrendingUp, History, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useWallet } from '@/hooks/useWallet';
+import { useAuthSystem } from '@/hooks/useAuthSystem';
+import RewardAdButton from '@/components/store/RewardAdButton';
 
 const Wallet: React.FC = () => {
-  const coinBalance = 150;
-  
-  const recentTransactions = [
-    { id: 1, type: 'earn', description: 'Watched Ad', amount: 1, time: '2 hours ago' },
-    { id: 2, type: 'spend', description: 'Bought Apple', amount: -5, time: '3 hours ago' },
-    { id: 3, type: 'earn', description: 'Daily Login', amount: 10, time: '1 day ago' },
-  ];
+  const { user } = useAuthSystem();
+  const { balance, transactions, refreshWallet } = useWallet();
 
+  useEffect(() => {
+    if (user) {
+      refreshWallet();
+    }
+  }, [user]);
+
+  if (!user) {
+    return (
+      <>
+        <Helmet>
+          <title>Wallet - Play with Droplink</title>
+          <meta name="description" content="Manage your coins and view transaction history" />
+        </Helmet>
+        
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
+              Your Wallet
+            </h1>
+            <p className="text-lg text-gray-600 mb-8">
+              Please sign in to manage your coins and view transaction history
+            </p>
+            <Button asChild>
+              <Link to="/auth">Sign In</Link>
+            </Button>
+          </div>
+        </div>
+      </>
+    );
+  }
+  
   return (
     <>
       <Helmet>
@@ -38,7 +67,7 @@ const Wallet: React.FC = () => {
             <CardContent className="text-center py-8">
               <Coins className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
               <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                {coinBalance} Coins
+                {balance} Coins
               </h2>
               <p className="text-gray-600 mb-4">Your current balance</p>
               
@@ -63,11 +92,9 @@ const Wallet: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-gray-600 mb-4">
-                  Earn 1 coin per ad watched
+                  Earn 1 coin per ad watched (5 min cooldown)
                 </p>
-                <Button className="w-full bg-blue-500 hover:bg-blue-600">
-                  Watch Ad (+1 Coin)
-                </Button>
+                <RewardAdButton />
               </CardContent>
             </Card>
 
@@ -116,19 +143,26 @@ const Wallet: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {recentTransactions.map((transaction) => (
-                  <div key={transaction.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-medium">{transaction.description}</p>
-                      <p className="text-sm text-gray-500">{transaction.time}</p>
+                {transactions.length > 0 ? (
+                  transactions.map((transaction) => (
+                    <div key={transaction.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <p className="font-medium">{transaction.description}</p>
+                        <p className="text-sm text-gray-500">{transaction.time}</p>
+                      </div>
+                      <span className={`font-bold ${
+                        transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {transaction.amount > 0 ? '+' : ''}{transaction.amount} coins
+                      </span>
                     </div>
-                    <span className={`font-bold ${
-                      transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {transaction.amount > 0 ? '+' : ''}{transaction.amount} coins
-                    </span>
+                  ))
+                ) : (
+                  <div className="text-center text-gray-500 py-8">
+                    <p>No transactions yet</p>
+                    <p className="text-sm">Start earning coins by watching ads!</p>
                   </div>
-                ))}
+                )}
               </div>
             </CardContent>
           </Card>

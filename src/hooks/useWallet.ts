@@ -1,108 +1,136 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuthSystem } from '@/hooks/useAuthSystem';
 import { toast } from '@/hooks/use-toast';
 
-interface WalletState {
-  dropletCoins: number;
-  piBalance: number;
-  totalEarned: number;
-  lastClaimTime: number;
+interface Transaction {
+  id: string;
+  type: 'earn' | 'spend';
+  description: string;
+  amount: number;
+  time: string;
 }
 
 export const useWallet = () => {
-  const [wallet, setWallet] = useState<WalletState>({
-    dropletCoins: 100,
-    piBalance: 0,
-    totalEarned: 100,
-    lastClaimTime: 0
-  });
+  const { user } = useAuthSystem();
+  const [balance, setBalance] = useState(0);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  // Load from localStorage
-  useEffect(() => {
-    const savedWallet = localStorage.getItem('droplet_wallet');
-    if (savedWallet) {
-      try {
-        setWallet(JSON.parse(savedWallet));
-      } catch (error) {
-        console.log('Error loading wallet');
+  // Fetch wallet data
+  const fetchWalletData = async () => {
+    if (!user) return;
+
+    try {
+      const { data: walletData, error } = await supabase
+        .from('user_wallet')
+        .select('droplet_coins')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching wallet:', error);
+        return;
       }
+
+      setBalance(walletData?.droplet_coins || 0);
+    } catch (error) {
+      console.error('Error fetching wallet data:', error);
     }
-  }, []);
+  };
 
-  // Save to localStorage
   useEffect(() => {
-    localStorage.setItem('droplet_wallet', JSON.stringify(wallet));
-  }, [wallet]);
+    fetchWalletData();
+  }, [user]);
 
-  const addCoins = useCallback((amount: number, source: string = 'manual') => {
-    setWallet(prev => ({
-      ...prev,
-      dropletCoins: prev.dropletCoins + amount,
-      totalEarned: prev.totalEarned + amount
-    }));
+  const addCoins = async (amount: number, source: string) => {
+    if (!user) return;
 
-    toast({
-      title: `Earned ${amount} coins! 💰`,
-      description: `Source: ${source}`,
-      className: "bg-yellow-50 border-yellow-200"
-    });
-  }, []);
+    try {
+      const { error } = await supabase.rpc('add_droplet_coins', {
+        p_user_id: user.id,
+        p_coins_to_add: amount
+      });
 
-  const spendCoins = useCallback((amount: number) => {
-    if (wallet.dropletCoins < amount) {
+      if (error) {
+        console.error('Error adding coins:', error);
+        return;
+      }
+
+      // Refresh wallet data
+      await fetchWalletData();
+
+      // Add mock transaction
+      const newTransaction: Transaction = {
+        id: Date.now().toString(),
+        type: 'earn',
+        description: source,
+        amount: amount,
+        time: 'just now'
+      };
+
+      setTransactions(prev => [newTransaction, ...prev]);
+
+    } catch (error) {
+      console.error('Error adding coins:', error);
+    }
+  };
+
+  const spendCoins = async (amount: number, description: string) => {
+    if (!user) return false;
+
+    if (balance < amount) {
       toast({
-        title: "Not enough coins! 💸",
-        description: `You need ${amount} coins but only have ${wallet.dropletCoins}`,
+        title: "Insufficient Coins",
+        description: "You don't have enough coins for this purchase",
         variant: "destructive"
       });
       return false;
     }
 
-    setWallet(prev => ({
-      ...prev,
-      dropletCoins: prev.dropletCoins - amount
-    }));
+    try {
+      // Update wallet balance
+      const { error } = await supabase
+        .from('user_wallet')
+        .update({ 
+          droplet_coins: balance - amount,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id);
 
-    return true;
-  }, [wallet.dropletCoins]);
+      if (error) {
+        console.error('Error spending coins:', error);
+        return false;
+      }
 
-  const claimDailyCoins = useCallback((petLevel: number = 1) => {
-    const now = Date.now();
-    const lastClaim = wallet.lastClaimTime;
-    const timeDiff = now - lastClaim;
-    const oneDay = 24 * 60 * 60 * 1000;
+      // Update local state
+      setBalance(prev => prev - amount);
 
-    if (timeDiff < oneDay) {
-      return 0;
+      // Add transaction
+      const newTransaction: Transaction = {
+        id: Date.now().toString(),
+        type: 'spend',
+        description: description,
+        amount: -amount,
+        time: 'just now'
+      };
+
+      setTransactions(prev => [newTransaction, ...prev]);
+
+      return true;
+    } catch (error) {
+      console.error('Error spending coins:', error);
+      return false;
     }
-
-    const baseReward = 50;
-    const levelBonus = petLevel * 10;
-    const totalReward = baseReward + levelBonus;
-
-    setWallet(prev => ({
-      ...prev,
-      dropletCoins: prev.dropletCoins + totalReward,
-      totalEarned: prev.totalEarned + totalReward,
-      lastClaimTime: now
-    }));
-
-    return totalReward;
-  }, [wallet.lastClaimTime]);
-
-  const canClaimDailyCoins = useCallback(() => {
-    const now = Date.now();
-    const lastClaim = wallet.lastClaimTime;
-    const timeDiff = now - lastClaim;
-    const oneDay = 24 * 60 * 60 * 1000;
-    return timeDiff >= oneDay;
-  }, [wallet.lastClaimTime]);
+  };
 
   return {
-    wallet,
+    balance,
+    transactions,
+    loading,
     addCoins,
     spendCoins,
-    claimDailyCoins,
-    canClaimDailyCoins
+    refreshWallet: fetchWalletData
   };
 };
