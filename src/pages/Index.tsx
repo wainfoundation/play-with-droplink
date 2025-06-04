@@ -1,154 +1,182 @@
 
-import React from 'react';
-import SplashWrapper from '@/components/welcome/SplashWrapper';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
-import { Play, Eye, Sparkles } from 'lucide-react';
-import MascotIcon from '@/components/MascotIcon';
-import { dropinkColors } from '@/styles/designSystem';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Sparkles, Heart, Shield, Users, Play, ArrowRight } from "lucide-react";
+import { useAuthSystem } from "@/hooks/useAuthSystem";
+import { isRunningInPiBrowser } from "@/utils/pi-sdk";
+import CharacterRenderer from "@/components/welcome/CharacterRenderer";
+import { characters } from "@/components/welcome/characterData";
+import Footer from "@/components/Footer";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { user, loading } = useAuthSystem();
+  const isPiBrowser = isRunningInPiBrowser();
 
-  const handleStartPlaying = () => {
-    navigate('/play');
+  useEffect(() => {
+    if (user && !loading) {
+      navigate('/play');
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const handleGetStarted = () => {
+    navigate('/auth');
   };
 
-  const handleViewLanding = () => {
-    navigate('/landing');
+  const handlePlayDemo = () => {
+    navigate('/playdrop');
   };
 
   return (
-    <SplashWrapper>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col items-center justify-center p-4 relative overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <motion.div
-            className="absolute top-10 left-10 w-16 h-16 rounded-full bg-blue-200/30"
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.6, 0.3],
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-          <motion.div
-            className="absolute top-32 right-16 w-12 h-12 rounded-full bg-purple-200/30"
-            animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.3, 0.5, 0.3],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1,
-            }}
-          />
-          <motion.div
-            className="absolute bottom-32 left-20 w-20 h-20 rounded-full bg-cyan-200/30"
-            animate={{
-              scale: [1, 1.1, 1],
-              opacity: [0.3, 0.7, 0.3],
-            }}
-            transition={{
-              duration: 5,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 2,
-            }}
-          />
-        </div>
-
-        <div className="text-center max-w-md relative z-10">
-          {/* Mascot with floating animation */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="mb-8"
-          >
-            <div className="relative">
-              <MascotIcon size={140} mood="excited" className="mx-auto" />
-              {/* Sparkle effects around mascot */}
-              <motion.div
-                className="absolute -top-2 -right-2"
-                animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [0.5, 1, 0.5],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
-                <Sparkles className="h-6 w-6 text-yellow-400" />
-              </motion.div>
-            </div>
-          </motion.div>
-
-          {/* Title and description */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent">
-              Welcome to Droplink!
-            </h1>
-            <p className="text-lg md:text-xl text-gray-700 mb-2 font-medium">
-              Your Pi-powered pet companion awaits
-            </p>
-            <p className="text-base text-gray-600 mb-8">
-              Start your journey today and earn Pi cryptocurrency while caring for your virtual pet!
-            </p>
-          </motion.div>
-          
-          {/* Action buttons */}
+    <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100">
+      {/* Hero Section */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="space-y-4"
+            className="mb-8"
           >
-            <Button 
-              onClick={handleStartPlaying}
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-4 text-lg font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 group"
-            >
-              <Play className="mr-2 h-5 w-5 group-hover:animate-pulse" />
-              Start Playing
-            </Button>
+            <div className="flex justify-center mb-6">
+              <CharacterRenderer character={characters[0]} size={120} />
+            </div>
+            <h1 className="text-5xl font-bold text-gray-800 mb-4">
+              Welcome to <span className="text-primary">PlayDrop</span>
+            </h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+              Your adorable virtual pet game on Pi Network! Care for your droplet, play games, and earn Pi rewards.
+            </p>
             
-            <Button 
-              onClick={handleViewLanding}
-              variant="outline"
-              className="w-full py-4 text-lg font-medium border-2 border-gray-300 hover:border-blue-400 hover:bg-blue-50 transition-all duration-300 group"
-            >
-              <Eye className="mr-2 h-5 w-5 group-hover:animate-pulse" />
-              View Landing Page
-            </Button>
+            {isPiBrowser ? (
+              <Badge className="bg-green-100 text-green-800 border-green-300 mb-6">
+                ✓ Pi Browser Detected - Ready to Play!
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300 mb-6">
+                ⚠️ Best experienced in Pi Browser
+              </Badge>
+            )}
           </motion.div>
 
-          {/* Pi Network badge */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.8 }}
-            transition={{ delay: 1, duration: 0.5 }}
-            className="mt-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
           >
-            <div className="inline-flex items-center bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg">
-              <div className="w-2 h-2 bg-orange-400 rounded-full mr-2 animate-pulse"></div>
-              <span className="text-sm text-gray-600 font-medium">Powered by Pi Network</span>
-            </div>
+            <Button 
+              onClick={handleGetStarted}
+              size="lg"
+              className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-8 py-3"
+            >
+              Get Started
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+            <Button 
+              onClick={handlePlayDemo}
+              variant="outline"
+              size="lg"
+              className="border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-3"
+            >
+              <Play className="mr-2 h-5 w-5" />
+              Try Demo
+            </Button>
           </motion.div>
         </div>
+
+        {/* Features Grid */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
+        >
+          <Card className="border-none bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardContent className="p-6 text-center">
+              <div className="bg-gradient-to-br from-pink-100 to-red-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Heart className="w-8 h-8 text-pink-600" />
+              </div>
+              <h3 className="font-semibold text-gray-800 mb-2">Pet Care</h3>
+              <p className="text-sm text-gray-600">Feed, clean, and play with your adorable droplet companion</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardContent className="p-6 text-center">
+              <div className="bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Sparkles className="w-8 h-8 text-blue-600" />
+              </div>
+              <h3 className="font-semibold text-gray-800 mb-2">Mini Games</h3>
+              <p className="text-sm text-gray-600">Play fun games and earn coins to buy items for your pet</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardContent className="p-6 text-center">
+              <div className="bg-gradient-to-br from-yellow-100 to-orange-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-8 h-8 text-yellow-600" />
+              </div>
+              <h3 className="font-semibold text-gray-800 mb-2">Pi Rewards</h3>
+              <p className="text-sm text-gray-600">Earn Pi coins through gameplay and activities</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardContent className="p-6 text-center">
+              <div className="bg-gradient-to-br from-green-100 to-teal-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="font-semibold text-gray-800 mb-2">Community</h3>
+              <p className="text-sm text-gray-600">Join the Pi Network gaming community</p>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* How it Works */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="text-center"
+        >
+          <h2 className="text-3xl font-bold text-gray-800 mb-8">How PlayDrop Works</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold">1</div>
+              <h3 className="font-semibold mb-2">Sign in with Pi</h3>
+              <p className="text-gray-600">Connect your Pi Network wallet to start playing</p>
+            </div>
+            <div className="text-center">
+              <div className="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold">2</div>
+              <h3 className="font-semibold mb-2">Care for Your Pet</h3>
+              <p className="text-gray-600">Feed, clean, and play with your droplet to keep it happy</p>
+            </div>
+            <div className="text-center">
+              <div className="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold">3</div>
+              <h3 className="font-semibold mb-2">Earn Rewards</h3>
+              <p className="text-gray-600">Complete activities and mini-games to earn Pi coins</p>
+            </div>
+          </div>
+        </motion.div>
       </div>
-    </SplashWrapper>
+
+      <Footer />
+    </div>
   );
 };
 

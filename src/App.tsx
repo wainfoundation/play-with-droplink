@@ -1,129 +1,99 @@
-import React, { Suspense, useEffect, useState } from 'react';
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  useLocation,
-} from 'react-router-dom';
-import { Toaster } from '@/components/ui/toaster';
-import { useAuth } from '@/hooks/useAuth';
-import { PiContextProvider } from '@/contexts/PiContext';
-import { ThemeProvider } from '@/components/theme-provider';
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query'
-import LandingPage from '@/pages/LandingPage';
-import Index from '@/pages/Index';
-import EnhancedSplashScreen from '@/components/splash/EnhancedSplashScreen';
-import EnhancedLandingPage from '@/pages/EnhancedLandingPage';
 
-function AppRoutes() {
-  const { loading } = useAuth();
-  const location = useLocation();
-  const [showSplashScreen, setShowSplashScreen] = useState(true);
+import { Helmet } from "react-helmet-async";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { SecurityHeaders } from "@/components/security/SecurityHeaders";
+import SessionManager from "@/components/security/SessionManager";
+import SplashWrapper from "@/components/welcome/SplashWrapper";
+import Index from "./pages/Index";
+import AuthPage from "./pages/AuthPage";
+import PlayWithMascot from "./pages/PlayWithMascot";
+import PlayDrop from "./pages/PlayDrop";
+import Pricing from "./pages/Pricing";
+import Privacy from "./pages/Privacy";
+import Contact from "./pages/Contact";
+import NotFound from "./pages/NotFound";
+import Welcome from "./pages/Welcome";
+import Shop from "./pages/Shop";
+import Inventory from "./pages/Inventory";
+import Wallet from "./pages/Wallet";
+import Games from "./pages/Games";
+import Stats from "./pages/Stats";
+import Settings from "./pages/Settings";
 
-  useEffect(() => {
-    // Simulate a loading delay
-    const timer = setTimeout(() => {
-      setShowSplashScreen(false);
-    }, 1000); // Adjust the duration as needed
+// Create query client outside of component to avoid recreation
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
-    return () => clearTimeout(timer);
-  }, []);
+// Home page wrapper that shows splash/welcome flow for new users
+const HomeWrapper = () => {
+  // Always show splash/welcome flow as requested
+  return (
+    <SplashWrapper>
+      <Index />
+    </SplashWrapper>
+  );
+};
 
-  const renderContent = () => {
-    if (showSplashScreen) {
-      return <EnhancedSplashScreen onComplete={() => setShowSplashScreen(false)} />;
-    }
+const AppRoutes = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Main game flow with splash/welcome */}
+        <Route path="/" element={<HomeWrapper />} />
+        <Route path="/welcome" element={<Welcome />} />
+        
+        {/* Game pages */}
+        <Route path="/play" element={<PlayWithMascot />} />
+        <Route path="/playdrop" element={<PlayDrop />} />
+        
+        {/* Game feature pages */}
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/inventory" element={<Inventory />} />
+        <Route path="/wallet" element={<Wallet />} />
+        <Route path="/games" element={<Games />} />
+        <Route path="/stats" element={<Stats />} />
+        <Route path="/settings" element={<Settings />} />
+        
+        {/* Auth pages (redirect to auth page) */}
+        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/login" element={<Navigate to="/auth" replace />} />
+        <Route path="/signup" element={<Navigate to="/auth" replace />} />
+        
+        {/* Static pages */}
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/terms" element={<Privacy />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/contact" element={<Contact />} />
+        
+        {/* 404 page */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
 
-    return (
-      <Suspense fallback={
-        <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center z-50">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
-          </div>
-        </div>
-      }>
-        <Routes>
-          <Route path="/landing" element={<EnhancedLandingPage />} />
-          <Route path="/" element={<Index />} />
-          <Route path="/home" element={
-            <Suspense fallback={<p>Loading...</p>}>
-              {/* <Home /> */}
-            </Suspense>
-          } />
-          <Route path="/play" element={
-            <Suspense fallback={<p>Loading...</p>}>
-              {/* <PlayWithMascot /> */}
-            </Suspense>
-          } />
-          <Route path="/playdrop" element={
-            <Suspense fallback={<p>Loading...</p>}>
-              {/* <PlayDropDemo /> */}
-            </Suspense>
-          } />
-          <Route path="/shop" element={
-            <Suspense fallback={<p>Loading...</p>}>
-              {/* <Shop /> */}
-            </Suspense>
-          } />
-          <Route path="/inventory" element={
-            <Suspense fallback={<p>Loading...</p>}>
-              {/* <Inventory /> */}
-            </Suspense>
-          } />
-          <Route path="/stats" element={
-            <Suspense fallback={<p>Loading...</p>}>
-              {/* <Stats /> */}
-            </Suspense>
-          } />
-          <Route path="/wallet" element={
-            <Suspense fallback={<p>Loading...</p>}>
-              {/* <Wallet /> */}
-            </Suspense>
-          } />
-          <Route path="/settings" element={
-            <Suspense fallback={<p>Loading...</p>}>
-              {/* <Settings /> */}
-            </Suspense>
-          } />
-          <Route path="/auth" element={
-            <Suspense fallback={<p>Loading...</p>}>
-              {/* <AuthPage /> */}
-            </Suspense>
-          } />
-          <Route path="*" element={<p>404 Not Found</p>} />
-        </Routes>
-      </Suspense>
-    );
-  };
-
-  return renderContent();
-}
-
-function App() {
-  const queryClient = new QueryClient()
-
+const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider
-        defaultTheme="system"
-        storageKey="droplink-theme"
-      >
-        <PiContextProvider>
-          <Router>
-            <AppRoutes />
-            <Toaster />
-          </Router>
-        </PiContextProvider>
-      </ThemeProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <SecurityHeaders />
+        <SessionManager />
+        <AppRoutes />
+      </TooltipProvider>
     </QueryClientProvider>
   );
-}
+};
 
 export default App;

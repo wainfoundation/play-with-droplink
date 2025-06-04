@@ -1,102 +1,135 @@
 
-// Enhanced sound utilities for the app
-export const sounds = {
-  loadingComplete: '/sounds/ui/success.mp3',
-  buttonClick: '/sounds/ui/click.mp3',
-  hover: '/sounds/ui/hover.mp3',
-  setupComplete: '/sounds/ui/success.mp3', // Added missing setupComplete sound
+// Helper function to play sounds with volume control
+export const playSound = (audioUrl: string, volume = 1): void => {
+  const audio = new Audio(audioUrl);
+  audio.volume = volume;
+  
+  // Handle Safari/iOS requirement for user interaction
+  const playPromise = audio.play();
+  
+  if (playPromise !== undefined) {
+    playPromise.catch((error) => {
+      console.error("Audio playback error:", error);
+    });
+  }
 };
 
-export const playSound = (soundPath: string, volume: number = 0.5) => {
-  try {
-    const audio = new Audio(soundPath);
-    audio.volume = volume;
-    audio.play().catch(() => {
-      // Silently fail if sound can't be played
-      console.log('Sound playback failed, continuing without sound');
-    });
-  } catch (error) {
-    // Silently fail if sound loading fails
-    console.log('Sound loading failed, continuing without sound');
-  }
+// Game sound effects library
+export const gameSounds = {
+  // UI Sounds
+  click: "/sounds/ui/click.mp3",
+  hover: "/sounds/ui/hover.mp3",
+  buttonPress: "/sounds/ui/button-press.mp3",
+  
+  // Game Events
+  levelComplete: "/sounds/game/level-complete.mp3",
+  gameOver: "/sounds/game/game-over.mp3",
+  victory: "/sounds/game/victory.mp3",
+  newLevel: "/sounds/game/new-level.mp3",
+  
+  // Color Merge Specific
+  colorMerge: "/sounds/color-merge/merge.mp3",
+  correctMatch: "/sounds/color-merge/correct-match.mp3",
+  wrongMove: "/sounds/color-merge/wrong-move.mp3",
+  perfectMatch: "/sounds/color-merge/perfect-match.mp3",
+  
+  // Block Connect Specific
+  blockPlace: "/sounds/block-connect/block-place.mp3",
+  lineComplete: "/sounds/block-connect/line-complete.mp3",
+  blockDrop: "/sounds/block-connect/block-drop.mp3",
+  
+  // General Game Sounds
+  collect: "/sounds/game/collect.mp3",
+  powerUp: "/sounds/game/power-up.mp3",
+  unlock: "/sounds/game/unlock.mp3",
+  error: "/sounds/game/error.mp3",
+  success: "/sounds/game/success.mp3",
+  
+  // Lives and Hearts
+  loseLife: "/sounds/game/lose-life.mp3",
+  gainLife: "/sounds/game/gain-life.mp3",
+  
+  // Pi Related
+  piPayment: "/sounds/pi/payment.mp3",
+  piEarn: "/sounds/pi/earn.mp3",
+  
+  // Background Music
+  calmBackground: "/sounds/background/calm-ambient.mp3",
+  gameplayMusic: "/sounds/background/gameplay-music.mp3",
+  
+  // System sounds from before
+  loadingComplete: "/sounds/loading-complete.mp3",
+  setupComplete: "/sounds/setup-complete.mp3",
 };
 
 // Background music manager
-export const backgroundMusic = {
-  currentAudio: null as HTMLAudioElement | null,
-  
-  play: (soundPath: string, volume: number = 0.3) => {
-    try {
-      // Stop current music if playing
-      if (backgroundMusic.currentAudio) {
-        backgroundMusic.currentAudio.pause();
-        backgroundMusic.currentAudio = null;
-      }
-      
-      const audio = new Audio(soundPath);
-      audio.volume = volume;
-      audio.loop = true;
-      audio.play().catch(() => {
-        console.log('Background music playback failed');
+class BackgroundMusicManager {
+  private audio: HTMLAudioElement | null = null;
+  private currentTrack: string | null = null;
+  private volume: number = 0.3;
+  private isPlaying: boolean = false;
+
+  play(track: string, loop: boolean = true) {
+    if (this.currentTrack === track && this.isPlaying) return;
+    
+    this.stop();
+    
+    this.audio = new Audio(track);
+    this.audio.volume = this.volume;
+    this.audio.loop = loop;
+    this.currentTrack = track;
+    
+    const playPromise = this.audio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        this.isPlaying = true;
+      }).catch((error) => {
+        console.error("Background music playback error:", error);
       });
-      backgroundMusic.currentAudio = audio;
-    } catch (error) {
-      console.log('Background music loading failed');
-    }
-  },
-  
-  stop: () => {
-    if (backgroundMusic.currentAudio) {
-      backgroundMusic.currentAudio.pause();
-      backgroundMusic.currentAudio = null;
-    }
-  },
-  
-  setVolume: (volume: number) => {
-    if (backgroundMusic.currentAudio) {
-      backgroundMusic.currentAudio.volume = volume;
     }
   }
+
+  stop() {
+    if (this.audio) {
+      this.audio.pause();
+      this.audio.currentTime = 0;
+      this.isPlaying = false;
+    }
+  }
+
+  setVolume(volume: number) {
+    this.volume = Math.max(0, Math.min(1, volume));
+    if (this.audio) {
+      this.audio.volume = this.volume;
+    }
+  }
+
+  fadeOut(duration: number = 1000) {
+    if (!this.audio) return;
+    
+    const startVolume = this.audio.volume;
+    const fadeStep = startVolume / (duration / 50);
+    
+    const fadeInterval = setInterval(() => {
+      if (this.audio && this.audio.volume > 0) {
+        this.audio.volume = Math.max(0, this.audio.volume - fadeStep);
+      } else {
+        this.stop();
+        clearInterval(fadeInterval);
+      }
+    }, 50);
+  }
+}
+
+export const backgroundMusic = new BackgroundMusicManager();
+
+// Sound effects with categories
+export const playSoundEffect = (soundKey: keyof typeof gameSounds, volume?: number) => {
+  playSound(gameSounds[soundKey], volume);
 };
 
-// Sound effect player with predefined effects
-export const playSoundEffect = (effectName: string, volume: number = 0.5) => {
-  const soundMap: Record<string, string> = {
-    // UI sounds
-    'click': '/sounds/ui/click.mp3',
-    'hover': '/sounds/ui/hover.mp3',
-    'success': '/sounds/ui/success.mp3',
-    
-    // Game sounds
-    'collect': '/sounds/game/collect.mp3',
-    'error': '/sounds/game/error.mp3',
-    'gameOver': '/sounds/game/game-over.mp3',
-    'levelComplete': '/sounds/game/level-complete.mp3',
-    'newLevel': '/sounds/game/new-level.mp3',
-    'victory': '/sounds/game/victory.mp3',
-    'loseLife': '/sounds/game/lose-life.mp3',
-    'gainLife': '/sounds/game/gain-life.mp3',
-    
-    // Color merge specific
-    'colorMerge': '/sounds/color-merge/merge.mp3',
-    'correctMatch': '/sounds/color-merge/correct-match.mp3',
-    'perfectMatch': '/sounds/color-merge/perfect-match.mp3',
-    'wrongMove': '/sounds/color-merge/wrong-move.mp3',
-    
-    // Block connect specific
-    'blockPlace': '/sounds/block-connect/block-place.mp3',
-    'blockDrop': '/sounds/block-connect/block-drop.mp3',
-    'lineComplete': '/sounds/block-connect/line-complete.mp3',
-    
-    // Pi sounds
-    'piEarn': '/sounds/pi/earn.mp3',
-    'piPayment': '/sounds/pi/payment.mp3',
-  };
-  
-  const soundPath = soundMap[effectName];
-  if (soundPath) {
-    playSound(soundPath, volume);
-  } else {
-    console.log(`Sound effect '${effectName}' not found`);
-  }
+// Predefined sound effects (backward compatibility)
+export const sounds = {
+  loadingComplete: gameSounds.loadingComplete,
+  setupComplete: gameSounds.setupComplete,
 };
