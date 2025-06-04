@@ -1,0 +1,39 @@
+/assets
+│
+├── images/              # PNG, JPG, GIF, etc.
+│   ├── logo.png
+│   ├── banner.jpg
+│   └── avatars/
+│       └── default.png
+│
+├── icons/               # SVG, PNG icons
+│   ├── home.svg
+│   └── menu.svg
+│
+├── fonts/               # TTF, OTF, WOFF, etc.
+│   ├── Roboto-Regular.ttf
+│   └── OpenSans-Bold.woff2
+│
+├── audio/               # MP3, WAV, etc.
+│   ├── click.mp3
+│   └── background.wav
+│
+├── video/               # MP4, WebM, etc.
+│   ├── intro.mp4
+│   └── tutorial.webm
+│
+├── css/                 # Global CSS files
+│   └── main.css
+│
+├── js/                  # Static JS files
+│   └── utils.js
+│
+├── json/                # Config or data files
+│   └── faq.json
+│
+├── docs/                # Images for README or wikis
+│   └── architecture.png
+│
+└── themes/              # UI themes or color schemes
+    ├── dark.json
+    └── light.json
