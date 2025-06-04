@@ -6,8 +6,8 @@ interface AuthGuardProps {
   requireAuth?: boolean;
 }
 
-const AuthGuard: React.FC<AuthGuardProps> = ({ children, requireAuth = false }) => {
-  // For testing purposes, always allow access without authentication
+const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
+  // For now, always allow access without authentication
   return <>{children}</>;
 };
 

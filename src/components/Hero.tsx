@@ -1,331 +1,59 @@
-import React, { useState, useEffect } from 'react';
+
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Star, Shield, Zap, Globe } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Gamepad2, Sparkles, Heart } from 'lucide-react';
 
-const Hero = () => {
-  const [currentEmotion, setCurrentEmotion] = useState(0);
-  
-  const emotions = [
-  { thought: "Welcome to Droplink!", eyes: "happy", mouth: "smile" },
-  { thought: "I'm sleepy... 😴", eyes: "sleepy", mouth: "neutral" },
-  { thought: "Let's build something amazing!", eyes: "excited", mouth: "big-smile" },
-  { thought: "Pi Network is awesome! π", eyes: "normal", mouth: "smile" },
-  { thought: "Ready to get started?", eyes: "wink", mouth: "smile" },
-  { thought: "Hmm... I'm thinking 🤔", eyes: "thinking", mouth: "pursed" },
-  { thought: "Wow, that’s cool! 🤩", eyes: "starry", mouth: "open-smile" },
-  { thought: "Uh-oh... something went wrong!", eyes: "worried", mouth: "frown" },
-  { thought: "I love being helpful! 💡", eyes: "bright", mouth: "grin" },
-  { thought: "Yikes! That scared me! 😱", eyes: "wide", mouth: "shocked" },
-  { thought: "You're doing great! 🌟", eyes: "encouraging", mouth: "gentle-smile" },
-  { thought: "Need a break? ☕", eyes: "tired", mouth: "soft-smile" },
-  { thought: "Let's hustle! 🚀", eyes: "focused", mouth: "determined" },
-  { thought: "So peaceful... 🧘", eyes: "calm", mouth: "content" },
-  { thought: "Hehe, that’s funny 😄", eyes: "playful", mouth: "laugh" }
-];
-
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentEmotion((prev) => (prev + 1) % emotions.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const renderEyes = (type: string) => {
-    switch (type) {
-      case "happy":
-        return (
-          <>
-            <path d="M110 160 Q120 155 130 160" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
-            <path d="M170 160 Q180 155 190 160" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
-          </>
-        );
-      case "sleepy":
-        return (
-          <>
-            <path d="M110 165 L130 165" stroke="#333" strokeWidth="3" strokeLinecap="round" />
-            <path d="M170 165 L190 165" stroke="#333" strokeWidth="3" strokeLinecap="round" />
-          </>
-        );
-      case "excited":
-        return (
-          <>
-            <circle cx="120" cy="165" r="9" fill="#fff" />
-            <circle cx="180" cy="165" r="9" fill="#fff" />
-            <circle cx="120" cy="165" r="6" fill="#333" />
-            <circle cx="180" cy="165" r="6" fill="#333" />
-          </>
-        );
-      case "wink":
-        return (
-          <>
-            <circle cx="120" cy="165" r="9" fill="#fff" />
-            <circle cx="123" cy="168" r="4.5" fill="#333" />
-            <path d="M170 160 Q180 155 190 160" stroke="#333" strokeWidth="3" fill="none" strokeLinecap="round" />
-          </>
-        );
-      default:
-        return (
-          <>
-            <circle cx="120" cy="165" r="9" fill="#fff" />
-            <circle cx="180" cy="165" r="9" fill="#fff" />
-            <circle cx="123" cy="168" r="4.5" fill="#333" className="animate-gentle-blink" />
-            <circle cx="183" cy="168" r="4.5" fill="#333" className="animate-gentle-blink" />
-          </>
-        );
-    }
-  };
-
-  const renderMouth = (type: string) => {
-    switch (type) {
-      case "big-smile":
-        return (
-          <path
-            d="M115 210 Q150 250 185 210"
-            stroke="#fff"
-            strokeWidth="4.5"
-            fill="none"
-            strokeLinecap="round"
-          />
-        );
-      case "neutral":
-        return (
-          <ellipse cx="150" cy="220" rx="8" ry="3" fill="#fff" />
-        );
-      default:
-        return (
-          <path
-            d="M120 210 Q150 240 180 210"
-            stroke="#fff"
-            strokeWidth="4.5"
-            fill="none"
-            strokeLinecap="round"
-          />
-        );
-    }
-  };
-
+const Hero: React.FC = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-muted/20 to-primary/10">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-      <div className="absolute top-20 left-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 right-20 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-pulse delay-1000" />
-      
-      {/* Mascot */}
-      <div className="absolute right-10 top-1/2 transform -translate-y-1/2 hidden lg:block">
-        <svg
-          width="300"
-          height="360"
-          viewBox="0 0 300 360"
-          className="animate-bounce-gentle"
-        >
-          {/* Droplet shape */}
-          <path
-            d="M150 30 C90 90, 52.5 150, 52.5 210 C52.5 277.5, 97.5 330, 150 330 C202.5 330, 247.5 277.5, 247.5 210 C247.5 150, 210 90, 150 30 Z"
-            fill="url(#heroDropletGradient)"
-            className="animate-pulse-gentle"
-          />
+    <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-20 px-4">
+      <div className="container mx-auto text-center">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            Welcome to <span className="text-primary">Droplet Pet</span>
+          </h1>
           
-          {/* Gradient definition */}
-          <defs>
-            <linearGradient id="heroDropletGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#00aaff" />
-              <stop offset="50%" stopColor="#0099ee" />
-              <stop offset="100%" stopColor="#0077cc" />
-            </linearGradient>
-          </defs>
+          <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
+            Take care of your adorable virtual pet droplet! Feed, play, and watch it grow happy and healthy.
+          </p>
           
-          {/* Highlight */}
-          <ellipse
-            cx="112.5"
-            cy="105"
-            rx="18"
-            ry="27"
-            fill="rgba(255, 255, 255, 0.6)"
-            className="animate-shimmer"
-          />
-          
-          {/* Face */}
-          {renderEyes(emotions[currentEmotion].eyes)}
-          {renderMouth(emotions[currentEmotion].mouth)}
-          
-          {/* Thought bubble */}
-          <g className="animate-float">
-            <path
-              d="M200 60 Q200 40 220 40 L290 40 Q310 40 310 60 L310 110 Q310 130 290 130 L250 130 L230 150 L250 130 L220 130 Q200 130 200 110 Z"
-              fill="#fff"
-              stroke="#0099ee"
-              strokeWidth="2"
-              className="drop-shadow-md"
-            />
-            <text x="255" y="70" textAnchor="middle" className="text-xs font-medium fill-primary">
-              {emotions[currentEmotion].thought.split(' ').slice(0, 2).join(' ')}
-            </text>
-            <text x="255" y="85" textAnchor="middle" className="text-xs font-medium fill-primary">
-              {emotions[currentEmotion].thought.split(' ').slice(2, 4).join(' ')}
-            </text>
-            <text x="255" y="100" textAnchor="middle" className="text-xs font-medium fill-primary">
-              {emotions[currentEmotion].thought.split(' ').slice(4).join(' ')}
-            </text>
-            
-            {/* Small thought bubbles */}
-            <circle cx="210" cy="140" r="3" fill="#fff" stroke="#0099ee" strokeWidth="1" />
-            <circle cx="200" cy="148" r="2" fill="#fff" stroke="#0099ee" strokeWidth="1" />
-          </g>
-        </svg>
-      </div>
-      
-      <div className="container mx-auto px-4 py-20 relative z-10">
-        <div className="max-w-4xl mx-auto text-center lg:text-left lg:max-w-2xl">
-          {/* Main Hero Content */}
-          <div className="mb-8">
-            <div className="inline-flex items-center px-4 py-2 bg-primary/10 rounded-full text-primary font-medium text-sm mb-6 animate-fade-in">
-              <Star className="w-4 h-4 mr-2" />
-              Powered by Pi Network
-            </div>
-            
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-600 to-secondary bg-clip-text text-transparent leading-tight animate-fade-in delay-200">
-              Your Pi Domain,
-              <br />
-              Your Digital Hub
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto lg:mx-0 leading-relaxed animate-fade-in delay-400">
-              Transform your .pi domain into a powerful business hub with Pi payments, 
-              professional profiles, and seamless Pi Browser integration.
-            </p>
-          </div>
-
-          {/* Feature Highlights */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 animate-fade-in delay-600">
-            <div className="flex items-center justify-center p-4 bg-white/50 backdrop-blur-sm rounded-lg border border-primary/20">
-              <Shield className="w-6 h-6 text-primary mr-3" />
-              <span className="font-medium">Pi Native Integration</span>
-            </div>
-            <div className="flex items-center justify-center p-4 bg-white/50 backdrop-blur-sm rounded-lg border border-primary/20">
-              <Zap className="w-6 h-6 text-primary mr-3" />
-              <span className="font-medium">Instant Pi Payments</span>
-            </div>
-            <div className="flex items-center justify-center p-4 bg-white/50 backdrop-blur-sm rounded-lg border border-primary/20">
-              <Star className="w-6 h-6 text-primary mr-3" />
-              <span className="font-medium">Professional Profiles</span>
-            </div>
-          </div>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center animate-fade-in delay-800 mb-12">
-            <Button 
-              asChild
-              size="lg" 
-              className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 transform transition hover:scale-105 duration-200 text-lg px-8 py-4"
-            >
-              <Link to="/signup">
-                Get Started Free <ArrowRight className="ml-2 h-5 w-5" />
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+            <Button asChild size="lg" className="text-lg px-8 py-6">
+              <Link to="/play" className="flex items-center gap-2">
+                <Heart className="h-6 w-6" />
+                Start Playing
               </Link>
             </Button>
-            <Button 
-              asChild
-              variant="outline" 
-              size="lg" 
-              className="hover:bg-primary/5 transition-colors text-lg px-8 py-4"
-            >
-              <Link to="/demo">Watch Demo</Link>
+            
+            <Button variant="outline" asChild size="lg" className="text-lg px-8 py-6">
+              <Link to="/games" className="flex items-center gap-2">
+                <Gamepad2 className="h-6 w-6" />
+                Mini Games
+              </Link>
             </Button>
           </div>
-
-          {/* Embedded Video Section */}
-          <div className="mb-12 animate-fade-in delay-1000">
-            <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-primary/20">
-              <h3 className="text-xl font-bold mb-4 text-center">See Droplink in Action</h3>
-              <div className="relative w-full" style={{ paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}>
-                <iframe 
-                  src="https://www.youtube-nocookie.com/embed/1sv5cf9ygZs?si=rATq0V5J1SH_iNpE&controls=1" 
-                  title="Droplink Demo Video" 
-                  frameBorder="0" 
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                  referrerPolicy="strict-origin-when-cross-origin" 
-                  allowFullScreen
-                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                  className="rounded-lg"
-                />
-              </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
+            <div className="text-center">
+              <div className="text-4xl mb-4">💧</div>
+              <h3 className="text-lg font-semibold mb-2">Care for Your Pet</h3>
+              <p className="text-gray-600">Feed, clean, and play with your virtual droplet</p>
             </div>
-          </div>
-
-          {/* Trust Indicators */}
-          <div className="text-center lg:text-left animate-fade-in delay-1200">
-            <p className="text-sm text-muted-foreground mb-4">
-              Trusted by Pi Network pioneers worldwide
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center lg:justify-start items-center gap-6 sm:gap-8">
-              <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm rounded-lg px-4 py-2 border border-primary/20">
-                <div className="text-xl font-bold text-primary">π</div>
-                <span className="text-sm font-medium">Pi Browser Compatible</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm rounded-lg px-4 py-2 border border-primary/20">
-                <Globe className="w-5 h-5 text-primary" />
-                <span className="text-sm font-medium">.pi Domain Ready</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm rounded-lg px-4 py-2 border border-primary/20">
-                <div className="text-xl font-bold text-primary">💰</div>
-                <span className="text-sm font-medium">Pi Payments Enabled</span>
-              </div>
+            
+            <div className="text-center">
+              <div className="text-4xl mb-4">🎮</div>
+              <h3 className="text-lg font-semibold mb-2">Play Mini Games</h3>
+              <p className="text-gray-600">Earn coins and boost your pet's happiness</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-4xl mb-4">🏠</div>
+              <h3 className="text-lg font-semibold mb-2">Explore Rooms</h3>
+              <p className="text-gray-600">Visit different rooms and discover new activities</p>
             </div>
           </div>
         </div>
       </div>
-
-      <style>
-        {`
-        @keyframes bounce-gentle {
-          0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-          40% { transform: translateY(-15px); }
-          60% { transform: translateY(-8px); }
-        }
-        
-        @keyframes pulse-gentle {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.8; }
-        }
-        
-        @keyframes gentle-blink {
-          0%, 85%, 100% { opacity: 1; }
-          90%, 95% { opacity: 0.1; }
-        }
-        
-        @keyframes shimmer {
-          0%, 100% { opacity: 0.6; }
-          50% { opacity: 1; }
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-8px); }
-        }
-        
-        .animate-bounce-gentle {
-          animation: bounce-gentle 4s ease-in-out infinite;
-        }
-        
-        .animate-pulse-gentle {
-          animation: pulse-gentle 3s ease-in-out infinite;
-        }
-        
-        .animate-gentle-blink {
-          animation: gentle-blink 6s ease-in-out infinite;
-        }
-        
-        .animate-shimmer {
-          animation: shimmer 2.5s ease-in-out infinite;
-        }
-        
-        .animate-float {
-          animation: float 4s ease-in-out infinite;
-        }
-        `}
-      </style>
     </section>
   );
 };
