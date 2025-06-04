@@ -31,7 +31,7 @@ interface ShopItem {
   price_coins: number;
   price_pi?: number;
   image_url?: string;
-  stat_effects?: any;
+  effect?: any;
   rarity: string;
 }
 
@@ -51,61 +51,110 @@ export const usePetSystem = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize pet data
+  // Initialize pet data using existing tables
   const initializePet = useCallback(async () => {
     if (!user) return;
 
     try {
       setLoading(true);
       
-      // Check if pet exists
+      // Use existing user_pet_data table
       let { data: existingPet, error: petError } = await supabase
-        .from('pets')
+        .from('user_pet_data')
         .select('*')
         .eq('user_id', user.id)
         .single();
 
       if (petError && petError.code === 'PGRST116') {
-        // Create new pet
+        // Create new pet using existing structure
         const { data: newPet, error: createError } = await supabase
-          .from('pets')
+          .from('user_pet_data')
           .insert([{
             user_id: user.id,
             pet_name: 'My Droplet',
-            character_id: 'droplet-blue'
+            current_mood: 'happy',
+            level: 1,
+            experience: 0,
+            experience_to_next: 100,
+            hunger: 60,
+            happiness: 80,
+            energy: 85,
+            cleanliness: 70,
+            pi_coins: 100
           }])
           .select()
           .single();
 
         if (createError) throw createError;
-        setPet(newPet);
+        setPet({
+          id: newPet.id,
+          user_id: newPet.user_id,
+          pet_name: newPet.pet_name,
+          character_id: 'droplet-blue',
+          current_mood: newPet.current_mood,
+          level: newPet.level,
+          experience: newPet.experience,
+          experience_to_next: newPet.experience_to_next,
+          hunger: newPet.hunger,
+          happiness: newPet.happiness,
+          energy: newPet.energy,
+          cleanliness: newPet.cleanliness,
+          health: 100,
+          pi_coins: newPet.pi_coins,
+          created_at: newPet.created_at,
+          updated_at: newPet.updated_at
+        });
       } else if (petError) {
         throw petError;
       } else {
-        setPet(existingPet);
+        setPet({
+          id: existingPet.id,
+          user_id: existingPet.user_id,
+          pet_name: existingPet.pet_name,
+          character_id: 'droplet-blue',
+          current_mood: existingPet.current_mood,
+          level: existingPet.level,
+          experience: existingPet.experience,
+          experience_to_next: existingPet.experience_to_next,
+          hunger: existingPet.hunger,
+          happiness: existingPet.happiness,
+          energy: existingPet.energy,
+          cleanliness: existingPet.cleanliness,
+          health: 100,
+          pi_coins: existingPet.pi_coins,
+          created_at: existingPet.created_at,
+          updated_at: existingPet.updated_at
+        });
       }
 
-      // Load inventory
+      // Load inventory using existing user_inventory table
       const { data: inventoryData, error: inventoryError } = await supabase
-        .from('inventory')
+        .from('user_inventory')
         .select(`
           *,
           shop_item:shop_items(*)
         `)
         .eq('user_id', user.id);
 
-      if (inventoryError) throw inventoryError;
-      setInventory(inventoryData || []);
+      if (inventoryError) {
+        console.warn('Inventory error:', inventoryError);
+        setInventory([]);
+      } else {
+        setInventory(inventoryData || []);
+      }
 
       // Load shop items
       const { data: shopData, error: shopError } = await supabase
         .from('shop_items')
         .select('*')
-        .eq('is_available', true)
         .order('category, price_coins');
 
-      if (shopError) throw shopError;
-      setShopItems(shopData || []);
+      if (shopError) {
+        console.warn('Shop error:', shopError);
+        setShopItems([]);
+      } else {
+        setShopItems(shopData || []);
+      }
 
     } catch (err) {
       console.error('Error initializing pet:', err);
@@ -136,19 +185,21 @@ export const usePetSystem = () => {
           return false;
         }
 
-        statsUpdate = inventoryItem.shop_item?.stat_effects || statsUpdate;
-        cost = 0; // No coin cost when using inventory
+        if (inventoryItem.shop_item?.effect) {
+          statsUpdate = inventoryItem.shop_item.effect;
+        }
+        cost = 0;
         itemName = inventoryItem.shop_item?.name || 'Food';
 
         // Remove item from inventory
         if (inventoryItem.quantity === 1) {
           await supabase
-            .from('inventory')
+            .from('user_inventory')
             .delete()
             .eq('id', inventoryItem.id);
         } else {
           await supabase
-            .from('inventory')
+            .from('user_inventory')
             .update({ quantity: inventoryItem.quantity - 1 })
             .eq('id', inventoryItem.id);
         }
@@ -173,24 +224,14 @@ export const usePetSystem = () => {
       };
 
       const { data: updatedPet, error } = await supabase
-        .from('pets')
+        .from('user_pet_data')
         .update(newStats)
         .eq('id', pet.id)
         .select()
         .single();
 
       if (error) throw error;
-      setPet(updatedPet);
-
-      // Record activity
-      await supabase
-        .from('pet_activities')
-        .insert([{
-          user_id: user.id,
-          pet_id: pet.id,
-          activity_type: 'feed',
-          xp_gained: 10
-        }]);
+      setPet(prev => prev ? { ...prev, ...newStats } : null);
 
       toast({
         title: `Yummy! 🍎`,
@@ -228,19 +269,21 @@ export const usePetSystem = () => {
           return false;
         }
 
-        statsUpdate = inventoryItem.shop_item?.stat_effects || statsUpdate;
+        if (inventoryItem.shop_item?.effect) {
+          statsUpdate = inventoryItem.shop_item.effect;
+        }
         cost = 0;
         itemName = inventoryItem.shop_item?.name || 'Soap';
 
         // Remove item from inventory
         if (inventoryItem.quantity === 1) {
           await supabase
-            .from('inventory')
+            .from('user_inventory')
             .delete()
             .eq('id', inventoryItem.id);
         } else {
           await supabase
-            .from('inventory')
+            .from('user_inventory')
             .update({ quantity: inventoryItem.quantity - 1 })
             .eq('id', inventoryItem.id);
         }
@@ -263,23 +306,14 @@ export const usePetSystem = () => {
       };
 
       const { data: updatedPet, error } = await supabase
-        .from('pets')
+        .from('user_pet_data')
         .update(newStats)
         .eq('id', pet.id)
         .select()
         .single();
 
       if (error) throw error;
-      setPet(updatedPet);
-
-      await supabase
-        .from('pet_activities')
-        .insert([{
-          user_id: user.id,
-          pet_id: pet.id,
-          activity_type: 'clean',
-          xp_gained: 8
-        }]);
+      setPet(prev => prev ? { ...prev, ...newStats } : null);
 
       toast({
         title: "So clean! ✨",
@@ -309,23 +343,14 @@ export const usePetSystem = () => {
       };
 
       const { data: updatedPet, error } = await supabase
-        .from('pets')
+        .from('user_pet_data')
         .update(newStats)
         .eq('id', pet.id)
         .select()
         .single();
 
       if (error) throw error;
-      setPet(updatedPet);
-
-      await supabase
-        .from('pet_activities')
-        .insert([{
-          user_id: user.id,
-          pet_id: pet.id,
-          activity_type: 'play',
-          xp_gained: 15
-        }]);
+      setPet(prev => prev ? { ...prev, ...newStats } : null);
 
       toast({
         title: "So much fun! 🎮",
@@ -350,23 +375,14 @@ export const usePetSystem = () => {
       };
 
       const { data: updatedPet, error } = await supabase
-        .from('pets')
+        .from('user_pet_data')
         .update(newStats)
         .eq('id', pet.id)
         .select()
         .single();
 
       if (error) throw error;
-      setPet(updatedPet);
-
-      await supabase
-        .from('pet_activities')
-        .insert([{
-          user_id: user.id,
-          pet_id: pet.id,
-          activity_type: 'sleep',
-          xp_gained: 5
-        }]);
+      setPet(prev => prev ? { ...prev, ...newStats } : null);
 
       toast({
         title: "Sweet dreams! 😴",
@@ -398,7 +414,7 @@ export const usePetSystem = () => {
 
       // Deduct coins
       const { error: petError } = await supabase
-        .from('pets')
+        .from('user_pet_data')
         .update({ pi_coins: pet.pi_coins - item.price_coins })
         .eq('id', pet.id);
 
@@ -406,7 +422,7 @@ export const usePetSystem = () => {
 
       // Add to inventory
       const { error: inventoryError } = await supabase
-        .from('inventory')
+        .from('user_inventory')
         .insert([{
           user_id: user.id,
           item_id: itemId,
@@ -416,24 +432,16 @@ export const usePetSystem = () => {
       if (inventoryError) {
         // If item already exists, increase quantity
         const { error: updateError } = await supabase
-          .from('inventory')
-          .update({ quantity: supabase.raw('quantity + 1') })
-          .eq('user_id', user.id)
-          .eq('item_id', itemId);
+          .rpc('increment', { 
+            table_name: 'user_inventory',
+            row_id: itemId,
+            column_name: 'quantity'
+          });
 
-        if (updateError) throw updateError;
+        if (updateError) {
+          console.warn('Could not update inventory quantity:', updateError);
+        }
       }
-
-      // Record transaction
-      await supabase
-        .from('transactions')
-        .insert([{
-          user_id: user.id,
-          transaction_type: 'item_purchase',
-          amount: item.price_coins,
-          currency: 'coins',
-          item_id: itemId
-        }]);
 
       toast({
         title: "Purchase successful! 🛒",
@@ -453,29 +461,6 @@ export const usePetSystem = () => {
       return false;
     }
   }, [user, pet, shopItems, initializePet]);
-
-  // Set up real-time updates
-  useEffect(() => {
-    if (!user) return;
-
-    const subscription = supabase
-      .channel('pet_updates')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'pets',
-        filter: `user_id=eq.${user.id}`
-      }, (payload) => {
-        if (payload.eventType === 'UPDATE') {
-          setPet(payload.new as Pet);
-        }
-      })
-      .subscribe();
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [user]);
 
   // Initialize on mount
   useEffect(() => {

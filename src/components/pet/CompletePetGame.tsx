@@ -206,13 +206,12 @@ const CompletePetGame: React.FC<CompletePetGameProps> = ({ onBack }) => {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             {[
               { key: 'hunger', label: 'Hunger', value: pet.hunger },
               { key: 'happiness', label: 'Happiness', value: pet.happiness },
               { key: 'energy', label: 'Energy', value: pet.energy },
-              { key: 'cleanliness', label: 'Clean', value: pet.cleanliness },
-              { key: 'health', label: 'Health', value: pet.health }
+              { key: 'cleanliness', label: 'Clean', value: pet.cleanliness }
             ].map(stat => (
               <div key={stat.key} className="bg-white/60 rounded-xl p-3 text-center">
                 <div className="flex items-center justify-center gap-1 mb-2">
@@ -300,35 +299,41 @@ const CompletePetGame: React.FC<CompletePetGameProps> = ({ onBack }) => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {shopItems.map(item => (
-                  <Card key={item.id} className="p-4">
-                    <div className="text-center">
-                      <div className="text-3xl mb-2">
-                        {item.category === 'food' && '🍎'}
-                        {item.category === 'hygiene' && '🧼'}
-                        {item.category === 'toy' && '🎾'}
-                        {item.category === 'medicine' && '💊'}
+              {shopItems.length === 0 ? (
+                <p className="text-center text-gray-500 py-8">
+                  Shop items coming soon!
+                </p>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {shopItems.map(item => (
+                    <Card key={item.id} className="p-4">
+                      <div className="text-center">
+                        <div className="text-3xl mb-2">
+                          {item.category === 'food' && '🍎'}
+                          {item.category === 'hygiene' && '🧼'}
+                          {item.category === 'toy' && '🎾'}
+                          {item.category === 'medicine' && '💊'}
+                        </div>
+                        <h3 className="font-bold">{item.name}</h3>
+                        <p className="text-xs text-gray-600 mb-2">{item.description}</p>
+                        <Badge variant="outline" className="mb-2">{item.rarity}</Badge>
+                        <div className="flex items-center justify-center gap-1 mb-3">
+                          <Coins className="w-4 h-4 text-yellow-600" />
+                          <span className="font-bold">{item.price_coins}π</span>
+                        </div>
+                        <Button
+                          size="sm"
+                          onClick={() => buyItem(item.id)}
+                          disabled={pet.pi_coins < item.price_coins}
+                          className="w-full"
+                        >
+                          Buy
+                        </Button>
                       </div>
-                      <h3 className="font-bold">{item.name}</h3>
-                      <p className="text-xs text-gray-600 mb-2">{item.description}</p>
-                      <Badge variant="outline" className="mb-2">{item.rarity}</Badge>
-                      <div className="flex items-center justify-center gap-1 mb-3">
-                        <Coins className="w-4 h-4 text-yellow-600" />
-                        <span className="font-bold">{item.price_coins}π</span>
-                      </div>
-                      <Button
-                        size="sm"
-                        onClick={() => buyItem(item.id)}
-                        disabled={pet.pi_coins < item.price_coins}
-                        className="w-full"
-                      >
-                        Buy
-                      </Button>
-                    </div>
-                  </Card>
-                ))}
-              </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
