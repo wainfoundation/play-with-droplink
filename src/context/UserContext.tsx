@@ -1,6 +1,5 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import React, { createContext, useContext, useState } from 'react';
 
 interface UserProfile {
   id: string;
@@ -20,28 +19,38 @@ interface UserProfile {
 
 interface UserContextType {
   user: UserProfile | null;
-  profile: UserProfile | null; // Added profile alias
+  profile: UserProfile | null;
   isLoggedIn: boolean;
   loading: boolean;
-  isAdmin: boolean; // Added isAdmin
-  showAds: boolean; // Added showAds
-  subscription: any; // Added subscription
-  isLoading: boolean; // Added isLoading alias
+  isAdmin: boolean;
+  showAds: boolean;
+  subscription: any;
+  isLoading: boolean;
   refreshUser: () => Promise<void>;
-  refreshUserData: () => Promise<void>; // Added refreshUserData alias
-  setIsAdmin: (isAdmin: boolean) => void; // Added setIsAdmin
-  signOut: () => Promise<void>; // Added signOut
+  refreshUserData: () => Promise<void>;
+  setIsAdmin: (isAdmin: boolean) => void;
+  signOut: () => Promise<void>;
 }
 
+// Mock dev user for development mode
+const DEV_USER: UserProfile = {
+  id: 'dev-user-123',
+  username: 'dev_user',
+  display_name: 'Development User',
+  plan: 'premium',
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString()
+};
+
 const UserContext = createContext<UserContextType>({
-  user: null,
-  profile: null,
-  isLoggedIn: false,
-  loading: true,
-  isAdmin: false,
-  showAds: true,
-  subscription: null,
-  isLoading: true,
+  user: DEV_USER,
+  profile: DEV_USER,
+  isLoggedIn: true,
+  loading: false,
+  isAdmin: true,
+  showAds: false,
+  subscription: { plan: 'premium', is_active: true },
+  isLoading: false,
   refreshUser: async () => {},
   refreshUserData: async () => {},
   setIsAdmin: () => {},
@@ -49,72 +58,29 @@ const UserContext = createContext<UserContextType>({
 });
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(true);
 
   const refreshUser = async () => {
-    try {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      
-      if (authUser) {
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('id', authUser.id)
-          .single();
-        
-        setUser(profile);
-      } else {
-        setUser(null);
-      }
-    } catch (error) {
-      console.error('Error fetching user:', error);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
+    // Development mode - no actual refresh needed
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setIsAdmin(false);
+    // Development mode - no actual sign out
   };
-
-  // Calculate showAds based on user plan
-  const showAds = user?.plan === 'free' || !user?.plan;
-
-  useEffect(() => {
-    refreshUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN' && session?.user) {
-          await refreshUser();
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null);
-          setIsAdmin(false);
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   return (
     <UserContext.Provider 
       value={{ 
-        user, 
-        profile: user, // profile is an alias for user
-        isLoggedIn: !!user, 
-        loading,
+        user: DEV_USER,
+        profile: DEV_USER,
+        isLoggedIn: true,
+        loading: false,
         isAdmin,
-        showAds,
-        subscription: null, // placeholder for subscription
-        isLoading: loading, // isLoading is an alias for loading
+        showAds: false, // No ads in dev mode
+        subscription: { plan: 'premium', is_active: true },
+        isLoading: false,
         refreshUser,
-        refreshUserData: refreshUser, // refreshUserData is an alias for refreshUser
+        refreshUserData: refreshUser,
         setIsAdmin,
         signOut
       }}

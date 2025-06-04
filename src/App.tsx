@@ -5,8 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { SecurityHeaders } from "@/components/security/SecurityHeaders";
-import SessionManager from "@/components/security/SessionManager";
+import { UserProvider } from "@/context/UserContext";
 import SplashWrapper from "@/components/welcome/SplashWrapper";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
@@ -38,7 +37,6 @@ const queryClient = new QueryClient({
 
 // Home page wrapper that shows splash/welcome flow for new users
 const HomeWrapper = () => {
-  // Always show splash/welcome flow as requested
   return (
     <SplashWrapper>
       <Index />
@@ -69,10 +67,10 @@ const AppRoutes = () => {
         <Route path="/stats" element={<Stats />} />
         <Route path="/settings" element={<Settings />} />
         
-        {/* Auth pages (redirect to auth page) */}
-        <Route path="/auth" element={<AuthPage />} />
-        <Route path="/login" element={<Navigate to="/auth" replace />} />
-        <Route path="/signup" element={<Navigate to="/auth" replace />} />
+        {/* Auth pages - redirect to main game in dev mode */}
+        <Route path="/auth" element={<Navigate to="/" replace />} />
+        <Route path="/login" element={<Navigate to="/" replace />} />
+        <Route path="/signup" element={<Navigate to="/" replace />} />
         
         {/* Static pages */}
         <Route path="/pricing" element={<Pricing />} />
@@ -90,13 +88,13 @@ const AppRoutes = () => {
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <SecurityHeaders />
-        <SessionManager />
-        <AppRoutes />
-      </TooltipProvider>
+      <UserProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <AppRoutes />
+        </TooltipProvider>
+      </UserProvider>
     </QueryClientProvider>
   );
 };
