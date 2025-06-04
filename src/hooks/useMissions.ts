@@ -112,7 +112,7 @@ export const useMissions = () => {
 
       if (error) throw error;
 
-      const result = data as UpdateMissionProgressResponse;
+      const result = data as unknown as UpdateMissionProgressResponse;
       
       if (result.updated_missions && result.updated_missions.length > 0) {
         // Refresh missions to show updated progress
@@ -146,7 +146,7 @@ export const useMissions = () => {
 
       if (error) throw error;
 
-      const result = data as ClaimMissionRewardResponse;
+      const result = data as unknown as ClaimMissionRewardResponse;
       
       if (result.success) {
         toast({

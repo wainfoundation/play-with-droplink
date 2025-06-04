@@ -92,7 +92,7 @@ const EnhancedDailyRewards: React.FC = () => {
 
       if (error) throw error;
 
-      const result = data as ClaimDailyRewardResponse;
+      const result = data as unknown as ClaimDailyRewardResponse;
 
       if (result.success) {
         setRewardData(result);
