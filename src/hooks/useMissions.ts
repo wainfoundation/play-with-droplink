@@ -18,6 +18,27 @@ export interface Mission {
   difficulty: string;
 }
 
+interface UpdateMissionProgressResponse {
+  success: boolean;
+  updated_missions: Array<{
+    id: string;
+    title: string;
+    progress: number;
+    target: number;
+    completed: boolean;
+    reward_coins: number;
+    reward_xp: number;
+  }>;
+}
+
+interface ClaimMissionRewardResponse {
+  success: boolean;
+  coins_earned?: number;
+  xp_earned?: number;
+  mission_title?: string;
+  error?: string;
+}
+
 export const useMissions = () => {
   const { user } = useUser();
   const [missions, setMissions] = useState<Mission[]>([]);
@@ -91,12 +112,14 @@ export const useMissions = () => {
 
       if (error) throw error;
 
-      if (data.updated_missions && data.updated_missions.length > 0) {
+      const result = data as UpdateMissionProgressResponse;
+      
+      if (result.updated_missions && result.updated_missions.length > 0) {
         // Refresh missions to show updated progress
         await loadMissions();
         
         // Show completion notifications
-        data.updated_missions.forEach((mission: any) => {
+        result.updated_missions.forEach((mission: any) => {
           if (mission.completed) {
             toast({
               title: "🎉 Mission Complete!",
@@ -123,10 +146,12 @@ export const useMissions = () => {
 
       if (error) throw error;
 
-      if (data.success) {
+      const result = data as ClaimMissionRewardResponse;
+      
+      if (result.success) {
         toast({
           title: "🎁 Reward Claimed!",
-          description: `+${data.coins_earned} coins, +${data.xp_earned} XP`,
+          description: `+${result.coins_earned} coins, +${result.xp_earned} XP`,
           className: "bg-yellow-50 border-yellow-200"
         });
         
@@ -136,7 +161,7 @@ export const useMissions = () => {
       } else {
         toast({
           title: "Cannot claim reward",
-          description: data.error,
+          description: result.error,
           variant: "destructive"
         });
         return false;

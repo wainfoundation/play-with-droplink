@@ -17,13 +17,20 @@ interface DailyReward {
   isToday: boolean;
 }
 
+interface ClaimDailyRewardResponse {
+  success: boolean;
+  streak?: number;
+  coins?: number;
+  xp?: number;
+}
+
 const EnhancedDailyRewards: React.FC = () => {
   const { user } = useUser();
   const [streak, setStreak] = useState(0);
   const [canClaim, setCanClaim] = useState(false);
   const [claiming, setClaiming] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
-  const [rewardData, setRewardData] = useState<any>(null);
+  const [rewardData, setRewardData] = useState<ClaimDailyRewardResponse | null>(null);
 
   // Generate 7 days of rewards
   const generateRewards = (): DailyReward[] => {
@@ -85,9 +92,11 @@ const EnhancedDailyRewards: React.FC = () => {
 
       if (error) throw error;
 
-      if (data.success) {
-        setRewardData(data);
-        setStreak(data.streak);
+      const result = data as ClaimDailyRewardResponse;
+
+      if (result.success) {
+        setRewardData(result);
+        setStreak(result.streak || 0);
         setCanClaim(false);
         setShowAnimation(true);
         
@@ -99,7 +108,7 @@ const EnhancedDailyRewards: React.FC = () => {
         
         toast({
           title: "🎁 Daily Reward Claimed!",
-          description: `Day ${data.streak}: +${data.coins} coins, +${data.xp} XP`,
+          description: `Day ${result.streak}: +${result.coins} coins, +${result.xp} XP`,
           className: "bg-yellow-50 border-yellow-200"
         });
       } else {
