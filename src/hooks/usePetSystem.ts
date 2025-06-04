@@ -140,7 +140,15 @@ export const usePetSystem = () => {
         console.warn('Inventory error:', inventoryError);
         setInventory([]);
       } else {
-        setInventory(inventoryData || []);
+        // Transform the data to match our interface
+        const transformedInventory = (inventoryData || []).map(item => ({
+          id: item.id,
+          item_id: item.item_id,
+          quantity: item.quantity,
+          is_equipped: item.equipped || false, // Map 'equipped' to 'is_equipped'
+          shop_item: item.shop_item
+        }));
+        setInventory(transformedInventory);
       }
 
       // Load shop items
@@ -420,27 +428,29 @@ export const usePetSystem = () => {
 
       if (petError) throw petError;
 
-      // Add to inventory
-      const { error: inventoryError } = await supabase
-        .from('user_inventory')
-        .insert([{
-          user_id: user.id,
-          item_id: itemId,
-          quantity: 1
-        }]);
-
-      if (inventoryError) {
-        // If item already exists, increase quantity
+      // Check if item already exists in inventory
+      const existingItem = inventory.find(inv => inv.item_id === itemId);
+      
+      if (existingItem) {
+        // Update quantity
         const { error: updateError } = await supabase
-          .rpc('increment', { 
-            table_name: 'user_inventory',
-            row_id: itemId,
-            column_name: 'quantity'
-          });
+          .from('user_inventory')
+          .update({ quantity: existingItem.quantity + 1 })
+          .eq('id', existingItem.id);
 
-        if (updateError) {
-          console.warn('Could not update inventory quantity:', updateError);
-        }
+        if (updateError) throw updateError;
+      } else {
+        // Add new item to inventory
+        const { error: inventoryError } = await supabase
+          .from('user_inventory')
+          .insert([{
+            user_id: user.id,
+            item_id: itemId,
+            quantity: 1,
+            equipped: false
+          }]);
+
+        if (inventoryError) throw inventoryError;
       }
 
       toast({
@@ -460,7 +470,7 @@ export const usePetSystem = () => {
       });
       return false;
     }
-  }, [user, pet, shopItems, initializePet]);
+  }, [user, pet, shopItems, inventory, initializePet]);
 
   // Initialize on mount
   useEffect(() => {
