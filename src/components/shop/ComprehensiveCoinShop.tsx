@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -104,7 +103,7 @@ const ComprehensiveCoinShop: React.FC<ComprehensiveCoinShopProps> = ({ onBack })
       
       // Add coins to wallet (simulate successful payment)
       const totalCoins = pack.coins + pack.bonus;
-      addCoins(totalCoins, `Pi purchase: ${pack.description}`);
+      addCoins(totalCoins);
       
       // Show success message
       console.log(`Successfully purchased ${totalCoins} coins!`);
@@ -115,7 +114,7 @@ const ComprehensiveCoinShop: React.FC<ComprehensiveCoinShopProps> = ({ onBack })
 
   const watchAdForCoins = () => {
     // Simulate watching an ad for 1 coin
-    addCoins(1, 'Watched advertisement');
+    addCoins(1);
   };
 
   if (!user) {

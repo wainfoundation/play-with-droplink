@@ -69,11 +69,15 @@ export const usePetEconomy = (characterId: string) => {
     }));
   };
 
+  // Add alias for addCoins to maintain compatibility
+  const addCoins = earnCoins;
+
   return {
     wallet,
     dailyRewardAvailable,
     claimDailyReward,
     spendCoins,
     earnCoins,
+    addCoins,
   };
 };

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { shopItems, ShopItem } from '@/data/shopItems';
@@ -13,7 +12,7 @@ interface LocalInventoryItem {
 
 export const useLocalShop = (characterId: string) => {
   const [inventory, setInventory] = useState<LocalInventoryItem[]>([]);
-  const { wallet, spendCoins, addToInventory } = usePetEconomy(characterId);
+  const { wallet, spendCoins } = usePetEconomy(characterId);
 
   // Load inventory from localStorage
   useEffect(() => {
@@ -42,7 +41,7 @@ export const useLocalShop = (characterId: string) => {
       return false;
     }
 
-    const success = spendCoins(item.price, item.name);
+    const success = spendCoins(item.price);
     if (!success) return false;
 
     // Add to inventory
