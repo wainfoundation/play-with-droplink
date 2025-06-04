@@ -19,7 +19,7 @@ const MyBooStyleGame: React.FC = () => {
   const [showShop, setShowShop] = useState(false);
   const [showInventory, setShowInventory] = useState(false);
 
-  const { moodState, actions } = usePetMoodEngine(selectedCharacter.id);
+  const { moodState, actions, currentMessage, isAsleep } = usePetMoodEngine(selectedCharacter.id);
   const { wallet } = usePetEconomy(selectedCharacter.id);
 
   // Load saved character
@@ -101,7 +101,22 @@ const MyBooStyleGame: React.FC = () => {
             transition={{ duration: 0.5 }}
             className="mb-8"
           >
-            <PetDisplay characterId={selectedCharacter.id} className="scale-125" />
+            <PetDisplay 
+              characterId={selectedCharacter.id} 
+              mood={moodState.happiness > 80 ? 'excited' : moodState.happiness < 40 ? 'sad' : 'happy'}
+              isAsleep={isAsleep}
+              size={150}
+            />
+          </motion.div>
+
+          {/* Pet Message */}
+          <motion.div
+            key={currentMessage}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white/90 backdrop-blur-sm rounded-xl p-4 mb-6 max-w-sm text-center shadow-lg border-2 border-white/50"
+          >
+            <p className="text-gray-800 font-medium">{currentMessage}</p>
           </motion.div>
 
           {/* Room Decorations */}
@@ -152,7 +167,7 @@ const MyBooStyleGame: React.FC = () => {
             onClick={() => setShowInventory(true)}
             className="flex flex-col items-center justify-center w-16 h-16 bg-white rounded-xl shadow-lg text-green-500"
           >
-            <span className="text-2xl">🏠</span>
+            <span className="text-2xl">🎒</span>
           </motion.button>
         </div>
 
@@ -203,23 +218,7 @@ const MyBooStyleGame: React.FC = () => {
         {/* Inventory Modal */}
         <AnimatePresence>
           {showInventory && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-black/50"
-              onClick={() => setShowInventory(false)}
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                onClick={(e) => e.stopPropagation()}
-                className="h-full overflow-auto"
-              >
-                <InventoryModal onClose={() => setShowInventory(false)} />
-              </motion.div>
-            </motion.div>
+            <InventoryModal onClose={() => setShowInventory(false)} />
           )}
         </AnimatePresence>
       </div>

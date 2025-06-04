@@ -7,74 +7,84 @@ interface RoomBackgroundProps {
 }
 
 const RoomBackground: React.FC<RoomBackgroundProps> = ({ roomId, children }) => {
-  const getRoomStyle = (room: string) => {
+  const getRoomStyles = (room: string) => {
     switch (room) {
-      case 'kitchen':
-        return 'bg-gradient-to-br from-orange-100 via-orange-50 to-yellow-50';
-      case 'bathroom':
-        return 'bg-gradient-to-br from-cyan-100 via-cyan-50 to-blue-50';
-      case 'playroom':
-        return 'bg-gradient-to-br from-green-100 via-green-50 to-emerald-50';
-      case 'garden':
-        return 'bg-gradient-to-br from-emerald-100 via-green-50 to-lime-50';
       case 'bedroom':
+        return 'bg-gradient-to-br from-purple-100 via-blue-50 to-indigo-100';
+      case 'kitchen':
+        return 'bg-gradient-to-br from-orange-100 via-yellow-50 to-red-100';
+      case 'bathroom':
+        return 'bg-gradient-to-br from-cyan-100 via-blue-50 to-teal-100';
+      case 'playroom':
+        return 'bg-gradient-to-br from-pink-100 via-purple-50 to-blue-100';
+      case 'nature':
+        return 'bg-gradient-to-br from-green-100 via-emerald-50 to-lime-100';
+      case 'health':
+        return 'bg-gradient-to-br from-green-100 via-white to-blue-100';
       default:
-        return 'bg-gradient-to-br from-purple-100 via-pink-50 to-blue-50';
+        return 'bg-gradient-to-br from-blue-50 via-white to-purple-50';
     }
   };
 
   const getRoomDecorations = (room: string) => {
     switch (room) {
+      case 'bedroom':
+        return (
+          <>
+            <div className="absolute bottom-10 left-10 text-4xl">🛏️</div>
+            <div className="absolute top-20 right-20 text-3xl">🌙</div>
+            <div className="absolute bottom-20 right-15 text-2xl">⭐</div>
+          </>
+        );
       case 'kitchen':
         return (
           <>
-            <div className="absolute top-10 left-10 text-4xl opacity-20">🍳</div>
-            <div className="absolute top-20 right-16 text-3xl opacity-20">🥘</div>
-            <div className="absolute bottom-32 left-20 text-5xl opacity-15">🍽️</div>
+            <div className="absolute bottom-10 left-10 text-4xl">🍳</div>
+            <div className="absolute top-20 right-20 text-3xl">🥘</div>
+            <div className="absolute bottom-20 right-15 text-2xl">🍎</div>
           </>
         );
       case 'bathroom':
         return (
           <>
-            <div className="absolute top-16 left-12 text-4xl opacity-20">🚿</div>
-            <div className="absolute top-24 right-20 text-3xl opacity-20">🧼</div>
-            <div className="absolute bottom-40 right-16 text-5xl opacity-15">🛁</div>
+            <div className="absolute bottom-10 left-10 text-4xl">🛁</div>
+            <div className="absolute top-20 right-20 text-3xl">🚿</div>
+            <div className="absolute bottom-20 right-15 text-2xl">🧼</div>
           </>
         );
       case 'playroom':
         return (
           <>
-            <div className="absolute top-12 left-16 text-4xl opacity-20">🎮</div>
-            <div className="absolute top-32 right-12 text-3xl opacity-20">🧸</div>
-            <div className="absolute bottom-36 left-12 text-5xl opacity-15">⚽</div>
+            <div className="absolute bottom-10 left-10 text-4xl">🎾</div>
+            <div className="absolute top-20 right-20 text-3xl">🧸</div>
+            <div className="absolute bottom-20 right-15 text-2xl">🎮</div>
           </>
         );
-      case 'garden':
+      case 'nature':
         return (
           <>
-            <div className="absolute top-14 left-14 text-4xl opacity-20">🌸</div>
-            <div className="absolute top-28 right-18 text-3xl opacity-20">🦋</div>
-            <div className="absolute bottom-44 right-14 text-5xl opacity-15">🌳</div>
+            <div className="absolute bottom-10 left-10 text-4xl">🌳</div>
+            <div className="absolute top-20 right-20 text-3xl">🌸</div>
+            <div className="absolute bottom-20 right-15 text-2xl">🦋</div>
           </>
         );
-      case 'bedroom':
+      case 'health':
+        return (
+          <>
+            <div className="absolute bottom-10 left-10 text-4xl">💊</div>
+            <div className="absolute top-20 right-20 text-3xl">🏥</div>
+            <div className="absolute bottom-20 right-15 text-2xl">💉</div>
+          </>
+        );
       default:
-        return (
-          <>
-            <div className="absolute top-16 left-16 text-4xl opacity-20">🛏️</div>
-            <div className="absolute top-32 right-20 text-3xl opacity-20">🌙</div>
-            <div className="absolute bottom-40 left-24 text-5xl opacity-15">💤</div>
-          </>
-        );
+        return null;
     }
   };
 
   return (
-    <div className={`min-h-screen ${getRoomStyle(roomId)} relative overflow-hidden transition-all duration-500`}>
+    <div className={`min-h-screen relative ${getRoomStyles(roomId)}`}>
       {getRoomDecorations(roomId)}
-      <div className="relative z-10">
-        {children}
-      </div>
+      {children}
     </div>
   );
 };

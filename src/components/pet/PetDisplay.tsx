@@ -1,137 +1,132 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import CharacterRenderer from '../welcome/CharacterRenderer';
-import { usePersistentPetEngine } from '@/hooks/usePersistentPetEngine';
-import { useRoomManager } from '@/hooks/useRoomManager';
+import CharacterRenderer from '@/components/welcome/CharacterRenderer';
 
 interface PetDisplayProps {
   characterId: string;
+  mood?: string;
+  isAsleep?: boolean;
+  size?: number;
   className?: string;
 }
 
-const PetDisplay: React.FC<PetDisplayProps> = ({ characterId, className = "" }) => {
-  const { moodState, currentMessage } = usePersistentPetEngine();
-  const { getCurrentMood } = useRoomManager();
-  
-  const roomMood = getCurrentMood();
-  
-  const { happiness, health, hunger, energy } = moodState;
-
-  const getMoodEmoji = (happiness: number, health: number, hunger: number, energy: number, roomMood: string) => {
-    if (roomMood === 'sleepy' && energy < 50) return '😴';
-    if (roomMood === 'playful' && energy > 50) return '🤩';
-    if (roomMood === 'clean') return '✨';
-    if (roomMood === 'hungry') return '😋';
-    if (roomMood === 'sick' && health < 50) return '🤒';
-    if (roomMood === 'adventurous') return '🌟';
-    
-    if (health < 30) return '🤒';
-    if (hunger < 30) return '😋';
-    if (energy < 30) return '😴';
-    if (happiness > 80) return '😊';
-    if (happiness < 30) return '😢';
-    return '😐';
-  };
-
-  const getCharacterMood = () => {
-    if (roomMood.primaryMood === 'sleepy') return 'sleepy';
-    if (roomMood.primaryMood === 'playful') return 'happy';
-    if (roomMood.primaryMood === 'sick') return 'sad';
-    if (happiness > 70) return 'happy';
-    if (happiness < 40) return 'sad';
-    return 'neutral';
-  };
-
+const PetDisplay: React.FC<PetDisplayProps> = ({
+  characterId,
+  mood = 'happy',
+  isAsleep = false,
+  size = 150,
+  className = ''
+}) => {
   const character = {
     id: characterId,
     name: 'Droplet',
     gender: 'neutral',
-    color: characterId.includes('pink') ? '#ff69b4' : characterId.includes('green') ? '#32cd32' : '#00aaff',
-    mood: getCharacterMood(),
-    personality: roomMood.primaryMood
+    color: '#3B82F6',
+    mood: isAsleep ? 'sleepy' : mood,
+    personality: 'friendly'
+  };
+
+  const getAnimationProps = () => {
+    if (isAsleep) {
+      return {
+        animate: {
+          y: [0, -2, 0],
+          scale: [1, 1.02, 1],
+        },
+        transition: {
+          duration: 3,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }
+      };
+    }
+
+    switch (mood) {
+      case 'excited':
+        return {
+          animate: {
+            y: [0, -10, 0],
+            scale: [1, 1.1, 1],
+          },
+          transition: {
+            duration: 1,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }
+        };
+      case 'sad':
+        return {
+          animate: {
+            y: [0, 2, 0],
+          },
+          transition: {
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }
+        };
+      case 'sick':
+        return {
+          animate: {
+            x: [-2, 2, -2],
+            scale: [0.95, 1, 0.95],
+          },
+          transition: {
+            duration: 1.5,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }
+        };
+      default:
+        return {
+          animate: {
+            y: [0, -5, 0],
+          },
+          transition: {
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }
+        };
+    }
   };
 
   return (
-    <div className={`flex flex-col items-center ${className}`}>
-      {/* Pet Character with Room-Based Animation */}
-      <motion.div
-        animate={{ 
-          scale: roomMood.primaryMood === 'playful' ? [1, 1.05, 1] : [1, 1.02, 1],
-          y: roomMood.primaryMood === 'sleepy' ? [0, -1, 0] : [0, -3, 0],
-          rotate: roomMood.primaryMood === 'playful' ? [0, 2, -2, 0] : [0, 1, -1, 0]
-        }}
-        transition={{ 
-          duration: roomMood.primaryMood === 'playful' ? 1.5 : 2.5, 
-          repeat: Infinity,
-          ease: "easeInOut" 
-        }}
-        className="relative mb-4"
-      >
-        <CharacterRenderer character={character} size={120} />
-        
-        {/* Room & Mood Indicator */}
-        <motion.div
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          className="absolute -top-1 -right-1 text-2xl"
-        >
-          {getMoodEmoji(happiness, health, hunger, energy, roomMood.primaryMood)}
-        </motion.div>
-
-        {/* Room-specific effects */}
-        {roomMood.primaryMood === 'sleepy' && energy < 40 && (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="absolute -right-8 top-12"
-          >
-            <span className="text-3xl">💤</span>
-          </motion.div>
-        )}
-
-        {roomMood.primaryMood === 'playful' && happiness > 60 && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ 
-              opacity: [0, 1, 0],
-              y: [-20, -30, -40]
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="absolute top-0 left-1/2 transform -translate-x-1/2"
-          >
-            <span className="text-xl">✨</span>
-          </motion.div>
-        )}
-
-        {roomMood.primaryMood === 'clean' && (
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            className="absolute -left-6 top-8"
-          >
-            <span className="text-2xl">🧼</span>
-          </motion.div>
-        )}
+    <div className={`relative ${className}`}>
+      <motion.div {...getAnimationProps()}>
+        <CharacterRenderer character={character} size={size} />
       </motion.div>
-
-      {/* Pet Message with Room Context */}
-      {currentMessage && (
+      
+      {/* Sleep animation */}
+      {isAsleep && (
         <motion.div
-          initial={{ opacity: 0, y: 10, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -10, scale: 0.9 }}
-          className="relative bg-white/90 backdrop-blur-sm rounded-2xl px-4 py-2 shadow-lg max-w-xs text-center border-2 border-white/50"
+          className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-2xl"
+          animate={{ opacity: [0, 1, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
         >
-          <p className="text-sm text-gray-800 font-medium">
-            {currentMessage}
-            {roomMood.primaryMood !== 'neutral' && (
-              <span className="block text-xs text-gray-600 mt-1 capitalize">
-                Feeling {roomMood.primaryMood} in this room
-              </span>
-            )}
-          </p>
-          <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white/90"></div>
+          💤
+        </motion.div>
+      )}
+      
+      {/* Mood indicators */}
+      {mood === 'sick' && (
+        <motion.div
+          className="absolute -top-6 -right-2 text-xl"
+          animate={{ rotate: [-10, 10, -10] }}
+          transition={{ duration: 1, repeat: Infinity }}
+        >
+          🤒
+        </motion.div>
+      )}
+      
+      {mood === 'excited' && (
+        <motion.div
+          className="absolute -top-4 -right-4 text-lg"
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 0.5, repeat: Infinity }}
+        >
+          ✨
         </motion.div>
       )}
     </div>

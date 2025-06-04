@@ -1,170 +1,246 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { toast } from '@/hooks/use-toast';
 
 export interface MoodState {
-  happiness: number;
   hunger: number;
   energy: number;
+  happiness: number;
   cleanliness: number;
+  social: number;
   health: number;
-  affection: number;
   tiredness: number;
+  affection: number;
 }
 
-export interface PetPersonality {
+interface PetPersonality {
   name: string;
   favoriteActivity: string;
-  moodModifiers: {
-    happiness: number;
-    energy: number;
-    social: number;
-  };
   sleepSchedule: {
     bedtime: number;
     wakeTime: number;
   };
+  needDecayRates: {
+    hunger: number;
+    energy: number;
+    cleanliness: number;
+    social: number;
+  };
 }
-
-export interface PetMoodState extends MoodState {
-  personality: PetPersonality;
-}
-
-const initialMoodState: MoodState = {
-  happiness: 70,
-  hunger: 80,
-  energy: 75,
-  cleanliness: 85,
-  health: 90,
-  affection: 60,
-  tiredness: 20
-};
-
-const defaultPersonality: PetPersonality = {
-  name: 'Friendly Pet',
-  favoriteActivity: 'playing with toys',
-  moodModifiers: {
-    happiness: 1.0,
-    energy: 1.0,
-    social: 1.0
-  },
-  sleepSchedule: {
-    bedtime: 22,
-    wakeTime: 7
-  }
-};
 
 export const usePetMoodEngine = (characterId: string) => {
-  const [moodState, setMoodState] = useState<MoodState>(initialMoodState);
-  const [personality] = useState<PetPersonality>(defaultPersonality);
-  const [currentMessage, setCurrentMessage] = useState('');
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [moodState, setMoodState] = useState<MoodState>({
+    hunger: 80,
+    energy: 85,
+    happiness: 75,
+    cleanliness: 90,
+    social: 70,
+    health: 95,
+    tiredness: 20,
+    affection: 80,
+  });
 
-  // Load mood state from localStorage
-  useEffect(() => {
-    const savedMood = localStorage.getItem(`pet_mood_${characterId}`);
-    if (savedMood) {
-      try {
-        setMoodState(JSON.parse(savedMood));
-      } catch (error) {
-        console.log('Error loading mood state');
-      }
-    }
-  }, [characterId]);
+  const [currentMessage, setCurrentMessage] = useState("Hello! I'm happy to see you!");
+  const [isAsleep, setIsAsleep] = useState(false);
+  const [lastInteraction, setLastInteraction] = useState(Date.now());
 
-  // Save mood state to localStorage
-  useEffect(() => {
-    localStorage.setItem(`pet_mood_${characterId}`, JSON.stringify(moodState));
-  }, [moodState, characterId]);
+  // Pet personality based on character
+  const personality: PetPersonality = {
+    name: 'Droplet',
+    favoriteActivity: 'playing',
+    sleepSchedule: {
+      bedtime: 21, // 9 PM
+      wakeTime: 7,  // 7 AM
+    },
+    needDecayRates: {
+      hunger: 0.5,
+      energy: 0.3,
+      cleanliness: 0.2,
+      social: 0.4,
+    },
+  };
 
-  // Generate contextual messages based on mood
-  useEffect(() => {
-    const generateMessage = () => {
-      const { happiness, hunger, energy, cleanliness, health, tiredness } = moodState;
-      
-      if (health < 30) return "I don't feel very well... 🤒";
-      if (hunger < 25) return "I'm so hungry! Can we eat something? 🍎";
-      if (tiredness > 80) return "I'm getting really sleepy... 😴";
-      if (cleanliness < 25) return "I feel dirty! Can we take a bath? 🛁";
-      if (energy < 25) return "I'm too tired to play right now... 😴";
-      if (happiness > 85) return "I'm so happy! This is the best day ever! 😊";
-      if (happiness < 30) return "I'm feeling a bit sad... 😢";
-      if (energy > 80) return "I'm full of energy! Let's play! 🎾";
-      
-      return "I'm doing okay! Thanks for taking care of me! 😊";
-    };
-
-    setCurrentMessage(generateMessage());
+  // Get current mood based on stats
+  const getCurrentMood = useCallback(() => {
+    const { hunger, energy, happiness, cleanliness, health, social } = moodState;
+    
+    if (health < 30) return 'sick';
+    if (energy < 25) return 'sleepy';
+    if (hunger < 25) return 'hungry';
+    if (cleanliness < 30) return 'dirty';
+    if (social < 30) return 'lonely';
+    if (happiness > 85) return 'excited';
+    if (happiness < 40) return 'sad';
+    return 'happy';
   }, [moodState]);
 
-  // Mood decay over time
+  // Generate contextual messages
+  const generateMessage = useCallback(() => {
+    const mood = getCurrentMood();
+    const hour = new Date().getHours();
+    
+    const messages = {
+      sick: ["I don't feel well...", "Could you help me feel better?", "I need some medicine..."],
+      hungry: ["I'm getting hungry!", "Could you feed me something?", "My tummy is rumbling!"],
+      sleepy: ["I'm feeling sleepy...", "Maybe it's time for a nap?", "Yawn... so tired..."],
+      dirty: ["I could use a bath!", "I'm feeling a bit messy...", "Time for some cleaning!"],
+      lonely: ["I miss having company...", "Want to chat with me?", "It's been quiet lately..."],
+      excited: ["This is so much fun!", "I'm feeling great!", "Let's play together!"],
+      sad: ["I'm feeling down...", "Could you cheer me up?", "Things feel a bit gloomy..."],
+      happy: hour < 12 ? "Good morning! Ready for a new day?" : 
+             hour < 18 ? "What shall we do today?" : 
+             "Having a wonderful day!"
+    };
+
+    const moodMessages = messages[mood as keyof typeof messages] || messages.happy;
+    return Array.isArray(moodMessages) 
+      ? moodMessages[Math.floor(Math.random() * moodMessages.length)]
+      : moodMessages;
+  }, [getCurrentMood]);
+
+  // Check if it's sleep time
+  const isSleepTime = useCallback(() => {
+    const hour = new Date().getHours();
+    return hour >= personality.sleepSchedule.bedtime || hour < personality.sleepSchedule.wakeTime;
+  }, [personality.sleepSchedule]);
+
+  // Stat decay based on time and activity
   useEffect(() => {
-    const interval = setInterval(() => {
-      setMoodState(prev => ({
-        ...prev,
-        hunger: Math.max(0, prev.hunger - 0.5),
-        energy: Math.max(0, prev.energy - 0.3),
-        cleanliness: Math.max(0, prev.cleanliness - 0.2),
-        happiness: Math.max(0, prev.happiness - 0.1),
-        tiredness: Math.min(100, prev.tiredness + 0.4)
-      }));
+    const decayInterval = setInterval(() => {
+      const now = Date.now();
+      const timeSinceLastInteraction = (now - lastInteraction) / (1000 * 60); // minutes
+      
+      setMoodState(prev => {
+        const newState = { ...prev };
+        
+        // Natural decay rates (per minute)
+        if (!isAsleep) {
+          newState.hunger = Math.max(0, prev.hunger - personality.needDecayRates.hunger);
+          newState.energy = Math.max(0, prev.energy - personality.needDecayRates.energy);
+          newState.cleanliness = Math.max(0, prev.cleanliness - personality.needDecayRates.cleanliness);
+          newState.social = Math.max(0, prev.social - personality.needDecayRates.social);
+          newState.tiredness = Math.min(100, prev.tiredness + 0.3);
+        } else {
+          // Recovery during sleep
+          newState.energy = Math.min(100, prev.energy + 2);
+          newState.tiredness = Math.max(0, prev.tiredness - 2);
+        }
+
+        // Health is affected by other stats
+        const avgCare = (newState.hunger + newState.cleanliness + newState.happiness) / 3;
+        if (avgCare < 40) {
+          newState.health = Math.max(0, prev.health - 0.5);
+        } else if (avgCare > 70) {
+          newState.health = Math.min(100, prev.health + 0.2);
+        }
+
+        // Happiness is affected by other needs
+        const needsSatisfied = (newState.hunger + newState.energy + newState.cleanliness + newState.social) / 4;
+        newState.happiness = Math.max(0, Math.min(100, needsSatisfied * 0.8 + newState.affection * 0.2));
+
+        return newState;
+      });
+    }, 60000); // Every minute
+
+    return () => clearInterval(decayInterval);
+  }, [lastInteraction, isAsleep, personality.needDecayRates]);
+
+  // Update message periodically
+  useEffect(() => {
+    const messageInterval = setInterval(() => {
+      setCurrentMessage(generateMessage());
     }, 30000); // Every 30 seconds
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => clearInterval(messageInterval);
+  }, [generateMessage]);
 
-  const updateMood = useCallback((changes: Partial<MoodState>, message: string) => {
-    setIsAnimating(true);
-    setMoodState(prev => {
-      const newState = { ...prev };
-      Object.entries(changes).forEach(([key, value]) => {
-        if (typeof value === 'number') {
-          newState[key as keyof MoodState] = Math.max(0, Math.min(100, prev[key as keyof MoodState] + value));
-        }
-      });
-      return newState;
-    });
+  // Check sleep schedule
+  useEffect(() => {
+    const sleepCheck = setInterval(() => {
+      setIsAsleep(isSleepTime() && moodState.tiredness > 60);
+    }, 60000); // Check every minute
 
-    toast({
-      title: message,
-      description: "Your pet's mood has changed!",
-      className: "bg-green-50 border-green-200"
-    });
+    return () => clearInterval(sleepCheck);
+  }, [isSleepTime, moodState.tiredness]);
 
-    setTimeout(() => setIsAnimating(false), 1000);
-  }, []);
-
+  // Pet care actions
   const actions = {
-    feedPet: useCallback(() => {
-      updateMood({ hunger: 30, happiness: 10, energy: 5 }, "Fed your pet! 🍎");
-    }, [updateMood]),
+    feedPet: () => {
+      setMoodState(prev => ({
+        ...prev,
+        hunger: Math.min(100, prev.hunger + 25),
+        happiness: Math.min(100, prev.happiness + 10),
+        affection: Math.min(100, prev.affection + 5),
+      }));
+      setLastInteraction(Date.now());
+      setCurrentMessage("Yummy! Thank you for feeding me!");
+    },
 
-    playWithPet: useCallback(() => {
-      updateMood({ happiness: 20, energy: -10, affection: 15, tiredness: 10 }, "Played with your pet! 🎾");
-    }, [updateMood]),
+    playWithPet: () => {
+      if (moodState.energy > 20) {
+        setMoodState(prev => ({
+          ...prev,
+          happiness: Math.min(100, prev.happiness + 20),
+          social: Math.min(100, prev.social + 15),
+          energy: Math.max(0, prev.energy - 10),
+          affection: Math.min(100, prev.affection + 10),
+        }));
+        setLastInteraction(Date.now());
+        setCurrentMessage("This is so much fun! I love playing with you!");
+      } else {
+        setCurrentMessage("I'm too tired to play right now...");
+      }
+    },
 
-    sleepPet: useCallback(() => {
-      updateMood({ energy: 40, tiredness: -50, health: 10 }, "Your pet had a good rest! 😴");
-    }, [updateMood]),
+    bathePet: () => {
+      setMoodState(prev => ({
+        ...prev,
+        cleanliness: Math.min(100, prev.cleanliness + 30),
+        happiness: Math.min(100, prev.happiness + 5),
+        health: Math.min(100, prev.health + 5),
+      }));
+      setLastInteraction(Date.now());
+      setCurrentMessage("Ahh, that feels so refreshing!");
+    },
 
-    bathePet: useCallback(() => {
-      updateMood({ cleanliness: 40, happiness: 5, health: 5 }, "Bath time was fun! 🛁");
-    }, [updateMood]),
+    petCharacter: () => {
+      setMoodState(prev => ({
+        ...prev,
+        affection: Math.min(100, prev.affection + 15),
+        happiness: Math.min(100, prev.happiness + 10),
+        social: Math.min(100, prev.social + 10),
+      }));
+      setLastInteraction(Date.now());
+      setCurrentMessage("I love your gentle touch! ❤️");
+    },
 
-    giveMedicine: useCallback(() => {
-      updateMood({ health: 30, happiness: -5, energy: 5 }, "Medicine helped your pet feel better! 💊");
-    }, [updateMood]),
+    sleepPet: () => {
+      setIsAsleep(true);
+      setMoodState(prev => ({
+        ...prev,
+        energy: Math.min(100, prev.energy + 30),
+        tiredness: Math.max(0, prev.tiredness - 40),
+      }));
+      setLastInteraction(Date.now());
+      setCurrentMessage("Goodnight! 💤");
+    },
 
-    petCharacter: useCallback(() => {
-      updateMood({ happiness: 15, affection: 20 }, "Your pet loves the attention! 💖");
-    }, [updateMood])
+    giveMedicine: () => {
+      setMoodState(prev => ({
+        ...prev,
+        health: Math.min(100, prev.health + 40),
+        happiness: Math.min(100, prev.happiness + 5),
+      }));
+      setLastInteraction(Date.now());
+      setCurrentMessage("Thank you! I feel much better now!");
+    },
   };
 
   return {
     moodState,
-    personality,
     currentMessage,
-    isAnimating,
-    actions
+    isAsleep,
+    personality,
+    getCurrentMood: getCurrentMood(),
+    actions,
   };
 };
