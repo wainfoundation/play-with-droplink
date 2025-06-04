@@ -7,14 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 import { Utensils, Gamepad2, Sparkles, Moon, Heart, Star } from 'lucide-react';
 import { useMascotProgression } from '@/hooks/useMascotProgression';
-import PetDisplay from './PetDisplay';
+import MascotRenderer from './MascotRenderer';
 import MascotEvolution from './MascotEvolution';
-import { characters } from '@/components/welcome/characterData';
 
 const EnhancedPetGame: React.FC = () => {
   const { mascotState, petCareActivity, droplinkActivity, hasRoom } = useMascotProgression();
   const [showEvolution, setShowEvolution] = useState(false);
-  const [selectedCharacter] = useState(characters[0]);
 
   const handleFeed = async () => {
     const message = petCareActivity.feedPet();
@@ -103,13 +101,27 @@ const EnhancedPetGame: React.FC = () => {
                 </Button>
               </div>
 
-              {/* Pet Character */}
-              <div className="flex justify-center">
-                <PetDisplay
-                  characterId={selectedCharacter.id}
+              {/* Enhanced Mascot Character with Stage-Based Rendering */}
+              <div className="flex justify-center py-4">
+                <MascotRenderer
+                  stage={mascotState.stage}
                   mood={getCurrentMood()}
-                  size={180}
+                  size="large"
+                  isAnimated={true}
                 />
+              </div>
+
+              {/* XP Progress Bar */}
+              <div className="bg-gray-100 rounded-full p-1">
+                <div 
+                  className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full h-4 flex items-center justify-center text-white text-xs font-medium transition-all duration-300"
+                  style={{ 
+                    width: `${mascotState.xpToNext > 0 ? ((mascotState.xp % 1000) / 10) : 100}%`,
+                    minWidth: '20%'
+                  }}
+                >
+                  {mascotState.xp} XP
+                </div>
               </div>
 
               {/* Stats Display */}

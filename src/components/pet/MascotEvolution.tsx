@@ -6,21 +6,11 @@ import { Progress } from '@/components/ui/progress';
 import { motion } from 'framer-motion';
 import { Star, Crown, Zap, Gift, Calendar, TrendingUp } from 'lucide-react';
 import { useMascotProgression, MascotStage } from '@/hooks/useMascotProgression';
+import MascotRenderer from './MascotRenderer';
 
 const MascotEvolution: React.FC = () => {
   const { mascotState, getStageInfo } = useMascotProgression();
   const stageInfo = getStageInfo();
-
-  const getStageIcon = (stage: MascotStage) => {
-    switch (stage) {
-      case 'baby': return '👶';
-      case 'kid': return '🧒';
-      case 'teen': return '🧑';
-      case 'adult': return '👨';
-      case 'old': return '👴';
-      default: return '👶';
-    }
-  };
 
   const getStageColor = (stage: MascotStage) => {
     switch (stage) {
@@ -46,15 +36,14 @@ const MascotEvolution: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Current Stage */}
+        {/* Current Stage with Visual Mascot */}
         <div className="text-center">
-          <motion.div
-            animate={{ scale: [1, 1.1, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="text-6xl mb-2"
-          >
-            {getStageIcon(mascotState.stage)}
-          </motion.div>
+          <MascotRenderer
+            stage={mascotState.stage}
+            mood="happy"
+            size="medium"
+            isAnimated={true}
+          />
           <Badge className={getStageColor(mascotState.stage)}>
             {mascotState.stage.toUpperCase()} STAGE
           </Badge>
@@ -79,7 +68,7 @@ const MascotEvolution: React.FC = () => {
           )}
         </div>
 
-        {/* Evolution Stages */}
+        {/* Evolution Stages Timeline */}
         <div className="grid grid-cols-5 gap-2">
           {(['baby', 'kid', 'teen', 'adult', 'old'] as MascotStage[]).map((stage, index) => {
             const isUnlocked = mascotState.xp >= (stageInfo.requirements?.minXP || 0);
@@ -96,7 +85,7 @@ const MascotEvolution: React.FC = () => {
                       : 'bg-gray-100 text-gray-400'
                   }
                 `}>
-                  {getStageIcon(stage)}
+                  <MascotRenderer stage={stage} size="small" isAnimated={false} />
                 </div>
                 <p className="text-xs font-medium capitalize">{stage}</p>
               </div>
