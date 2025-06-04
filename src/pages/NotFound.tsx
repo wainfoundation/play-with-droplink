@@ -1,46 +1,51 @@
-import { useLocation, Link } from "react-router-dom";
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { AlertTriangle } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import GoToTop from '@/components/GoToTop';
 
-const NotFound = () => {
-  const location = useLocation();
+import React from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';
+import { Card, CardContent } from '@/components/ui/card';
+import IconButton from '@/components/ui/icon-button';
+import { Home, ArrowLeft } from 'lucide-react';
 
-  useEffect(() => {
-    console.error(
-      "404 Error: User attempted to access non-existent route:",
-      location.pathname
-    );
-  }, [location.pathname]);
+const NotFound: React.FC = () => {
+  const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className="flex-grow flex items-center justify-center py-12 px-4 bg-gray-50">
-        <div className="text-center max-w-md mx-auto">
-          <div className="flex justify-center mb-6">
-            <AlertTriangle className="h-20 w-20 text-orange-500" />
-          </div>
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">404</h1>
-          <p className="text-xl text-gray-700 mb-8">
-            Oops! We couldn't find the page you're looking for.
-          </p>
-          <div className="space-y-4">
-            <Button asChild className="w-full bg-primary hover:bg-primary/90">
-              <Link to="/">Return to Home</Link>
-            </Button>
-            <Button asChild variant="outline" className="w-full">
-              <Link to="/dashboard">Go to Dashboard</Link>
-            </Button>
-          </div>
-        </div>
-      </main>
-      <GoToTop />
-      <Footer />
-    </div>
+    <>
+      <Helmet>
+        <title>Page Not Found - PlayDrop</title>
+        <meta name="description" content="The page you're looking for doesn't exist." />
+      </Helmet>
+      
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center px-4">
+        <Card className="max-w-md w-full">
+          <CardContent className="p-8 text-center">
+            <div className="text-8xl mb-6">💧</div>
+            <h1 className="text-6xl font-bold text-gray-600 mb-4">404</h1>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+              Page Not Found
+            </h2>
+            <p className="text-gray-600 mb-8">
+              Oops! Your droplet got lost. The page you're looking for doesn't exist.
+            </p>
+            
+            <div className="flex gap-4 justify-center">
+              <IconButton
+                icon={Home}
+                label="Go Home"
+                onClick={() => navigate('/')}
+                className="bg-blue-500 hover:bg-blue-600"
+              />
+              <IconButton
+                icon={ArrowLeft}
+                label="Go Back"
+                onClick={() => navigate(-1)}
+                className="bg-gray-500 hover:bg-gray-600"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </>
   );
 };
 
