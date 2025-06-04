@@ -19,6 +19,7 @@ import NotFound from "./pages/NotFound";
 import Welcome from "./pages/Welcome";
 import PetSetup from "./pages/PetSetup";
 import Shop from "./pages/Shop";
+import CoinStore from "./pages/CoinStore";
 import Inventory from "./pages/Inventory";
 import Wallet from "./pages/Wallet";
 import Games from "./pages/Games";
@@ -61,6 +62,7 @@ const AppRoutes = () => {
         
         {/* Game feature pages */}
         <Route path="/shop" element={<Shop />} />
+        <Route path="/coin-store" element={<CoinStore />} />
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/wallet" element={<Wallet />} />
         <Route path="/games" element={<Games />} />

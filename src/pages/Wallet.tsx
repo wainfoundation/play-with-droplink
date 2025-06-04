@@ -3,7 +3,8 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Coins, Gift, TrendingUp, History } from 'lucide-react';
+import { Coins, Gift, TrendingUp, History, ShoppingCart } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Wallet: React.FC = () => {
   const coinBalance = 150;
@@ -39,7 +40,15 @@ const Wallet: React.FC = () => {
               <h2 className="text-3xl font-bold text-gray-800 mb-2">
                 {coinBalance} Coins
               </h2>
-              <p className="text-gray-600">Your current balance</p>
+              <p className="text-gray-600 mb-4">Your current balance</p>
+              
+              {/* Buy More Coins Button */}
+              <Button asChild className="bg-yellow-500 hover:bg-yellow-600 text-white">
+                <Link to="/coin-store" className="flex items-center gap-2">
+                  <ShoppingCart className="h-4 w-4" />
+                  Buy More Coins with Pi
+                </Link>
+              </Button>
             </CardContent>
           </Card>
 
