@@ -1,3 +1,4 @@
+
 import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -17,6 +18,7 @@ import CustomerSuccessStories from "@/components/CustomerSuccessStories";
 import AppInfo from "@/components/AppInfo";
 import GoToTop from "@/components/GoToTop";
 import WorkflowShowcase from "@/components/WorkflowShowcase";
+import { MusicToggle } from "@/components/ui/MusicToggle";
 import { Helmet } from "react-helmet-async";
 
 const Home = () => {
@@ -32,6 +34,14 @@ const Home = () => {
       </Helmet>
       
       <div className="min-h-screen w-full bg-gradient-to-br from-background via-muted/20 to-primary/10">
+        {/* Music Toggle - Fixed position */}
+        <div className="fixed top-4 right-4 z-50">
+          <MusicToggle 
+            variant="outline" 
+            className="bg-white/90 backdrop-blur-sm border-white/50 shadow-lg"
+          />
+        </div>
+
         <Navbar />
         <main className="w-full overflow-x-hidden">
           <Hero />

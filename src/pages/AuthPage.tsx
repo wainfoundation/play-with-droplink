@@ -13,6 +13,7 @@ import { isRunningInPiBrowser } from '@/utils/pi-sdk';
 import PiBrowserRedirect from '@/components/auth/PiBrowserRedirect';
 import CharacterRenderer from '@/components/welcome/CharacterRenderer';
 import { characters } from '@/components/welcome/characterData';
+import { MusicToggle } from '@/components/ui/MusicToggle';
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -65,6 +66,14 @@ const AuthPage = () => {
       </Helmet>
       
       <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 flex items-center justify-center p-4">
+        {/* Music Toggle - Fixed position */}
+        <div className="fixed top-4 right-4 z-50">
+          <MusicToggle 
+            variant="outline" 
+            className="bg-white/90 backdrop-blur-sm border-white/50 shadow-lg"
+          />
+        </div>
+
         <div className="w-full max-w-md">
           {/* Back Button */}
           <motion.div

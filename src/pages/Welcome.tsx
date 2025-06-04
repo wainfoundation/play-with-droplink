@@ -9,6 +9,7 @@ import CharacterRenderer from '@/components/welcome/CharacterRenderer';
 import CharacterMoodSelector from '@/components/welcome/CharacterMoodSelector';
 import { characters } from '@/components/welcome/characterData';
 import { generateRandomName, resetUsedNames } from '@/utils/nameGenerator';
+import { MusicToggle } from '@/components/ui/MusicToggle';
 
 const Welcome: React.FC = () => {
   const navigate = useNavigate();
@@ -72,6 +73,14 @@ const Welcome: React.FC = () => {
       </Helmet>
       
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-4">
+        {/* Music Toggle - Fixed position */}
+        <div className="fixed top-4 right-4 z-50">
+          <MusicToggle 
+            variant="outline" 
+            className="bg-white/90 backdrop-blur-sm border-white/50 shadow-lg"
+          />
+        </div>
+
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">

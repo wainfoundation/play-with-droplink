@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet-async';
 import { Sparkles, Heart, Globe, Play, SkipForward } from 'lucide-react';
 import CharacterRenderer from './CharacterRenderer';
 import { characters } from './characterData';
+import { MusicToggle } from '@/components/ui/MusicToggle';
 
 interface WelcomeHomeProps {
   mascotVisible: boolean;
@@ -36,6 +37,14 @@ const WelcomeHome: React.FC<WelcomeHomeProps> = ({
       </Helmet>
       
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden">
+        {/* Music Toggle - Fixed position */}
+        <div className="fixed top-4 right-4 z-50">
+          <MusicToggle 
+            variant="outline" 
+            className="bg-white/90 backdrop-blur-sm border-white/50 shadow-lg"
+          />
+        </div>
+
         {/* Background Effects */}
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-3xl animate-pulse" />
         <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-secondary/20 to-primary/20 rounded-full blur-3xl animate-pulse" />
