@@ -4,10 +4,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { X, Play, Pause } from 'lucide-react';
-import { MascotStage } from '@/hooks/useMascotProgression';
+import { EvolutionStage } from '@/hooks/usePetProgression';
 
 interface DropTapDashProps {
-  mascotStage: MascotStage;
+  mascotStage: EvolutionStage;
   onGameEnd: (score: number, xpEarned: number, coinsEarned: number) => void;
   onClose: () => void;
 }
@@ -31,15 +31,6 @@ const STAGE_CONFIG = {
     coinMultiplier: 0.5,
     theme: { primary: '#87CEEB', secondary: '#FFB6C1' }
   },
-  kid: {
-    dropSpeed: 3,
-    spawnRate: 1200,
-    maxDrops: 4,
-    gameDuration: 45,
-    xpMultiplier: 1.2,
-    coinMultiplier: 0.7,
-    theme: { primary: '#FF6B35', secondary: '#FFD700' }
-  },
   teen: {
     dropSpeed: 4,
     spawnRate: 1000,
@@ -58,7 +49,7 @@ const STAGE_CONFIG = {
     coinMultiplier: 1.5,
     theme: { primary: '#8B0000', secondary: '#DAA520' }
   },
-  old: {
+  elder: {
     dropSpeed: 3,
     spawnRate: 1800,
     maxDrops: 4,
