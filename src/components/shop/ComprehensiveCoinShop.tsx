@@ -181,7 +181,7 @@ const ComprehensiveCoinShop: React.FC<ComprehensiveCoinShopProps> = ({ onBack })
               <div className="text-center">
                 <p className="text-sm text-green-600 mb-2">Daily login bonus!</p>
                 <Button 
-                  onClick={() => addCoins(5, 'Daily login bonus')}
+                  onClick={() => addCoins(5)}
                   className="bg-green-500 hover:bg-green-600 text-white"
                 >
                   <Gift className="w-4 h-4 mr-2" />
