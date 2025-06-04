@@ -87,7 +87,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-primary to-secondary"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-primary to-secondary px-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
@@ -96,7 +96,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
-        className="text-center"
+        className="text-center w-full max-w-md"
       >
         {/* Mascot Logo with enhanced animation */}
         <motion.div
@@ -119,7 +119,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         
         {/* App Name with enhanced styling */}
         <motion.h1 
-          className="mb-3 font-poppins text-5xl md:text-6xl font-bold text-white drop-shadow-lg"
+          className="mb-3 font-poppins text-4xl md:text-5xl lg:text-6xl font-bold text-white drop-shadow-lg"
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.6, ease: "easeOut" }}
@@ -149,7 +149,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         
         {/* Loading text with dynamic updates */}
         <motion.p
-          className="mt-8 mb-4 text-white/90 font-medium text-lg"
+          className="mt-8 mb-4 text-white/90 font-medium text-lg text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8, duration: 0.5 }}
@@ -159,7 +159,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         
         {/* Progress Percentage */}
         <motion.p
-          className="mb-4 text-white/80 font-semibold text-xl"
+          className="mb-6 text-white/80 font-semibold text-xl text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.9, duration: 0.5 }}
@@ -167,16 +167,16 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           {Math.round(progress)}%
         </motion.p>
         
-        {/* Enhanced Progress Bar */}
+        {/* Enhanced Progress Bar - Centered */}
         <motion.div 
-          className="w-80 md:w-96"
+          className="w-full max-w-sm mx-auto"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 1.0, duration: 0.6 }}
         >
           <Progress 
             value={progress} 
-            className="h-3 bg-white/20 border border-white/30 rounded-full overflow-hidden" 
+            className="h-3 bg-white/20 border border-white/30 rounded-full overflow-hidden w-full" 
           />
         </motion.div>
         
