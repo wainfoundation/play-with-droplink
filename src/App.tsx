@@ -17,6 +17,7 @@ import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import Welcome from "./pages/Welcome";
+import PetSetup from "./pages/PetSetup";
 import Shop from "./pages/Shop";
 import Inventory from "./pages/Inventory";
 import Wallet from "./pages/Wallet";
@@ -51,9 +52,11 @@ const AppRoutes = () => {
         {/* Main game flow with splash/welcome */}
         <Route path="/" element={<HomeWrapper />} />
         <Route path="/welcome" element={<Welcome />} />
+        <Route path="/pet-setup" element={<PetSetup />} />
         
         {/* Game pages */}
         <Route path="/play" element={<PlayWithMascot />} />
+        <Route path="/home" element={<PlayWithMascot />} />
         <Route path="/playdrop" element={<PlayDrop />} />
         
         {/* Game feature pages */}

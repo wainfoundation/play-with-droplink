@@ -18,11 +18,12 @@ const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
   const [selectedCharacter, setSelectedCharacter] = useState('droplet-blue');
 
   useEffect(() => {
-    // Check if user has completed welcome flow
+    // Check if user has completed welcome flow AND pet setup
     const welcomeCompleted = localStorage.getItem('welcomeCompleted');
+    const petSetupCompleted = localStorage.getItem('petSetupCompleted');
     const hasSelectedCharacter = localStorage.getItem('selectedCharacter');
     
-    if (welcomeCompleted === 'true' && hasSelectedCharacter) {
+    if (welcomeCompleted === 'true' && petSetupCompleted === 'true' && hasSelectedCharacter) {
       setCurrentStep('complete');
       setShowSplash(false);
       return;
@@ -79,6 +80,7 @@ const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
   // Development bypass - add a skip button in development mode
   const handleDevBypass = () => {
     localStorage.setItem('welcomeCompleted', 'true');
+    localStorage.setItem('petSetupCompleted', 'true');
     localStorage.setItem('devBypass', 'true');
     setCurrentStep('complete');
   };
