@@ -13,10 +13,13 @@ try {
   preloadPiSDK();
   PiLogger.info('app_init', { environment: import.meta.env.MODE });
   
-  // Start background music after a short delay to ensure user interaction
+  // Start background music immediately (will wait for user interaction)
+  startMainTheme();
+  
+  // Also try to start after a short delay in case the first attempt fails
   setTimeout(() => {
     startMainTheme();
-  }, 1000);
+  }, 2000);
 } catch (error) {
   PiLogger.error('app_init_error', error);
 }

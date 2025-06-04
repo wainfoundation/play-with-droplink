@@ -1,3 +1,4 @@
+
 // Helper function to play sounds with volume control
 export const playSound = (audioUrl: string, volume = 1): void => {
   const audio = new Audio(audioUrl);
@@ -62,23 +63,66 @@ export const gameSounds = {
   setupComplete: "/sounds/setup-complete.mp3",
 };
 
-// Enhanced background music manager with persistence
+// Enhanced background music manager with persistence and autoplay handling
 class BackgroundMusicManager {
   private audio: HTMLAudioElement | null = null;
   private currentTrack: string | null = null;
   private volume: number = 0.3;
   private isPlaying: boolean = false;
   private isMuted: boolean = false;
+  private hasUserInteracted: boolean = false;
+  private pendingPlay: string | null = null;
 
   constructor() {
     // Load mute state from localStorage
     const savedMuteState = localStorage.getItem('droplet-music-muted');
     this.isMuted = savedMuteState === 'true';
+    
+    // Listen for first user interaction to enable autoplay
+    this.setupUserInteractionListener();
+  }
+
+  private setupUserInteractionListener() {
+    const enableAudio = () => {
+      this.hasUserInteracted = true;
+      console.log('User interaction detected, enabling audio');
+      
+      // If there's a pending play request, execute it now
+      if (this.pendingPlay && !this.isMuted) {
+        this.play(this.pendingPlay);
+        this.pendingPlay = null;
+      }
+      
+      // Remove listeners after first interaction
+      document.removeEventListener('click', enableAudio);
+      document.removeEventListener('keydown', enableAudio);
+      document.removeEventListener('touchstart', enableAudio);
+    };
+    
+    document.addEventListener('click', enableAudio);
+    document.addEventListener('keydown', enableAudio);
+    document.addEventListener('touchstart', enableAudio);
   }
 
   play(track: string, loop: boolean = true) {
-    if (this.isMuted) return;
-    if (this.currentTrack === track && this.isPlaying) return;
+    console.log('Attempting to play music:', track, 'Muted:', this.isMuted, 'User interacted:', this.hasUserInteracted);
+    
+    if (this.isMuted) {
+      console.log('Music is muted, not playing');
+      return;
+    }
+    
+    if (this.currentTrack === track && this.isPlaying) {
+      console.log('Music already playing');
+      return;
+    }
+    
+    // If user hasn't interacted yet, store the request for later
+    if (!this.hasUserInteracted) {
+      console.log('No user interaction yet, storing play request');
+      this.pendingPlay = track;
+      return;
+    }
     
     this.stop();
     
@@ -91,8 +135,15 @@ class BackgroundMusicManager {
     if (playPromise !== undefined) {
       playPromise.then(() => {
         this.isPlaying = true;
+        console.log('Music started successfully');
       }).catch((error) => {
         console.error("Background music playback error:", error);
+        // Try again in a moment if it failed
+        setTimeout(() => {
+          if (this.audio && !this.isMuted) {
+            this.audio.play().catch(e => console.log('Retry play failed:', e));
+          }
+        }, 1000);
       });
     }
   }
@@ -108,11 +159,14 @@ class BackgroundMusicManager {
   toggle() {
     this.isMuted = !this.isMuted;
     localStorage.setItem('droplet-music-muted', this.isMuted.toString());
+    console.log('Music toggled, muted:', this.isMuted);
     
     if (this.isMuted) {
       this.stop();
-    } else if (this.currentTrack) {
-      this.play(this.currentTrack);
+    } else if (this.currentTrack || this.pendingPlay) {
+      // Try to play the current track or pending track
+      const trackToPlay = this.currentTrack || this.pendingPlay || gameSounds.mainTheme;
+      this.play(trackToPlay);
     }
     
     return this.isMuted;
@@ -152,8 +206,9 @@ class BackgroundMusicManager {
 
 export const backgroundMusic = new BackgroundMusicManager();
 
-// Auto-start main theme
+// Auto-start main theme (will wait for user interaction)
 export const startMainTheme = () => {
+  console.log('startMainTheme called');
   backgroundMusic.play(gameSounds.mainTheme);
 };
 
