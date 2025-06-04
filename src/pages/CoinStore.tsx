@@ -6,7 +6,6 @@ import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CoinPackCard from '@/components/store/CoinPackCard';
 import RewardAdButton from '@/components/store/RewardAdButton';
-import { useAuth } from '@/hooks/useAuth';
 
 export interface CoinPack {
   id: number;
@@ -20,7 +19,6 @@ export interface CoinPack {
 
 const CoinStore: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   const coinPacks: CoinPack[] = [
     { id: 1, coins: 10, pi: 1, title: 'Starter Pack' },
@@ -29,25 +27,6 @@ const CoinStore: React.FC = () => {
     { id: 4, coins: 300, pi: 20, promo: true, title: 'Special Deal' },
     { id: 5, coins: 1000, pi: 50, premium: true, title: 'Premium Tier' },
   ];
-
-  if (!user) {
-    return (
-      <>
-        <Helmet>
-          <title>Coin Store - Droplet Pet</title>
-          <meta name="description" content="Purchase Droplet Coins with Pi Network" />
-        </Helmet>
-        
-        <div className="min-h-screen bg-gradient-to-b from-yellow-50 to-yellow-100 px-4 py-6">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-3xl font-bold mb-4">🪙 Buy Droplet Coins</h1>
-            <p className="text-gray-600 mb-8">Please sign in to purchase coins</p>
-            <Button onClick={() => navigate('/auth')}>Sign In</Button>
-          </div>
-        </div>
-      </>
-    );
-  }
 
   return (
     <>
