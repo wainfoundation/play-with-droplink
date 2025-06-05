@@ -624,45 +624,6 @@ export type Database = {
           },
         ]
       }
-      missions: {
-        Row: {
-          created_at: string
-          description: string
-          difficulty: string
-          id: string
-          is_active: boolean
-          mission_type: string
-          reward_coins: number
-          reward_xp: number
-          target_count: number
-          title: string
-        }
-        Insert: {
-          created_at?: string
-          description: string
-          difficulty?: string
-          id?: string
-          is_active?: boolean
-          mission_type: string
-          reward_coins?: number
-          reward_xp?: number
-          target_count?: number
-          title: string
-        }
-        Update: {
-          created_at?: string
-          description?: string
-          difficulty?: string
-          id?: string
-          is_active?: boolean
-          mission_type?: string
-          reward_coins?: number
-          reward_xp?: number
-          target_count?: number
-          title?: string
-        }
-        Relationships: []
-      }
       orders: {
         Row: {
           access_token: string | null
@@ -1132,56 +1093,6 @@ export type Database = {
           },
         ]
       }
-      user_missions: {
-        Row: {
-          assigned_date: string
-          claimed_at: string | null
-          completed_at: string | null
-          created_at: string
-          current_progress: number
-          id: string
-          is_completed: boolean
-          mission_id: string | null
-          reward_claimed: boolean
-          target_count: number
-          user_id: string
-        }
-        Insert: {
-          assigned_date?: string
-          claimed_at?: string | null
-          completed_at?: string | null
-          created_at?: string
-          current_progress?: number
-          id?: string
-          is_completed?: boolean
-          mission_id?: string | null
-          reward_claimed?: boolean
-          target_count: number
-          user_id: string
-        }
-        Update: {
-          assigned_date?: string
-          claimed_at?: string | null
-          completed_at?: string | null
-          created_at?: string
-          current_progress?: number
-          id?: string
-          is_completed?: boolean
-          mission_id?: string | null
-          reward_claimed?: boolean
-          target_count?: number
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_missions_mission_id_fkey"
-            columns: ["mission_id"]
-            isOneToOne: false
-            referencedRelation: "missions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_owned_characters: {
         Row: {
           character_id: string
@@ -1455,16 +1366,8 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: Json
       }
-      claim_mission_reward: {
-        Args: { p_user_id: string; p_mission_id: string }
-        Returns: Json
-      }
       decay_pet_stats: {
         Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      generate_daily_missions: {
-        Args: { p_user_id: string }
         Returns: undefined
       }
       regenerate_life: {
@@ -1474,14 +1377,6 @@ export type Database = {
       toggle_equip_item: {
         Args: { p_user_id: string; p_item_id: string; p_equip: boolean }
         Returns: undefined
-      }
-      update_mission_progress: {
-        Args: {
-          p_user_id: string
-          p_mission_type: string
-          p_increment?: number
-        }
-        Returns: Json
       }
       use_item: {
         Args: { p_user_id: string; p_item_id: string }

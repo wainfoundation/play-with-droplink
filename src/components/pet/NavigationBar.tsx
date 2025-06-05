@@ -1,51 +1,90 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Home, Store, Package, Wallet, Gamepad2, BarChart3, Settings, Target } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Home, ShoppingBag, Package, Coins } from 'lucide-react';
 
-const NavigationBar: React.FC = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+interface NavigationBarProps {
+  activeRoom: string;
+  onRoomChange: (room: string) => void;
+  onOpenShop: () => void;
+  onOpenInventory: () => void;
+  coinBalance: number;
+}
 
-  const navItems = [
-    { icon: Home, label: 'Home', path: '/play' },
-    { icon: Target, label: 'Missions', path: '/missions' },
-    { icon: Store, label: 'Shop', path: '/shop' },
-    { icon: Package, label: 'Inventory', path: '/inventory' },
-    { icon: Wallet, label: 'Wallet', path: '/wallet' },
-    { icon: Gamepad2, label: 'Games', path: '/games' },
-    { icon: BarChart3, label: 'Stats', path: '/stats' },
-    { icon: Settings, label: 'Settings', path: '/settings' }
+const NavigationBar: React.FC<NavigationBarProps> = ({
+  activeRoom,
+  onRoomChange,
+  onOpenShop,
+  onOpenInventory,
+  coinBalance
+}) => {
+  const rooms = [
+    { id: 'bedroom', name: 'Room', icon: '🏠', color: 'from-blue-400 to-blue-600' },
+    { id: 'kitchen', name: 'Kitchen', icon: '🍽️', color: 'from-orange-400 to-orange-600' },
+    { id: 'bathroom', name: 'Bath', icon: '🛁', color: 'from-cyan-400 to-cyan-600' },
+    { id: 'playroom', name: 'Play', icon: '🎮', color: 'from-green-400 to-green-600' },
+    { id: 'garden', name: 'Garden', icon: '🌳', color: 'from-emerald-400 to-emerald-600' }
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-blue-400 to-purple-500 border-t-4 border-white z-40 shadow-2xl">
-      <div className="flex justify-around items-center py-3 px-2 max-w-md mx-auto">
-        {navItems.map(({ icon: Icon, label, path }) => {
-          const isActive = location.pathname === path || 
-                          (path === '/play' && location.pathname === '/home');
-          return (
-            <Button
-              key={path}
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate(path)}
-              className={`flex flex-col items-center gap-1 p-3 min-w-0 transition-all duration-300 rounded-xl ${
-                isActive 
-                  ? 'bg-white text-blue-600 scale-110 shadow-lg' 
-                  : 'text-white hover:bg-white/20 hover:scale-105'
-              }`}
-            >
-              <Icon className="w-5 h-5" />
-              <span className="text-xs font-bold truncate">{label}</span>
-            </Button>
-          );
-        })}
+    <div className="bg-white/90 backdrop-blur-sm border-t-2 border-white/50 p-4">
+      {/* Coin Balance */}
+      <div className="flex justify-center mb-4">
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          className="flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white px-4 py-2 rounded-full shadow-lg"
+        >
+          <Coins className="w-5 h-5" />
+          <span className="font-bold">{coinBalance.toLocaleString()}</span>
+        </motion.div>
       </div>
-      
-      {/* Decorative bottom border */}
-      <div className="h-1 bg-gradient-to-r from-yellow-400 to-pink-400"></div>
+
+      {/* Room Navigation */}
+      <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+        {rooms.map((room) => (
+          <motion.div key={room.id} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              onClick={() => onRoomChange(room.id)}
+              className={`
+                flex flex-col items-center gap-1 h-16 min-w-[70px] px-3
+                ${activeRoom === room.id 
+                  ? `bg-gradient-to-r ${room.color} text-white shadow-lg` 
+                  : 'bg-white/80 text-gray-600 hover:bg-white'
+                }
+                border-2 border-white/50 transition-all duration-200
+              `}
+              variant="outline"
+            >
+              <span className="text-xl">{room.icon}</span>
+              <span className="text-xs font-medium">{room.name}</span>
+            </Button>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Shop & Inventory */}
+      <div className="flex gap-3 justify-center">
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Button
+            onClick={onOpenShop}
+            className="flex items-center gap-2 bg-gradient-to-r from-purple-400 to-purple-600 hover:from-purple-500 hover:to-purple-700 text-white px-6 py-3 rounded-full shadow-lg"
+          >
+            <ShoppingBag className="w-5 h-5" />
+            <span className="font-semibold">Shop</span>
+          </Button>
+        </motion.div>
+
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Button
+            onClick={onOpenInventory}
+            className="flex items-center gap-2 bg-gradient-to-r from-emerald-400 to-emerald-600 hover:from-emerald-500 hover:to-emerald-700 text-white px-6 py-3 rounded-full shadow-lg"
+          >
+            <Package className="w-5 h-5" />
+            <span className="font-semibold">Items</span>
+          </Button>
+        </motion.div>
+      </div>
     </div>
   );
 };

@@ -7,7 +7,7 @@ interface AuthGuardProps {
 }
 
 const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
-  // Development mode - always allow access without authentication
+  // For now, always allow access without authentication
   return <>{children}</>;
 };
 

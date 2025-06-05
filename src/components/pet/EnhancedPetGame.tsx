@@ -1,188 +1,287 @@
-
 import React, { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import IconButton from '@/components/ui/icon-button';
-import NavigationBar from '@/components/pet/NavigationBar';
-import { 
-  Settings,
-  Heart,
-  Coins,
-  Star,
-  Gift
-} from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
+import { Utensils, Gamepad2, Sparkles, Moon, Heart, Star, Zap } from 'lucide-react';
+import { useMascotProgression } from '@/hooks/useMascotProgression';
+import MascotRenderer from './MascotRenderer';
+import MascotEvolution from './MascotEvolution';
+import DropTapDash from '@/components/games/DropTapDash';
+import { MusicToggle } from '@/components/ui/MusicToggle';
 
 const EnhancedPetGame: React.FC = () => {
-  const navigate = useNavigate();
-  const [petStats] = useState({
-    happiness: 85,
-    energy: 78,
-    hunger: 65,
-    cleanliness: 90
-  });
+  const { mascotState, petCareActivity, droplinkActivity, hasRoom } = useMascotProgression();
+  const [showEvolution, setShowEvolution] = useState(false);
+  const [showDropTapDash, setShowDropTapDash] = useState(false);
 
-  const [userStats] = useState({
-    coins: 1240,
-    level: 15,
-    xp: 2847,
-    streak: 5
-  });
+  const handleFeed = async () => {
+    const message = petCareActivity.feedPet();
+    toast({
+      title: "Fed your pet! 🍎",
+      description: message,
+      className: "bg-green-50 border-green-200"
+    });
+  };
+
+  const handlePlay = async () => {
+    const message = petCareActivity.playWithPet();
+    toast({
+      title: "Played with your pet! 🎮",
+      description: message,
+      className: "bg-blue-50 border-blue-200"
+    });
+  };
+
+  const handleBathe = async () => {
+    const message = petCareActivity.bathePet();
+    toast({
+      title: "Gave your pet a bath! 🛁",
+      description: message,
+      className: "bg-cyan-50 border-cyan-200"
+    });
+  };
+
+  const handleRest = async () => {
+    const message = petCareActivity.restPet();
+    toast({
+      title: "Your pet is resting! 😴",
+      description: message,
+      className: "bg-purple-50 border-purple-200"
+    });
+  };
+
+  // Simulate Droplink activities for demo
+  const simulateDroplinkActivity = (activity: keyof typeof droplinkActivity) => {
+    const message = droplinkActivity[activity]();
+    toast({
+      title: "Droplink Activity! ⭐",
+      description: message,
+      className: "bg-yellow-50 border-yellow-200"
+    });
+  };
+
+  const getCurrentMood = () => {
+    const avgStats = Object.values(mascotState.stats).reduce((a, b) => a + b, 0) / 5;
+    if (avgStats >= 85) return 'excited';
+    if (avgStats >= 70) return 'happy';
+    if (avgStats >= 50) return 'content';
+    if (avgStats >= 30) return 'sad';
+    return 'sick';
+  };
+
+  const handleGameEnd = (score: number, xpEarned: number, coinsEarned: number) => {
+    // Add XP through the progression system
+    droplinkActivity.communityEngagement(); // This gives XP
+    
+    toast({
+      title: "DropTap Dash Complete! 🎮",
+      description: `Score: ${score} | +${xpEarned} XP | +${coinsEarned} coins`,
+      className: "bg-green-50 border-green-200"
+    });
+    
+    setShowDropTapDash(false);
+  };
 
   return (
-    <>
-      <Helmet>
-        <title>PlayDrop - Your Virtual Pet Adventure</title>
-        <meta name="description" content="Take care of your virtual droplet pet and watch it grow!" />
-      </Helmet>
-      
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20">
-        {/* Header - My Boo Style */}
-        <div className="bg-gradient-to-r from-blue-400 to-purple-500 text-white relative">
-          <div className="max-w-6xl mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="text-3xl animate-bounce">💧</div>
-                <div>
-                  <h1 className="text-2xl font-bold">
-                    PlayDrop
-                  </h1>
-                  <p className="text-sm opacity-90">Level {userStats.level} • Day {userStats.streak}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 bg-yellow-400 text-black rounded-full px-4 py-2 font-bold">
-                  <span className="text-lg">💰</span>
-                  <span>{userStats.coins}</span>
-                </div>
-                <div className="flex items-center gap-2 bg-white/20 rounded-full px-3 py-2">
-                  <Star className="h-4 w-4 text-yellow-300" />
-                  <span className="font-bold text-sm">{userStats.xp}</span>
-                </div>
-                <IconButton
-                  icon={Settings}
-                  label="Settings"
-                  onClick={() => navigate('/settings')}
-                  className="bg-white/20 hover:bg-white/30"
-                  size="sm"
-                />
-              </div>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="text-center space-y-2 relative">
+          <h1 className="text-3xl font-bold text-gray-800">
+            PlayyDrop Mascot Care
+          </h1>
+          <p className="text-gray-600">
+            Care for your mascot and grow through Droplink activities!
+          </p>
           
-          {/* Decorative wave */}
-          <div className="absolute bottom-0 left-0 right-0">
-            <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block w-full h-6">
-              <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="currentColor"></path>
-              <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="currentColor"></path>
-              <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="currentColor"></path>
-            </svg>
+          {/* Music Toggle Button */}
+          <div className="absolute top-0 right-0">
+            <MusicToggle 
+              variant="outline" 
+              className="bg-white/80 backdrop-blur-sm border-white/50"
+            />
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="max-w-6xl mx-auto px-4 py-6 space-y-6">
-          {/* Pet Display Area - My Boo Style */}
-          <Card className="bg-gradient-to-br from-blue-100 to-purple-100 border-4 border-white shadow-xl">
-            <CardContent className="p-8">
-              <div className="text-center">
-                <div className="text-8xl mb-4 animate-bounce drop-shadow-lg">💧</div>
-                <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  Your Droplet Pet
-                </h2>
-                <p className="text-gray-600 mb-6 text-lg">Happy and energetic!</p>
-                
-                {/* Pet Stats - My Boo Style */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-lg mx-auto">
-                  <div className="bg-white rounded-2xl p-4 shadow-lg border-2 border-red-200">
-                    <div className="flex items-center gap-2 mb-2 justify-center">
-                      <Heart className="h-5 w-5 text-red-500" />
-                      <span className="text-sm font-bold text-red-600">Happy</span>
-                    </div>
-                    <div className="text-2xl font-bold text-red-600">{petStats.happiness}%</div>
-                  </div>
-                  <div className="bg-white rounded-2xl p-4 shadow-lg border-2 border-yellow-200">
-                    <div className="flex items-center gap-2 mb-2 justify-center">
-                      <span className="text-lg">⚡</span>
-                      <span className="text-sm font-bold text-yellow-600">Energy</span>
-                    </div>
-                    <div className="text-2xl font-bold text-yellow-600">{petStats.energy}%</div>
-                  </div>
-                  <div className="bg-white rounded-2xl p-4 shadow-lg border-2 border-green-200">
-                    <div className="flex items-center gap-2 mb-2 justify-center">
-                      <span className="text-lg">🍎</span>
-                      <span className="text-sm font-bold text-green-600">Hunger</span>
-                    </div>
-                    <div className="text-2xl font-bold text-green-600">{petStats.hunger}%</div>
-                  </div>
-                  <div className="bg-white rounded-2xl p-4 shadow-lg border-2 border-blue-200">
-                    <div className="flex items-center gap-2 mb-2 justify-center">
-                      <span className="text-lg">🛁</span>
-                      <span className="text-sm font-bold text-blue-600">Clean</span>
-                    </div>
-                    <div className="text-2xl font-bold text-blue-600">{petStats.cleanliness}%</div>
-                  </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Pet Display */}
+          <Card className="p-6">
+            <CardContent className="space-y-6">
+              {/* Mascot Stage Badge */}
+              <div className="flex justify-between items-center">
+                <Badge className="bg-blue-100 text-blue-800">
+                  {mascotState.stage.toUpperCase()} STAGE
+                </Badge>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowEvolution(!showEvolution)}
+                >
+                  <Star className="w-4 h-4 mr-1" />
+                  Evolution
+                </Button>
+              </div>
+
+              {/* Enhanced Mascot Character with Stage-Based Rendering */}
+              <div className="flex justify-center py-4">
+                <MascotRenderer
+                  stage={mascotState.stage}
+                  mood={getCurrentMood()}
+                  size="large"
+                  isAnimated={true}
+                />
+              </div>
+
+              {/* XP Progress Bar */}
+              <div className="bg-gray-100 rounded-full p-1">
+                <div 
+                  className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full h-4 flex items-center justify-center text-white text-xs font-medium transition-all duration-300"
+                  style={{ 
+                    width: `${mascotState.xpToNext > 0 ? ((mascotState.xp % 1000) / 10) : 100}%`,
+                    minWidth: '20%'
+                  }}
+                >
+                  {mascotState.xp} XP
                 </div>
               </div>
+
+              {/* Stats Display */}
+              <div className="grid grid-cols-2 gap-3">
+                {Object.entries(mascotState.stats).map(([stat, value]) => (
+                  <div key={stat} className="text-center space-y-1">
+                    <div className="text-sm font-medium capitalize">{stat}</div>
+                    <div className="text-xl font-bold text-blue-600">{value}%</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pet Care Actions */}
+              <div className="grid grid-cols-2 gap-3">
+                <Button onClick={handleFeed} className="flex items-center gap-2">
+                  <Utensils className="w-4 h-4" />
+                  Feed
+                </Button>
+                <Button onClick={handlePlay} className="flex items-center gap-2">
+                  <Gamepad2 className="w-4 h-4" />
+                  Play
+                </Button>
+                <Button onClick={handleBathe} className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  Bathe
+                </Button>
+                <Button onClick={handleRest} className="flex items-center gap-2">
+                  <Moon className="w-4 h-4" />
+                  Rest
+                </Button>
+              </div>
+
+              {/* Mini-Game Button */}
+              <Button 
+                onClick={() => setShowDropTapDash(true)}
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                Play DropTap Dash
+              </Button>
             </CardContent>
           </Card>
 
-          {/* Daily Progress */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="border-4 border-white shadow-xl">
-              <CardHeader className="bg-gradient-to-r from-purple-400 to-pink-400 text-white rounded-t-lg">
-                <CardTitle className="flex items-center gap-2">
-                  <Gift className="h-5 w-5" />
-                  Daily Streak
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-purple-600 mb-2">{userStats.streak} Days</div>
-                  <p className="text-gray-600 mb-4">Keep playing to maintain your streak!</p>
-                  <Button 
-                    onClick={() => navigate('/missions')}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-full px-8 py-3 text-lg font-bold shadow-lg"
+          {/* Evolution Panel or Droplink Activities */}
+          {showEvolution ? (
+            <MascotEvolution />
+          ) : (
+            <Card className="p-6">
+              <CardContent className="space-y-6">
+                <h3 className="text-xl font-semibold flex items-center gap-2">
+                  <Heart className="w-5 h-5 text-red-500" />
+                  Earn XP through Droplink
+                </h3>
+
+                {/* Droplink Activity Buttons */}
+                <div className="space-y-3">
+                  <Button
+                    onClick={() => simulateDroplinkActivity('addLink')}
+                    className="w-full justify-start bg-green-500 hover:bg-green-600"
                   >
-                    View Missions
+                    <span className="mr-2">🔗</span>
+                    Add New Link (+50 XP)
+                  </Button>
+                  
+                  <Button
+                    onClick={() => simulateDroplinkActivity('shareLink')}
+                    className="w-full justify-start bg-blue-500 hover:bg-blue-600"
+                  >
+                    <span className="mr-2">📤</span>
+                    Share Link (+75 XP)
+                  </Button>
+                  
+                  <Button
+                    onClick={() => simulateDroplinkActivity('dailyLogin')}
+                    className="w-full justify-start bg-purple-500 hover:bg-purple-600"
+                  >
+                    <span className="mr-2">📅</span>
+                    Daily Login (+100 XP)
+                  </Button>
+                  
+                  <Button
+                    onClick={() => simulateDroplinkActivity('communityEngagement')}
+                    className="w-full justify-start bg-orange-500 hover:bg-orange-600"
+                  >
+                    <span className="mr-2">👥</span>
+                    Community Activity (+150 XP)
+                  </Button>
+                  
+                  <Button
+                    onClick={() => simulateDroplinkActivity('completeProfile')}
+                    className="w-full justify-start bg-pink-500 hover:bg-pink-600"
+                  >
+                    <span className="mr-2">✨</span>
+                    Complete Profile (+200 XP)
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
 
-            <Card className="border-4 border-white shadow-xl">
-              <CardHeader className="bg-gradient-to-r from-blue-400 to-cyan-400 text-white rounded-t-lg">
-                <CardTitle className="flex items-center gap-2">
-                  <Star className="h-5 w-5" />
-                  Today's Goals
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
-                    <span className="font-medium">Feed your pet</span>
-                    <Badge className="bg-green-500 text-white rounded-full">✓ Done</Badge>
+                {/* XP Progress */}
+                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Total XP</span>
+                    <span className="text-blue-600 font-bold">{mascotState.xp}</span>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
-                    <span className="font-medium">Play a mini game</span>
-                    <Badge variant="outline" className="rounded-full">2/3</Badge>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Next Evolution</span>
+                    <span className="text-sm">{mascotState.xpToNext} XP needed</span>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
-                    <span className="font-medium">Clean your pet</span>
-                    <Badge variant="outline" className="rounded-full">Pending</Badge>
+                </div>
+
+                {/* Unlocked Rooms */}
+                <div className="space-y-2">
+                  <h4 className="font-medium">Unlocked Rooms:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {mascotState.roomsUnlocked.map((room) => (
+                      <Badge key={room} variant="outline" className="text-xs">
+                        {room.replace('_', ' ')}
+                      </Badge>
+                    ))}
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </div>
+          )}
         </div>
-
-        <NavigationBar />
       </div>
-    </>
+
+      {/* DropTap Dash Game Modal */}
+      <AnimatePresence>
+        {showDropTapDash && (
+          <DropTapDash
+            mascotStage={mascotState.stage}
+            onGameEnd={handleGameEnd}
+            onClose={() => setShowDropTapDash(false)}
+          />
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 
