@@ -18,7 +18,6 @@ const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
   const [selectedCharacter, setSelectedCharacter] = useState('droplet-blue');
 
   useEffect(() => {
-    // Check if user has completed welcome flow AND pet setup
     const welcomeCompleted = localStorage.getItem('welcomeCompleted');
     const petSetupCompleted = localStorage.getItem('petSetupCompleted');
     const hasSelectedCharacter = localStorage.getItem('selectedCharacter');
@@ -29,7 +28,6 @@ const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
       return;
     }
     
-    // Start with splash screen
     setCurrentStep('splash');
     setShowSplash(true);
   }, []);
@@ -38,7 +36,6 @@ const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
     setCurrentStep('welcome');
     setShowSplash(false);
     
-    // Stagger the welcome animations
     setTimeout(() => setMascotVisible(true), 200);
     setTimeout(() => setWelcomeTextVisible(true), 800);
     setTimeout(() => setButtonsVisible(true), 1400);
@@ -57,7 +54,6 @@ const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
   };
 
   const handleCharacterConfirm = () => {
-    // Save selected character to localStorage
     const selectedCharacterData = { id: selectedCharacter };
     localStorage.setItem('selectedCharacter', JSON.stringify(selectedCharacterData));
     setCurrentStep('tutorial');
@@ -77,7 +73,6 @@ const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
     setCurrentStep('complete');
   };
 
-  // Development bypass - add a skip button in development mode
   const handleDevBypass = () => {
     localStorage.setItem('welcomeCompleted', 'true');
     localStorage.setItem('petSetupCompleted', 'true');
@@ -93,7 +88,6 @@ const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
     return (
       <div className="relative">
         <SplashScreen onComplete={handleSplashComplete} />
-        {/* Development bypass button */}
         {process.env.NODE_ENV === 'development' && (
           <button
             onClick={handleDevBypass}

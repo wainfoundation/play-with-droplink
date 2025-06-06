@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { playSound, sounds } from '@/utils/sounds';
 import { Progress } from "@/components/ui/progress";
 import MascotIcon from './MascotIcon';
 
@@ -15,13 +14,11 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
   const [loadingText, setLoadingText] = useState('Initializing...');
 
   useEffect(() => {
-    // Total loading time in milliseconds - slightly longer for better experience
     const totalLoadTime = 3500;
-    const updateInterval = 50; // More frequent updates for smoother progress
+    const updateInterval = 50;
     const totalUpdates = totalLoadTime / updateInterval;
     const progressIncrement = 100 / totalUpdates;
     
-    // Loading text progression
     const loadingSteps = [
       { progress: 0, text: 'Initializing Pet System...' },
       { progress: 25, text: 'Loading Character Data...' },
@@ -31,12 +28,10 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       { progress: 100, text: 'Welcome to Droplink!' }
     ];
     
-    // Start progress animation
     const interval = setInterval(() => {
       setProgress((prevProgress) => {
         const newProgress = Math.min(prevProgress + progressIncrement, 100);
         
-        // Update loading text based on progress
         const currentStep = loadingSteps.find(step => newProgress >= step.progress);
         if (currentStep) {
           setLoadingText(currentStep.text);
@@ -50,19 +45,8 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       });
     }, updateInterval);
     
-    // Complete the loading after the total time
     const timer = setTimeout(() => {
-      // Play completion sound
-      try {
-        playSound(sounds.loadingComplete, 0.4);
-      } catch (error) {
-        console.log('Sound not available, continuing...');
-      }
-      
-      // Fade out smoothly
       setIsVisible(false);
-      
-      // Small delay for smooth transition
       setTimeout(() => {
         onComplete();
       }, 800);
@@ -98,7 +82,6 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
         className="text-center w-full max-w-md"
       >
-        {/* Mascot Logo with enhanced animation */}
         <motion.div
           className="mx-auto mb-8 h-32 w-32 rounded-xl bg-white p-6 shadow-2xl flex items-center justify-center"
           initial={{ scale: 0.8, rotate: -10, y: 50 }}
@@ -117,7 +100,6 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           <MascotIcon size={80} mood="excited" />
         </motion.div>
         
-        {/* App Name with enhanced styling */}
         <motion.h1 
           className="mb-3 font-poppins text-4xl md:text-5xl lg:text-6xl font-bold text-white drop-shadow-lg"
           initial={{ y: 30, opacity: 0 }}
@@ -127,7 +109,6 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           Play with Droplink
         </motion.h1>
         
-        {/* Enhanced tagline */}
         <motion.p 
           className="text-lg md:text-xl text-white/90 mb-2 font-medium"
           initial={{ y: 20, opacity: 0 }}
@@ -137,7 +118,6 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           Your Pi Network Gaming Hub
         </motion.p>
         
-        {/* Company Name */}
         <motion.p 
           className="text-sm text-white/70 mb-12"
           initial={{ y: 20, opacity: 0 }}
@@ -147,7 +127,6 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           by MRWAIN ORGANIZATION
         </motion.p>
         
-        {/* Loading text with dynamic updates */}
         <motion.p
           className="mt-8 mb-4 text-white/90 font-medium text-lg text-center"
           initial={{ opacity: 0 }}
@@ -157,7 +136,6 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           {loadingText}
         </motion.p>
         
-        {/* Progress Percentage */}
         <motion.p
           className="mb-6 text-white/80 font-semibold text-xl text-center"
           initial={{ opacity: 0 }}
@@ -167,7 +145,6 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           {Math.round(progress)}%
         </motion.p>
         
-        {/* Enhanced Progress Bar - Centered */}
         <motion.div 
           className="w-full max-w-sm mx-auto"
           initial={{ opacity: 0, scale: 0.8 }}
@@ -180,7 +157,6 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           />
         </motion.div>
         
-        {/* Animated decorative elements */}
         <motion.div
           className="absolute top-20 left-20 w-4 h-4 bg-white/30 rounded-full"
           animate={{

@@ -4,74 +4,32 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuthSystem } from "@/hooks/useAuthSystem";
+import { useUser } from "@/context/UserContext";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { Badge } from "@/components/ui/badge";
-import { authenticateWithPi, initPiNetwork, isRunningInPiBrowser } from "@/utils/pi-sdk";
 import { Shield, Zap } from "lucide-react";
 
 export function PiAuthButton() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const navigate = useNavigate();
-  const { refreshUserData } = useAuthSystem();
-
-  // Check if we're in Pi Browser
-  const isPiBrowser = isRunningInPiBrowser();
-  
-  // Check if we're in production mode
-  const isProduction = !import.meta.env.DEV;
-
-  if (!isPiBrowser) {
-    return (
-      <div className="text-center p-4 bg-orange-50 border border-orange-200 rounded-lg">
-        <p className="text-orange-600 font-medium">Pi Browser Required</p>
-        <p className="text-sm text-orange-500 mt-1">
-          This app must be accessed through Pi Browser for authentication.
-        </p>
-        <Button 
-          onClick={() => window.location.href = `https://minepi.com/browser/open?url=${encodeURIComponent(window.location.href)}`}
-          className="mt-3"
-          variant="outline"
-        >
-          Open in Pi Browser
-        </Button>
-      </div>
-    );
-  }
+  const { refreshUserData } = useUser();
 
   const handleAuth = async () => {
     try {
       setIsAuthenticating(true);
       
-      console.log("Initializing Pi SDK...");
-      const initialized = initPiNetwork();
-      if (!initialized) {
-        throw new Error("Failed to initialize Pi SDK");
-      }
-      console.log("Pi SDK initialized successfully");
+      // Simulate Pi Network authentication for development
+      const mockUser = {
+        uid: `pi_user_${Date.now()}`,
+        username: `pioneer_${Math.random().toString(36).substring(7)}`
+      };
 
-      console.log("Starting Pi authentication...");
-      const authResult = await authenticateWithPi(["username", "payments"]);
-      if (!authResult) {
-        throw new Error("Pi authentication failed - no result returned");
-      }
-
-      console.log("Pi auth result:", authResult);
-
-      // Validate required fields from auth result
-      if (!authResult.user?.uid) {
-        throw new Error("No user ID returned from Pi authentication");
-      }
-
-      if (!authResult.user?.username) {
-        throw new Error("No username returned from Pi authentication");
-      }
+      console.log("Mock Pi auth result:", mockUser);
 
       // Create/update user profile in Supabase
       const { data: existingUser, error: fetchError } = await supabase
         .from('user_profiles')
         .select('*')
-        .eq('id', authResult.user.uid)
+        .eq('id', mockUser.uid)
         .single();
 
       if (fetchError && fetchError.code !== 'PGRST116') {
@@ -94,16 +52,16 @@ export function PiAuthButton() {
 
         toast({
           title: "Welcome back!",
-          description: `Welcome back, ${authResult.user.username}!`,
+          description: `Welcome back, ${mockUser.username}!`,
         });
       } else {
         // New user, create profile
         const { error: insertError } = await supabase
           .from('user_profiles')
           .insert({
-            id: authResult.user.uid,
-            username: authResult.user.username,
-            display_name: authResult.user.username,
+            id: mockUser.uid,
+            username: mockUser.username,
+            display_name: mockUser.username,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           });
@@ -115,7 +73,7 @@ export function PiAuthButton() {
 
         toast({
           title: "Account created!",
-          description: `Welcome to PlayDrop, ${authResult.user.username}!`,
+          description: `Welcome to PlayDrop, ${mockUser.username}!`,
         });
       }
 
@@ -123,7 +81,7 @@ export function PiAuthButton() {
       const { error: walletError } = await supabase
         .from('user_wallet')
         .upsert({
-          user_id: authResult.user.uid,
+          user_id: mockUser.uid,
           updated_at: new Date().toISOString()
         }, { 
           onConflict: 'user_id',
@@ -179,15 +137,8 @@ export function PiAuthButton() {
         )}
       </Button>
       
-      <div className={`text-center text-sm p-2 rounded ${
-        isProduction 
-          ? 'text-green-600 bg-green-50' 
-          : 'text-orange-600 bg-orange-50'
-      }`}>
-        {isProduction 
-          ? 'Production mode - Pi Network authentication ready'
-          : 'Development mode - Pi Network sandbox authentication'
-        }
+      <div className="text-center text-sm p-2 rounded bg-orange-50 text-orange-600">
+        Development mode - Mock Pi Network authentication
       </div>
     </div>
   );
