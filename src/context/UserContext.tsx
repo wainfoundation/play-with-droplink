@@ -19,13 +19,24 @@ interface UserProfile {
   tutorial_completed?: boolean;
 }
 
+interface Subscription {
+  plan: string;
+  is_active: boolean;
+  expires_at: string;
+}
+
 interface UserContextType {
   user: User | null;
   profile: UserProfile | null;
   isLoggedIn: boolean;
   loading: boolean;
+  isLoading: boolean; // Alias for loading
+  showAds: boolean;
+  isAdmin: boolean;
+  subscription: Subscription | null;
   refreshUserData: () => Promise<void>;
   signOut: () => Promise<void>;
+  setIsAdmin: (isAdmin: boolean) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -34,6 +45,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
 
   const fetchUserProfile = async (userId: string) => {
     try {
@@ -49,6 +62,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       setProfile(data);
+      
+      // Set admin status based on profile or other criteria
+      if (data?.plan === 'admin' || data?.username === 'admin') {
+        setIsAdmin(true);
+      }
     } catch (error) {
       console.error('Error fetching user profile:', error);
     }
@@ -65,6 +83,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await supabase.auth.signOut();
       setUser(null);
       setProfile(null);
+      setIsAdmin(false);
+      setSubscription(null);
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -80,6 +100,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           await fetchUserProfile(session.user.id);
         } else {
           setProfile(null);
+          setIsAdmin(false);
+          setSubscription(null);
         }
         setLoading(false);
       }
@@ -97,13 +119,21 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
+  // Determine showAds based on plan
+  const showAds = profile?.plan === 'free' || !profile?.plan;
+
   const value = {
     user,
     profile,
     isLoggedIn: !!user,
     loading,
+    isLoading: loading, // Alias for loading
+    showAds,
+    isAdmin,
+    subscription,
     refreshUserData,
-    signOut
+    signOut,
+    setIsAdmin
   };
 
   return (

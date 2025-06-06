@@ -18,8 +18,8 @@ interface ProfileData {
 }
 
 export const useProfileData = (username?: string) => {
-  const { user } = useUser();
-  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const { user, profile } = useUser();
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [links, setLinks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +36,7 @@ export const useProfileData = (username?: string) => {
       }
 
       // Fetch user profile
-      const { data: profileData, error: profileError } = await supabase
+      const { data: fetchedProfileData, error: profileError } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('username', profileUsername)
@@ -49,17 +49,17 @@ export const useProfileData = (username?: string) => {
         throw profileError;
       }
 
-      if (!profileData) {
+      if (!fetchedProfileData) {
         throw new Error('Profile not found');
       }
 
-      setProfile(profileData);
+      setProfileData(fetchedProfileData);
 
       // Fetch user links
       const { data: linksData, error: linksError } = await supabase
         .from('links')
         .select('*')
-        .eq('user_id', profileData.id)
+        .eq('user_id', fetchedProfileData.id)
         .eq('is_active', true)
         .order('position', { ascending: true });
 
@@ -73,7 +73,7 @@ export const useProfileData = (username?: string) => {
       // TODO: Fetch analytics when analytics table is available
       console.log('Analytics fetching not yet implemented - table does not exist');
 
-      return profileData;
+      return fetchedProfileData;
     } catch (error) {
       console.error('Error fetching profile:', error);
       setError(error instanceof Error ? error.message : 'Unknown error');
@@ -85,7 +85,7 @@ export const useProfileData = (username?: string) => {
 
   const updateProfile = async (updates: Partial<ProfileData>) => {
     try {
-      if (!profile) return false;
+      if (!profileData) return false;
 
       const { error } = await supabase
         .from('user_profiles')
@@ -93,12 +93,12 @@ export const useProfileData = (username?: string) => {
           ...updates,
           updated_at: new Date().toISOString()
         })
-        .eq('id', profile.id);
+        .eq('id', profileData.id);
 
       if (error) throw error;
 
       // Update local state
-      setProfile(prev => prev ? { ...prev, ...updates } : null);
+      setProfileData(prev => prev ? { ...prev, ...updates } : null);
       return true;
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -107,14 +107,14 @@ export const useProfileData = (username?: string) => {
   };
 
   useEffect(() => {
-    if (username || user?.username) {
-      fetchProfile(username || user?.username);
+    if (username || profile?.username) {
+      fetchProfile(username || profile?.username);
     }
-  }, [username, user?.username]);
+  }, [username, profile?.username]);
 
   return {
-    profile,
-    profileData: profile,
+    profile: profileData,
+    profileData,
     links,
     loading,
     error,

@@ -19,16 +19,16 @@ const LinksSection = () => {
   const [isEditingLink, setIsEditingLink] = useState<string | null>(null);
   const [profileUrl, setProfileUrl] = useState<string>("");
   const [previousLinkCount, setPreviousLinkCount] = useState(0);
-  const { user } = useUser(); // Updated to use user instead of profile
+  const { user, profile } = useUser();
   const { links, isLoading, fetchLinks, handleReorderLink } = useLinks(user?.id);
   const { plan, limits } = useUserPlan();
   const { openUpgradeModal } = useUpgradeModal();
 
   useEffect(() => {
-    if (user?.username) { // Updated to use user instead of profile
-      setProfileUrl(`https://droplink.space/@${user.username}`);
+    if (profile?.username) {
+      setProfileUrl(`https://droplink.space/@${profile.username}`);
     }
-  }, [user]); // Updated dependency
+  }, [profile]);
 
   // Check if user has completed initial link setup
   useEffect(() => {
@@ -123,7 +123,7 @@ const LinksSection = () => {
       <CardContent>
         <ProfileUrlDisplay 
           profileUrl={profileUrl} 
-          username={user?.username} // Updated to use user instead of profile
+          username={profile?.username}
         />
         
         {renderContent()}
