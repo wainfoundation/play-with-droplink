@@ -4,12 +4,14 @@ import SplashScreen from '@/components/SplashScreen';
 import WelcomeHome from '@/components/welcome/WelcomeHome';
 import CharacterSelection from '@/components/welcome/CharacterSelection';
 import GameTutorial from '@/components/welcome/GameTutorial';
+import { useUser } from '@/context/UserContext';
 
 interface SplashWrapperProps {
   children: React.ReactNode;
 }
 
 const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
+  const { isLoggedIn, loading } = useUser();
   const [currentStep, setCurrentStep] = useState<'splash' | 'welcome' | 'character' | 'tutorial' | 'complete'>('splash');
   const [showSplash, setShowSplash] = useState(true);
   const [mascotVisible, setMascotVisible] = useState(false);
@@ -18,21 +20,38 @@ const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
   const [selectedCharacter, setSelectedCharacter] = useState('droplet-blue');
 
   useEffect(() => {
+    // Wait for auth loading to complete
+    if (loading) return;
+
     const welcomeCompleted = localStorage.getItem('welcomeCompleted');
     const petSetupCompleted = localStorage.getItem('petSetupCompleted');
     const hasSelectedCharacter = localStorage.getItem('selectedCharacter');
     
-    if (welcomeCompleted === 'true' && petSetupCompleted === 'true' && hasSelectedCharacter) {
+    // If user is logged in and has completed setup, skip to main app
+    if (isLoggedIn && welcomeCompleted === 'true' && petSetupCompleted === 'true' && hasSelectedCharacter) {
       setCurrentStep('complete');
       setShowSplash(false);
       return;
     }
     
-    setCurrentStep('splash');
-    setShowSplash(true);
-  }, []);
+    // If user is not logged in, show splash and then redirect to auth
+    if (!isLoggedIn) {
+      setCurrentStep('splash');
+      setShowSplash(true);
+    } else {
+      // User is logged in but hasn't completed setup
+      setCurrentStep('welcome');
+      setShowSplash(false);
+    }
+  }, [isLoggedIn, loading]);
 
   const handleSplashComplete = () => {
+    if (!isLoggedIn) {
+      // Redirect to auth page for non-authenticated users
+      window.location.href = '/auth';
+      return;
+    }
+
     setCurrentStep('welcome');
     setShowSplash(false);
     
@@ -65,11 +84,13 @@ const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
 
   const handleTutorialComplete = () => {
     localStorage.setItem('welcomeCompleted', 'true');
+    localStorage.setItem('petSetupCompleted', 'true');
     setCurrentStep('complete');
   };
 
   const handleSkipWelcome = () => {
     localStorage.setItem('welcomeCompleted', 'true');
+    localStorage.setItem('petSetupCompleted', 'true');
     setCurrentStep('complete');
   };
 
@@ -79,6 +100,17 @@ const SplashWrapper: React.FC<SplashWrapperProps> = ({ children }) => {
     localStorage.setItem('devBypass', 'true');
     setCurrentStep('complete');
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (currentStep === 'complete') {
     return <>{children}</>;

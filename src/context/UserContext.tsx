@@ -1,6 +1,7 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { User, Session } from '@supabase/supabase-js';
 
 interface UserProfile {
   id: string;
@@ -8,117 +9,105 @@ interface UserProfile {
   display_name?: string;
   avatar_url?: string;
   bio?: string;
-  pi_domain?: string;
-  custom_domain?: string;
-  plan?: string;
   pi_wallet_address?: string;
-  total_score?: number;
-  games_played?: number;
-  created_at?: string;
-  updated_at?: string;
+  plan?: string;
+  daily_streak?: number;
+  last_daily_claim?: string;
+  xp?: number;
+  level?: number;
+  selected_room?: string;
+  tutorial_completed?: boolean;
 }
 
 interface UserContextType {
-  user: UserProfile | null;
-  profile: UserProfile | null; // Added profile alias
+  user: User | null;
+  profile: UserProfile | null;
   isLoggedIn: boolean;
   loading: boolean;
-  isAdmin: boolean; // Added isAdmin
-  showAds: boolean; // Added showAds
-  subscription: any; // Added subscription
-  isLoading: boolean; // Added isLoading alias
-  refreshUser: () => Promise<void>;
-  refreshUserData: () => Promise<void>; // Added refreshUserData alias
-  setIsAdmin: (isAdmin: boolean) => void; // Added setIsAdmin
-  signOut: () => Promise<void>; // Added signOut
+  refreshUserData: () => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
-const UserContext = createContext<UserContextType>({
-  user: null,
-  profile: null,
-  isLoggedIn: false,
-  loading: true,
-  isAdmin: false,
-  showAds: true,
-  subscription: null,
-  isLoading: true,
-  refreshUser: async () => {},
-  refreshUserData: async () => {},
-  setIsAdmin: () => {},
-  signOut: async () => {},
-});
+const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
 
-  const refreshUser = async () => {
+  const fetchUserProfile = async (userId: string) => {
     try {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      
-      if (authUser) {
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('id', authUser.id)
-          .single();
-        
-        setUser(profile);
-      } else {
-        setUser(null);
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching user profile:', error);
+        return;
       }
+
+      setProfile(data);
     } catch (error) {
-      console.error('Error fetching user:', error);
-      setUser(null);
-    } finally {
-      setLoading(false);
+      console.error('Error fetching user profile:', error);
+    }
+  };
+
+  const refreshUserData = async () => {
+    if (user) {
+      await fetchUserProfile(user.id);
     }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setIsAdmin(false);
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+      setProfile(null);
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
-  // Calculate showAds based on user plan
-  const showAds = user?.plan === 'free' || !user?.plan;
-
   useEffect(() => {
-    refreshUser();
-
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (event === 'SIGNED_IN' && session?.user) {
-          await refreshUser();
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null);
-          setIsAdmin(false);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          await fetchUserProfile(session.user.id);
+        } else {
+          setProfile(null);
         }
+        setLoading(false);
       }
     );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserProfile(session.user.id);
+      }
+      setLoading(false);
+    });
 
     return () => subscription.unsubscribe();
   }, []);
 
+  const value = {
+    user,
+    profile,
+    isLoggedIn: !!user,
+    loading,
+    refreshUserData,
+    signOut
+  };
+
   return (
-    <UserContext.Provider 
-      value={{ 
-        user, 
-        profile: user, // profile is an alias for user
-        isLoggedIn: !!user, 
-        loading,
-        isAdmin,
-        showAds,
-        subscription: null, // placeholder for subscription
-        isLoading: loading, // isLoading is an alias for loading
-        refreshUser,
-        refreshUserData: refreshUser, // refreshUserData is an alias for refreshUser
-        setIsAdmin,
-        signOut
-      }}
-    >
+    <UserContext.Provider value={value}>
       {children}
     </UserContext.Provider>
   );
@@ -126,7 +115,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useUser = () => {
   const context = useContext(UserContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useUser must be used within a UserProvider');
   }
   return context;
